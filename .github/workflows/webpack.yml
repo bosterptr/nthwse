@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
     - uses: actions/checkout@v4
 
@@ -21,13 +21,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
-      run: cd frontend && npm install
+      run: npm install
 
     - name: Build project
-      run: cd frontend && npm run build
+      run: npm run build
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./frontend/build  # Ścieżka do katalogu, gdzie znajduje się zbudowany projekt
+        publish_dir: ./frontend/build
