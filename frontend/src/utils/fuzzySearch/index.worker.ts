@@ -3,7 +3,6 @@ import { expose } from 'comlink';
 import initSearchModule, {
   init,
   search,
-  // similarities_to_search_results,
   substring_search,
 } from 'fuzzy_search';
 
@@ -28,17 +27,6 @@ export class WebWorkerFuzzSearcher {
     if (!this.loaded) throw new Error('You need to initialize the worker');
     return substring_search(query, Int32Array.from(filterByTags));
   }
-
-  // public async similaritesToSearchResults(
-  //   similarities: number[],
-  //   filterByTags: number[],
-  // ): Promise<SearchResult[]> {
-  //   if (!this.loaded) throw new Error('You need to initialize the worker');
-  //   return similarities_to_search_results(
-  //     Float32Array.from(similarities),
-  //     Int32Array.from(filterByTags),
-  //   );
-  // }
 }
 
 expose(WebWorkerFuzzSearcher);
