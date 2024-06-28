@@ -1,0 +1,377 @@
+<html><head>
+<title>HTTP Hacking with Python</title>
+</head>
+<body bgcolor="#cccccc" style="font-family:Arial">
+<h1>HTTP Hacking with Python</h1>
+<h2>What You Need</h2>
+Any computer with Python 2.7 installed.
+<h2>Purpose</h2>
+Learn Python HTTP Methods.
+<hr>
+<h1>Task 1: Using HEAD to Grab HTTP Banners</h1>
+Using a text editor such as Notepad,
+enter this code, as
+shown below:
+<blockquote><code><big><b><pre>import socket
+s = socket.socket()
+s.settimeout(2)
+
+target = 'ad.samsclass.info'
+
+s.connect((target, 80))
+s.send('HEAD / HTTP/1.1\nHost: ' + target + '\n\n')
+print s.recv(1024)
+s.close()
+</pre></b></big></code></blockquote>
+<p><img src="VPhttp1.png" border="1"></p><p>
+Save the file as <b>head.py</b>.
+Save it in
+the C:\python27 folder.
+</p><h2>Running the HEAD Script</h2>
+In a Command Prompt window,
+execute these commands to
+run the
+head.py program.
+<blockquote><code><big><b><pre>cd C:\python27
+python head.py
+</pre></b></big></code></blockquote>
+You should see an HTTP banner,
+telling you that my server uses
+Apache on Ubuntu Linux,
+as shown below:
+<p><img src="VPhttp2.png" border="1"></p><p>
+</p><blockquote><table cellpadding="10" border="1"><tbody><tr><td>
+<h2>Explanation</h2>
+This code connects on TCP port 80 just like
+the scanner you made in a previous project,
+but once it connects, it sends an HTTP
+request like this:
+<blockquote><code><big><b><pre>HEAD / HTTP/1.1
+Host: www.ccsf.edu
+</pre></b></big></code></blockquote>
+The HEAD method grabs only the banner,
+without getting any pages from the server.
+</td></tr></tbody></table></blockquote>
+<hr>
+<h1>Task 2: Using POST to Log In</h1>
+This is a simple login form.
+Try logging in with a username of
+<b>foo</b> and a password of
+<b>bar</b>.
+<p>
+</p><blockquote><table cellpadding="10" border="1"><tbody><tr><td>
+<form action="https://games.samsclass.info/python/login1.php" method="post">
+<p>
+<font size="4">Username:</font> &nbsp; &nbsp; &nbsp;
+<textarea name="u" rows="1" cols="25"></textarea>
+</p><p>
+<font size="4">Password:</font> &nbsp; &nbsp; &nbsp;
+<textarea name="p" rows="1" cols="25"></textarea>
+</p><p>
+<input type="submit" value="LOG IN">
+</p></form>
+</td></tr></tbody></table></blockquote>
+Your credentials are rejected, as shown below.
+<p><img src="VPhttp3.png" border="1"></p><p>
+</p><h2>Using Chrome Developer Tools</h2>
+For the next step, you need Chrome. If you
+don't have it,
+<a href="https://www.google.com/chrome/browser/desktop/">
+get it here</a>.
+<p>
+You should be viewing this page in Chrome.
+</p><p>
+From the Chrome menu bar, click
+<b>View</b>,
+<b>Developer</b>,
+"<b>Developer Tools</b>".
+</p><p>
+In the Developer Tools pane, at
+the top, click <b>Network</b>.
+</p><p>
+Log in again with a username of
+<b>foo</b> and a password of
+<b>bar</b>.
+</p><p>
+The Developer Tools shows a network
+request to "login1.php",
+as shown below.
+</p><p><img src="VPhttp4.png" border="1"></p><p>
+In the "Developer Tools" pane,
+click <b>login1.php</b>. Details of the
+network request appear.
+</p><p>
+In the "Request Headers" section,
+click "<b>view source</b>",
+as shown below.
+</p><p><img src="VPhttp5.png" border="1"></p><p>
+A block of text appears, beginning with
+"POST". Highlight all this text with
+your mouse, right-click, and click
+<b>Copy</b>,
+as shown below.
+</p><p><img src="VPhttp6.png" border="1"></p><p>
+</p><h2>Making a Python POST Login Script</h2>
+In a Command Prompt window,
+execute these commands to copy
+the head.py script, and edit the
+post.py script:
+<p>
+</p><blockquote><code><big><b><pre>cd C:\python27
+copy head.py post.py
+notepad post.py
+</pre></b></big></code></blockquote>
+In Notepad, after the line beginning
+with "target",
+type this text:
+<blockquote><code><big><b><pre>req = """
+</pre></b></big></code></blockquote>
+Point your mouse cursor just to
+the right of the three quotation marks,
+right-click, and click
+<b>Paste</b>,
+as shown below.
+<p><img src="VPhttp7.png" border="1"></p><p>
+The request lines appear,
+as shown below.
+</p><p><img src="VPhttp8.png" border="1"></p><p>
+After the request lines, press
+<b>Enter</b> twice, and add this text:
+</p><blockquote><code><big><b><pre>u=foo&amp;p=bar"""
+</pre></b></big></code></blockquote>
+Your script should look like the
+example shown below.
+<p><img src="VPhttp9.png" border="1"></p><p>
+In the "s.send" line,
+remove all the text between the parentheses
+and replace it with <b>req</b>,
+as shown below.
+</p><p><img src="VPhttp10.png" border="1"></p><p>
+</p><h2>Running the POST Script</h2>
+In a Command Prompt window,
+execute this command to run the
+post.py program.
+<blockquote><code><big><b><pre>python post.py
+</pre></b></big></code></blockquote>
+You should see a response beginning
+with "HTTP/1.1 200 OK",
+as shown below.
+<p><img src="VPhttp11.png" border="1"></p><p>
+</p><h2>Requesting Plain Text</h2>
+Notice the strange symbols at the end
+of the response. This is the Web page
+saying your credentials were rejected,
+but it's zipped and unreadable. This
+happens because our request allowed the
+server to send the data with
+"Content-Encoding: gzip". That works in
+a Web browser, but we want plain, readable
+text.
+<p>
+To get that, we need to remove
+the "Accpt-Encoding" tag.
+</p><p>
+In Notepad, find the line
+starting with "Accept-Encoding",
+as highlighted in the image below.
+</p><p><img src="VPhttp12.png" border="1"></p><p>
+Delete that line entirely,
+as shown below.
+</p><p><img src="VPhttp13.png" border="1"></p><p>
+In Notepad, save the "post.py" file.
+</p><p>
+In the Command Prompt window,
+execute this command to run the
+post.py program.
+</p><blockquote><code><big><b><pre>python post.py
+</pre></b></big></code></blockquote>
+Now you get a readable response,
+as shown below.
+<p><img src="VPhttp14.png" border="1"></p><p>
+</p><h2>Putting the Username and Password into Variables</h2>
+In Notepad, modify your script to use variables
+for the username and password, as shown below.
+<p>
+The changed lines are outlined in green.
+</p><p><img src="VPhttp15.png" border="1"></p><p>
+In Notepad, save the modified program.
+</p><p>
+In the Command Prompt window,
+execute this command to run the
+post.py program.
+</p><blockquote><code><big><b><pre>python post.py
+</pre></b></big></code></blockquote>
+You get the same response,
+as shown below.
+<p><img src="VPhttp14.png" border="1"></p><p>
+</p><h2>Changing the Username and Password</h2>
+In Notepad, modify your script so the username
+is <b>root</b> and the password is <b>toor</b>,
+as shown below.
+<p><img src="VPhttp16.png" border="1"></p><p>
+In Notepad, save the modified program.
+</p><p>
+In the Command Prompt window,
+execute this command to run the
+post.py program.
+</p><blockquote><code><big><b><pre>python post.py
+</pre></b></big></code></blockquote>
+You get a "socket.timeout" error message,
+as shown below.
+<p><img src="VPhttp17.png" border="1"></p><p>
+</p><h2>Changing Content-Length</h2>
+Why is this script failing? It's because
+we changed the length of the username
+and password without also changing
+the "Content-Length" line to match.
+<p>
+In Notepad, modify your script as shown below,
+to calculate the correct Content-Length
+and insert it into the request.
+</p><p><img src="VPhttp18.png" border="1"></p><p>
+In Notepad, save the modified program.
+</p><p>
+In the Command Prompt window,
+execute this command to run the
+post.py program.
+</p><blockquote><code><big><b><pre>python post.py
+</pre></b></big></code></blockquote>
+Now you get a "200 OK" response,
+as shown below.
+<p><img src="VPhttp19.png" border="1"></p><p>
+</p><h2>Using a Different Password</h2>
+In Notepad, modify your script to
+use a password of
+<blockquote><code><big><b><pre>password
+</pre></b></big></code></blockquote>
+instead of "toor".
+<p>
+Run that script to get a
+"Successful Login" message,
+as shown below.
+</p><p><img src="VPhttp20.png" border="1"></p><p>
+</p><hr>
+<h1>Task 3: Using Loops</h1>
+<h2>Looping Through String Values</h2>
+In Notepad, create this
+script. Save it
+with the filename <b>loop1.py</b>
+<p><img src="VPhttp21.png" border="1"></p><p>
+In the Command Prompt window,
+run the
+loop1.py program.
+</p><p>
+You should see four lines of output,
+as shown below.
+</p><p><img src="VPhttp22.png" border="1"></p><p>
+</p><h2>Looping Through Numerical Values</h2>
+In Notepad, create this
+script. Save it
+with the filename <b>loop2.py</b>
+<p><img src="VPhttp23.png" border="1"></p><p>
+In the Command Prompt window,
+run the
+loop2.py program.
+</p><p>
+You should see five lines of output,
+as shown below.
+</p><p><img src="VPhttp24.png" border="1"></p><p>
+</p><hr>
+<h1>Challenge 1: Brute Forcing a Login Form (15)</h1>
+Write a script in Python to try all possible
+credentials and get into the form below.
+<p>
+The user name is one of these:
+</p><ul>
+<li>bill
+</li><li>ted
+</li><li>sally
+</li><li>sue
+</li></ul>
+The PIN is a two-digit number, like
+this:
+<ul>
+<li>00
+</li><li>01
+</li><li>02 <br>
+... <br>
+</li><li>98
+</li><li>99
+</li></ul>
+<blockquote><table cellpadding="10" border="1"><tbody><tr><td>
+<form action="https://games.samsclass.info/python/login2r.php" method="post">
+<table cellpadding="10">
+<tbody><tr><td><b><big>Username:</big></b></td>
+<td><textarea name="u" rows="1" cols="10"></textarea></td></tr>
+<tr><td><b><big>PIN:</big></b></td>
+<td><textarea name="p" rows="1" cols="2"></textarea></td></tr>
+</tbody></table>
+<p align="center">
+<input type="submit" value="LOG IN">
+</p>
+</form>
+</td></tr></tbody></table></blockquote>
+Write a script that finds the correct
+credentials and logs in.
+<p>
+When you find it,
+you'll be able to get your name onto the
+<a href="https://games.samsclass.info/tmp/VPlogin2-winners.html"><b>WINNERS PAGE</b></a>
+as shown below:
+</p><p><img src="VPhttp50.png" border="1"></p><p>
+</p><blockquote>
+<table cellpadding="10" border="5"><tbody><tr><td>
+<h2>Hints</h2>
+1. Don't just use the same script you created
+earlier. Examine a login with Chrome Developer Tools
+to see how this login differs from the previous one.
+<p>
+2. Apache only allows
+you to make 100 HTTP requests before you need to close the connection and re-open it.
+</p></td></tr></tbody></table>
+</blockquote>
+<hr>
+<h1>Challenge 2: Four Accounts (50)</h1>
+Break into each of the four accounts below.
+<p>
+You'll be able to get your name onto these pages:
+</p><ul>
+<li><a href="https://games.samsclass.info/tmp/VPlogin3a-winners"><b>WINNERS A</b></a>
+</li><li><a href="https://games.samsclass.info/tmp/VPlogin3b-winners"><b>WINNERS B</b></a>
+</li><li><a href="https://games.samsclass.info/tmp/VPlogin3c-winners"><b>WINNERS C</b></a>
+</li><li><a href="https://games.samsclass.info/tmp/VPlogin3d-winners"><b>WINNERS D</b></a>
+</li></ul>
+<blockquote><table cellpadding="10" border="1"><tbody><tr><td>
+<form action="https://games.samsclass.info/python/login3r.php" method="post">
+<p>
+<font size="4">Username:</font> &nbsp; &nbsp; &nbsp;
+<textarea name="u" rows="1" cols="25"></textarea>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<font size="4">PIN:</font>
+&nbsp;&nbsp;&nbsp;<textarea name="p" rows="1" cols="3"></textarea>
+</p><p>
+<input type="submit" value="SUBMIT">
+</p></form>
+<h2>Credits</h2>
+CEO: Sarah Bellum<br>
+Staff: Pete Moss, Sandy Beach
+<br>
+(Stolen from
+<a href="http://prairiehome.publicradio.org/features/hodgepodge/19980911_season24/">
+A Prairie Home Companion</a>)
+</td></tr></tbody></table></blockquote>
+<blockquote>
+<table cellpadding="10" border="5"><tbody><tr><td>
+<h2>Hints</h2>
+1. First try logging in by hand. Examine the
+error messages you get to find out what names
+and password types are used.
+<p>
+2. You need to find four accounts, but only three employee names are shown. Think about what other account is needed, why it would not appear in the list of employees, and why it might not have the same security policies.
+</p></td></tr></tbody></table>
+</blockquote>
+<hr>
+Updated to https PHP links 10-20-18 <br>
+
+
+</body></html>

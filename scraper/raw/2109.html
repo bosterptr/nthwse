@@ -1,0 +1,333 @@
+<html lang="en"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp">
+        <title>PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE - 0xv1n</title><meta name="Description" content="ctf. cybersecurity. malware."><meta property="og:url" content="http://0xv1n.github.io/posts/scmanager/">
+  <meta property="og:site_name" content="0xv1n">
+  <meta property="og:title" content="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE">
+  <meta property="og:description" content="Living off the Land Earlier this week, Grzegorz Tworek posted a really cool way of establishing a persistent LPE that I haven’t previously seen in the wild. From a (compromised) privileged account we can abuse the Service Control Manager to allow any arbitrary non-administrative user to have full SYSTEM permissions on a machine persistently by feeding an overly permissive ACL to the service control manager with sdset.
+Some background knowledge Understanding what this attack is doing will require some light reading into both sdset as well as Microsoft’s Security Descriptor Definition Language (SDDL).">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-02-27T00:00:00+00:00">
+    <meta property="article:modified_time" content="2023-02-27T00:00:00+00:00">
+    <meta property="article:tag" content="Service">
+    <meta property="article:tag" content="Sdmanager">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE">
+  <meta name="twitter:description" content="Living off the Land Earlier this week, Grzegorz Tworek posted a really cool way of establishing a persistent LPE that I haven’t previously seen in the wild. From a (compromised) privileged account we can abuse the Service Control Manager to allow any arbitrary non-administrative user to have full SYSTEM permissions on a machine persistently by feeding an overly permissive ACL to the service control manager with sdset.
+Some background knowledge Understanding what this attack is doing will require some light reading into both sdset as well as Microsoft’s Security Descriptor Definition Language (SDDL).">
+      <meta name="twitter:site" content="@0xv1nx0">
+<meta name="application-name" content="0xv1n">
+<meta name="apple-mobile-web-app-title" content="0xv1n"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://0xv1n.github.io/posts/scmanager/"><link rel="prev" href="http://0xv1n.github.io/posts/crackme8/"><link rel="next" href="http://0xv1n.github.io/posts/processprotection/"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PrivEsc: Abusing the Service Control Manager for Stealthy \u0026 Persistent LPE",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/0xv1n.github.io\/posts\/scmanager\/"
+        },"genre": "posts","keywords": "service, sdmanager","wordcount":  948 ,
+        "url": "http:\/\/0xv1n.github.io\/posts\/scmanager\/","datePublished": "2023-02-27T00:00:00+00:00","dateModified": "2023-02-27T00:00:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "0xv1n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="0xv1n">0xv1n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/about/"> About Me </a><a class="menu-item" href="/tifa/"> Tifa </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;"><input type="text" placeholder="Search titles or contents..." id="search-input-desktop" class="input" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" style="position: relative; vertical-align: top;" dir="auto"><pre aria-hidden="true" style="position: absolute; visibility: hidden; white-space: pre; font-family: system-ui, -apple-system, Segoe UI, Roboto, Emoji, Helvetica, Arial, sans-serif; font-size: 16px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: normal; text-indent: 0px; text-rendering: optimizelegibility; text-transform: none;"></pre></span>
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="0xv1n">0xv1n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/about/" title="">About Me</a><a class="menu-item" href="/tifa/" title="">Tifa</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop" style="position: relative;"><span class="dropdown-menu" style="position: absolute; z-index: 100; display: none; top: 0px; left: 0px; right: auto;" role="listbox" id="algolia-autocomplete-listbox-0"><div class="dataset-search"></div></span></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto" style="left: 1009.43px; max-width: 270.567px; visibility: visible; position: absolute; top: 160px;">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li class="has-active"><a href="#dakawd--wat" class="active">D:(A;;KA;;;WD) … wat.</a>
+      <ul>
+        <li><a href="#ace-security-principals">ACE Security Principals</a></li>
+        <li><a href="#tldr">TL;DR</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#examining-our-normal-users-permissions">Examining our normal user’s permissions.</a></li>
+    <li><a href="#modify-the-permissions-of-scmanager-via-sdset">Modify the permissions of SCMANAGER via SDSET</a></li>
+    <li><a href="#confirm-changes-took-place">Confirm changes took place</a></li>
+    <li><a href="#create-a-malicious-service-for-persistent-lpe">Create a malicious Service for persistent LPE</a></li>
+    <li><a href="#restart-machine">Restart Machine</a></li>
+    <li><a href="#persistent-local-privilege-escalation">Persistent Local Privilege Escalation</a></li>
+  </ul>
+</nav></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>0xv1n</a></span>&nbsp;<span class="post-category">included in <a href="/categories/redteam/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Redteam</a>&nbsp;<a href="/categories/persistence/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Persistence</a>&nbsp;<a href="/categories/privesc/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Privesc</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-02-27">2023-02-27</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;948 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static" data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"></div>
+            </div><div class="content" id="content"><h1 id="living-off-the-land" class="headerLink"><a href="#living-off-the-land" class="header-mark"></a>Living off the Land</h1>
+<p>Earlier this week, <a href="https://twitter.com/0gtweet" target="_blank" rel="noopener noreffer ">Grzegorz Tworek</a> posted a <a href="https://twitter.com/0gtweet/status/1628720819537936386?cxt=HHwWhIC87Ze9sJotAAAA" target="_blank" rel="noopener noreffer ">really cool way of establishing a persistent LPE that I haven’t previously seen in the wild</a>. From a (<em>compromised</em>) privileged account we can abuse the Service Control Manager to allow any arbitrary non-administrative user to have full <strong>SYSTEM</strong> permissions on a machine persistently by feeding an overly permissive ACL to the service control manager with <code>sdset</code>.</p>
+<h1 id="some-background-knowledge" class="headerLink"><a href="#some-background-knowledge" class="header-mark"></a>Some background knowledge</h1>
+<p>Understanding what this attack is doing will require some light reading into both <a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc742037%28v=ws.11%29" target="_blank" rel="noopener noreffer ">sdset</a> as well as Microsoft’s <strong>Security Descriptor Definition Language</strong> (<a href="https://go.microsoft.com/fwlink/?LinkID=570" target="_blank" rel="noopener noreffer ">SDDL</a>). But… to summarize both articles for you, we just need to know the format of a <em>Security Descriptor string</em> contains tokens to indicate each of the four main components of a security descriptor: <strong>owner</strong> (O:), <strong>primary group</strong> (G:), <strong>DACL</strong> (D:), <strong>SACL</strong> (S:), as well as tokens for the access-control entity. Security Descriptors can contain any combination of these tokens, and not all are necessarily required as we will demonstrate below.</p>
+<p>Per the tweet, we just need to run <code>sc.exe sdset scmanager D:(A;;KA;;;WD)</code> from an elevated Windows shell (i.e. something with local admin privilege). Before I demonstrate the entire attack, let’s break this down a little more.</p>
+<h2 id="dakawd--wat" class="headerLink"><a href="#dakawd--wat" class="header-mark"></a>D:(A;;KA;;;WD) … wat.</h2>
+<p>If you’re like me, and have a very limited knowledge of how these Microsoft SDDL tokens work or what each portion represents, we should take some time to understand a little more. (<em>You know, learn something new and all that jazz</em>)</p>
+<p>So what is this string actually representing? Let’s break each component down. To start, we should know the general access control entry syntax:</p>
+<p><code>ace_type;ace_flags;rights;object_guid;inherit_object_guid;account_sid;(resource_attribute)</code></p>
+<ul>
+<li><strong>D:</strong> Discretionary ACL (DACL)
+<ul>
+<li><em>A DACL identifies users and groups who are allowed or denied access to an object.</em></li>
+</ul>
+</li>
+<li><strong>A;</strong> Access Allowed (<code>ace_type</code>)
+<ul>
+<li>This first segment represents the beginning of the access-control entry (<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ifs/ace" target="_blank" rel="noopener noreffer ">ACE</a>). An ACL contains a list of ACEs. An ACE defines access to an object for a specific user or group or defines the types of access that generate system-administration messages or alarms for a specific user or group. The user or group is identified by a security identifier (SID).</li>
+</ul>
+</li>
+<li><code>ace_flags</code> is empty</li>
+<li><strong>KA;</strong> KEY_ALL_ACCESS (<code>rights</code>)
+<ul>
+<li>This token can also refer to Domain key credential administrators if used in the context of a SID, which isn’t at all confusing. All we need to know is this gives access to <strong>all</strong> registry keys related to SDDL.</li>
+</ul>
+</li>
+<li><code>object_guid</code> is empty</li>
+<li><code>inherit_object_guid</code> is empty</li>
+<li><strong>WD</strong> - Security Principal of Everyone (<code>account_sid</code>)
+<ul>
+<li>Below you’ll find a table of some common security principals we can reference in an SDDL string.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ace-security-principals" class="headerLink"><a href="#ace-security-principals" class="header-mark"></a>ACE Security Principals</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Abbreviation</th>
+<th>Security Principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AU</td>
+<td>Authenticated Users</td>
+</tr>
+<tr>
+<td>BA</td>
+<td>Built-in administrators</td>
+</tr>
+<tr>
+<td>SY</td>
+<td>Local System</td>
+</tr>
+<tr>
+<td>BU</td>
+<td>Built-in users</td>
+</tr>
+<tr>
+<td>WD</td>
+<td>Everyone</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="tldr" class="headerLink"><a href="#tldr" class="header-mark"></a>TL;DR</h3>
+<p>The TL;DR here is, this command grants <strong>everyone</strong>, <strong>all</strong>, permissions on the service control manager. Meaning, I can (as a non-privileged user) create a service that will allow me to execute any arbitrary command as if I were <strong>SYSTEM</strong> due to the <code>scmanager</code> running as <strong>SYSTEM</strong> context. There’s a million articles you can read like <a href="https://learn.microsoft.com/en-us/windows/win32/secauthz/ace-strings" target="_blank" rel="noopener noreffer ">this one</a> if you want more technical references.</p>
+<h1 id="example-attack-flow" class="headerLink"><a href="#example-attack-flow" class="header-mark"></a>Example Attack Flow</h1>
+<h2 id="examining-our-normal-users-permissions" class="headerLink"><a href="#examining-our-normal-users-permissions" class="header-mark"></a>Examining our normal user’s permissions.</h2>
+<p>So to start, we will use a non-privileged account and output the user information. Here I’m just basically demonstrating that the account we will privesc from has <strong>no administrative privileges</strong>.</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/normaluser.png" data-srcset="/images/privesc/scmanager/normaluser.png, /images/privesc/scmanager/normaluser.png 1.5x, /images/privesc/scmanager/normaluser.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/normaluser.png" title="/images/privesc/scmanager/normaluser.png" width="602" height="603"></p>
+<h2 id="modify-the-permissions-of-scmanager-via-sdset" class="headerLink"><a href="#modify-the-permissions-of-scmanager-via-sdset" class="header-mark"></a>Modify the permissions of SCMANAGER via SDSET</h2>
+<p>Next, we execute the command to modify the <code>scmanager</code> ACL from our elevated command prompt. This must be done with an administrative account (<em>the one that’s been compromised</em>):</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/sdsetcmd.png" data-srcset="/images/privesc/scmanager/sdsetcmd.png, /images/privesc/scmanager/sdsetcmd.png 1.5x, /images/privesc/scmanager/sdsetcmd.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/sdsetcmd.png" title="/images/privesc/scmanager/sdsetcmd.png" width="509" height="92"></p>
+<div class="details admonition warning open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-exclamation-triangle fa-fw" aria-hidden="true"></i>DETECTION OPPORTUNITY<i class="details-icon fas fa-angle-right fa-fw" aria-hidden="true"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content">Modifications to the ACL of the service-control manager should be scrutinized heavily. Below is a sample sigma rule to detect this blog’s POC behavior:</div>
+        </div>
+    </div>
+<div class="highlight"><div class="chroma open"><div class="code-header language-yaml"><span class="code-title"><i class="arrow fas fa-chevron-right fa-fw" aria-hidden="true"></i></span><span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span><span class="copy" data-clipboard-text="title: DACL Modification of Service Control Manager via sdset
+id: 8998782b-66de-44e7-8335-305e2dd431b3
+status: experimental
+description: This rule detects usage of sdset to modify the DACL of the service-control manager service, scmanager.
+references:
+    - https://twitter.com/0gtweet/status/1628720819537936386?cxt=HHwWhIC87Ze9sJotAAAA
+tags:
+    - attack.persistence
+    - attack.privilege_escalation
+author: Gabriel De Jesus (0xv1n)
+date: 2023/02/28
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection:
+        Image|endswith:
+            - '\sc.exe'
+        CommandLine|contains|all:
+            - ' sdset '
+            - ' scmanager '
+            - ' D:(A;;KA;;;WD) '
+    condition: selection
+fields:
+    - Image
+    - CommandLine
+falsepositives:
+    - Unknown
+level: high
+" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span></div><div class="table-wrapper"><table><tbody><tr><td><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l">DACL Modification of Service Control Manager via sdset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">8998782b-66de-44e7-8335-305e2dd431b3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l">experimental</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l">This rule detects usage of sdset to modify the DACL of the service-control manager service, scmanager.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">references</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">https://twitter.com/0gtweet/status/1628720819537936386?cxt=HHwWhIC87Ze9sJotAAAA</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">tags</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">attack.persistence</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">attack.privilege_escalation</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l">Gabriel De Jesus (0xv1n)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="m">2023</span><span class="l">/02/28</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">logsource</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">product</span><span class="p">:</span><span class="w"> </span><span class="l">windows</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l">process_creation</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">detection</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">selection</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">Image|endswith</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="s1">'\sc.exe'</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">CommandLine|contains|all</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="s1">' sdset '</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="s1">' scmanager '</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="s1">' D:(A;;KA;;;WD) '</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l">selection</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">fields</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">Image</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">CommandLine</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">falsepositives</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">Unknown</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l">high</span><span class="w">
+</span></span></span></code></pre></td></tr></tbody></table></div></div></div><h2 id="confirm-changes-took-place" class="headerLink"><a href="#confirm-changes-took-place" class="header-mark"></a>Confirm changes took place</h2>
+<p>We know the command was successful due to the feedback returned by the OS, but if we want to check the Security Descriptor for a service, we can do so with <code>sdshow &lt;service_name&gt;</code>. In this case, we confirm that <code>scmanager</code> indeed has the new security descriptor.</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/sdsetshow.png" data-srcset="/images/privesc/scmanager/sdsetshow.png, /images/privesc/scmanager/sdsetshow.png 1.5x, /images/privesc/scmanager/sdsetshow.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/sdsetshow.png" title="/images/privesc/scmanager/sdsetshow.png" width="528" height="208"></p>
+<p><strong>Additionally</strong> (and thanks to Grzegorz!), we can run <code>sc.exe sdshow scmanager showrights</code> to enumerate the rights of the service. This essentially maps the tokens to their security descriptors and allows us to more easily understand the rights a particular service has:</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/showrights.png" data-srcset="/images/privesc/scmanager/showrights.png, /images/privesc/scmanager/showrights.png 1.5x, /images/privesc/scmanager/showrights.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/showrights.png" title="/images/privesc/scmanager/showrights.png" width="482" height="355"></p>
+<h2 id="create-a-malicious-service-for-persistent-lpe" class="headerLink"><a href="#create-a-malicious-service-for-persistent-lpe" class="header-mark"></a>Create a malicious Service for persistent LPE</h2>
+<p>We can now create a service from our non-privileged account to add our account to the local admin group of this machine:</p>
+<div class="highlight"><div class="chroma open"><div class="code-header language-powershell"><span class="code-title"><i class="arrow fas fa-chevron-right fa-fw" aria-hidden="true"></i></span><span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span><span class="copy" data-clipboard-text="sc create LPE displayName= &quot;LPE&quot; binPath= &quot;C:\Windows\System32\net.exe localgroup Administrators nonpriv-user /add&quot; start= auto
+" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span></div><div class="table-wrapper"><table><tbody><tr><td><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">sc </span><span class="n">create</span> <span class="n">LPE</span> <span class="n">displayName</span><span class="p">=</span> <span class="s2">"LPE"</span> <span class="n">binPath</span><span class="p">=</span> <span class="s2">"C:\Windows\System32\net.exe localgroup Administrators nonpriv-user /add"</span> <span class="n">start</span><span class="p">=</span> <span class="n">auto</span>
+</span></span></code></pre></td></tr></tbody></table></div></div></div><p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/sccreate.png" data-srcset="/images/privesc/scmanager/sccreate.png, /images/privesc/scmanager/sccreate.png 1.5x, /images/privesc/scmanager/sccreate.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/sccreate.png" title="/images/privesc/scmanager/sccreate.png" width="961" height="114"></p>
+<h2 id="restart-machine" class="headerLink"><a href="#restart-machine" class="header-mark"></a>Restart Machine</h2>
+<p>At this point, all we need to do is restart the machine and allow the service control manager to execute our new service with <strong>SYSTEM</strong> privileges. Once it comes back online, we should see that our account now is added to local admins.</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/admin.png" data-srcset="/images/privesc/scmanager/admin.png, /images/privesc/scmanager/admin.png 1.5x, /images/privesc/scmanager/admin.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/admin.png" title="/images/privesc/scmanager/admin.png" width="618" height="574"></p>
+<p>The best part of this mechanism, is that even if a smart admin removes the local admin privilege on the account, we still have the service. If the admin removes the service, we still have the ability to create a new one. The remediation for this type of persistence would be reverting the DACL of <code>scmanager</code> to a hardened state.</p>
+<h2 id="persistent-local-privilege-escalation" class="headerLink"><a href="#persistent-local-privilege-escalation" class="header-mark"></a>Persistent Local Privilege Escalation</h2>
+<p>And now, any time we want, we can spawn an arbitrary process with administrator privileges:</p>
+<p><img class="lazyload" src="/svg/loading.min.svg" data-src="/images/privesc/scmanager/LPE.png" data-srcset="/images/privesc/scmanager/LPE.png, /images/privesc/scmanager/LPE.png 1.5x, /images/privesc/scmanager/LPE.png 2x" data-sizes="auto" alt="/images/privesc/scmanager/LPE.png" title="/images/privesc/scmanager/LPE.png" width="492" height="129"></p>
+<hr>
+<p><em>Hope this helps!</em></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-02-27</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://0xv1n.github.io/posts/scmanager/" data-title="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE" data-via="0xv1nx0" data-hashtags="service,sdmanager"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://0xv1n.github.io/posts/scmanager/" data-hashtag="service"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://0xv1n.github.io/posts/scmanager/" data-title="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://0xv1n.github.io/posts/scmanager/" data-title="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" class="icon"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"></path></svg></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://0xv1n.github.io/posts/scmanager/" data-title="PrivEsc: Abusing the Service Control Manager for Stealthy &amp; Persistent LPE"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/service/">Service</a>,&nbsp;<a href="/tags/sdmanager/">Sdmanager</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/crackme8/" class="prev" rel="prev" title="Reversing ELFs on TryHackMe: Crackme8"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Reversing ELFs on TryHackMe: Crackme8</a>
+            <a href="/posts/processprotection/" class="next" rel="next" title="Kernel Drivers, Process Protection, and ...Bears?">Kernel Drivers, Process Protection, and ...Bears?<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope="" itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">0xv1n</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script>
+
+</body></html>

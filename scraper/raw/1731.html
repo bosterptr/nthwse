@@ -1,0 +1,894 @@
+<html lang="en-US"><head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    
+    <title>Evading Static Machine Learning Malware Detection Models – Part 1: The Black-Box Approach – Compass Security Blog</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="Compass Security Blog » Feed" href="https://blog.compass-security.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Compass Security Blog » Comments Feed" href="https://blog.compass-security.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Compass Security Blog » Evading Static Machine Learning Malware Detection Models – Part 1: The Black-Box Approach Comments Feed" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/feed/">
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blog.compass-security.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.5.3"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel="stylesheet" id="wp-block-library-css" href="https://blog.compass-security.com/wp-includes/css/dist/block-library/style.min.css?ver=6.5.3" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #fff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--accent: #014176;--wp--preset--color--dark-gray: #444;--wp--preset--color--medium-gray: #666;--wp--preset--color--light-gray: #888;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 16px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--regular: 19px;--wp--preset--font-size--larger: 32px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="wp-featherlight-css" href="https://blog.compass-security.com/wp-content/plugins/wp-featherlight/css/wp-featherlight.min.css?ver=1.3.4" type="text/css" media="all">
+<link rel="stylesheet" id="enlighterjs-css" href="https://blog.compass-security.com/wp-content/plugins/enlighter/cache/enlighterjs.min.css?ver=bolAfeK8q5zoJbL" type="text/css" media="all">
+<link rel="stylesheet" id="hemingway_googleFonts-css" href="//fonts.googleapis.com/css?family=Lato%3A400%2C700%2C400italic%2C700italic%7CRaleway%3A400%2C700" type="text/css" media="all">
+<link rel="stylesheet" id="hemingway_style-css" href="https://blog.compass-security.com/wp-content/themes/hemingway/style.css?ver=2.1.2" type="text/css" media="all">
+<link rel="stylesheet" id="child-style-css" href="https://blog.compass-security.com/wp-content/themes/compass_security/style.css?ver=21.1.0" type="text/css" media="all">
+<script type="text/javascript" src="https://blog.compass-security.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-content/themes/compass_security/js/featherlight_img.js?ver=6.5.3" id="wp-featherlight-img-js"></script>
+<link rel="https://api.w.org/" href="https://blog.compass-security.com/wp-json/"><link rel="alternate" type="application/json" href="https://blog.compass-security.com/wp-json/wp/v2/posts/5396"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blog.compass-security.com/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.5.3">
+<link rel="canonical" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/">
+<link rel="shortlink" href="https://blog.compass-security.com/?p=5396">
+<link rel="alternate" type="application/json+oembed" href="https://blog.compass-security.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.compass-security.com%2F2020%2F10%2Fevading-static-machine-learning-malware-detection-models-the-black-box-approach%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://blog.compass-security.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.compass-security.com%2F2020%2F10%2Fevading-static-machine-learning-malware-detection-models-the-black-box-approach%2F&amp;format=xml">
+
+        <!--Customizer CSS-->
+
+        <style type="text/css">
+            body::selection { background:#014176; }            body a { color:#014176; }            body a:hover { color:#014176; }            .blog-title a:hover { color:#014176; }            .blog-menu a:hover { color:#014176; }            .blog-search #searchsubmit { background-color:#014176; }            .blog-search #searchsubmit { border-color:#014176; }            .blog-search #searchsubmit:hover { background-color:#014176; }            .blog-search #searchsubmit:hover { border-color:#014176; }            .featured-media .sticky-post { background-color:#014176; }            .post-title a:hover { color:#014176; }            .post-meta a:hover { color:#014176; }            .post-content a { color:#014176; }            .post-content a:hover { color:#014176; }            .blog .format-quote blockquote cite a:hover { color:#014176; }            .post-content a.more-link:hover { background-color:#014176; }            .post-content input[type="submit"]:hover { background-color:#014176; }            .post-content input[type="reset"]:hover { background-color:#014176; }            .post-content input[type="button"]:hover { background-color:#014176; }            .post-content fieldset legend { background-color:#014176; }            .post-content .searchform #searchsubmit { background:#014176; }            .post-content .searchform #searchsubmit { border-color:#014176; }            .post-content .searchform #searchsubmit:hover { background:#014176; }            .post-content .searchform #searchsubmit:hover { border-color:#014176; }            .post-categories a { color:#014176; }            .post-categories a:hover { color:#014176; }            .post-tags a:hover { background:#014176; }            .post-tags a:hover:after { border-right-color:#014176; }            .post-nav a:hover { color:#014176; }            .archive-nav a:hover { color:#014176; }            .logged-in-as a { color:#014176; }            .logged-in-as a:hover { color:#014176; }            .content #respond input[type="submit"]:hover { background-color:#014176; }            .comment-meta-content cite a:hover { color:#014176; }            .comment-meta-content p a:hover { color:#014176; }            .comment-actions a:hover { color:#014176; }            #cancel-comment-reply-link { color:#014176; }            #cancel-comment-reply-link:hover { color:#014176; }            .comment-nav-below a:hover { color:#014176; }            .widget-title a { color:#014176; }            .widget-title a:hover { color:#014176; }            .widget_text a { color:#014176; }            .widget_text a:hover { color:#014176; }            .widget_rss a { color:#014176; }            .widget_rss a:hover { color:#014176; }            .widget_archive a { color:#014176; }            .widget_archive a:hover { color:#014176; }            .widget_meta a { color:#014176; }            .widget_meta a:hover { color:#014176; }            .widget_recent_comments a { color:#014176; }            .widget_recent_comments a:hover { color:#014176; }            .widget_pages a { color:#014176; }            .widget_pages a:hover { color:#014176; }            .widget_links a { color:#014176; }            .widget_links a:hover { color:#014176; }            .widget_recent_entries a { color:#014176; }            .widget_recent_entries a:hover { color:#014176; }            .widget_categories a { color:#014176; }            .widget_categories a:hover { color:#014176; }            .widget_search #searchsubmit { background:#014176; }            .widget_search #searchsubmit { border-color:#014176; }            .widget_search #searchsubmit:hover { background:#014176; }            .widget_search #searchsubmit:hover { border-color:#014176; }            #wp-calendar a { color:#014176; }            #wp-calendar a:hover { color:#014176; }            #wp-calendar tfoot a:hover { color:#014176; }            .dribbble-shot:hover { background:#014176; }            .widgetmore a { color:#014176; }            .widgetmore a:hover { color:#014176; }            .flickr_badge_image a:hover img { background:#014176; }            .footer .flickr_badge_image a:hover img { background:#014176; }            .footer .dribbble-shot:hover img { background:#014176; }            .sidebar .tagcloud a:hover { background:#014176; }            .footer .tagcloud a:hover { background:#014176; }            .credits a:hover { color:#014176; }
+            body#tinymce.wp-editor a { color:#014176; }            body#tinymce.wp-editor a:hover { color:#014176; }        </style>
+
+        <!--/Customizer CSS-->
+
+        <style type="text/css"><!-- Customizer CSS -->::selection { background-color: #014176; }.featured-media .sticky-post { background-color: #014176; }fieldset legend { background-color: #014176; }:root .has-accent-background-color { background-color: #014176; }button:hover { background-color: #014176; }.button:hover { background-color: #014176; }.faux-button:hover { background-color: #014176; }a.more-link:hover { background-color: #014176; }.wp-block-button__link:hover { background-color: #014176; }.is-style-outline .wp-block-button__link.has-accent-color:hover { background-color: #014176; }.wp-block-file__button:hover { background-color: #014176; }input[type="button"]:hover { background-color: #014176; }input[type="reset"]:hover { background-color: #014176; }input[type="submit"]:hover { background-color: #014176; }.post-tags a:hover { background-color: #014176; }.content #respond input[type="submit"]:hover { background-color: #014176; }.search-form .search-submit { background-color: #014176; }.sidebar .tagcloud a:hover { background-color: #014176; }.footer .tagcloud a:hover { background-color: #014176; }.is-style-outline .wp-block-button__link.has-accent-color:hover { border-color: #014176; }.post-tags a:hover:after { border-right-color: #014176; }a { color: #014176; }.blog-title a:hover { color: #014176; }.blog-menu a:hover { color: #014176; }.post-title a:hover { color: #014176; }.post-meta a:hover { color: #014176; }.blog .format-quote blockquote cite a:hover { color: #014176; }:root .has-accent-color { color: #014176; }.post-categories a { color: #014176; }.post-categories a:hover { color: #014176; }.post-nav a:hover { color: #014176; }.archive-nav a:hover { color: #014176; }.comment-meta-content cite a:hover { color: #014176; }.comment-meta-content p a:hover { color: #014176; }.comment-actions a:hover { color: #014176; }#cancel-comment-reply-link { color: #014176; }#cancel-comment-reply-link:hover { color: #014176; }.widget-title a { color: #014176; }.widget-title a:hover { color: #014176; }.widget_text a { color: #014176; }.widget_text a:hover { color: #014176; }.widget_rss a { color: #014176; }.widget_rss a:hover { color: #014176; }.widget_archive a { color: #014176; }.widget_archive a:hover { color: #014176; }.widget_meta a { color: #014176; }.widget_meta a:hover { color: #014176; }.widget_recent_comments a { color: #014176; }.widget_recent_comments a:hover { color: #014176; }.widget_pages a { color: #014176; }.widget_pages a:hover { color: #014176; }.widget_links a { color: #014176; }.widget_links a:hover { color: #014176; }.widget_recent_entries a { color: #014176; }.widget_recent_entries a:hover { color: #014176; }.widget_categories a { color: #014176; }.widget_categories a:hover { color: #014176; }#wp-calendar a { color: #014176; }#wp-calendar a:hover { color: #014176; }#wp-calendar tfoot a:hover { color: #014176; }.wp-calendar-nav a:hover { color: #014176; }.widgetmore a { color: #014176; }.widgetmore a:hover { color: #014176; }</style><!-- /Customizer CSS --><link rel="icon" href="https://blog.compass-security.com/wp-content/uploads/2017/03/compass_128x128.png" sizes="32x32">
+<link rel="icon" href="https://blog.compass-security.com/wp-content/uploads/2017/03/compass_128x128.png" sizes="192x192">
+<link rel="apple-touch-icon" href="https://blog.compass-security.com/wp-content/uploads/2017/03/compass_128x128.png">
+<meta name="msapplication-TileImage" content="https://blog.compass-security.com/wp-content/uploads/2017/03/compass_128x128.png">
+		<style type="text/css" id="wp-custom-css">
+			.cli-switch input:checked + .cli-slider {
+    background-color: rgb(1, 65, 118);
+}
+
+.cli-tab-footer .wt-cli-privacy-accept-btn {
+    background-color: rgb(1, 65, 118);
+}
+
+.post-content .horizontal-scroll code {
+  overflow: auto;
+	white-space: pre;
+	word-wrap: normal;
+}		</style>
+		
+</head>
+
+<body class="post-template-default single single-post postid-5396 single-format-standard wp-featherlight-captions">
+
+<div class="big-wrapper">
+
+    <div class="header-cover section bg-dark-light no-padding">
+
+        <div class="header section" style="background-image: url(https://blog.compass-security.com/wp-content/themes/compass_security/images/header.png);">
+
+            <div class="header-inner section-inner">
+
+                
+                    <div class="blog-info">
+
+                        <h2 class="blog-title">
+                            <a href="https://blog.compass-security.com" title="Compass Security Blog — Offensive Defense" rel="home">Compass Security Blog</a>
+                        </h2>
+
+                        
+                            <h3 class="blog-description">Offensive Defense</h3>
+
+                        
+                    </div> <!-- /blog-info -->
+
+                
+            </div> <!-- /header-inner -->
+
+        </div> <!-- /header -->
+
+    </div> <!-- /bg-dark -->
+
+    <div class="navigation section no-padding bg-dark">
+
+        <div class="navigation-inner section-inner">
+
+            <div class="toggle-container hidden">
+
+                <div class="nav-toggle toggle">
+
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+
+                    <div class="clear"></div>
+
+                </div>
+
+                <div class="search-toggle toggle">
+
+                    <div class="metal"></div>
+                    <div class="glass"></div>
+                    <div class="handle"></div>
+
+                </div>
+
+                <div class="clear"></div>
+
+            </div> <!-- /toggle-container -->
+
+            <div class="blog-search hidden">
+
+                <form method="get" class="searchform" action="https://blog.compass-security.com/">
+    <input type="search" value="" placeholder="Search" name="s" id="s">
+    <input type="submit" id="searchsubmit" value="Search">
+</form>
+            </div>
+
+            <ul class="blog-menu">
+
+                <li id="menu-item-4780" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-4780"><a href="https://blog.compass-security.com/">Home</a></li>
+<li id="menu-item-4781" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4781"><a href="https://blog.compass-security.com/archive/">Archive</a></li>
+<li id="menu-item-4782" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4782"><a href="https://blog.compass-security.com/contact/">Contact</a></li>
+<li id="menu-item-4783" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4783"><a href="https://blog.compass-security.com/mailing-list-tigerinfo/">Newsletter</a></li>
+<li id="menu-item-4793" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4793"><a href="https://twitter.com/compasssecurity"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+<li id="menu-item-4794" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4794"><a href="https://ch.linkedin.com/company/compass-security-ag"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+<li id="menu-item-4792" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4792"><a href="https://compass-security.com/"><i class="fas fa-globe" aria-hidden="true"></i></a></li>
+
+                <li class="header-search">
+                    <form method="get" id="menusearchsm2" class="searchform" action="https://blog.compass-security.com/">
+                        <input type="search" value="" placeholder="Search" name="s" id="sm2">
+                        <div class="search-lupe">
+                            <div class="metal"></div>
+                            <div class="glass"></div>
+                            <div class="handle"></div>
+                        </div>
+                    </form>
+                </li>
+
+                <!-- TODO where to place the logo if wanted -->
+                
+                <div class="clear"></div>
+
+            </ul>
+
+            <ul class="mobile-menu">
+
+                <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-4780"><a href="https://blog.compass-security.com/">Home</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4781"><a href="https://blog.compass-security.com/archive/">Archive</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4782"><a href="https://blog.compass-security.com/contact/">Contact</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4783"><a href="https://blog.compass-security.com/mailing-list-tigerinfo/">Newsletter</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4793"><a href="https://twitter.com/compasssecurity"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4794"><a href="https://ch.linkedin.com/company/compass-security-ag"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4792"><a href="https://compass-security.com/"><i class="fas fa-globe" aria-hidden="true"></i></a></li>
+
+            </ul>
+
+        </div> <!-- /navigation-inner -->
+
+    </div> <!-- /navigation -->
+<div class="wrapper section-inner">
+
+	<div class="content left">
+
+		
+			<div class="posts">
+
+				<div id="post-5396" class="post-5396 post type-post status-publish format-standard has-post-thumbnail hentry category-evasion category-machine-learning category-malware-detection category-research-2 tag-antivirus tag-av tag-bypass">
+
+					<div class="post-header">
+
+						
+					    <h1 class="post-title"><a href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/" rel="bookmark" title="Evading Static Machine Learning Malware Detection Models – Part 1: The Black-Box Approach">Evading Static Machine Learning Malware Detection Models – Part 1: The Black-Box Approach</a></h1>
+
+					    <div class="post-meta">
+
+							<span class="post-date"><a href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/" title="Evading Static Machine Learning Malware Detection Models – Part 1: The Black-Box Approach">October 6, 2020</a></span>
+
+							<span class="date-sep"> / </span>
+
+							<span class="post-author"><a href="https://blog.compass-security.com/author/akress/" title="Posts by Adrian Kress" rel="author">Adrian Kress</a></span>
+
+							<span class="date-sep"> / </span>
+
+							<a href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/#comments">4 Comments</a>
+							
+						</div>
+
+					</div> <!-- /post-header -->
+
+					<div class="post-content">
+
+						
+<p>Modern anti-malware products such as Windows Defender increasingly rely on the use of machine learning algorithms to detect and classify harmful malware. In this two-part series, we are going to investigate the robustness of a static machine learning malware detection model trained with the <a href="https://github.com/endgameinc/ember">EMBER </a>dataset. For this purpose we will working with the Jigsaw ransomware.</p>
+
+
+
+<p>This blog series is based on my bachelor thesis, which I wrote in summer 2020 at <a href="https://ethz.ch/de.html">ETH Zurich</a>. In the first part of this blog, we take a look at common evasion tools used by malware writers today.</p>
+
+
+
+<p>In the second part, we will investigate the process of the feature engineering of the model and how we can use the gained knowledge to evade a machine learning malware detection model successfully.</p>
+
+
+
+<h2 class="wp-block-heading">Machine Learning Malware Detection Models</h2>
+
+
+
+<p>In recent years, various machine learning algorithms have been used to further increase the reliability of malware detection. Following the work of the last two decades, different approaches of feature representation, such as the inclusion of n-grams at the byte level, and applied techniques from natural language processing  have been studied. In general, current developments in the field of deep learning have significantly improved the usability of machine learning models for object classification, machine translation and speech recognition. Numerous of these approaches use raw images, text, or speech waveforms as input to a machine learning model from which the most useful feature representation for the task at hand is derived. For malware detection, extracting timestamps, code size, imported functions and byte sequences is the right way to create a reliable feature representation. However, regardless of the data set or the feature engineering process, the lifecycle of a machine learning malware detection model usually consists of two phases: the Training phase and the Protection phase. As shown in the picture below, a training set is created with which the model is trained in the Training phase. This process is an art in itself where many things can go wrong. In a paper from 2016 it was found that an unbalanced training set led to serious overfitting. In that work, most of the benign files in the training set were signed by Microsoft, and as a result, the model classified all Microsoft files as benign and all non-Microsoft files as malicious during the Protection phase.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="779" height="581" src="https://blog.compass-security.com/wp-content/uploads/2020/10/lifecycle.png" alt="" class="wp-image-5397" srcset="https://blog.compass-security.com/wp-content/uploads/2020/10/lifecycle.png 779w, https://blog.compass-security.com/wp-content/uploads/2020/10/lifecycle-300x224.png 300w, https://blog.compass-security.com/wp-content/uploads/2020/10/lifecycle-768x573.png 768w, https://blog.compass-security.com/wp-content/uploads/2020/10/lifecycle-676x504.png 676w" sizes="(max-width: 779px) 100vw, 779px"><figcaption>Machine Learning malware detection algorithm lifecycle</figcaption></figure>
+
+
+
+<p>After the Training phase the model is ready for use and can now be used in the Protection phase to classify unknown executables. The output of the trained model is a probability value between 0 and 1, with values closer to 0 for benign behavior and values closer to 1 for malicious behavior. In order to get a definitive result, AV software will round this value up or down. Furthermore, machine learning malware detection is typically used statically or dynamically to classify a particular piece of software. While the dynamic approach extracts the features at runtime, the static approach investigates the features without executing the code. In this blog, we are going to investigate machine learning models using the static approach.</p>
+
+
+
+<h2 class="wp-block-heading">Evasion Theory</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<p>After some time of research into the theory of malware evasion, it became apparent that it is possible for an attacker to successfully evade a model if one of the following conditions is met:</p>
+
+
+
+<p>• Modeling error: It is almost impossible to create a model that perfectly reflects the real world. Therefore, there are always flaws in the model that could be exploited by an attacker.</p>
+
+
+
+<p>• Concept drift: The model is trained with an old training set and no longer up to date. These kind of models are evaded by newer malware.</p>
+
+
+
+<p>• Bayes error rate: There exist software or partial software that can be classified as either benign or malicious (for example RAT, which can be interpreted as Remote Administration Tool or as Remote Access Trojaner).  So an attacker can take usage of this fact.</p>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>This part is for math lovers and can be skipped as it is not necessary for understanding this blog. It contains some formal definitions for the above mentioned conditions:</p><p>• Modeling error: Exploiting the fact that the discriminative model approximates the true posterior <em>p(y|x)</em> as <em>p'(y|x)</em>, an attacker finds an evasive variant <em>x’</em> for which<br><em>p(y=malicious|x’)</em> <em>&gt; n</em>, but <em>p'(y=malicious|x’)&nbsp;&lt; n</em> for an arbitrary threshold <em>n</em>.</p><p>• Concept drift: Since the model has been trained to approximate <em>p(y,x)</em>, but the distribution benign vs. malicious has drifted to a different distribution <em>p'(y,x)</em>.</p><p>• Bayes error rate: If <em>p(x|y=benign)</em> and <em>p(x|y=malicious)</em> overlap, there exists the probability for an attacker to find a <em>x’</em>, where&nbsp; <em>p(x’|y=malicious)</em>&nbsp;<em>&lt;</em>&nbsp;<em>p(x’|y=benign)</em>.</p><cite>H. Anderson, A. Kharkar, B. Filar, D. Evans and P. Roth, “Learning to Evade Static PE Machine Learning Malware Models via Reinforcement Learning,” 2018.&nbsp;</cite></blockquote>
+</div></div>
+</div></div>
+</div></div>
+</div></div>
+
+
+
+<p>It is obvious that all these conditions, especially Bayes error and modeling error, are strongly dependent on the preprocessing and the data set itself. It would certainly be useful to take a look at the training set and feature engineering of a machine learning malware detection model. I’ll save this for the second part of the blog, where we will dive deeper in the structure of the chosen model.</p>
+
+
+
+<p>According to recently published literature, there are mainly three different approaches to attacking a machine learning classifier for malware. The first approach we will refer to as <strong>The White-Box Approach</strong>. With this approach the structure and the weights of the trained model must be known to the attacker. Given the architecture and the trained weights of the model, the attacker can easily test the model directly to determine how best to increase the model’s loss function using backpropagation (roughly, how best to bypass the model). This is called a gradient-based attack.</p>
+
+
+
+<p>In <strong>The Black-Box Approach</strong> the attacker tries to bypass the detection without any knowledge about model, but has unlimited access to query it. This approach is considered to be the real world scenario, but the chances of success are much lower than with the White-Box approach to evade the model.</p>
+
+
+
+<p>The last approach is a combination of the first two approaches. For this reason, this approach receives the appropriate name <strong>The Gray-Box Approach</strong>. In this approach the attacker knows the structure of the model but not the trained weights. Just like in the Black-Box approach, the attacker can test the model without limitation. </p>
+
+
+
+<p>In this blog post we are going to modify the Jigsaw ransomware with commonly used evasion tools to bypass the <a href="https://github.com/endgameinc/ember">EMBER </a>Model in the Black-Box approach. In the second part of this blog-series we take a look at the Gray-Box Approach and try to reverse engineer the feature engineering process of <a href="https://github.com/endgameinc/ember">EMBER </a>to get necessary information to evade the benchmark <a href="https://github.com/endgameinc/ember">EMBER </a>model. But first let’s discuss the rationale behind working with the <a href="https://github.com/endgameinc/ember">EMBER </a>project.</p>
+
+
+
+<h2 class="wp-block-heading">Why EMBER?</h2>
+
+
+
+<p><a href="https://github.com/endgameinc/ember">EMBER </a>is an open dataset for training malware detection machine learning models. This dataset is an open source collection of 1.1 million benign and malicious samples, where their hashes were scanned by <a href="https://www.virustotal.com/">VirusTotal</a>. Besides the data set, an out-of-the-box LightGBM-trained decision tree model is provided on their GitHub page. This model achieves a prediction score of 0.9991123 on it’s validation set, which is a very good result considering the size of the data set. In addition, the data set and source code of the pre-processing/feature engineering of the data used to train the model are also available on GitHub. This is exactly what we are looking for: a newly published (2018) all-in-one project with a huge dataset, equipped with a very advanced feature engineering process and a pre-trained, ready-to-use model. After importing this model in our test environment, it is time to find a suitable malware to test it with. </p>
+
+
+
+<h2 class="wp-block-heading">I want to play a game…</h2>
+
+
+
+<p>Since some malware is quite complex, such as Zeus, it makes sense to limit the search to ransomware. Finally, I think the Jigsaw ransomware is a good choice to work with because it has a simple and straightforward design and because there is a lot of information about it online.</p>
+
+
+
+<p>The Jigsaw ransomware is written in C# using the .NET framework. To scare its victims, the Jigsaw ransomware uses the marionette Billy the Puppet from the horror film “Saw” as an image. The ransomware was discovered in April 2016. It was mainly spread via malicious email attachments.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="814" height="580" src="https://blog.compass-security.com/wp-content/uploads/2020/10/Jigsaw_4.png" alt="" class="wp-image-5398" srcset="https://blog.compass-security.com/wp-content/uploads/2020/10/Jigsaw_4.png 814w, https://blog.compass-security.com/wp-content/uploads/2020/10/Jigsaw_4-300x214.png 300w, https://blog.compass-security.com/wp-content/uploads/2020/10/Jigsaw_4-768x547.png 768w, https://blog.compass-security.com/wp-content/uploads/2020/10/Jigsaw_4-676x482.png 676w" sizes="(max-width: 814px) 100vw, 814px"><figcaption>This window is used by the Jigsaw ransomware to scare the victim.</figcaption></figure>
+
+
+
+<p>As frightening as the upper image can be to its victims, the malware authors do not seem to be very experienced in writing  ransomware. Since the malware is written in .NET and the decryption key is hardcoded in the source code of the ransomware, it is an easy way to recover the encrypted files.  Fun fact: When the ransom software first ran in our sandbox environment, the Jigsaw ransomware crashed in the middle of the encryption process. After a long debug session, it turned out that the encryption process could only handle files with a file path of less than 260 characters. So we modify the source code so that the encryption process ignore such files. After this small intervention, this modified version runs smoothly and is ready to query the model.</p>
+
+
+
+<h2 class="wp-block-heading">The Black-Box Approach</h2>
+
+
+
+<p>In the Black-Box approach, we want to simulate an attacker who has no knowledge about the model but unlimited access to examine the model.  Before we start changing our ransomware, it is useful to upload it on <a href="https://www.virustotal.com/gui/">VirusTotal</a> to get a rough overview.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="560" src="https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified-1024x560.png" alt="" class="wp-image-5402" srcset="https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified-1024x560.png 1024w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified-300x164.png 300w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified-768x420.png 768w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified-676x370.png 676w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_unmodified.png 1406w" sizes="(max-width: 1024px) 100vw, 1024px"><figcaption>The Jigsaw version I found online was detected by 64 engines on VirusTotal.</figcaption></figure>
+
+
+
+<p>As shown in the picture above, 64 of 73 malware detectors on <a href="https://www.virustotal.com/">VirusTotal </a>classify the software as malicious. Not much different is the result of our model:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><em><strong>Evasion</strong></em></td><td><em><strong>Score of Model</strong></em></td></tr><tr><td><em>none</em></td><td>0.999094562</td></tr></tbody></table></figure>
+
+
+
+<p>Not surprisingly, the ransomware is classified malicious by the model with a score around 0.99. The goal of this blog is to reduce this number to a value below 0.5.</p>
+
+
+
+<p>The first thing we want to try is to change some parameters in the compilation process and see what happens. To start with, we add or remove some compiler flags (Add: <em>deterministic, highentropyva+</em>, Remove: <em>optimize+</em>). These flags seem to have the biggest impact on the compilation process. Next, we change the version of the csc compiler (Roslyn version) to version 4.0.30319 and the .NET framework from version 3.5 to 4.5.1. In the result box below, the output of our model is displayed for each attempt</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><em><strong>Evasion</strong></em></td><td><em><strong>Score of Model</strong></em></td></tr><tr><td><em>Compiler flags</em></td><td>0.947133742</td></tr><tr><td><em>Framework 4.5.1</em></td><td>0.92757697</td></tr><tr><td><em>csc v4.0.30319</em></td><td>0.955827899</td></tr></tbody></table></figure>
+
+
+
+<p>A small reduction of the result is obvious, but since the various compiler commands do not change the file structure significantly, it is not surprising that the results of the model do not differ significantly between our basic version and the slightly modified versions. Let’s continue with more advanced evasion tools.</p>
+
+
+
+<p>Obfuscators are tools that convert a program to another version without changing the semantics. Initially, obfuscators were developed to protect the intellectual property of programmers. Malware writers discovered this tool to generate newer versions of their malware, which are harder to be detected by anti-virus software. Examples of these techniques are Dead-Code Insertion, Register Reassignment, and Subroutine Reordering. To obfuscate our ransomware we will work with <a href="https://freeobfuscator.com/">freeobfuscator</a>. <a href="https://freeobfuscator.com/">Freeobfuscator</a> operates with an already compiled input file so it is easy to obfuscate our Jigsaw software. The query of our model with the obfuscated ransomware ends in the following result:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><em><strong>Evasion</strong></em></td><td><em><strong>Score of Model</strong></em></td></tr><tr><td><em><a href="https://freeobfuscator.com/">freeobfuscator</a></em></td><td>0.720558865</td></tr></tbody></table></figure>
+
+
+
+<p>From the result, it is clear that renaming classes and methods with random titles increase the complexity to detect the malicious behavior of the ransomware. However, since the file structure is largely present, the model classifies the obfuscated version with a score of around 0.75. The next evasion tool on our list are packers.</p>
+
+
+
+<p>Packers usually use a compression algorithm to make a file smaller. The name comes from the use of packed software that unpacks itself during runtime. Nowadays, packed software usually indicates malicious behavior, as many malware writers use packers to evade AV software. Sometimes packers are used to embed imported DLLs in an executable. One of the most famous packers is called <a href="https://upx.github.io/">UPX</a>.</p>
+
+
+
+<p>Since <a href="https://upx.github.io/">UPX</a> does not support .NET applications, we are forced to find a similar application that operates on .NET applications. The <a href="https://www.pelock.com/products/netshrink">.netshrink</a> application can compress our ransomware and add unpacking code to the output file so that it remains fully functional, but with reduced size. After compressing our ransomware, the model still detects malicious behavior.</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><em><strong>Evasion</strong></em></td><td><em><strong>Score of Model</strong></em></td></tr><tr><td><em><a href="https://www.pelock.com/products/netshrink">netshrink</a></em></td><td>0.999518866</td></tr></tbody></table></figure>
+
+
+
+<p>Using a packer software to compress the file size did not reduce the score of the prediction. On the contrary, the result is even slightly higher than the unchanged Jigsaw ransomware. This raises questions. I think the second part of this blog series will provide answers to this behavior, when the feature engineering process is examined in more detail. In the next test, we compile the Jigsaw source code to a DLL and write a C# code that imports this DLL and calls the <em>main()</em> function of the created DLL. To bind the generated DLL into the executable, we are using the packer <a href="https://github.com/Fody/Costura">Costura</a>.</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><em><strong>Evasion</strong></em></td><td><em><strong>Score of Model</strong></em></td></tr><tr><td><em><a href="https://github.com/Fody/Costura">Costura </a></em></td><td>0.000083112</td></tr></tbody></table></figure>
+
+
+
+<p>As shown in the box above, this approach drastically reduces the score of the model. Importing the Jigsaw DLL in a code that only calls the <em>main()</em> function of the imported DLL completely bypasses the model. Now it’s time to upload the Costura-version on <a href="https://www.virustotal.com/gui/">VirusTotal</a>.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="617" src="https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified-1024x617.png" alt="" class="wp-image-5403" srcset="https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified-1024x617.png 1024w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified-300x181.png 300w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified-768x463.png 768w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified-676x407.png 676w, https://blog.compass-security.com/wp-content/uploads/2020/10/blog_1_modified.png 1449w" sizes="(max-width: 1024px) 100vw, 1024px"><figcaption>The Costura-version was detected by 14 engines <em>on VirusTotal</em>.</figcaption></figure>
+
+
+
+<p>Even the score on <a href="https://www.virustotal.com/gui/">VirusTotal</a> has been reduced from 64 to 14, which is a suprising result considering that we have limited ourselves to the static aspect of malware detection in this blog. Since the scanning process from <a href="https://www.virustotal.com/gui/">VirusTotal</a> took about 20 min to get this result, it’s very clear that these 14 anti-virus programs detected this ransomware with a dynamic approach when the Jigsaw ransomware wants to change an entry in a registry key. </p>
+
+
+
+<h2 class="wp-block-heading">Conclusion: The Black-Box Approach</h2>
+
+
+
+<p>Let’s quickly summarize what we have done so far. In this blog, we discussed some background information about machine learning malware detection models and how they can be evaded. We set up a test environment by creating a machine learning malware detection model using the <a href="https://github.com/endgameinc/ember">EMBER </a>dataset. To test this model we have thoroughly analyzed the Jigsaw ransomware and tested it in a sandbox environment. Further, two frequently used evasion tools were presented: software obfuscators and runtime packers. Furthermore, we analyzed the results of the model that classifies different modified versions of the Jigsaw ransomware using the presented evasion tools. In the end we were able to successfully bypass the model with the help of the packer <a href="https://github.com/Fody/Costura">Costura</a>. Furthermore, this version was only detected by 14 engines on <a href="https://www.virustotal.com/gui/">VirusTotal</a>.</p>
+
+
+
+<p>In the second part of this blog series we will take a look at the <a href="https://github.com/endgameinc/ember">EMBER </a>dataset, including an insight in the feature engineering process of <a href="https://github.com/endgameinc/ember">EMBER</a>. With the gained knowledge we will try detect possible blindspots of the model and use them to evade the ransomware with specially placed modifications.</p>
+
+
+
+<h1 class="wp-block-heading">References</h1>
+
+
+
+<p>1. H. Anderson and P. Roth, “EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models,” ArXiv eprints, April 2018.</p>
+
+
+
+<p>2.&nbsp; E. Raff, Z. Richard, C. Russell, S. Jared, P. Yacci, R. Ward, T. Anna, M. McLean and N. Charles, “An investigation of byte ngram features for malware classification,” Journal of Computer Virology and Hacking Techniques, September 2016.&nbsp;</p>
+
+
+
+<p>3.&nbsp; H. Anderson, A. Kharkar, B. Filar, D. Evans and P. Roth, “Learning to Evade Static PE Machine Learning Malware Models via Reinforcement Learning,” 2018.&nbsp;</p>
+
+
+
+<p>4.&nbsp; I. Thomson, “Saw-inspired horror slowly deletes your PC’s files as you scramble to pay the ransom,” The Register, 2016.&nbsp;</p>
+
+
+
+<p>5.&nbsp; I. You and K. Yim, “Malware Obfuscation Techniques: A Brief Survey,” in 2010 International Conference on Broadband, Wireless Computing, Communication and Applications, 2010, pp. 297-300.</p>
+
+
+
+<p>6. “C# Compiler Options Listed Alphabetically,” Microsoft, [Online]. Available: <a href="https://docs.microsoft.com/enus/dotnet/csharp/language-reference/compiler-options/listed-alphabetically">https://docs.microsoft.com/enus/dotnet/csharp/language-reference/compiler-options/listed-alphabetically</a>. [Accessed 14 5 2020].</p>
+
+
+
+<p>7. “freeobfuscator,” Free Obfuscator, 2018. [Online]. Available: <a href="https://freeobfuscator.com/">https://freeobfuscator.com/</a>. [Accessed 14 5 2020].</p>
+
+
+
+<p>8.&nbsp; F. Guo, P. Ferrie and T.-c. Chiueh, “A Study of the Packer Problem and Its Solutions,” in Recent Advances in Intrusion Detection”, Berlin, Springer Berlin Heidelberg, 2008, pp. 98-115.</p>
+
+
+
+<p>9.&nbsp; L. Molnár, M. F. Oberhumer and J. F. Reiser, “UPX,” The UPX Team, 1996-2020. [Online]. Available: <a href="https://upx.github.io/">https://upx.github.io/</a>. [Accessed 15 5 2020].</p>
+
+
+
+<p>10.&nbsp; “.netshrink,” PELock LLC, 2001 – 2020. [Online]. Available: <a href="https://www.pelock.com/products/netshrink">https://www.pelock.com/products/netshrink</a>. [Accessed 15 5 2020].</p>
+
+
+
+<p>11.&nbsp; “Costura,” Fody, [Online]. Available: <a href="https://github.com/Fody/Costura">https://github.com/Fody/Costura</a>. [Accessed 15 5 2020].</p>
+
+
+
+<p><br></p>
+
+						
+					</div> <!-- /post-content -->
+
+					<div class="clear"></div>
+
+					<div class="post-meta-bottom">
+
+						<p class="post-categories"><span class="category-icon"><span class="front-flap"></span></span> <a href="https://blog.compass-security.com/category/evasion/" rel="category tag">Evasion</a>, <a href="https://blog.compass-security.com/category/machine-learning/" rel="category tag">Machine Learning</a>, <a href="https://blog.compass-security.com/category/malware-detection/" rel="category tag">Malware Detection</a>, <a href="https://blog.compass-security.com/category/research-2/" rel="category tag">Research</a></p>
+
+						<p class="post-tags"><a href="https://blog.compass-security.com/tag/antivirus/" rel="tag">antivirus</a><a href="https://blog.compass-security.com/tag/av/" rel="tag">av</a><a href="https://blog.compass-security.com/tag/bypass/" rel="tag">Bypass</a></p>
+						<div class="clear"></div>
+
+						<div class="post-nav">
+
+							
+								<a class="post-nav-older" title="Previous post: 101 for lateral movement detection" href="https://blog.compass-security.com/2020/09/101-for-lateral-movement-detection/">
+
+								<h5>Previous post</h5>
+								101 for lateral movement detection
+								</a>
+
+							
+							
+								<a class="post-nav-newer" title="Next post: Burp Extension: Copy Request &amp; Response" href="https://blog.compass-security.com/2020/10/burp-extension-copy-request-response/">
+
+								<h5>Next post</h5>
+								Burp Extension: Copy Request &amp; Response
+								</a>
+
+							
+							<div class="clear"></div>
+
+						</div> <!-- /post-nav -->
+
+					</div> <!-- /post-meta-bottom -->
+
+					
+	<div class="comments">
+	
+		<a name="comments"></a>
+			
+		<h2 class="comments-title">
+		
+			4 Comments			
+		</h2>
+
+		<ol class="commentlist">
+					<li class="comment even thread-even depth-1" id="li-comment-335567">
+		
+			<div id="comment-335567" class="comment">
+			
+				<div class="comment-meta comment-author vcard">
+								
+					<img alt="" src="https://secure.gravatar.com/avatar/4d60cf63585643fc1e0acfe79be1bd28?s=120&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/4d60cf63585643fc1e0acfe79be1bd28?s=240&amp;d=mm&amp;r=g 2x" class="avatar avatar-120 photo" height="120" width="120" loading="lazy" decoding="async">
+					<div class="comment-meta-content">
+												
+						<cite class="fn">Tobias </cite>						
+						<p>
+														<time datetime="2020-10-21T12:52:12+02:00" title="October 21, 2020 at 12:52">
+								October 21, 2020 at 12:52							</time>
+						</p>
+						
+					</div><!-- .comment-meta-content -->
+					
+				</div><!-- .comment-meta -->
+
+				<div class="comment-content post-content">
+				
+									
+					<p>Awsome work! Looking forward to part two.</p>
+					
+					<div class="comment-actions group">
+					
+												
+						<a rel="nofollow" class="comment-reply-link" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/?replytocom=335567#respond" data-commentid="335567" data-postid="5396" data-belowelement="comment-335567" data-respondelement="respond" data-replyto="Reply to Tobias" aria-label="Reply to Tobias">Reply</a>											
+					</div><!-- .comment-actions -->
+					
+				</div><!-- .comment-content -->
+
+			</div><!-- .comment-## -->
+		<ul class="children">
+		<li class="comment byuser comment-author-akress bypostauthor odd alt depth-2" id="li-comment-335854">
+		
+			<div id="comment-335854" class="comment">
+			
+				<div class="comment-meta comment-author vcard">
+								
+					<img alt="" src="https://secure.gravatar.com/avatar/980861bd18dd96434a87138c45049790?s=120&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/980861bd18dd96434a87138c45049790?s=240&amp;d=mm&amp;r=g 2x" class="avatar avatar-120 photo" height="120" width="120" loading="lazy" decoding="async">
+					<div class="comment-meta-content">
+												
+						<cite class="fn">Adrian Kress <span class="post-author"> (Post author)</span></cite>						
+						<p>
+														<time datetime="2020-11-10T08:45:25+01:00" title="November 10, 2020 at 08:45">
+								November 10, 2020 at 08:45							</time>
+						</p>
+						
+					</div><!-- .comment-meta-content -->
+					
+				</div><!-- .comment-meta -->
+
+				<div class="comment-content post-content">
+				
+									
+					<p>Hi Tobias</p>
+<p>Thanks for your feedback. I appreciate it very much. Here would be the second part:<br>
+<a href="https://blog.compass-security.com/2020/11/evading-static-machine-learning-malware-detection-models-part-2-the-gray-box-approach/" rel="ugc">https://blog.compass-security.com/2020/11/evading-static-machine-learning-malware-detection-models-part-2-the-gray-box-approach/</a></p>
+					
+					<div class="comment-actions group">
+					
+												
+						<a rel="nofollow" class="comment-reply-link" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/?replytocom=335854#respond" data-commentid="335854" data-postid="5396" data-belowelement="comment-335854" data-respondelement="respond" data-replyto="Reply to Adrian Kress" aria-label="Reply to Adrian Kress">Reply</a>											
+					</div><!-- .comment-actions -->
+					
+				</div><!-- .comment-content -->
+
+			</div><!-- .comment-## -->
+		</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-odd thread-alt depth-1" id="li-comment-336045">
+		
+			<div id="comment-336045" class="comment">
+			
+				<div class="comment-meta comment-author vcard">
+								
+					<img alt="" src="https://secure.gravatar.com/avatar/e6754173b5e91220f534087eb3f344c4?s=120&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/e6754173b5e91220f534087eb3f344c4?s=240&amp;d=mm&amp;r=g 2x" class="avatar avatar-120 photo" height="120" width="120" loading="lazy" decoding="async">
+					<div class="comment-meta-content">
+												
+						<cite class="fn">Vaibhav </cite>						
+						<p>
+														<time datetime="2020-11-23T11:20:53+01:00" title="November 23, 2020 at 11:20">
+								November 23, 2020 at 11:20							</time>
+						</p>
+						
+					</div><!-- .comment-meta-content -->
+					
+				</div><!-- .comment-meta -->
+
+				<div class="comment-content post-content">
+				
+									
+					<p>Great work!</p>
+					
+					<div class="comment-actions group">
+					
+												
+						<a rel="nofollow" class="comment-reply-link" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/?replytocom=336045#respond" data-commentid="336045" data-postid="5396" data-belowelement="comment-336045" data-respondelement="respond" data-replyto="Reply to Vaibhav" aria-label="Reply to Vaibhav">Reply</a>											
+					</div><!-- .comment-actions -->
+					
+				</div><!-- .comment-content -->
+
+			</div><!-- .comment-## -->
+		<ul class="children">
+		<li class="comment byuser comment-author-akress bypostauthor odd alt depth-2" id="li-comment-336053">
+		
+			<div id="comment-336053" class="comment">
+			
+				<div class="comment-meta comment-author vcard">
+								
+					<img alt="" src="https://secure.gravatar.com/avatar/980861bd18dd96434a87138c45049790?s=120&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/980861bd18dd96434a87138c45049790?s=240&amp;d=mm&amp;r=g 2x" class="avatar avatar-120 photo" height="120" width="120" loading="lazy" decoding="async">
+					<div class="comment-meta-content">
+												
+						<cite class="fn">Adrian Kress <span class="post-author"> (Post author)</span></cite>						
+						<p>
+														<time datetime="2020-11-24T10:34:49+01:00" title="November 24, 2020 at 10:34">
+								November 24, 2020 at 10:34							</time>
+						</p>
+						
+					</div><!-- .comment-meta-content -->
+					
+				</div><!-- .comment-meta -->
+
+				<div class="comment-content post-content">
+				
+									
+					<p>Thanks for your feedback. I am glad that you liked my post.</p>
+					
+					<div class="comment-actions group">
+					
+												
+						<a rel="nofollow" class="comment-reply-link" href="https://blog.compass-security.com/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/?replytocom=336053#respond" data-commentid="336053" data-postid="5396" data-belowelement="comment-336053" data-respondelement="respond" data-replyto="Reply to Adrian Kress" aria-label="Reply to Adrian Kress">Reply</a>											
+					</div><!-- .comment-actions -->
+					
+				</div><!-- .comment-content -->
+
+			</div><!-- .comment-## -->
+		</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		</ol>
+		
+					
+				
+	</div><!-- /comments -->
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2020/10/evading-static-machine-learning-malware-detection-models-the-black-box-approach/#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://blog.compass-security.com/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> <span class="required-field-message">Required fields are marked <span class="required">*</span></span></p><p class="comment-form-comment"><label for="comment">Comment <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" autocomplete="name" required="required"></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" autocomplete="email" required="required"></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="text" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="5396" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="b43833252b"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="1718453580132"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+			   	
+			</div> <!-- /post -->
+
+		</div> <!-- /posts -->
+
+	</div> <!-- /content -->
+
+	
+	<div class="sidebar right" role="complementary">
+		
+		<div id="recent-posts-8" class="widget widget_recent_entries"><div class="widget-content">
+		<h3 class="widget-title">Recent Posts</h3>
+		<ul>
+											<li>
+					<a href="https://blog.compass-security.com/2024/06/blockchain-smart-contract-bugs/">Blockchain / Smart Contract Bugs</a>
+									</li>
+											<li>
+					<a href="https://blog.compass-security.com/2024/05/how-to-become-a-hacker/">How to become a Hacker</a>
+									</li>
+											<li>
+					<a href="https://blog.compass-security.com/2024/05/bug-bounty-insights-from-our-first-hand-experience/">Bug Bounty: Insights from Our First-hand Experience</a>
+									</li>
+											<li>
+					<a href="https://blog.compass-security.com/2024/04/new-burp-extension-jwt-scanner/">New Burp Extension: JWT-scanner</a>
+									</li>
+											<li>
+					<a href="https://blog.compass-security.com/2024/04/behind-the-scenes-of-ransomware-attacks/">Behind The Scenes Of Ransomware Attacks</a>
+									</li>
+					</ul>
+
+		</div></div><div id="categories-4" class="widget widget_categories"><div class="widget-content"><h3 class="widget-title">Categories</h3><form action="https://blog.compass-security.com" method="get"><label class="screen-reader-text" for="cat">Categories</label><select name="cat" id="cat" class="postform">
+	<option value="-1">Select Category</option>
+	<option class="level-0" value="222">APT&nbsp;&nbsp;(8)</option>
+	<option class="level-0" value="452">Authentication&nbsp;&nbsp;(15)</option>
+	<option class="level-0" value="567">Entra ID&nbsp;&nbsp;(1)</option>
+	<option class="level-0" value="479">Evasion&nbsp;&nbsp;(3)</option>
+	<option class="level-0" value="116">Event&nbsp;&nbsp;(34)</option>
+	<option class="level-0" value="207">Exploiting&nbsp;&nbsp;(16)</option>
+	<option class="level-0" value="7">Forensic&nbsp;&nbsp;(23)</option>
+	<option class="level-0" value="9">Hacking-Lab&nbsp;&nbsp;(18)</option>
+	<option class="level-0" value="105">Hardening&nbsp;&nbsp;(33)</option>
+	<option class="level-0" value="356">Incident Response&nbsp;&nbsp;(13)</option>
+	<option class="level-0" value="136">Industrial Control Systems&nbsp;&nbsp;(14)</option>
+	<option class="level-0" value="231">Information Leakage&nbsp;&nbsp;(6)</option>
+	<option class="level-0" value="311">Internet of Things&nbsp;&nbsp;(14)</option>
+	<option class="level-0" value="576">Job&nbsp;&nbsp;(1)</option>
+	<option class="level-0" value="106">Linux&nbsp;&nbsp;(8)</option>
+	<option class="level-0" value="226">Log Management&nbsp;&nbsp;(6)</option>
+	<option class="level-0" value="477">Machine Learning&nbsp;&nbsp;(2)</option>
+	<option class="level-0" value="478">Malware Detection&nbsp;&nbsp;(6)</option>
+	<option class="level-0" value="239">Mobile&nbsp;&nbsp;(10)</option>
+	<option class="level-0" value="240">Networking&nbsp;&nbsp;(13)</option>
+	<option class="level-0" value="208">OS X&nbsp;&nbsp;(1)</option>
+	<option class="level-0" value="10">Patch&nbsp;&nbsp;(5)</option>
+	<option class="level-0" value="64">Penetration Test&nbsp;&nbsp;(53)</option>
+	<option class="level-0" value="417">Red Teaming&nbsp;&nbsp;(10)</option>
+	<option class="level-0" value="111">Research&nbsp;&nbsp;(69)</option>
+	<option class="level-0" value="65">Reversing&nbsp;&nbsp;(12)</option>
+	<option class="level-0" value="175">Risk Assessment&nbsp;&nbsp;(10)</option>
+	<option class="level-0" value="561">Scam&nbsp;&nbsp;(1)</option>
+	<option class="level-0" value="135">Standards&nbsp;&nbsp;(10)</option>
+	<option class="level-0" value="453">SuisseID&nbsp;&nbsp;(1)</option>
+	<option class="level-0" value="63">Talk&nbsp;&nbsp;(22)</option>
+	<option class="level-0" value="331">Tools&nbsp;&nbsp;(21)</option>
+	<option class="level-0" value="5">Training&nbsp;&nbsp;(19)</option>
+	<option class="level-0" value="1">Uncategorized&nbsp;&nbsp;(20)</option>
+	<option class="level-0" value="8">Vulnerability&nbsp;&nbsp;(41)</option>
+	<option class="level-0" value="54">Web Application&nbsp;&nbsp;(49)</option>
+	<option class="level-0" value="454">Web Server&nbsp;&nbsp;(13)</option>
+	<option class="level-0" value="451">Windows&nbsp;&nbsp;(27)</option>
+	<option class="level-0" value="298">Wireless&nbsp;&nbsp;(6)</option>
+	<option class="level-0" value="329">Write-up&nbsp;&nbsp;(26)</option>
+</select>
+</form><script type="text/javascript">
+/* <![CDATA[ */
+
+(function() {
+	var dropdown = document.getElementById( "cat" );
+	function onCatChange() {
+		if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
+			dropdown.parentNode.submit();
+		}
+	}
+	dropdown.onchange = onCatChange;
+})();
+
+/* ]]> */
+</script>
+</div></div><div id="tag_cloud-7" class="widget widget_tag_cloud"><div class="widget-content"><h3 class="widget-title">Tags</h3><div class="tagcloud"><a href="https://blog.compass-security.com/tag/active-directory/" class="tag-cloud-link tag-link-84 tag-link-position-1" style="font-size: 15.5pt;" aria-label="Active Directory (9 items)">Active Directory</a>
+<a href="https://blog.compass-security.com/tag/advanced-metering-infrastructure/" class="tag-cloud-link tag-link-144 tag-link-position-2" style="font-size: 10pt;" aria-label="Advanced Metering Infrastructure (5 items)">Advanced Metering Infrastructure</a>
+<a href="https://blog.compass-security.com/tag/advisory/" class="tag-cloud-link tag-link-60 tag-link-position-3" style="font-size: 11.75pt;" aria-label="Advisory (6 items)">Advisory</a>
+<a href="https://blog.compass-security.com/tag/ami/" class="tag-cloud-link tag-link-145 tag-link-position-4" style="font-size: 8pt;" aria-label="AMI (4 items)">AMI</a>
+<a href="https://blog.compass-security.com/tag/application-security/" class="tag-cloud-link tag-link-103 tag-link-position-5" style="font-size: 10pt;" aria-label="Application Security (5 items)">Application Security</a>
+<a href="https://blog.compass-security.com/tag/asfws/" class="tag-cloud-link tag-link-125 tag-link-position-6" style="font-size: 21.25pt;" aria-label="ASFWS (16 items)">ASFWS</a>
+<a href="https://blog.compass-security.com/tag/asp-net/" class="tag-cloud-link tag-link-194 tag-link-position-7" style="font-size: 14.25pt;" aria-label="ASP.NET (8 items)">ASP.NET</a>
+<a href="https://blog.compass-security.com/tag/black-hat/" class="tag-cloud-link tag-link-186 tag-link-position-8" style="font-size: 15.5pt;" aria-label="Black Hat (9 items)">Black Hat</a>
+<a href="https://blog.compass-security.com/tag/bloodhound/" class="tag-cloud-link tag-link-436 tag-link-position-9" style="font-size: 11.75pt;" aria-label="bloodhound (6 items)">bloodhound</a>
+<a href="https://blog.compass-security.com/tag/burp/" class="tag-cloud-link tag-link-263 tag-link-position-10" style="font-size: 8pt;" aria-label="Burp (4 items)">Burp</a>
+<a href="https://blog.compass-security.com/tag/burp-extension/" class="tag-cloud-link tag-link-264 tag-link-position-11" style="font-size: 8pt;" aria-label="Burp Extension (4 items)">Burp Extension</a>
+<a href="https://blog.compass-security.com/tag/conference/" class="tag-cloud-link tag-link-202 tag-link-position-12" style="font-size: 19.25pt;" aria-label="Conference (13 items)">Conference</a>
+<a href="https://blog.compass-security.com/tag/ctf/" class="tag-cloud-link tag-link-280 tag-link-position-13" style="font-size: 21.25pt;" aria-label="CTF (16 items)">CTF</a>
+<a href="https://blog.compass-security.com/tag/cve/" class="tag-cloud-link tag-link-441 tag-link-position-14" style="font-size: 8pt;" aria-label="CVE (4 items)">CVE</a>
+<a href="https://blog.compass-security.com/tag/defcon/" class="tag-cloud-link tag-link-118 tag-link-position-15" style="font-size: 10pt;" aria-label="Defcon (5 items)">Defcon</a>
+<a href="https://blog.compass-security.com/tag/dfir/" class="tag-cloud-link tag-link-297 tag-link-position-16" style="font-size: 10pt;" aria-label="DFIR (5 items)">DFIR</a>
+<a href="https://blog.compass-security.com/tag/exchange/" class="tag-cloud-link tag-link-248 tag-link-position-17" style="font-size: 10pt;" aria-label="Exchange (5 items)">Exchange</a>
+<a href="https://blog.compass-security.com/tag/exploit/" class="tag-cloud-link tag-link-25 tag-link-position-18" style="font-size: 8pt;" aria-label="Exploit (4 items)">Exploit</a>
+<a href="https://blog.compass-security.com/tag/hardening/" class="tag-cloud-link tag-link-76 tag-link-position-19" style="font-size: 17.5pt;" aria-label="Hardening (11 items)">Hardening</a>
+<a href="https://blog.compass-security.com/tag/html/" class="tag-cloud-link tag-link-134 tag-link-position-20" style="font-size: 10pt;" aria-label="HTML (5 items)">HTML</a>
+<a href="https://blog.compass-security.com/tag/insomnihack/" class="tag-cloud-link tag-link-330 tag-link-position-21" style="font-size: 20.5pt;" aria-label="Insomni'hack (15 items)">Insomni'hack</a>
+<a href="https://blog.compass-security.com/tag/less/" class="tag-cloud-link tag-link-108 tag-link-position-22" style="font-size: 10pt;" aria-label="less (5 items)">less</a>
+<a href="https://blog.compass-security.com/tag/linux-2/" class="tag-cloud-link tag-link-110 tag-link-position-23" style="font-size: 10pt;" aria-label="Linux (5 items)">Linux</a>
+<a href="https://blog.compass-security.com/tag/logging/" class="tag-cloud-link tag-link-228 tag-link-position-24" style="font-size: 13pt;" aria-label="Logging (7 items)">Logging</a>
+<a href="https://blog.compass-security.com/tag/microsoft/" class="tag-cloud-link tag-link-195 tag-link-position-25" style="font-size: 17.5pt;" aria-label="Microsoft (11 items)">Microsoft</a>
+<a href="https://blog.compass-security.com/tag/penetration-testing/" class="tag-cloud-link tag-link-266 tag-link-position-26" style="font-size: 8pt;" aria-label="Penetration Testing (4 items)">Penetration Testing</a>
+<a href="https://blog.compass-security.com/tag/phishing/" class="tag-cloud-link tag-link-336 tag-link-position-27" style="font-size: 8pt;" aria-label="phishing (4 items)">phishing</a>
+<a href="https://blog.compass-security.com/tag/poc/" class="tag-cloud-link tag-link-37 tag-link-position-28" style="font-size: 10pt;" aria-label="PoC (5 items)">PoC</a>
+<a href="https://blog.compass-security.com/tag/privilege-escalation/" class="tag-cloud-link tag-link-320 tag-link-position-29" style="font-size: 10pt;" aria-label="Privilege Escalation (5 items)">Privilege Escalation</a>
+<a href="https://blog.compass-security.com/tag/pwn2own/" class="tag-cloud-link tag-link-574 tag-link-position-30" style="font-size: 10pt;" aria-label="Pwn2Own (5 items)">Pwn2Own</a>
+<a href="https://blog.compass-security.com/tag/relay/" class="tag-cloud-link tag-link-162 tag-link-position-31" style="font-size: 8pt;" aria-label="relay (4 items)">relay</a>
+<a href="https://blog.compass-security.com/tag/research/" class="tag-cloud-link tag-link-30 tag-link-position-32" style="font-size: 22pt;" aria-label="Research (17 items)">Research</a>
+<a href="https://blog.compass-security.com/tag/saml/" class="tag-cloud-link tag-link-262 tag-link-position-33" style="font-size: 11.75pt;" aria-label="SAML (6 items)">SAML</a>
+<a href="https://blog.compass-security.com/tag/saml-raider/" class="tag-cloud-link tag-link-265 tag-link-position-34" style="font-size: 8pt;" aria-label="SAML Raider (4 items)">SAML Raider</a>
+<a href="https://blog.compass-security.com/tag/security/" class="tag-cloud-link tag-link-114 tag-link-position-35" style="font-size: 11.75pt;" aria-label="Security (6 items)">Security</a>
+<a href="https://blog.compass-security.com/tag/sharepoint/" class="tag-cloud-link tag-link-196 tag-link-position-36" style="font-size: 10pt;" aria-label="SharePoint (5 items)">SharePoint</a>
+<a href="https://blog.compass-security.com/tag/smart-grid/" class="tag-cloud-link tag-link-137 tag-link-position-37" style="font-size: 8pt;" aria-label="Smart Grid (4 items)">Smart Grid</a>
+<a href="https://blog.compass-security.com/tag/social-engineering/" class="tag-cloud-link tag-link-15 tag-link-position-38" style="font-size: 10pt;" aria-label="Social Engineering (5 items)">Social Engineering</a>
+<a href="https://blog.compass-security.com/tag/sudo/" class="tag-cloud-link tag-link-107 tag-link-position-39" style="font-size: 10pt;" aria-label="sudo (5 items)">sudo</a>
+<a href="https://blog.compass-security.com/tag/sudoers/" class="tag-cloud-link tag-link-109 tag-link-position-40" style="font-size: 10pt;" aria-label="sudoers (5 items)">sudoers</a>
+<a href="https://blog.compass-security.com/tag/vulnerability-2/" class="tag-cloud-link tag-link-27 tag-link-position-41" style="font-size: 19.25pt;" aria-label="Vulnerability (13 items)">Vulnerability</a>
+<a href="https://blog.compass-security.com/tag/web/" class="tag-cloud-link tag-link-268 tag-link-position-42" style="font-size: 8pt;" aria-label="web (4 items)">web</a>
+<a href="https://blog.compass-security.com/tag/web-security/" class="tag-cloud-link tag-link-289 tag-link-position-43" style="font-size: 11.75pt;" aria-label="Web Security (6 items)">Web Security</a>
+<a href="https://blog.compass-security.com/tag/xss/" class="tag-cloud-link tag-link-51 tag-link-position-44" style="font-size: 17.5pt;" aria-label="XSS (11 items)">XSS</a>
+<a href="https://blog.compass-security.com/tag/xxe/" class="tag-cloud-link tag-link-104 tag-link-position-45" style="font-size: 10pt;" aria-label="XXE (5 items)">XXE</a></div>
+</div></div>	</div><!-- .sidebar -->
+	
+
+	<div class="clear"></div>
+
+</div> <!-- /wrapper -->
+
+<div class="footer section large-padding bg-dark">
+
+    <div class="footer-inner section-inner">
+
+        
+            <div class="column column-1 left">
+
+                <div class="widgets">
+
+                    <div id="block-10" class="widget widget_block"><div class="widget-content"><h3 class="widget-title">Compass Links</h3>
+<ul class="xoxo blogroll">
+<li><a href="https://www.compass-security.com/en/" target="_blank">Compass Website</a></li>
+<li><a href="https://www.compass-security.com/en/products/filebox/" target="_blank">FileBox</a></li>
+<li><a href="https://www.hacking-lab.com/" target="_blank">Hacking-Lab</a></li>
+<li><a href="https://www.compass-security.com/en/imprint" target="_blank">Impressum</a></li>
+<li><a href="https://www.compass-security.com/en/legal" target="_blank">Legal</a></li>
+<li><a href="https://blog.compass-security.com/feed/" target="_blank">RSS Feed</a></li>
+</ul></div></div>
+                </div>
+
+            </div>
+
+         <!-- /footer-a -->
+
+         <!-- /footer-b -->
+
+        <div class="clear"></div>
+
+    </div> <!-- /footer-inner -->
+
+</div> <!-- /footer -->
+
+<div class="credits section bg-dark no-padding">
+
+    <div class="credits-inner section-inner">
+
+        <p class="credits-left">
+
+            © 2024 <a href="https://blog.compass-security.com" title="Compass Security Blog">Compass Security Blog</a>
+
+        </p>
+
+        <p class="credits-right">
+
+            <span><a title="To the top" class="tothetop">Up ↑</a>
+
+        </span></p>
+
+        <div class="clear"></div>
+
+    </div> <!-- /credits-inner -->
+
+</div> <!-- /credits -->
+
+</div> <!-- /big-wrapper -->
+
+<script type="text/javascript" src="https://blog.compass-security.com/wp-includes/js/comment-reply.min.js?ver=6.5.3" id="comment-reply-js" async="async" data-wp-strategy="async"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-content/themes/compass_security/js/search.js?ver=6.5.3" id="child_search-js"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-content/themes/hemingway/assets/js/global.js?ver=2.1.2" id="hemingway_global-js"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-content/plugins/wp-featherlight/js/wpFeatherlight.pkgd.min.js?ver=1.3.4" id="wp-featherlight-js"></script>
+<script type="text/javascript" src="https://blog.compass-security.com/wp-content/plugins/enlighter/cache/enlighterjs.min.js?ver=bolAfeK8q5zoJbL" id="enlighterjs-js"></script>
+<script type="text/javascript" id="enlighterjs-js-after">
+/* <![CDATA[ */
+!function(e,n){if("undefined"!=typeof EnlighterJS){var o={"selectors":{"block":"pre.EnlighterJSRAW","inline":"code.EnlighterJSRAW"},"options":{"indent":2,"ampersandCleanup":true,"linehover":true,"rawcodeDbclick":false,"textOverflow":"break","linenumbers":true,"theme":"godzilla","language":"generic","retainCssClasses":false,"collapse":false,"toolbarOuter":"","toolbarTop":"{BTN_RAW}{BTN_COPY}{BTN_WINDOW}{BTN_WEBSITE}","toolbarBottom":""}};(e.EnlighterJSINIT=function(){EnlighterJS.init(o.selectors.block,o.selectors.inline,o.options)})()}else{(n&&(n.error||n.log)||function(){})("Error: EnlighterJS resources not loaded yet!")}}(window,console);
+/* ]]> */
+</script>
+<script defer="" type="text/javascript" src="https://blog.compass-security.com/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1704837122" id="akismet-frontend-js"></script>
+
+
+
+
+</body></html>

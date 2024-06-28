@@ -1,0 +1,630 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Writing a Windows Fuzzer From Scratch | Legacyy</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="Writing a Windows Fuzzer From Scratch">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Over the past year, I have dedicated a large majority of my spare time to studying Windows internals. Doing so got me hooked on content from vulnerability research space, and such I have started learning how to fuzz simple windows targets.">
+<meta property="og:description" content="Over the past year, I have dedicated a large majority of my spare time to studying Windows internals. Doing so got me hooked on content from vulnerability research space, and such I have started learning how to fuzz simple windows targets.">
+<link rel="canonical" href="http://legacyy.xyz/vr/windows/2023/10/23/writing-a-windows-fuzzer-from-scratch.html">
+<meta property="og:url" content="http://legacyy.xyz/vr/windows/2023/10/23/writing-a-windows-fuzzer-from-scratch.html">
+<meta property="og:site_name" content="Legacyy">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2023-10-23T16:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Writing a Windows Fuzzer From Scratch">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-10-23T16:00:00+00:00","datePublished":"2023-10-23T16:00:00+00:00","description":"Over the past year, I have dedicated a large majority of my spare time to studying Windows internals. Doing so got me hooked on content from vulnerability research space, and such I have started learning how to fuzz simple windows targets.","headline":"Writing a Windows Fuzzer From Scratch","mainEntityOfPage":{"@type":"WebPage","@id":"http://legacyy.xyz/vr/windows/2023/10/23/writing-a-windows-fuzzer-from-scratch.html"},"url":"http://legacyy.xyz/vr/windows/2023/10/23/writing-a-windows-fuzzer-from-scratch.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://legacyy.xyz/feed.xml" title="Legacyy"></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Legacyy</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Writing a Windows Fuzzer From Scratch</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-10-23T16:00:00+00:00" itemprop="datePublished">Oct 23, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Over the past year, I have dedicated a large majority of my spare time to studying Windows internals. Doing so got me hooked on content from vulnerability research space, and such I have started learning how to fuzz simple windows targets.</p>
+
+<p>Whilst I’m comfortable using tools such as <a href="https://github.com/0vercl0k/wtf">What the fuzz</a>, I figured it’d be useful to write my own fuzzer in order to gain a proper understanding of how things work under the hood. This post documents my initial design, alongside some potential optimisations, and will hopefully give a foundation for those who are looking to get started.</p>
+
+<p><strong>Quick disclaimer</strong>: This is by no means optimal, and the hardcore devs will sob, however it’s designed to be easy to understand for someone new to the topic and I personally think it accomplishes that.</p>
+
+<h1 id="contents">Contents</h1>
+<ol>
+  <li><a href="#what-is-fuzzing-and-why-is-it-useful">What Is Fuzzing, and Why Is It Useful?</a></li>
+  <li><a href="#fuzzer-overview">Fuzzer Overview</a></li>
+  <li><a href="#the-target">The Target</a></li>
+  <li><a href="#writing-the-fuzzer">Writing The Fuzzer</a>
+    <ul>
+      <li><a href="#mutator">Mutator</a>
+        <ul>
+          <li><a href="#constructor--destructor">Constructor &amp; Destructor</a></li>
+          <li><a href="#get-set--reset-mutatedinput">Get Set &amp; Reset MutatedInput</a></li>
+          <li><a href="#mutation-methods">Mutation Methods</a></li>
+        </ul>
+      </li>
+      <li><a href="#execution-engine">Execution Engine</a>
+        <ul>
+          <li><a href="#constructor--destructor-1">Constructor &amp; Destructor</a></li>
+          <li><a href="#runtestcase">RunTestCase</a></li>
+        </ul>
+      </li>
+      <li><a href="#bringing-it-all-together">Bringing It All Together</a></li>
+    </ul>
+  </li>
+  <li><a href="#benchmarking">Benchmarking</a>
+    <ul>
+      <li><a href="#test-1---no-crashes">Test 1 - No Crashes</a></li>
+      <li><a href="#test-2---crashes">Test 2 - Crashes</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#references">References</a></li>
+</ol>
+
+<h1 id="what-is-fuzzing-and-why-is-it-useful">What Is Fuzzing, and Why Is It Useful?</h1>
+
+<p>Whilst I usually don’t like to quote Wikipedia, they have a very good summary of fuzzing:</p>
+
+<p><em>“In programming and software development, fuzzing or fuzz testing is an automated software testing technique that involves providing invalid, unexpected, or random data as inputs to a computer program. The program is then monitored for exceptions such as crashes, failing built-in code assertions, or potential memory leaks.”</em> ~ <a href="https://en.wikipedia.org/wiki/Fuzzing">wikipedia.org/wiki/fuzzing</a></p>
+
+<p>Fuzzing is almost quintessential for those looking to find new memory corruption bugs without spending a painstaking amount of time reverse engineering the target. This comes in especially handy when looking at functionality such as deserialisation, file format parsing, or packet parsers.</p>
+
+<h1 id="fuzzer-overview">Fuzzer Overview</h1>
+
+<p>The fuzzer is comprised of two core parts, a “mutator” and an “execution engine”.</p>
+
+<p>The mutator takes a given user input and mutates it, usually in ways of which are likely to trigger bugs (e.g. extending length/flipping bits). On the other hand, the execution engine takes the mutated input, and passes this to the target, executing our test case. It then checks if a crash is detected, and if so will notify the user so that they can further analyse this and look to develop an exploit.</p>
+
+<h1 id="the-target">The Target</h1>
+
+<p>For sake of the initial POC, I created as simple of a test target as I could think of - a <code class="language-plaintext highlighter-rouge">strcpy</code> based stack overflow. In future posts I will look to showcase a more complex target, but for now this is enough for a POC.</p>
+
+<p><strong>main.cpp</strong></p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define _CRT_SECURE_NO_WARNINGS
+#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">64</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">puts</span><span class="p">(</span><span class="s">"Usage: .</span><span class="se">\\</span><span class="s">FuzzMe &lt;name&gt;"</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span> <span class="c1">// unsafe</span>
+
+	<span class="n">printf</span><span class="p">(</span><span class="s">"Hello: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="writing-the-fuzzer">Writing The Fuzzer</h1>
+
+<p>I chose to write the Fuzzer in C++, whilst others have decided to show an initial POC in python, such as in <a href="https://twitter.com/h0mbre_">h0mbre</a>’s <a href="https://h0mbre.github.io/Fuzzing-Like-A-Caveman/">Fuzzing Like A Caveman</a> (a huge inspiration for this series), I personally prefer to jump straight into the C++ side of things for both speed, and lack of fighting the python abstraction layer.</p>
+
+<p>As mentioned previously, this fuzzer will be comprised of two main components, the mutator, and the execution engine itself. There will also be some code to execute our main fuzzing loop, but that will be quite short.</p>
+
+<p><em>Note: <code class="language-plaintext highlighter-rouge">logging.h</code> is just a modified version of <code class="language-plaintext highlighter-rouge">debug.h</code> from my <a href="https://github.com/iilegacyyii/UsefulScripts#debugh">UsefulScripts GitHub repo</a>.</em></p>
+
+<h2 id="mutator">Mutator</h2>
+
+<p>The mutator will be in charge of modifying our initial input, creating malformed payloads to be passed to our target. Therefore it requires a few essential pieces of functionality, once those are implemented, it can be extended in any variety of ways:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">SetInput</code>
+    <ul>
+      <li>Sets the fuzzer’s base input to later be mutated.</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">ResetMutatedInput</code>
+    <ul>
+      <li>Resets the fuzzer’s mutated input back to the original input, ready to be mutated again.</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">GetMutatedInput</code>
+    <ul>
+      <li>Retrieves the mutated input after our chosen mutation methods have been applied.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>As for how the mutator will mutate user input, I chose to add two methods to this fuzzer, <code class="language-plaintext highlighter-rouge">ExtendInput</code> and <code class="language-plaintext highlighter-rouge">FlipBits</code>:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ExtendInput</code>
+    <ul>
+      <li>Extends the length of the current input by a random amount of bytes, padding empty space with null bytes.</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">FlipBits</code>
+    <ul>
+      <li>Randomly flips bits in the current input. Without this, we would simply be extending input length with null bytes, and that wouldn’t trigger our bug.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>By the end of this section, the following <code class="language-plaintext highlighter-rouge">Mutator</code> class will be fully implemented:</p>
+
+<p><strong>mutator.hpp</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#pragma once
+#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;random&gt;</span><span class="cp">
+</span>
+<span class="k">class</span> <span class="nc">Mutator</span> 
+<span class="p">{</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">_Input</span><span class="p">;</span>
+	<span class="n">SIZE_T</span> <span class="n">_InputLength</span><span class="p">;</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">_MutatedInput</span><span class="p">;</span>
+	<span class="n">SIZE_T</span> <span class="n">_MutatedInputLength</span><span class="p">;</span>
+<span class="nl">public:</span>
+	<span class="n">Mutator</span><span class="p">();</span>
+	<span class="o">~</span><span class="n">Mutator</span><span class="p">();</span>
+	<span class="n">BOOL</span> <span class="n">ExtendInput</span><span class="p">(</span><span class="n">SIZE_T</span> <span class="n">Amount</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">);</span>
+	<span class="n">VOID</span> <span class="n">FlipBits</span><span class="p">();</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">GetMutatedInput</span><span class="p">();</span>
+	<span class="n">BOOL</span> <span class="n">ResetMutatedInput</span><span class="p">();</span>
+	<span class="n">BOOL</span> <span class="n">SetInput</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">SIZE_T</span> <span class="n">Length</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="constructor--destructor">Constructor &amp; Destructor</h3>
+
+<p>First, I implemented the constructor and destructor methods of our class, these will handle initialisation of our private fields (<code class="language-plaintext highlighter-rouge">_Input</code>, <code class="language-plaintext highlighter-rouge">_InputLength</code>, etc.) and freeing the allocated heap chunks during cleanup respectively.</p>
+
+<p><strong>mutator.cpp</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Mutator</span><span class="o">::</span><span class="n">Mutator</span><span class="p">()</span> <span class="c1">// constructor</span>
+<span class="p">{</span>
+	<span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span> <span class="c1">// seed prng</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_InputLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">Mutator</span><span class="o">::~</span><span class="n">Mutator</span><span class="p">()</span> <span class="c1">// destructor</span>
+<span class="p">{</span>
+	<span class="n">free</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span><span class="p">);</span>
+	<span class="n">free</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="get-set--reset-mutatedinput">Get Set &amp; Reset MutatedInput</h3>
+
+<p>Next, I implemented <code class="language-plaintext highlighter-rouge">GetMutatedInput</code>, <code class="language-plaintext highlighter-rouge">SetMutatedInput</code>, and <code class="language-plaintext highlighter-rouge">ResetMutatedInput</code>. As these are fairly self explanatory, I will just include the source below.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BYTE</span><span class="o">*</span> <span class="n">Mutator</span><span class="o">::</span><span class="n">GetMutatedInput</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="k">return</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">BOOL</span> <span class="n">Mutator</span><span class="o">::</span><span class="n">ResetMutatedInput</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="c1">// Cleanup mutated input</span>
+	<span class="n">free</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">);</span>
+	
+	<span class="c1">// Create a copy of this-&gt;_Input and allocate as _MutatedInput</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_InputLength</span><span class="p">);</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">=</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_InputLength</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span> <span class="o">==</span> <span class="n">FALSE</span><span class="p">)</span> <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+
+	<span class="n">memcpy</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">BOOL</span> <span class="n">Mutator</span><span class="o">::</span><span class="n">SetInput</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">SIZE_T</span> <span class="n">Length</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">// Allocate new original input</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">NewInput</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span><span class="p">,</span> <span class="n">Length</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">NewInput</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+
+	<span class="c1">// Again, for the input to be mutated</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">NewMutatedInput</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">,</span> <span class="n">Length</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">NewMutatedInput</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">// No need to free this-&gt;_Input, is done in destructor</span>
+		<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">// If successful, replace inputs with our new heap chunks </span>
+	<span class="c1">// (using realloc so no need to free the originals)</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span> <span class="o">=</span> <span class="n">NewInput</span><span class="p">;</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_InputLength</span> <span class="o">=</span> <span class="n">Length</span><span class="p">;</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span> <span class="o">=</span> <span class="n">NewMutatedInput</span><span class="p">;</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">=</span> <span class="n">Length</span><span class="p">;</span>
+
+	<span class="n">memcpy</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_Input</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">Length</span><span class="p">);</span>
+	<span class="n">memcpy</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">,</span> <span class="n">Length</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="mutation-methods">Mutation Methods</h3>
+
+<p>Now that getting, setting, and resetting of inputs is implemented. It is time to start work on the fun part, mutation methods.</p>
+
+<p><strong>ExtendInput</strong></p>
+
+<p>This method will extend <code class="language-plaintext highlighter-rouge">_MutatedInput</code> by <code class="language-plaintext highlighter-rouge">Amount</code> bytes. <code class="language-plaintext highlighter-rouge">Amount</code> can either be pre-defined or will be a randomly selected value between 1 and 4096. The extra <code class="language-plaintext highlighter-rouge">Amount</code> bytes will be set to null bytes.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BOOL</span> <span class="n">Mutator</span><span class="o">::</span><span class="n">ExtendInput</span><span class="p">(</span><span class="n">SIZE_T</span> <span class="n">Amount</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Amount</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">// If no amount specified, expand string by up to 4096 bytes</span>
+		<span class="n">Amount</span> <span class="o">=</span> <span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="mi">4096</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">Amount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">Amount</span><span class="o">++</span><span class="p">;</span> <span class="c1">// Will extend by 1 at minimum</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Attempt to extend MutatedInput to the new size</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">NewMutatedInput</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">+</span> <span class="n">Amount</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">NewMutatedInput</span><span class="p">)</span> <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+
+	<span class="c1">// Fill with null bytes and write current MutatedInput to the start</span>
+	<span class="n">memset</span><span class="p">(</span><span class="n">NewMutatedInput</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">+</span> <span class="n">Amount</span><span class="p">);</span>
+	<span class="n">memcpy</span><span class="p">(</span><span class="n">NewMutatedInput</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span><span class="p">);</span>
+
+	<span class="c1">// Replace mutated input fields</span>
+	<span class="n">free</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">);</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span> <span class="o">=</span> <span class="n">NewMutatedInput</span><span class="p">;</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">=</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span> <span class="o">+</span> <span class="n">Amount</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>FlipBits</strong></p>
+
+<p>As the name suggests, <code class="language-plaintext highlighter-rouge">FlipBits</code> will randomly flip bits in <code class="language-plaintext highlighter-rouge">_MutatedInput</code>. There are a variety of ways to approach this, for example only flipping bits in X percent of bytes. However, to keep things easy to understand, I decided to just flip bits in every byte of <code class="language-plaintext highlighter-rouge">_MutatedInput</code>.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">VOID</span> <span class="n">Mutator</span><span class="o">::</span><span class="n">FlipBits</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="k">for</span> <span class="p">(</span><span class="n">SIZE_T</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInputLength</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">this</span><span class="o">-&gt;</span><span class="n">_MutatedInput</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^=</span> <span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="mi">256</span><span class="p">;</span> <span class="c1">// randomly flip bits given values from 0-255</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that <code class="language-plaintext highlighter-rouge">Mutator</code> is fully implemented, I looked to create the <code class="language-plaintext highlighter-rouge">ExecutionEngine</code>.</p>
+
+<h2 id="execution-engine">Execution Engine</h2>
+
+<p>As shown in the <a href="#the-target">target source</a> above, our target will take user input from <code class="language-plaintext highlighter-rouge">argv[1]</code>, and so we shall look to build the execution engine (in this case also acting as our harness). In order to keep this as simple as possible, <code class="language-plaintext highlighter-rouge">ExecutionEngine</code> will have just one key method <code class="language-plaintext highlighter-rouge">RunTestCase</code>.</p>
+
+<p>Similar to the <code class="language-plaintext highlighter-rouge">Mutator</code> class, by the end of this section the following class will be fully implemented:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#pragma once
+#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;random&gt;</span><span class="cp">
+#include</span> <span class="cpf">"logging.hpp"</span><span class="cp">
+</span>
+<span class="k">class</span> <span class="nc">ExecutionEngine</span>
+<span class="p">{</span>
+	<span class="n">BYTE</span><span class="o">*</span> <span class="n">_ExecutablePath</span><span class="p">;</span>
+<span class="nl">public:</span>
+	<span class="n">ExecutionEngine</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">ExecutablePath</span><span class="p">);</span>
+	<span class="o">~</span><span class="n">ExecutionEngine</span><span class="p">();</span>
+	<span class="n">DWORD</span> <span class="n">RunTestCase</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">Input</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="constructor--destructor-1">Constructor &amp; Destructor</h3>
+
+<p>In the case of such a basic execution engine, one could argue that these aren’t really necessary. However, I personally consider it good practice to have both for every class. The source is as follows:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ExecutionEngine</span><span class="o">::</span><span class="n">ExecutionEngine</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">ExecutablePath</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">this</span><span class="o">-&gt;</span><span class="n">_ExecutablePath</span> <span class="o">=</span> <span class="n">ExecutablePath</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">ExecutionEngine</span><span class="o">::~</span><span class="n">ExecutionEngine</span><span class="p">()</span>
+<span class="p">{</span>
+	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="runtestcase">RunTestCase</h3>
+
+<p>This is the meat of the <code class="language-plaintext highlighter-rouge">ExecutionEngine</code> class. In order to keep this explanation brief, I have summarised it below in bullet points:</p>
+
+<ol>
+  <li>Initialise variables needed for call to <code class="language-plaintext highlighter-rouge">CreateProcessA</code></li>
+  <li>Create an instance of the specified target using <code class="language-plaintext highlighter-rouge">_ExecutablePath</code></li>
+  <li>Wait until the process exits</li>
+  <li>Store the exit code</li>
+  <li>Cleanup handles</li>
+</ol>
+
+<p>The commented source is as follows:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DWORD</span> <span class="n">ExecutionEngine</span><span class="o">::</span><span class="n">RunTestCase</span><span class="p">(</span><span class="n">BYTE</span><span class="o">*</span> <span class="n">Input</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">DWORD</span> <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">STARTUPINFOA</span> <span class="n">si</span><span class="p">;</span>
+	<span class="n">PROCESS_INFORMATION</span> <span class="n">pi</span><span class="p">;</span>
+
+	<span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">));</span>
+	<span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pi</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">pi</span><span class="p">));</span>
+	<span class="n">si</span><span class="p">.</span><span class="n">cb</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+	<span class="n">si</span><span class="p">.</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="n">STARTF_USESTDHANDLES</span> <span class="o">|</span> <span class="n">CREATE_NO_WINDOW</span><span class="p">;</span> <span class="c1">// dont inherit stdin/stderr/stdout</span>
+
+	<span class="c1">// spawn target process with Input being passed into arguments</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">CreateProcessA</span><span class="p">((</span><span class="n">LPCSTR</span><span class="p">)</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_ExecutablePath</span><span class="p">,(</span><span class="n">LPSTR</span><span class="p">)</span><span class="n">Input</span><span class="p">,</span>
+		<span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pi</span><span class="p">))</span>
+	<span class="p">{</span>
+		<span class="n">LOG_ERROR</span><span class="p">(</span><span class="s">"Failed to create process (0x%08lx)"</span><span class="p">,</span> <span class="n">GetLastError</span><span class="p">());</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Wait for process to exit, and store the exit code</span>
+	<span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+	<span class="n">GetExitCodeProcess</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hProcess</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">exit_code</span><span class="p">);</span>
+	
+	<span class="c1">// cleanup handles</span>
+	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hProcess</span><span class="p">);</span>
+	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hThread</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">exit_code</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With <code class="language-plaintext highlighter-rouge">ExecutionEngine</code> fully implemented, we just need to bring it all together to create a fuzzing loop.</p>
+
+<h2 id="bringing-it-all-together">Bringing it All Together</h2>
+
+<p>Now that the core functionality for the fuzzer was implemented, I wrapped it in the following control flow:</p>
+
+<ol>
+  <li>Ensure proper args have been passed (<code class="language-plaintext highlighter-rouge">Usage: .\FirstFuzzer.exe &lt;exe&gt; &lt;initial_input&gt;</code>)</li>
+  <li>Check target exe exists and that the user read/execute permissions</li>
+  <li>Set <code class="language-plaintext highlighter-rouge">Mutator</code>’s initial input, and <code class="language-plaintext highlighter-rouge">ExecutionEngine</code>’s target exe</li>
+  <li>Run the fuzzer loop for <code class="language-plaintext highlighter-rouge">1000</code> iterations
+    <ul>
+      <li>Mutate input with <code class="language-plaintext highlighter-rouge">ExtendInput</code> and <code class="language-plaintext highlighter-rouge">FlipBits</code> methods</li>
+      <li>Execute the target via <code class="language-plaintext highlighter-rouge">RunTestCase</code>, providing our mutated input</li>
+      <li>Log crash if there is one</li>
+      <li>Reset mutated input</li>
+    </ul>
+  </li>
+  <li>Print fuzzing stats</li>
+  <li>Cleanup</li>
+</ol>
+
+<p>The commented source for this has been given below:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;time.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">"logging.hpp"</span><span class="cp">
+#include</span> <span class="cpf">"mutator.hpp"</span><span class="cp">
+#include</span> <span class="cpf">"executionEngine.hpp"</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">int</span> <span class="n">return_val</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">SIZE_T</span> <span class="n">iteration_goal</span> <span class="o">=</span> <span class="mi">300</span><span class="p">;</span>
+	<span class="n">Mutator</span><span class="o">*</span> <span class="n">mutator</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="n">ExecutionEngine</span><span class="o">*</span> <span class="n">execution_engine</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="n">DWORD</span> <span class="n">exit_code</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="kt">clock_t</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">;</span>
+	<span class="kt">double</span> <span class="n">time_spent</span><span class="p">;</span>
+	
+	<span class="c1">// Make sure there's 3 args</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">LOG_ERROR</span><span class="p">(</span><span class="s">"Invalid usage"</span><span class="p">);</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"    Usage: .</span><span class="se">\\</span><span class="s">FirstFuzzer.exe &lt;exe&gt; &lt;initial_input&gt;</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Check target exe exists</span>
+	<span class="n">HANDLE</span> <span class="n">file_handle</span> <span class="o">=</span> <span class="n">CreateFileA</span><span class="p">(</span>
+		<span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
+		<span class="n">GENERIC_READ</span> <span class="o">|</span> <span class="n">GENERIC_EXECUTE</span><span class="p">,</span> 
+		<span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> 
+		<span class="n">OPEN_EXISTING</span><span class="p">,</span>
+		<span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span>
+		<span class="nb">NULL</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">file_handle</span> <span class="o">==</span> <span class="n">INVALID_HANDLE_VALUE</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">LOG_ERROR</span><span class="p">(</span><span class="s">"File '%s' either does not exist, or you do not have permissions to execute"</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+		<span class="n">return_val</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+		<span class="k">goto</span> <span class="n">CLEANUP</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">file_handle</span><span class="p">);</span>
+	<span class="n">LOG_SUCCESS</span><span class="p">(</span><span class="s">"Target exe '%s'"</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+	<span class="c1">// Set initial input</span>
+	<span class="n">mutator</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Mutator</span><span class="p">();</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">mutator</span><span class="o">-&gt;</span><span class="n">SetInput</span><span class="p">((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">strlen</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="o">==</span> <span class="n">FALSE</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">LOG_ERROR</span><span class="p">(</span><span class="s">"Insufficient memory to allocate initial input"</span><span class="p">);</span>
+		<span class="n">return_val</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+		<span class="k">goto</span> <span class="n">CLEANUP</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Start fuzzing</span>
+	<span class="n">begin</span> <span class="o">=</span> <span class="n">clock</span><span class="p">();</span>
+	<span class="n">execution_engine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ExecutionEngine</span><span class="p">((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+	<span class="k">for</span> <span class="p">(</span><span class="n">SIZE_T</span> <span class="n">iteration_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">iteration_count</span> <span class="o">&lt;</span> <span class="n">iteration_goal</span><span class="p">;</span> <span class="n">iteration_count</span><span class="o">++</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">// mutate inputs</span>
+		<span class="n">mutator</span><span class="o">-&gt;</span><span class="n">ExtendInput</span><span class="p">();</span>
+		<span class="n">mutator</span><span class="o">-&gt;</span><span class="n">FlipBits</span><span class="p">();</span>
+
+		<span class="c1">// Run test case and check output</span>
+		<span class="n">exit_code</span> <span class="o">=</span> <span class="n">execution_engine</span><span class="o">-&gt;</span><span class="n">RunTestCase</span><span class="p">(</span><span class="n">mutator</span><span class="o">-&gt;</span><span class="n">GetMutatedInput</span><span class="p">());</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="n">LOG_SUCCESS</span><span class="p">(</span><span class="s">"Process exited with code: %d"</span><span class="p">,</span> <span class="n">exit_code</span><span class="p">);</span>
+		<span class="p">}</span>
+
+		<span class="c1">// Reset ready for the next test case</span>
+		<span class="n">mutator</span><span class="o">-&gt;</span><span class="n">ResetMutatedInput</span><span class="p">();</span>
+
+		<span class="c1">// Handle display</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">iteration_count</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="n">printf</span><span class="p">(</span><span class="s">"%lld/%lld iterations</span><span class="se">\r</span><span class="s">"</span><span class="p">,</span> <span class="n">iteration_count</span><span class="p">,</span> <span class="n">iteration_goal</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Final stats output</span>
+	<span class="n">end</span> <span class="o">=</span> <span class="n">clock</span><span class="p">();</span>
+	<span class="n">time_spent</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="n">end</span> <span class="o">-</span> <span class="n">begin</span><span class="p">)</span> <span class="o">/</span> <span class="n">CLOCKS_PER_SEC</span><span class="p">;</span>
+	<span class="n">LOG_SUCCESS</span><span class="p">(</span><span class="s">"%lld executions in %fs (%f/s)"</span><span class="p">,</span> <span class="n">iteration_goal</span><span class="p">,</span> <span class="n">time_spent</span><span class="p">,</span> <span class="n">iteration_goal</span><span class="o">/</span><span class="n">time_spent</span><span class="p">);</span>
+
+	<span class="nl">CLEANUP:</span>
+	<span class="k">delete</span> <span class="n">mutator</span><span class="p">;</span>
+	<span class="k">delete</span> <span class="n">execution_engine</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="n">return_val</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="benchmarking">Benchmarking</h1>
+
+<p>So in order to acquire a fair benchmark, I decided to perform two tests:</p>
+
+<ol>
+  <li>Run for 100, 1000, and 10000 iterations against target executable with just <code class="language-plaintext highlighter-rouge">ExtendedInput</code> mutation rule (should have no crashes)</li>
+  <li>Same as before, except with the <code class="language-plaintext highlighter-rouge">FlipBits</code> mutation rule added (will have many crashes)</li>
+</ol>
+
+<p>Performing both of these allows for a measure of the performance defecit of having the target executable crash rather than exiting cleanly.</p>
+
+<h2 id="test-1---no-crashes">Test 1 - No Crashes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Iterations</th>
+      <th>Total time taken (s)</th>
+      <th>Iterations/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>100</td>
+      <td>0.347s</td>
+      <td>288.184438</td>
+    </tr>
+    <tr>
+      <td>1000</td>
+      <td>3.308s</td>
+      <td>302.297461</td>
+    </tr>
+    <tr>
+      <td>10000</td>
+      <td>35.210</td>
+      <td>284.010224</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This gives an average of <code class="language-plaintext highlighter-rouge">285.604</code> iterations/s over the course of <code class="language-plaintext highlighter-rouge">11100</code> iterations, in the case of which there are no crashes.</p>
+
+<h2 id="test-2---crashes">Test 2 - Crashes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Iterations</th>
+      <th>Total time taken (s)</th>
+      <th>Iterations/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>100</td>
+      <td>3.419</td>
+      <td>29.248318</td>
+    </tr>
+    <tr>
+      <td>1000</td>
+      <td>36.228</td>
+      <td>27.602959</td>
+    </tr>
+    <tr>
+      <td>10000</td>
+      <td>328.949</td>
+      <td>30.399849</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This gives an average of <code class="language-plaintext highlighter-rouge">30.114</code> iterations/s over the course of <code class="language-plaintext highlighter-rouge">11100</code> iterations, in the case of which there are crashes. As you can see, this is approximately <code class="language-plaintext highlighter-rouge">9.5</code> times slower than fuzzing without crashes, and shows a good worst case in terms of performance defecit.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>After having set out to create a simple fuzzer, I had managed exactly that, and with speeds that are honestly not terrible given how un-optimised it is. In the next post, I will look to reduce the performance deficit incurred from a crash, implement proper crash logs, and perhaps point this at a real-world target!</p>
+
+<p>Massive thanks to those in the vulnerability research community for publishing their tooling, as well as providing writeups of their shenanigans, as without them I wouldn’t have been able to learn about such an interesting topic.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li><a href="https://h0mbre.github.io/Fuzzing-Like-A-Caveman/">Fuzzing Like A Caveman</a> - Awesome series by <a href="https://twitter.com/h0mbre_">h0mbre</a>, inspiring this series</li>
+  <li><a href="https://doar-e.github.io/blog/2023/05/05/competing-in-pwn2own-ics-2022-miami-exploiting-a-zero-click-remote-memory-corruption-in-iconics-genesis64/">Competing in Pwn2Own ICS 2022 Miami: Exploiting a zero click remote memory corruption in ICONICS Genesis64</a> - An awesome Pwn2Own journey writeup by <a href="https://twitter.com/0vercl0k">0vercl0k</a></li>
+</ul>
+
+  </div><a class="u-url" href="/vr/windows/2023/10/23/writing-a-windows-fuzzer-from-scratch.html" hidden=""></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Legacyy</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Legacyy</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/iiLegacyyii"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">iiLegacyyii</span></a></li><li><a href="https://www.twitter.com/0xLegacyy"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">0xLegacyy</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Red Team Operator and lover of all things Defense Evasion. 🦐 "It's shrimple" 🦐</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+</body></html>

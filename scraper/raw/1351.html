@@ -1,0 +1,488 @@
+<html lang="en-US" class="js_active vc_desktop vc_transform vc_transform vc_transform wf-opensans-n3-active wf-opensans-n4-active wf-opensans-n6-active wf-opensans-n7-active wf-opensans-n8-active wf-opensans-i3-active wf-opensans-i4-active wf-opensans-i6-active wf-opensans-i7-active wf-opensans-i8-active wf-montserrat-n4-active wf-montserrat-n7-active wf-adamina-n4-active wf-active"><head>
+<link rel="shortcut icon" href="https://azeria-labs.com/favicon.ico">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Heap Exploit Development |  Azeria Labs</title>
+<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+<!-- Mobile Specific Metas & Favicons -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, user-scalable=1"><!-- WordPress Stuff -->
+                        <script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-PFZX4BN7JZ&amp;cx=c&amp;_slc=1"></script><script async="" src="https://www.google-analytics.com/analytics.js"></script><script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.3/webfont.js" type="text/javascript" async=""></script><script>
+                            /* You can add more configuration options to webfontloader by previously defining the WebFontConfig with your options */
+                            if ( typeof WebFontConfig === "undefined" ) {
+                                WebFontConfig = new Object();
+                            }
+                            WebFontConfig['google'] = {families: ['Open+Sans:300,400,600,700,800,300italic,400italic,600italic,700italic,800italic', 'Montserrat:400,700', 'Adamina:400&amp;subset=latin']};
+
+                            (function() {
+                                var wf = document.createElement( 'script' );
+                                wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.5.3/webfont.js';
+                                wf.type = 'text/javascript';
+                                wf.async = 'true';
+                                var s = document.getElementsByTagName( 'script' )[0];
+                                s.parentNode.insertBefore( wf, s );
+                            })();
+                        </script>
+                        <meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="Azeria Labs » Feed" href="https://azeria-labs.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Azeria Labs » Comments Feed" href="https://azeria-labs.com/comments/feed/">
+<meta property="og:title" content="Heap Exploit Development"><meta property="og:type" content="article"><meta property="og:url" content="https://azeria-labs.com/heap-exploit-development-part-1/"><meta property="og:site_name" content="Azeria-Labs"><meta property="og:image" content="https://azeria-labs.com/promo.png"><script type="text/javascript">
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/azeria-labs.com\/wp-includes\/js\/wp-emoji-release.min.js"}};
+/*! This file is auto-generated */
+!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){p.clearRect(0,0,i.width,i.height),p.fillText(e,0,0);e=i.toDataURL();return p.clearRect(0,0,i.width,i.height),p.fillText(t,0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(p&&p.fillText)switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s("\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!s("\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!s("\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!s("\ud83e\udef1\ud83c\udffb\u200d\ud83e\udef2\ud83c\udfff","\ud83e\udef1\ud83c\udffb\u200b\ud83e\udef2\ud83c\udfff")}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(e=t.source||{}).concatemoji?c(e.concatemoji):e.wpemoji&&e.twemoji&&(c(e.twemoji),c(e.wpemoji)))}(window,document,window._wpemojiSettings);
+</script>
+<style type="text/css">img.wp-smiley,img.emoji{display:inline!important;border:none!important;box-shadow:none!important;height:1em!important;width:1em!important;margin:0 .07em!important;vertical-align:-.1em!important;background:none!important;padding:0!important}</style>
+	<link rel="stylesheet" id="wp-block-library-css" href="https://azeria-labs.com/wp-includes/css/dist/block-library/A.style.min.css.pagespeed.cf.1qpRdvAQUt.css" type="text/css" media="all">
+<link rel="stylesheet" id="classic-theme-styles-css" href="https://azeria-labs.com/wp-includes/css/A.classic-themes.min.css.pagespeed.cf.ILQxq27NYr.css" type="text/css" media="all">
+<style id="global-styles-inline-css" type="text/css">body{--wp--preset--color--black:#000;--wp--preset--color--cyan-bluish-gray:#abb8c3;--wp--preset--color--white:#fff;--wp--preset--color--pale-pink:#f78da7;--wp--preset--color--vivid-red:#cf2e2e;--wp--preset--color--luminous-vivid-orange:#ff6900;--wp--preset--color--luminous-vivid-amber:#fcb900;--wp--preset--color--light-green-cyan:#7bdcb5;--wp--preset--color--vivid-green-cyan:#00d084;--wp--preset--color--pale-cyan-blue:#8ed1fc;--wp--preset--color--vivid-cyan-blue:#0693e3;--wp--preset--color--vivid-purple:#9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple:linear-gradient(135deg,rgba(6,147,227,1) 0%,#9b51e0 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan:linear-gradient(135deg,#7adcb4 0%,#00d082 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange:linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red:linear-gradient(135deg,rgba(255,105,0,1) 0%,#cf2e2e 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray:linear-gradient(135deg,#eee 0%,#a9b8c3 100%);--wp--preset--gradient--cool-to-warm-spectrum:linear-gradient(135deg,#4aeadc 0%,#9778d1 20%,#cf2aba 40%,#ee2c82 60%,#fb6962 80%,#fef84c 100%);--wp--preset--gradient--blush-light-purple:linear-gradient(135deg,#ffceec 0%,#9896f0 100%);--wp--preset--gradient--blush-bordeaux:linear-gradient(135deg,#fecda5 0%,#fe2d2d 50%,#6b003e 100%);--wp--preset--gradient--luminous-dusk:linear-gradient(135deg,#ffcb70 0%,#c751c0 50%,#4158d0 100%);--wp--preset--gradient--pale-ocean:linear-gradient(135deg,#fff5cb 0%,#b6e3d4 50%,#33a7b5 100%);--wp--preset--gradient--electric-grass:linear-gradient(135deg,#caf880 0%,#71ce7e 100%);--wp--preset--gradient--midnight:linear-gradient(135deg,#020381 0%,#2874fc 100%);--wp--preset--duotone--dark-grayscale:url(#wp-duotone-dark-grayscale);--wp--preset--duotone--grayscale:url(#wp-duotone-grayscale);--wp--preset--duotone--purple-yellow:url(#wp-duotone-purple-yellow);--wp--preset--duotone--blue-red:url(#wp-duotone-blue-red);--wp--preset--duotone--midnight:url(#wp-duotone-midnight);--wp--preset--duotone--magenta-yellow:url(#wp-duotone-magenta-yellow);--wp--preset--duotone--purple-green:url(#wp-duotone-purple-green);--wp--preset--duotone--blue-orange:url(#wp-duotone-blue-orange);--wp--preset--font-size--small:13px;--wp--preset--font-size--medium:20px;--wp--preset--font-size--large:36px;--wp--preset--font-size--x-large:42px;--wp--preset--spacing--20:.44rem;--wp--preset--spacing--30:.67rem;--wp--preset--spacing--40:1rem;--wp--preset--spacing--50:1.5rem;--wp--preset--spacing--60:2.25rem;--wp--preset--spacing--70:3.38rem;--wp--preset--spacing--80:5.06rem;--wp--preset--shadow--natural:6px 6px 9px rgba(0,0,0,.2);--wp--preset--shadow--deep:12px 12px 50px rgba(0,0,0,.4);--wp--preset--shadow--sharp:6px 6px 0 rgba(0,0,0,.2);--wp--preset--shadow--outlined:6px 6px 0 -3px rgba(255,255,255,1) , 6px 6px rgba(0,0,0,1);--wp--preset--shadow--crisp:6px 6px 0 rgba(0,0,0,1)}:where(.is-layout-flex){gap:.5em}body .is-layout-flow>.alignleft{float:left;margin-inline-start:0;margin-inline-end:2em}body .is-layout-flow>.alignright{float:right;margin-inline-start:2em;margin-inline-end:0}body .is-layout-flow>.aligncenter{margin-left:auto!important;margin-right:auto!important}body .is-layout-constrained>.alignleft{float:left;margin-inline-start:0;margin-inline-end:2em}body .is-layout-constrained>.alignright{float:right;margin-inline-start:2em;margin-inline-end:0}body .is-layout-constrained>.aligncenter{margin-left:auto!important;margin-right:auto!important}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size);margin-left:auto!important;margin-right:auto!important}body .is-layout-constrained>.alignwide{max-width:var(--wp--style--global--wide-size)}body .is-layout-flex{display:flex}body .is-layout-flex{flex-wrap:wrap;align-items:center}body .is-layout-flex>*{margin:0}:where(.wp-block-columns.is-layout-flex){gap:2em}.has-black-color{color:var(--wp--preset--color--black)!important}.has-cyan-bluish-gray-color{color:var(--wp--preset--color--cyan-bluish-gray)!important}.has-white-color{color:var(--wp--preset--color--white)!important}.has-pale-pink-color{color:var(--wp--preset--color--pale-pink)!important}.has-vivid-red-color{color:var(--wp--preset--color--vivid-red)!important}.has-luminous-vivid-orange-color{color:var(--wp--preset--color--luminous-vivid-orange)!important}.has-luminous-vivid-amber-color{color:var(--wp--preset--color--luminous-vivid-amber)!important}.has-light-green-cyan-color{color:var(--wp--preset--color--light-green-cyan)!important}.has-vivid-green-cyan-color{color:var(--wp--preset--color--vivid-green-cyan)!important}.has-pale-cyan-blue-color{color:var(--wp--preset--color--pale-cyan-blue)!important}.has-vivid-cyan-blue-color{color:var(--wp--preset--color--vivid-cyan-blue)!important}.has-vivid-purple-color{color:var(--wp--preset--color--vivid-purple)!important}.has-black-background-color{background-color:var(--wp--preset--color--black)!important}.has-cyan-bluish-gray-background-color{background-color:var(--wp--preset--color--cyan-bluish-gray)!important}.has-white-background-color{background-color:var(--wp--preset--color--white)!important}.has-pale-pink-background-color{background-color:var(--wp--preset--color--pale-pink)!important}.has-vivid-red-background-color{background-color:var(--wp--preset--color--vivid-red)!important}.has-luminous-vivid-orange-background-color{background-color:var(--wp--preset--color--luminous-vivid-orange)!important}.has-luminous-vivid-amber-background-color{background-color:var(--wp--preset--color--luminous-vivid-amber)!important}.has-light-green-cyan-background-color{background-color:var(--wp--preset--color--light-green-cyan)!important}.has-vivid-green-cyan-background-color{background-color:var(--wp--preset--color--vivid-green-cyan)!important}.has-pale-cyan-blue-background-color{background-color:var(--wp--preset--color--pale-cyan-blue)!important}.has-vivid-cyan-blue-background-color{background-color:var(--wp--preset--color--vivid-cyan-blue)!important}.has-vivid-purple-background-color{background-color:var(--wp--preset--color--vivid-purple)!important}.has-black-border-color{border-color:var(--wp--preset--color--black)!important}.has-cyan-bluish-gray-border-color{border-color:var(--wp--preset--color--cyan-bluish-gray)!important}.has-white-border-color{border-color:var(--wp--preset--color--white)!important}.has-pale-pink-border-color{border-color:var(--wp--preset--color--pale-pink)!important}.has-vivid-red-border-color{border-color:var(--wp--preset--color--vivid-red)!important}.has-luminous-vivid-orange-border-color{border-color:var(--wp--preset--color--luminous-vivid-orange)!important}.has-luminous-vivid-amber-border-color{border-color:var(--wp--preset--color--luminous-vivid-amber)!important}.has-light-green-cyan-border-color{border-color:var(--wp--preset--color--light-green-cyan)!important}.has-vivid-green-cyan-border-color{border-color:var(--wp--preset--color--vivid-green-cyan)!important}.has-pale-cyan-blue-border-color{border-color:var(--wp--preset--color--pale-cyan-blue)!important}.has-vivid-cyan-blue-border-color{border-color:var(--wp--preset--color--vivid-cyan-blue)!important}.has-vivid-purple-border-color{border-color:var(--wp--preset--color--vivid-purple)!important}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background:var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple)!important}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background:var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan)!important}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background:var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange)!important}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background:var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red)!important}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background:var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray)!important}.has-cool-to-warm-spectrum-gradient-background{background:var(--wp--preset--gradient--cool-to-warm-spectrum)!important}.has-blush-light-purple-gradient-background{background:var(--wp--preset--gradient--blush-light-purple)!important}.has-blush-bordeaux-gradient-background{background:var(--wp--preset--gradient--blush-bordeaux)!important}.has-luminous-dusk-gradient-background{background:var(--wp--preset--gradient--luminous-dusk)!important}.has-pale-ocean-gradient-background{background:var(--wp--preset--gradient--pale-ocean)!important}.has-electric-grass-gradient-background{background:var(--wp--preset--gradient--electric-grass)!important}.has-midnight-gradient-background{background:var(--wp--preset--gradient--midnight)!important}.has-small-font-size{font-size:var(--wp--preset--font-size--small)!important}.has-medium-font-size{font-size:var(--wp--preset--font-size--medium)!important}.has-large-font-size{font-size:var(--wp--preset--font-size--large)!important}.has-x-large-font-size{font-size:var(--wp--preset--font-size--x-large)!important}.wp-block-navigation a:where(:not(.wp-element-button)){color:inherit}:where(.wp-block-columns.is-layout-flex){gap:2em}.wp-block-pullquote{font-size:1.5em;line-height:1.6}</style>
+<link rel="stylesheet" id="contact-form-7-css" href="https://azeria-labs.com/wp-content/plugins/contact-form-7/includes/css/A.styles.css.pagespeed.cf.BWVnRDAE9I.css" type="text/css" media="all">
+<link rel="stylesheet" id="stylesheet-css" href="https://azeria-labs.com/wp-content/themes/unicon/A.style.css.pagespeed.cf.CxYd9aqE1A.css" type="text/css" media="all">
+<link rel="stylesheet" id="js_composer_front-css" href="https://azeria-labs.com/wp-content/plugins/js_composer/assets/css/A.js_composer.min.css.pagespeed.cf.J2ymyeC32Y.css" type="text/css" media="all">
+<link rel="stylesheet" id="shortcodes-css" href="https://azeria-labs.com/wp-content/themes/unicon/framework/css/A.shortcodes.css.pagespeed.cf.gQlKZUpOmq.css" type="text/css" media="all">
+<link rel="stylesheet" id="responsive-css" href="https://azeria-labs.com/wp-content/themes/unicon/framework/css/A.responsive.css.pagespeed.cf.OD-Zu4XGUf.css" type="text/css" media="all">
+<script type="text/javascript" src="https://azeria-labs.com/wp-includes/js/jquery/jquery.min.js.pagespeed.ce.DoUKabx_0K.js" id="jquery-core-js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800,300italic,400italic,600italic,700italic,800italic%7CMontserrat:400,700%7CAdamina:400&amp;amp;subset=latin"><script type="text/javascript" src="https://azeria-labs.com/wp-includes/js/jquery/jquery-migrate.min.js.pagespeed.ce.XPorSB3m6H.js" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://azeria-labs.com/wp-json/"><link rel="alternate" type="application/json" href="https://azeria-labs.com/wp-json/wp/v2/pages/17860"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://azeria-labs.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://azeria-labs.com/wp-includes/wlwmanifest.xml">
+<link rel="canonical" href="https://azeria-labs.com/heap-exploit-development-part-1/">
+<link rel="shortlink" href="https://azeria-labs.com/?p=17860">
+<link rel="alternate" type="application/json+oembed" href="https://azeria-labs.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fazeria-labs.com%2Fheap-exploit-development-part-1%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://azeria-labs.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fazeria-labs.com%2Fheap-exploit-development-part-1%2F&amp;format=xml">
+<style type="text/css">body{font:400 13px Open\ Sans,Arial,Helvetica,sans-serif;color:#fff;line-height:1.9}.wrapall,.boxed-layout{background-color:#353535}body.page-template-page-blank-php{background:#353535!important}h1{font:400 28px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}h2{font:400 24px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}h3{font:400 20px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}h4{font:400 16px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}h5{font:400 16px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}h6{font:400 16px Adamina,Arial,Helvetica,sans-serif;color:#1cbac8}.title{font-family:'Adamina',Arial,Helvetica,sans-serif}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{font-weight:inherit;color:inherit}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover,a:hover h1,a:hover h2,a:hover h3,a:hover h4,a:hover h5,a:hover h6{color:#fff}a{color:#1cbac8}a:hover{color:#fff}input[type="text"],input[type="password"],input[type="email"],input[type="tel"],textarea,select{font-family:Open\ Sans,Arial,Helvetica,sans-serif;font-size:13px}#sidebar .widget h3{font:14px Montserrat,Arial,Helvetica,sans-serif;color:#1cbac8}.container .twelve.alt.sidebar-right,.container .twelve.alt.sidebar-left,#sidebar.sidebar-right #sidebar-widgets,#sidebar.sidebar-left #sidebar-widgets{border-color:#efefef}#topbar{background:#f5f5f5;color:#777}#topbar a{color:#999}#topbar a:hover{color:#333}@media only screen and (max-width:767px){#topbar .topbar-col1{background:#f5f5f5}}#navigation>ul>li>a{font:13px Montserrat,Arial,Helvetica,sans-serif;color:#fff}#navigation>ul>li:hover>a,#navigation>ul>li>a:hover{color:#1cbac8}#navigation li.current-menu-item>a:hover,#navigation li.current-page-ancestor>a:hover,#navigation li.current-menu-ancestor>a:hover,#navigation li.current-menu-parent>a:hover,#navigation li.current_page_ancestor>a:hover,#navigation>ul>li.sfHover>a{color:#1cbac8}#navigation li.current-menu-item>a,#navigation li.current-page-ancestor>a,#navigation li.current-menu-ancestor>a,#navigation li.current-menu-parent>a,#navigation li.current_page_ancestor>a{color:#ff5b5b}#navigation ul li:hover{border-color:#1cbac8}#navigation li.current-menu-item,#navigation li.current-page-ancestor,#navigation li.current-menu-ancestor,#navigation li.current-menu-parent,#navigation li.current_page_ancestor{border-color:#ff5b5b}#navigation .sub-menu{background:#262626}#navigation .sub-menu li a{font:13px Open\ Sans,Arial,Helvetica,sans-serif;color:#fff}#navigation .sub-menu li a:hover{color:#1b90c6}#navigation .sub-menu li.current_page_item>a,#navigation .sub-menu li.current_page_item>a:hover,#navigation .sub-menu li.current-menu-item>a,#navigation .sub-menu li.current-menu-item>a:hover,#navigation .sub-menu li.current-page-ancestor>a,#navigation .sub-menu li.current-page-ancestor>a:hover,#navigation .sub-menu li.current-menu-ancestor>a,#navigation .sub-menu li.current-menu-ancestor>a:hover,#navigation .sub-menu li.current-menu-parent>a,#navigation .sub-menu li.current-menu-parent>a:hover,#navigation .sub-menu li.current_page_ancestor>a,#navigation .sub-menu li.current_page_ancestor>a:hover{color:#1b90c6}#navigation .sub-menu li a,#navigation .sub-menu ul li a{border-color:#333}#navigation>ul>li.megamenu>ul.sub-menu{background:#262626;border-color:#1cbac8}#navigation>ul>li.megamenu>ul>li{border-right-color:#333!important}#navigation>ul>li.megamenu ul li a{color:#fff}#navigation>ul>li.megamenu>ul>li>a{color:#ff5b5b}#navigation>ul>li.megamenu>ul ul li a:hover,#header #navigation>ul>li.megamenu>ul ul li.current-menu-item a{color:#1b90c6!important;background-color:#333!important}#search-btn,#shopping-btn,#close-search-btn{color:#ff5b5b}#search-btn:hover,#shopping-btn:hover,#close-search-btn:hover{color:#ff5b5b}#slogan{font:20px Open\ Sans,Arial,Helvetica,sans-serif;color:#777;margin-top:26px}#mobile-navigation{background:#262626}#mobile-navigation ul li a{font:13px Open\ Sans,Arial,Helvetica,sans-serif;color:#fff;border-bottom-color:#333!important}#mobile-navigation ul li a:hover,#mobile-navigation ul li a:hover [class^="fa-"],#mobile-navigation li.open>a,#mobile-navigation ul li.current-menu-item>a,#mobile-navigation ul li.current-menu-ancestor>a{color:#1b90c6}body #mobile-navigation li.open>a [class^="fa-"]{color:#1b90c6}#mobile-navigation form,#mobile-navigation form input{background:#444;color:#1cbac8}#mobile-navigation form:before{color:#1cbac8}#mobile-header{background:#353535;height:90px}#mobile-navigation-btn,#mobile-cart-btn,#mobile-shopping-btn{color:#ff5b5b;line-height:90px}#mobile-navigation-btn:hover,#mobile-cart-btn:hover,#mobile-shopping-btn:hover{color:#ff5b5b}#mobile-header .logo{margin-top:0}#header.header-v1{height:90px;background:#353535}.header-v1 .logo{margin-top:0}.header-v1 #navigation>ul>li{height:90px;padding-top:65px}.header-v1 #navigation .sub-menu{top:90px}.header-v1 .header-icons-divider{line-height:90px;background:#6fbfc6}#header.header-v1 .widget_shopping_cart{top:90px}.header-v1 #search-btn,.header-v1 #close-search-btn,.header-v1 #shopping-btn{line-height:90px}.header-v1 #search-top,.header-v1 #search-top input{height:90px}.header-v1 #search-top input{color:#1cbac8;font-family:Open\ Sans,Arial,Helvetica,sans-serif}#header.header-v3{background:#353535}.header-v3 .navigation-wrap{background:#353535;border-top:1px solid #6fbfc6}.header-v3 .logo{margin-top:30px;margin-bottom:30px}#header.header-v4{background:#353535}.header-v4 .navigation-wrap{background:#353535;border-top:1px solid #6fbfc6}.header-v4 .logo{margin-top:30px;margin-bottom:30px}#transparentimage{padding:90px 0 0 0}.header-is-transparent #mobile-navigation{top:90px}.stuck{background:#353535}.titlebar h1{font:22px Open\ Sans,Arial,Helvetica,sans-serif;color:#777}#fulltitle{background:#f9f9f9;border-bottom:1px solid #efefef}#breadcrumbs{margin-top:6px}#breadcrumbs,#breadcrumbs a{font:13px Open\ Sans,Arial,Helvetica,sans-serif;color:#aaa}#breadcrumbs a:hover{color:#666}#fullimagecenter h1,#transparentimage h1{font:42px Montserrat,Arial,Helvetica,sans-serif;color:#fff;text-transform:uppercase;letter-spacing:1px;text-align:center}#footer .widget h3{font:13px Montserrat,Arial,Helvetica,sans-serif;color:#fff}#footer{color:#1cbac8;border-top:4px none #1cbac8}#footer{background-color:#262626}#footer a,#footer .widget ul li:after{color:#fff}#footer a:hover,#footer .widget ul li:hover:after{color:#fff}#footer .widget ul li{border-bottom-color:#333}#copyright{background:#1b1b1b;color:#1cbac8}#copyright a{color:#fff}#copyright a:hover{color:#1cbac8}.highlight{color:#1cbac8!important}::selection{background:#1cbac8}::-moz-selection{background:#1cbac8}#shopping-btn span{background:#1cbac8}.blog-page .post h1 a:hover,.blog-page .post h2 a:hover{color:#1cbac8}.entry-image .entry-overlay{background:#1cbac8}.entry-quote a:hover{background:#1cbac8}.entry-link a:hover{background:#1cbac8}.blog-single .entry-tags a:hover{color:#1cbac8}.sharebox ul li a:hover{color:#1cbac8}#pagination .current a{background:#1cbac8}#filters ul li a:hover{color:#1cbac8}#filters ul li a.active{color:#1cbac8}#back-to-top a:hover{background-color:#1cbac8}#sidebar .widget ul li a:hover{color:#1cbac8}#sidebar .widget ul li:hover:after{color:#1cbac8}.widget_tag_cloud a:hover,.widget_product_tag_cloud a:hover{background:#1cbac8;border-color:#1cbac8}.widget_portfolio .portfolio-widget-item .portfolio-overlay{background:#1cbac8}#sidebar .widget_nav_menu ul li a:hover{color:#1cbac8}#footer .widget_tag_cloud a:hover,#footer .widget_product_tag_cloud a:hover{background:#1cbac8;border-color:#1cbac8}.box.style-2{border-top-color:#1cbac8}.box.style-4{border-color:#1cbac8}.box.style-6{background:#1cbac8}a.button,input[type="submit"],button,.minti_button{background:#1cbac8;border-color:#1cbac8}a.button.color-2{color:#1cbac8;border-color:#1cbac8}a.button.color-3{background:#1cbac8;border-color:#1cbac8}a.button.color-9{color:#1cbac8}a.button.color-6:hover{background:#1cbac8;border-color:#1cbac8}a.button.color-7:hover{background:#1cbac8;border-color:#1cbac8}.counter-number{color:#1cbac8}.divider-title.align-center:after,.divider-title.align-left:after{background-color:#1cbac8}.divider5{border-bottom-color:#1cbac8}.dropcap.dropcap-circle{background-color:#1cbac8}.dropcap.dropcap-box{background-color:#1cbac8}.dropcap.dropcap-color{color:#1cbac8}.toggle .toggle-title.active,.color-light .toggle .toggle-title.active{background:#1cbac8;border-color:#1cbac8}.iconbox-style-1.icon-color-accent i.boxicon,.iconbox-style-2.icon-color-accent i.boxicon,.iconbox-style-3.icon-color-accent i.boxicon,.iconbox-style-8.icon-color-accent i.boxicon,.iconbox-style-9.icon-color-accent i.boxicon{color:#1cbac8!important}.iconbox-style-4.icon-color-accent i.boxicon,.iconbox-style-5.icon-color-accent i.boxicon,.iconbox-style-6.icon-color-accent i.boxicon,.iconbox-style-7.icon-color-accent i.boxicon,.flip .icon-color-accent.card .back{background:#1cbac8}.latest-blog .blog-item .blog-overlay{background:#1cbac8}.latest-blog .blog-item .blog-pic i{color:#1cbac8}.latest-blog .blog-item h4 a:hover{color:#1cbac8}.progressbar .progress-percentage{background:#1cbac8}.wpb_widgetised_column .widget ul li a:hover{color:#1cbac8}.wpb_widgetised_column .widget ul li:hover:after{color:#1cbac8}.wpb_accordion .wpb_accordion_wrapper .ui-state-active .ui-icon{background-color:#1cbac8}.wpb_accordion .wpb_accordion_wrapper .ui-state-active.wpb_accordion_header a{color:#1cbac8}.wpb_accordion .wpb_accordion_wrapper .wpb_accordion_header a:hover,.wpb_accordion .wpb_accordion_wrapper .wpb_accordion_header a:hover .ui-state-default .ui-icon{color:#1cbac8}.wpb_accordion .wpb_accordion_wrapper .wpb_accordion_header:hover .ui-icon{background-color:#1cbac8!important}.wpb_content_element.wpb_tabs .wpb_tabs_nav li.ui-tabs-active{border-bottom-color:#1cbac8}.portfolio-item h4 a:hover{color:#1cbac8}.portfolio-filters ul li a:hover{color:#1cbac8}.portfolio-filters ul li a.active{color:#1cbac8}.portfolio-overlay-icon .portfolio-overlay{background:#1cbac8}.portfolio-overlay-icon i{color:#1cbac8}.portfolio-overlay-effect .portfolio-overlay{background:#1cbac8}.portfolio-overlay-name .portfolio-overlay{background:#1cbac8}.portfolio-detail-attributes ul li a:hover{color:#1cbac8}a.catimage:hover .catimage-text{background:#1cbac8}.products li h3{font:400 13px Open\ Sans,Arial,Helvetica,sans-serif;color:#fff}.woocommerce .button.checkout-button{background:#1cbac8;border-color:#1cbac8}.woocommerce .products .onsale{background:#1cbac8}.product .onsale{background:#1cbac8}button.single_add_to_cart_button:hover{background:#1cbac8}.woocommerce-tabs>ul>li.active a{color:#1cbac8;border-bottom-color:#1cbac8}p.stars a:hover{background:#1cbac8}p.stars a.active,p.stars a.active:after{background:#1cbac8}.product_list_widget a{color:#1cbac8}.woocommerce .widget_layered_nav li.chosen a{color:#1cbac8!important}.woocommerce .widget_product_categories>ul>li.current-cat>a{color:#1cbac8!important}.woocommerce .widget_product_categories>ul>li.current-cat:after{color:#1cbac8!important}.woocommerce-message{background:#1cbac8}.bbp-topics-front ul.super-sticky .bbp-topic-title:before,.bbp-topics ul.super-sticky .bbp-topic-title:before,.bbp-topics ul.sticky .bbp-topic-title:before,.bbp-forum-content ul.sticky .bbp-topic-title:before{color:#1cbac8!important}#subscription-toggle a:hover{background:#1cbac8}.bbp-pagination-links span.current{background:#1cbac8}div.wpcf7-mail-sent-ok,div.wpcf7-mail-sent-ng,div.wpcf7-spam-blocked,div.wpcf7-validation-errors{background:#1cbac8}.wpcf7-not-valid{border-color:#1cbac8!important}.products .button.add_to_cart_button{color:#1cbac8!important}.minti_list.color-accent li:before{color:#1cbac8!important}.blogslider_text .post-categories li a{background-color:#1cbac8}.minti_zooming_slider .flex-control-nav li .minti_zooming_slider_ghost{background-color:#1cbac8}.minti_carousel.pagination_numbers .owl-dots .owl-dot.active{background-color:#1cbac8}.wpb_content_element.wpb_tour .wpb_tabs_nav li.ui-tabs-active,.color-light .wpb_content_element.wpb_tour .wpb_tabs_nav li.ui-tabs-active{background-color:#1cbac8}.masonry_icon i{color:#1cbac8}.font-special,.button,.counter-title,h6,.wpb_accordion .wpb_accordion_wrapper .wpb_accordion_header a,.pricing-plan .pricing-plan-head h3,a.catimage,.divider-title,button,input[type="submit"],input[type="reset"],input[type="button"],.vc_pie_chart h4,.page-404 h3,.minti_masonrygrid_item h4{font-family:'Montserrat',Arial,Helvetica,sans-serif}.ui-helper-reset{line-height:1.9}.blog-page .post div.entry-wrap div.entry-title h1 a,.blog-page .post div.entry-wrap div.entry-title h2 a,.entry-meta ul li a,#sidebar .widget.widget_recent_entries ul li a,#sidebar .widget.widget_categories ul li a{color:#fff}.blog-page .post div.entry-wrap div.entry-title h1 a:hover,.blog-page .post div.entry-wrap div.entry-title h2 a:hover,.entry-meta ul li a:hover,.entry-meta ul li,#sidebar .widget.widget_recent_entries ul li a:hover,#sidebar .widget.widget_categories ul li a:hover{color:#1cbac8}#header,#mobile-header{border-bottom:1px solid #fff}@media only screen and (max-width:959px){#header,.sticky-wrapper{display:none}#mobile-header{display:inherit}}</style><meta name="generator" content="Powered by WPBakery Page Builder - drag and drop page builder for WordPress.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cinzel" type="text/css" data-type="vc_custom-css"><style type="text/css" data-type="vc_custom-css">div.divider-title{color:#ffe0d4}div.divider-title.align-center:after{background-color:#ffe0d4}h1,h2{font-family:'Cinzel',serif;color:#000}p,ul>li{text-align:justify}table.tbl{margin-bottom:20px;border-collapse:separate;border-spacing:4px;border:2px solid #000}table.tbl .break-words{word-break:break-all}.tbl th,.tbl td{border:2px solid #000;padding:5px 10px;text-align:left}.tbl th{background-color:#888;color:#000;font-weight:bold}.tbl td{background-color:#566062}.tbl td.center,.tbl th.center{text-align:center}.tbl td.blue{background-color:#0e6068}.tbl td.dark-grey{background-color:#495358}.tbl td.light-grey{color:#000;background-color:#888;font-weight:bold}.tbl caption{text-align:justify}@media (max-width:1199px){table.tbl{width:100%}}@media (max-width:480px){table.tbl td,table.tbl th{word-break:break-all}}@media (min-width:1200px){table.tbl{width:70%;margin-left:15%;margin-right:15%}table.tbl.full-width{width:100%;margin-left:0;margin-right:0}}</style><noscript><style>.wpb_animate_when_almost_visible{opacity:1}</style></noscript><style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+<body class="page-template-default page page-id-17860 smooth-scroll wpb-js-composer js-comp-ver-6.9.0 vc_responsive">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-99769710-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<div class="site-wrapper wrapall">
+
+	<header id="header" class="header header-v3 clearfix">
+		
+	<div class="container">
+		<div class="sixteen columns">
+
+			<div id="logo" class="logo">
+									<a href="https://azeria-labs.com/"><img src="https://azeria-labs.com/wp-content/uploads/2017/08/azeria-labs-11.png.pagespeed.ce.Mn8gsglYk_.png" alt="Azeria Labs" class="logo_standard"></a>
+					<a href="https://azeria-labs.com/"><img src="https://azeria-labs.com/wp-content/uploads/2017/08/azeria-labs-11.png.pagespeed.ce.Mn8gsglYk_.png" width="378" height="110" alt="Azeria Labs" class="logo_retina"></a>							</div>
+
+			<div id="slogan" class="clearfix">
+							</div>
+
+		</div>
+	</div>
+	
+	<div class="navigation-wrap">
+		<div class="container">
+			<div class="sixteen columns">
+				
+				<div id="navigation" class="clearfix">
+					<ul id="nav" class="menu sf-js-enabled sf-arrows"><li id="menu-item-16543" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-16543"><a href="https://azeria-labs.com/writing-arm-assembly-part-1/" class="sf-with-ul">ARM Assembly</a>
+<ul class="sub-menu" style="display: none;">
+	<li id="menu-item-16164" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16164"><a href="https://azeria-labs.com/writing-arm-assembly-part-1/">Part 1: Introduction to ARM Assembly</a></li>
+	<li id="menu-item-16167" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16167"><a href="https://azeria-labs.com/arm-data-types-and-registers-part-2/">Part 2: ARM Data Types and Registers</a></li>
+	<li id="menu-item-16172" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16172"><a href="https://azeria-labs.com/arm-instruction-set-part-3/">Part 3: ARM Instruction Set</a></li>
+	<li id="menu-item-16217" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16217"><a href="https://azeria-labs.com/memory-instructions-load-and-store-part-4/">Part 4: Memory Instructions: LDR/STR</a></li>
+	<li id="menu-item-16495" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16495"><a href="https://azeria-labs.com/load-and-store-multiple-part-5/">Part 5: Load and Store Multiple</a></li>
+	<li id="menu-item-16175" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16175"><a href="https://azeria-labs.com/arm-conditional-execution-and-branching-part-6/">Part 6: Conditional Execution and Branching</a></li>
+	<li id="menu-item-16221" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16221"><a href="https://azeria-labs.com/functions-and-the-stack-part-7/">Part 7: Stack and Functions</a></li>
+	<li id="menu-item-17135" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17135"><a href="https://azeria-labs.com/assembly-basics-cheatsheet/">Assembly Basics Cheatsheet</a></li>
+</ul>
+</li>
+<li id="menu-item-17846" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17846"><a href="https://azeria-labs.com/azm/">Online Assembler</a></li>
+<li id="menu-item-17011" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-17011"><a href="https://azeria-labs.com/writing-arm-shellcode/" class="sf-with-ul">Exploitation</a>
+<ul class="sub-menu" style="display: none;">
+	<li id="menu-item-17012" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17012"><a href="https://azeria-labs.com/writing-arm-shellcode/">Writing ARM Shellcode</a></li>
+	<li id="menu-item-17294" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17294"><a href="https://azeria-labs.com/tcp-bind-shell-in-assembly-arm-32-bit/">TCP Bind Shell in Assembly (ARM 32-bit)</a></li>
+	<li id="menu-item-17401" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17401"><a href="https://azeria-labs.com/tcp-reverse-shell-in-assembly-arm-32-bit/">TCP Reverse Shell in Assembly (ARM 32-bit)</a></li>
+	<li id="menu-item-17071" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17071"><a href="https://azeria-labs.com/process-memory-and-memory-corruption/">Process Memory and Memory Corruption</a></li>
+	<li id="menu-item-18087" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18087"><a href="https://azeria-labs.com/stack-overflow-arm32/">Stack Overflows (Arm32)</a></li>
+	<li id="menu-item-18088" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18088"><a href="https://azeria-labs.com/return-oriented-programming-arm32/">Return Oriented Programming (Arm32)</a></li>
+	<li id="menu-item-17212" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17212"><a href="https://azeria-labs.com/part-3-stack-overflow-challenges/">Stack Overflow Challenges</a></li>
+	<li id="menu-item-17473" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17473"><a href="https://azeria-labs.com/process-continuation-shellcode/">Process Continuation Shellcode</a></li>
+	<li id="menu-item-17774" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17774"><a href="https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/">Glibc Heap – malloc</a></li>
+	<li id="menu-item-17833" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17833"><a href="https://azeria-labs.com/heap-exploitation-part-2-glibc-heap-free-bins/">Glibc Heap – free, bins, tcache</a></li>
+	<li id="menu-item-17862" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-17860 current_page_item menu-item-17862"><a href="https://azeria-labs.com/heap-exploit-development-part-1/" aria-current="page">Part 1: Heap Exploit Development</a></li>
+	<li id="menu-item-17883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17883"><a href="https://azeria-labs.com/heap-overflows-and-the-ios-kernel-heap/">Part 2: Heap Overflows and the iOS Kernel</a></li>
+	<li id="menu-item-17927" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17927"><a href="https://azeria-labs.com/grooming-the-ios-kernel-heap/">Part 3: Grooming the iOS Kernel Heap</a></li>
+</ul>
+</li>
+<li id="menu-item-16711" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-16711"><a href="https://azeria-labs.com/emulate-raspberry-pi-with-qemu/" class="sf-with-ul">Lab Environment</a>
+<ul class="sub-menu" style="display: none;">
+	<li id="menu-item-17171" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17171"><a href="https://azeria-labs.com/arm-lab-vm/">ARM Lab VM 1.0</a></li>
+	<li id="menu-item-18101" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18101"><a href="https://azeria-labs.com/lab-vm-2-0/">ARM Lab VM 2.0</a></li>
+	<li id="menu-item-16347" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16347"><a href="https://azeria-labs.com/debugging-with-gdb-introduction/">Debugging with GDB and GEF</a></li>
+	<li id="menu-item-16064" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16064"><a href="https://azeria-labs.com/emulate-raspberry-pi-with-qemu/">Emulate Raspberry Pi with QEMU</a></li>
+	<li id="menu-item-18134" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18134"><a href="https://azeria-labs.com/arm-on-x86-qemu-user/">Running Arm Binaries on x86 with QEMU-User</a></li>
+	<li id="menu-item-18046" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18046"><a href="https://azeria-labs.com/emulating-arm-firmware/">Emulating Arm Firmware</a></li>
+</ul>
+</li>
+<li id="menu-item-17962" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-17962"><a href="https://azeria-labs.com/trusted-execution-environments-tee-and-trustzone/" class="sf-with-ul">TrustZone Research</a>
+<ul class="sub-menu" style="display: none;">
+	<li id="menu-item-17963" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17963"><a href="https://azeria-labs.com/trusted-execution-environments-tee-and-trustzone/">TEEs and Arm TrustZone</a></li>
+	<li id="menu-item-18019" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18019"><a href="https://azeria-labs.com/trustonics-kinibi-tee-implementation/">Trustonic’s Kinibi TEE</a></li>
+</ul>
+</li>
+<li id="menu-item-17402" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-17402"><a href="https://azeria-labs.com/the-importance-of-deep-work-the-30-hour-method-for-learning-a-new-skill/" class="sf-with-ul">Self-Improvement</a>
+<ul class="sub-menu" style="display: none;">
+	<li id="menu-item-17404" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17404"><a href="https://azeria-labs.com/the-importance-of-deep-work-the-30-hour-method-for-learning-a-new-skill/">Deep Work &amp; The 30-Hour Method</a></li>
+	<li id="menu-item-17520" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17520"><a href="https://azeria-labs.com/paradox-of-choice/">Paradox of Choice</a></li>
+	<li id="menu-item-17676" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17676"><a href="https://azeria-labs.com/the-process-of-mastering-a-skill/">The Process of Mastering a Skill</a></li>
+</ul>
+</li>
+<li id="menu-item-16844" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16844"><a href="https://azeria-labs.com/about/">About</a></li>
+</ul>				</div>
+
+				
+			</div>
+		</div>
+	</div>	
+	
+</header>
+
+<div id="mobile-header">
+	<div class="container">
+		<div class="sixteen columns">
+			<div id="mobile-logo" class="logo">
+									<a href="https://azeria-labs.com/"><img src="https://azeria-labs.com/wp-content/uploads/2017/08/azeria-labs-11.png.pagespeed.ce.Mn8gsglYk_.png" alt="Azeria Labs" class="logo_standard"></a>
+					<a href="https://azeria-labs.com/"><img src="https://azeria-labs.com/wp-content/uploads/2017/08/azeria-labs-11.png.pagespeed.ce.Mn8gsglYk_.png" width="378" height="110" alt="Azeria Labs" class="logo_retina"></a>							</div>
+			<a href="#" id="mobile-navigation-btn"><i class="fa fa-bars"></i></a>
+					</div>
+	</div>
+</div>
+
+<div id="mobile-navigation" style="display: none;">
+	<div class="container">
+		<div class="sixteen columns">
+			<div class="menu-main-container"><ul id="mobile-nav" class="menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-16543 has-ul"><a href="https://azeria-labs.com/writing-arm-assembly-part-1/">ARM Assembly<i class="fa fa-chevron-down"></i></a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16164"><a href="https://azeria-labs.com/writing-arm-assembly-part-1/">Part 1: Introduction to ARM Assembly</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16167"><a href="https://azeria-labs.com/arm-data-types-and-registers-part-2/">Part 2: ARM Data Types and Registers</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16172"><a href="https://azeria-labs.com/arm-instruction-set-part-3/">Part 3: ARM Instruction Set</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16217"><a href="https://azeria-labs.com/memory-instructions-load-and-store-part-4/">Part 4: Memory Instructions: LDR/STR</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16495"><a href="https://azeria-labs.com/load-and-store-multiple-part-5/">Part 5: Load and Store Multiple</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16175"><a href="https://azeria-labs.com/arm-conditional-execution-and-branching-part-6/">Part 6: Conditional Execution and Branching</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16221"><a href="https://azeria-labs.com/functions-and-the-stack-part-7/">Part 7: Stack and Functions</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17135"><a href="https://azeria-labs.com/assembly-basics-cheatsheet/">Assembly Basics Cheatsheet</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17846"><a href="https://azeria-labs.com/azm/">Online Assembler</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-17011 has-ul"><a href="https://azeria-labs.com/writing-arm-shellcode/">Exploitation<i class="fa fa-chevron-down"></i></a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17012"><a href="https://azeria-labs.com/writing-arm-shellcode/">Writing ARM Shellcode</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17294"><a href="https://azeria-labs.com/tcp-bind-shell-in-assembly-arm-32-bit/">TCP Bind Shell in Assembly (ARM 32-bit)</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17401"><a href="https://azeria-labs.com/tcp-reverse-shell-in-assembly-arm-32-bit/">TCP Reverse Shell in Assembly (ARM 32-bit)</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17071"><a href="https://azeria-labs.com/process-memory-and-memory-corruption/">Process Memory and Memory Corruption</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18087"><a href="https://azeria-labs.com/stack-overflow-arm32/">Stack Overflows (Arm32)</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18088"><a href="https://azeria-labs.com/return-oriented-programming-arm32/">Return Oriented Programming (Arm32)</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17212"><a href="https://azeria-labs.com/part-3-stack-overflow-challenges/">Stack Overflow Challenges</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17473"><a href="https://azeria-labs.com/process-continuation-shellcode/">Process Continuation Shellcode</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17774"><a href="https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/">Glibc Heap – malloc</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17833"><a href="https://azeria-labs.com/heap-exploitation-part-2-glibc-heap-free-bins/">Glibc Heap – free, bins, tcache</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-17860 current_page_item menu-item-17862"><a href="https://azeria-labs.com/heap-exploit-development-part-1/" aria-current="page">Part 1: Heap Exploit Development</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17883"><a href="https://azeria-labs.com/heap-overflows-and-the-ios-kernel-heap/">Part 2: Heap Overflows and the iOS Kernel</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17927"><a href="https://azeria-labs.com/grooming-the-ios-kernel-heap/">Part 3: Grooming the iOS Kernel Heap</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-16711 has-ul"><a href="https://azeria-labs.com/emulate-raspberry-pi-with-qemu/">Lab Environment<i class="fa fa-chevron-down"></i></a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17171"><a href="https://azeria-labs.com/arm-lab-vm/">ARM Lab VM 1.0</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18101"><a href="https://azeria-labs.com/lab-vm-2-0/">ARM Lab VM 2.0</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16347"><a href="https://azeria-labs.com/debugging-with-gdb-introduction/">Debugging with GDB and GEF</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16064"><a href="https://azeria-labs.com/emulate-raspberry-pi-with-qemu/">Emulate Raspberry Pi with QEMU</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18134"><a href="https://azeria-labs.com/arm-on-x86-qemu-user/">Running Arm Binaries on x86 with QEMU-User</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18046"><a href="https://azeria-labs.com/emulating-arm-firmware/">Emulating Arm Firmware</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-17962 has-ul"><a href="https://azeria-labs.com/trusted-execution-environments-tee-and-trustzone/">TrustZone Research<i class="fa fa-chevron-down"></i></a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17963"><a href="https://azeria-labs.com/trusted-execution-environments-tee-and-trustzone/">TEEs and Arm TrustZone</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18019"><a href="https://azeria-labs.com/trustonics-kinibi-tee-implementation/">Trustonic’s Kinibi TEE</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-17402 has-ul"><a href="https://azeria-labs.com/the-importance-of-deep-work-the-30-hour-method-for-learning-a-new-skill/">Self-Improvement<i class="fa fa-chevron-down"></i></a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17404"><a href="https://azeria-labs.com/the-importance-of-deep-work-the-30-hour-method-for-learning-a-new-skill/">Deep Work &amp; The 30-Hour Method</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17520"><a href="https://azeria-labs.com/paradox-of-choice/">Paradox of Choice</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17676"><a href="https://azeria-labs.com/the-process-of-mastering-a-skill/">The Process of Mastering a Skill</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16844"><a href="https://azeria-labs.com/about/">About</a></li>
+</ul></div>			
+				
+		</div>
+	</div>
+</div>
+
+		
+			
+					<div id="notitlebar"></div>
+		
+
+
+<div id="page-wrap" class="container">
+
+	<div id="content" class="sidebar-right twelve alt columns">
+	
+		<div class="wpb_row vc_row-fluid standard-section section  section-no-parallax  stretch   " data-speed="1" style=""><div class="col span_12 color-dark left">
+	<div class="vc_col-sm-12 wpb_column column_container col no-padding color-dark" style="" data-animation="" data-delay="">
+		<div class="wpb_wrapper">
+			<div class="divider-title align-center">Heap Exploit Development – Case study from an in-the-wild iOS 0-day</div>
+	<div class="wpb_text_column wpb_content_element ">
+		<div class="wpb_wrapper">
+			<p><em>September 4, 2019</em></p>
+<p><span style="font-weight: 400;">Last week, Google published a </span><a href="https://googleprojectzero.blogspot.com/2019/08/a-very-deep-dive-into-ios-exploit.html"><span style="font-weight: 400;">series of blog posts</span></a><span style="font-weight: 400;"> detailing five iOS exploit chains being used in the wild that were found by Google’s Threat Analysis Group (TAG) team back in February. The reverse-engineering of how these exploits work by Google’s Project Zero team is very complicated and detailed, and for professional exploit developers or platform security engineers, there’s lots of information in these posts on how these specific exploits worked, along with how Google approached analyzing them.</span></p>
+<p><span style="font-weight: 400;">Between the technical details, hex dumps, and code-snippets lies a great story about the strategies and thought processes of the exploit developer themselves. Highlighting this story, and showing not just </span><i><span style="font-weight: 400;">what </span></i><span style="font-weight: 400;">the exploit developer did, but the strategy behind it might be helpful to people getting started at exploit development, as well as those who need to defend against memory corruption vulnerabilities in adjoining fields like platform security.</span></p>
+<p><span style="font-weight: 400;">For this reason, I want to do a write-up of </span><a href="https://googleprojectzero.blogspot.com/2019/08/in-wild-ios-exploit-chain-1.html"><span style="font-weight: 400;">one of the iOS exploits</span></a><span style="font-weight: 400;"> that Google found with a slightly different focus. As we walk through the various stages of </span><i><span style="font-weight: 400;">what </span></i><span style="font-weight: 400;">the exploit is doing, we can also look at some major vulnerability categories and exploitation strategies in general, and hopefully by doing so we can pull back the curtain a little on the magic of modern memory-corruption exploits, and see the huge amount of engineering that enables exploit developers to turn software defects into reliable exploits.</span></p>
+<p><span style="font-weight: 400;">In this first part of the series, I will give an overview of the different stages in this exploit chain. In the next few parts, we will cover the various stages of the exploit, and how it builds up tools (called “exploit primitives”) that it can use to take full control of the operating system.</span></p>
+
+		</div>
+	</div>
+<div class="spacer" style="height: 20px;"></div>
+		</div> 
+	</div> 
+</div></div><div class="wpb_row vc_row-fluid standard-section section  section-no-parallax  stretch   " data-speed="1" style=""><div class="col span_12 color-dark left">
+	<div class="vc_col-sm-12 wpb_column column_container col no-padding color-dark" style="" data-animation="" data-delay="">
+		<div class="wpb_wrapper">
+			<div class="divider-title align-center">Exploits and exploit chains</div>
+	<div class="wpb_text_column wpb_content_element ">
+		<div class="wpb_wrapper">
+			<p><span style="font-weight: 400;">Few modern exploits against hardened devices can fully compromise a device in a single go. Instead, exploit developers usually must </span><i><span style="font-weight: 400;">chain</span></i><span style="font-weight: 400;"> multiple exploits together, each giving a remote attacker a little more leverage over the device, until the device is fully compromised. Each exploit is built around one or more software vulnerabilities, with large amounts of exploit engineering work so the vulnerability causes the target program to fail in a way the exploit developer can reliably control, rather than simply causing the target program to crash.</span></p>
+
+		</div>
+	</div>
+<div class="single_image wpb_content_element align-left   " data-animation="none" data-delay="0"><img width="2165" height="607" src="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-process.png.pagespeed.ce.SZ3XCudsq2.png" class="attachment-full" alt="" decoding="async" loading="lazy" title="exploit-process" srcset="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-process.png.pagespeed.ce.SZ3XCudsq2.png 2165w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-process-300x84.png.pagespeed.ce.YfNinvSkfi.png 300w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-process-768x215.png 768w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-process-1024x287.png 1024w" sizes="(max-width: 2165px) 100vw, 2165px"></div>
+	<div class="wpb_text_column wpb_content_element ">
+		<div class="wpb_wrapper">
+			<p><span style="font-weight: 400;">In our case, this exploit is the second part of a chain, and is intended to be paired with some other exploit targeting the phone’s web-browser. That first exploit breaks into the web-browser from a webpage hosting that exploit. The exploit takes control of </span><i><span style="font-weight: 400;">Safari</span></i><span style="font-weight: 400;"> and provides a platform from which </span><i><span style="font-weight: 400;">this</span></i><span style="font-weight: 400;"> exploit can be launched against the iOS kernel itself. This exploit’s central job is to disable the </span><i><span style="font-weight: 400;">Safari </span></i><span style="font-weight: 400;">sandbox, allowing full control of the device. This access is then used to disable various protections on the iPhone, such as the code-signing requirement and platform policy, before downloading and launching a second-stage implant in the background.&nbsp;</span></p>
+<p><span style="font-weight: 400;">In general, this second-stage implant can do anything to the device. But in the specific case of this exploit chain being used in the wild, the implant is used to give interactive control over the phone, as well as steal chat history from WhatsApp, Telegram, iMessage, Google hangouts, the contents of emails from attached email accounts, contact lists, app lists, photos, device information including phone number, name, and IMEI, provide real-time GPS tracking of the target, and upload saved credentials, including Wi-Fi access point credentials from the phone. All of these are uploaded to the attackers’ server, and the implant persists until the device is rebooted. A detailed breakdown of how the implant used in the attack works can be found </span><a href="https://googleprojectzero.blogspot.com/2019/08/implant-teardown.html"><span style="font-weight: 400;">here</span></a><span style="font-weight: 400;">.</span></p>
+
+		</div>
+	</div>
+<div class="spacer" style="height: 20px;"></div>
+		</div> 
+	</div> 
+</div></div><div class="wpb_row vc_row-fluid standard-section section  section-no-parallax  stretch   " data-speed="1" style=""><div class="col span_12 color-dark left">
+	<div class="vc_col-sm-12 wpb_column column_container col no-padding color-dark" style="" data-animation="" data-delay="">
+		<div class="wpb_wrapper">
+			<div class="divider-title align-center">The iOS exploit, and the general exploit strategy</div>
+	<div class="wpb_text_column wpb_content_element ">
+		<div class="wpb_wrapper">
+			<p><span style="font-weight: 400;">The iOS kernel exploit used in these attacks is built around a </span><i><span style="font-weight: 400;">linear heap overflow </span></i><span style="font-weight: 400;">vulnerability in a graphics driver. The vulnerability itself is not particularly exciting, but it is exploited in a very interesting way: rather than exploiting the heap overflow directly, the exploit developer uses the vulnerability to construct a completely artificial </span><i><span style="font-weight: 400;">use-after-free</span></i><span style="font-weight: 400;"> vulnerability which is easier to control and build into powerful exploit primitives. The exploit developer then uses these exploit primitives to surgically gain access to the kernel’s private memory, which can be used to disable the devices’ defences against malware. Having done so, the exploit downloads and installs a malicious implant as </span><i><span style="font-weight: 400;">root </span></i><span style="font-weight: 400;">on the device.</span></p>
+<p><span style="font-weight: 400;"><a href="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview.png"><img decoding="async" class="alignleft wp-image-17867" src="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview-594x1024.png" alt="" width="300" height="518" srcset="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview-594x1024.png 594w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview-174x300.png 174w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview-768x1325.png 768w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-overview.png 851w" sizes="(max-width: 300px) 100vw, 300px"></a>The hacker’s overall strategy for exploiting this vulnerability is laid out below. Over the next few posts, I’ll discuss each step in more detail, and we’ll be able to see how exploit developers turn complex memory-corruption vulnerabilities into reliable exploits, even on modern hardened devices.</span></p>
+<ol>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Find a suitable </span><b><i>linear heap overflow </i></b><span style="font-weight: 400;">around which the exploit can be built, and which is triggered on some </span><i><span style="font-weight: 400;">vulnerable object</span></i></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Find a suitable </span><b><i>victim candidate</i></b><span style="font-weight: 400;"> that will be corrupted</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use a </span><b><i>heap groom</i></b> <span style="font-weight: 400;">so the </span><i><span style="font-weight: 400;">vulnerable object</span></i><span style="font-weight: 400;"> sits adjacent to a </span><i><span style="font-weight: 400;">victim object</span></i><span style="font-weight: 400;">.</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use a conversion technique to </span><b><i>construct an artificial use-after-free</i></b><span style="font-weight: 400;"> that is easier for the exploit developer to control.</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use the UAF to build an </span><b><i>information leak</i></b> <b><i>primitive</i></b><span style="font-weight: 400;">, and leak kernel addresses, bypassing ASLR.</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use the UAF to construct an </span><b><i>arbitrary read</i></b> <span style="font-weight: 400;">exploit primitive.</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use the UAF to build an artificial </span><b><i>arbitrary write</i></b> <span style="font-weight: 400;">exploit primitive out of a </span><i><span style="font-weight: 400;">vtable overwrite + </span></i><span style="font-weight: 400;">ROP sequence.</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Use the constructed primitives to elevate the current task to root, and disable system protections including the platform policy and code-signing requirements</span></li>
+<li style="font-weight: 400;"><span style="font-weight: 400;">Download and run the second-stage implant, which runs as root in the background.</span></li>
+</ol>
+
+		</div>
+	</div>
+
+		</div> 
+	</div> 
+</div></div><div class="wpb_row vc_row-fluid standard-section section  section-no-parallax  stretch   " data-speed="1" style=""><div class="col span_12 color-dark left">
+	<div class="vc_col-sm-12 wpb_column column_container col no-padding color-dark" style="" data-animation="" data-delay="">
+		<div class="wpb_wrapper">
+			<div class="spacer" style="height: 10px;"></div>
+	<div class="wpb_text_column wpb_content_element ">
+		<div class="wpb_wrapper">
+			<p><span style="font-weight: 400;">A detailed view of the entire exploit is shown below. We’ll cover each part in other posts, after which you will be able to click on the corresponding section for a detailed overview.</span></p>
+<p><a href="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1.png"><img decoding="async" loading="lazy" class="aligncenter wp-image-17873 size-large" src="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1-481x1024.png" alt="" width="481" height="1024" srcset="https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1-481x1024.png 481w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1-141x300.png 141w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1-768x1634.png 768w, https://azeria-labs.com/wp-content/uploads/2019/09/exploit-chain-1.png 1687w" sizes="(max-width: 481px) 100vw, 481px"></a></p>
+
+		</div>
+	</div>
+
+		</div> 
+	</div> 
+</div></div>
+
+		
+		
+			</div> <!-- end content -->
+
+		<div id="sidebar" class="sidebar-right alt">
+		<div id="sidebar-widgets" class="four columns">
+
+    <div id="nav_menu-20" class="widget widget_nav_menu"><h3>ARM Exploit Development</h3><div class="menu-arm-exploitation-container"><ul id="menu-arm-exploitation" class="menu"><li id="menu-item-17009" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17009"><a href="https://azeria-labs.com/writing-arm-shellcode/">Writing ARM Shellcode</a></li>
+<li id="menu-item-17337" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17337"><a href="https://azeria-labs.com/tcp-bind-shell-in-assembly-arm-32-bit/">TCP Bind Shell (ARM 32-bit)</a></li>
+<li id="menu-item-17463" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17463"><a href="https://azeria-labs.com/tcp-reverse-shell-in-assembly-arm-32-bit/">TCP Reverse Shell (ARM 32-bit)</a></li>
+<li id="menu-item-17072" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17072"><a href="https://azeria-labs.com/process-memory-and-memory-corruption/">Process Memory and Memory Corruption</a></li>
+<li id="menu-item-18090" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18090"><a href="https://azeria-labs.com/stack-overflow-arm32/">Stack Overflows (Arm32)</a></li>
+<li id="menu-item-18089" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18089"><a href="https://azeria-labs.com/return-oriented-programming-arm32/">Return Oriented Programming (Arm32)</a></li>
+<li id="menu-item-17221" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17221"><a href="https://azeria-labs.com/part-3-stack-overflow-challenges/">Stack Overflow Challenges</a></li>
+<li id="menu-item-17465" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17465"><a href="https://azeria-labs.com/process-continuation-shellcode/">Process Continuation Shellcode</a></li>
+<li id="menu-item-17775" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17775"><a href="https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/">Introduction to Glibc Heap (malloc)</a></li>
+<li id="menu-item-17832" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17832"><a href="https://azeria-labs.com/heap-exploitation-part-2-glibc-heap-free-bins/">Introduction to Glibc Heap (free, bins)</a></li>
+<li id="menu-item-17872" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-17860 current_page_item menu-item-17872"><a href="https://azeria-labs.com/heap-exploit-development-part-1/" aria-current="page">Heap Exploit Development (Part 1)</a></li>
+<li id="menu-item-17888" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17888"><a href="https://azeria-labs.com/heap-overflows-and-the-ios-kernel-heap/">Heap Overflows and iOS Kernel (Part 2)</a></li>
+<li id="menu-item-17929" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17929"><a href="https://azeria-labs.com/grooming-the-ios-kernel-heap/">Grooming the iOS Kernel Heap (Part 3)</a></li>
+</ul></div></div><div id="text-12" class="widget widget_text">			<div class="textwidget"><hr>
+<span style="color:white">Twitter: </span>
+<a href="https://twitter.com/fox0x01">
+@Fox0x01</a> <span style="color:white">and</span><a href="https://twitter.com/azeria_labs">
+@azeria_labs</a>
+<br><br>
+<h3 style="color:#ff5b5b">New ARM Assembly Cheat Sheet</h3>
+<a href="https://teespring.com/arm32-assembly-cheatsheet-2020" class="button color-2 small" target="_blank" rel="noopener">Poster</a>
+<a href="https://gumroad.com/l/Arm-cheatsheet-2020-version" class="button color-2 small" target="_blank" rel="noopener">Digital</a> <br><br>
+<img src="http://azeria-labs.com/wp-content/uploads/2020/05/cheatsheet-2020-mini.png" alt="Cheat Sheet"></div>
+		</div>
+</div>	</div>
+	
+</div> <!-- end page-wrap -->
+	
+		
+			
+		<footer id="footer">
+			<div class="container">
+				<div class="four columns"></div>
+								<div class="four columns"></div>
+												<div class="four columns"></div>
+												<div class="four columns"></div>	
+							</div>
+		</footer>
+		
+		<div id="copyright" class="clearfix">
+		<div class="container">
+			
+			<div class="sixteen columns">
+
+				<div class="copyright-text copyright-col1">
+											© 2017-2022 Azeria Labs™ | All Rights Reserved.									</div>
+				
+				<div class="copyright-col2">
+											
+<div class="social-icons clearfix">
+	<ul>
+													<li><a href="https://github.com/azeria-labs" target="_blank" title="Github"><i class="fa fa-github"></i></a></li>
+																									<li><a href="https://twitter.com/Fox0x01" target="_blank" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+															</ul>
+</div>									</div>
+
+			</div>
+			
+		</div>
+	</div><!-- end copyright -->
+			
+	</div><!-- end wrapall / boxed -->
+	
+		<div id="back-to-top"><a href="#"><i class="fa fa-chevron-up"></i></a></div>
+		
+	<script type="text/html" id="wpb-modifications"></script><script type="text/javascript" src="https://azeria-labs.com/wp-content/plugins/contact-form-7/includes/swv/js/index.js.pagespeed.ce.e-ZawnAkx7.js" id="swv-js"></script>
+<script type="text/javascript" id="contact-form-7-js-extra">
+/* <![CDATA[ */
+var wpcf7 = {"api":{"root":"https:\/\/azeria-labs.com\/wp-json\/","namespace":"contact-form-7\/v1"}};
+/* ]]> */
+</script>
+<script src="https://azeria-labs.com/wp-content/plugins,_contact-form-7,_includes,_js,_index.js+themes,_unicon,_framework,_js,_jquery.easing.min.js+themes,_unicon,_framework,_js,_waypoints.min.js+themes,_unicon,_framework,_js,_waypoints-sticky.min.js+themes,_unicon,_framework,_js,_prettyPhoto.js.pagespeed.jc.5JzarGntSN.js"></script><script>eval(mod_pagespeed_ywBAY$ryOe);</script>
+<script>eval(mod_pagespeed_rFGm7RXv88);</script>
+<script>eval(mod_pagespeed_Mzr4as6THB);</script>
+<script>eval(mod_pagespeed_rDcip3V3y8);</script>
+<script>eval(mod_pagespeed_F_oZkq$P_0);</script>
+<script type="text/javascript" src="https://azeria-labs.com/wp-content/themes/unicon/framework/js/isotope.pkgd.min.js.pagespeed.ce.9TqWB268we.js" id="minti-isotope-js"></script>
+<script type="text/javascript" src="https://azeria-labs.com/wp-content/themes/unicon/framework/js/functions.js.pagespeed.ce.r5dJtCVMsW.js" id="minti-functions-js"></script>
+<script src="https://azeria-labs.com/wp-content,_themes,_unicon,_framework,_js,_flexslider.min.js+wp-includes,_js,_comment-reply.min.js.pagespeed.jc.BVipDbzwnB.js"></script><script>eval(mod_pagespeed_mp3NGmTw$c);</script>
+<script>eval(mod_pagespeed_aR3dA613tt);</script>
+<script type="text/javascript" id="wpb_composer_front_js-js-extra">
+/* <![CDATA[ */
+var vcData = {"currentTheme":{"slug":"unicon"}};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://azeria-labs.com/wp-content/plugins/js_composer/assets/js/dist/js_composer_front.min.js" id="wpb_composer_front_js-js"></script>
+
+	<script type="text/javascript">
+	jQuery(document).ready(function($){
+		"use strict";
+	    
+		/* PrettyPhoto Options */
+		var lightboxArgs = {			
+						animation_speed: 'slow',
+						overlay_gallery: false,
+			autoplay_slideshow: false,
+						slideshow: 5000,
+									opacity: 0.8,
+						show_title: false,
+			social_tools: "",			deeplinking: false,
+			allow_resize: true,
+			allow_expand: false,
+			counter_separator_label: '/',
+			default_width: 1160,
+			default_height: 653
+		};
+		
+				/* Automatic Lightbox */
+		$('a[href$=jpg], a[href$=JPG], a[href$=jpeg], a[href$=JPEG], a[href$=png], a[href$=gif], a[href$=bmp]:has(img)').prettyPhoto(lightboxArgs);
+					
+		/* General Lightbox */
+		$('a[class^="prettyPhoto"], a[rel^="prettyPhoto"], .prettyPhoto').prettyPhoto(lightboxArgs);
+
+		/* WooCommerce Lightbox */
+		$("a[data-rel^='prettyPhoto']").prettyPhoto({
+			hook: 'data-rel',
+			social_tools: false,
+			deeplinking: false,
+			overlay_gallery: false,
+			opacity: 0.8,
+			allow_expand: false, /* Allow the user to expand a resized image. true/false */
+			show_title: false
+		});
+
+		
+	    
+		/* Transparent Header */
+	    function transparentHeader() {
+			if ($(document).scrollTop() >= 60) {
+				$('#header.header-v1').removeClass('header-transparent');
+			}
+			else {
+				$('#header.header-v1.stuck').addClass('header-transparent');
+			}
+		}
+			
+		/* Sticky Header */
+		if (/Android|BlackBerry|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) === false) {
+
+			var $stickyHeaders = $('#header.header-v1, #header.header-v3 .navigation-wrap, #header.header-v4 .navigation-wrap');
+			$stickyHeaders.waypoint('sticky');
+			
+			$(window).resize(function() {
+				$stickyHeaders.waypoint('unsticky');
+				if ($(window).width() < 944) {
+					$stickyHeaders.waypoint('unsticky');
+				}
+				else {
+					$stickyHeaders.waypoint('sticky');
+				}
+			});
+			
+			if ($("body").hasClass("header-is-transparent")) {
+				$(document).scroll(function() { transparentHeader(); });
+				transparentHeader();
+		    }
+
+		}			
+	    
+	    
+	    	
+	    /* Fill rest of page */
+	    			    			$('body').css({'background-color' : '#1b1b1b' });
+	    			    
+	});
+	</script>
+	
+
+
+</body></html>

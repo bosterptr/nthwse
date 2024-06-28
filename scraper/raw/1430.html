@@ -1,0 +1,440 @@
+<html lang="en-us"><head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <!-- Enable responsiveness on mobile devices-->
+  <meta data-rh="true" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  
+  <meta data-rh="true" property="og:image" content="https://csandker.io///public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_AD_high_privileged_access_map.png">
+  <meta data-rh="true" name="twitter:image:src" content="https://csandker.io///public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_AD_high_privileged_access_map.png">
+  <meta data-rh="true" name="twitter:tile:image" content="https://csandker.io///public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_AD_high_privileged_access_map.png">
+  <meta data-rh="true" name="twitter:card" content="summary_large_image">
+  <meta data-rh="true" name="title" content="Untangling Azure Active Directory Permissions II: Privileged Access">
+  <meta data-rh="true" property="og:title" content="Untangling Azure Active Directory Permissions II: Privileged Access">
+  <meta data-rh="true" property="twitter:title" content="Untangling Azure Active Directory Permissions II: Privileged Access">
+  <meta data-rh="true" name="description" content="I've focused on using my enumeration learnings to automate the process of identifying high privileged principals in an Azure Active Directory Tenant...">
+  <meta data-rh="true" property="og:description" content="I've focused on using my enumeration learnings to automate the process of identifying high privileged principals in an Azure Active Directory Tenant...">
+  <meta data-rh="true" property="og:type" content="article">
+  <meta data-rh="true" property="og:url" content="https://csandker.io///2022/11/10/Untangling-Azure-II-Privileged-Access.html">
+  <meta data-rh="true" property="article:published_time" content="2022-11-10 08:00:00 +0000">
+  
+  <title>
+    
+      Untangling Azure Active Directory Permissions II: Privileged Access · csandker.io
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="/public/css/poole.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/syntax.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/hyde.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/themes.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/toc.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/imagemodal.css ">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" type="text/css" href=" /public/css/fontawesome/all.min.css ">
+  
+  <!-- TimeLine -->
+  <link rel="stylesheet" type="text/css" href=" /public/css/timeline.min.css ">
+  <link rel="stylesheet" type="text/css" href=" /public/css/timeline-custom.css ">
+
+  <!-- JS -->
+  <script type="text/javascript" async="" src=" /public/js/jquery.min.js"></script>
+  <script type="text/javascript" async="" src=" /public/js/imagemodal.js"></script>
+  <script type="text/javascript" async="" src=" /public/js/main.js"></script>
+
+  <!-- Icons -->
+  <!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png"> -->
+  <link rel="shortcut icon" href="/public/img/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="">
+        <img class="sidebar-nav profile" src="/public/img/profile.png">
+      </a>
+      <div class="about-icons">
+          <a class="sidebar-nav icon" href="https://twitter.com/0xcsandker">
+            <span class="icon-span">
+              <i class="fab fa-twitter"></i>0xcsandker
+            </span>
+          </a>
+          <a class="sidebar-nav-item" href="https://github.com/csandker">
+            <span class="icon-span">
+              <i class="fab fa-github"></i>csandker
+            </span>
+          </a>
+          <a class="sidebar-nav-item" href="/feed.xml">
+            <span class="icon-span">
+              <i class="fas fa-rss-square"></i>RSS Feed
+            </span>
+          </a>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">//Posts</a>
+
+      
+      
+        
+          
+            <a class="sidebar-nav-item" href="/win-history/">//History of Windows</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/archive/">//Archive</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/find/">//Tags &amp; Search</a>
+          
+        
+      
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/me/">//ME</a>
+          
+        
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+
+    </nav>
+    <button class="switch-theme-btn">
+      <i class="fas fa-adjust"></i> 
+        Switch Theme
+    </button>
+
+  </div>
+</div>
+
+    <div class="sidebar-stripes"></div>
+
+    <div class="main-container">
+      <div class="content container">
+        <div class="post">
+  <h1 class="post-title">Untangling Azure Active Directory Permissions II: Privileged Access</h1>
+  <div class="post-dates">
+    <span class="post-date">10 Nov 2022</span>
+    
+    <span id="last-modified" class="last-modified-date">(Last Updated: 14 Nov 2022)</span>
+    
+  </div>
+  <div id="post-content" class="post-content">
+    <h2 class="no_toc toc-header" id="contents">Contents:<a href="#contents" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+<ul id="markdown-toc" class="post-toc">
+  <li><a href="#tldr" id="markdown-toc-tldr">TL;DR</a></li>
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#aad-access-concepts" id="markdown-toc-aad-access-concepts">AAD Access Concepts</a></li>
+  <li><a href="#privileged-access" id="markdown-toc-privileged-access">Privileged Access</a></li>
+  <li><a href="#azure-accesspermissions-v02" id="markdown-toc-azure-accesspermissions-v02">Azure-AccessPermissions v.0.2</a></li>
+  <li><a href="#adding-global-perspective" id="markdown-toc-adding-global-perspective">Adding Global Perspective</a></li>
+</ul>
+
+<h2 id="tldr">TL;DR<a href="#tldr" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>After focusing highly on service principals in my <a href="/2022/10/19/Untangling-Azure-Permissions.html">previous post</a>, I went on to add Users and Groups into my enumeration script and ended up re-structuring and re-designing the entire thing. I’ve also focused on using my enumeration learnings to automate the process of identifying high privileged principals in an Azure Active Directory Tenant.<br>
+If you came just for the tool, click <a href="#azure-accesspermissions-v02">here</a> for the fast track.</p>
+
+<h2 id="intro">Intro<a href="#intro" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p><em>A short note before I dive into the matter:<br>
+If you haven’t already done so, I’d recommend reading through my <a href="/2022/10/19/Untangling-Azure-Permissions.html">previous post</a> first to not get lost with terminology and concepts</em>.</p>
+
+<p>As detailed in said previous post, we already figured that there are basically only 3 types of principals that can have access to things:</p>
+
+<ul>
+  <li>Users</li>
+  <li>Groups</li>
+  <li>Service Principals</li>
+</ul>
+
+<p>In determining “how someone can be granted access to something”, I drilled down into the concepts of <strong>AppRoles</strong>, <strong>Application</strong> and <strong>Delegated</strong> API Permissions and finally also into what <strong>Effective Permissions</strong> are. These are important building blocks in describing how a principal gets access to something. However, there are also other building blocks, which I did not cover in the previous post (cause these others are less confusing). This post aims to add these into the picture to get a more complete view.</p>
+
+<h2 id="aad-access-concepts">AAD Access Concepts<a href="#aad-access-concepts" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>Okay so to begin with let’s wrap all of these things that were covered in the previous blog post into this simple statement:</p>
+
+<blockquote>
+  <p><strong>A resource application can grant a User/Group/Service principal access to a certain resource or object either via Application-Type or via Delegation-Type API permissions.</strong></p>
+</blockquote>
+
+<p>Cool, let’s frame that visually:</p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_Access_Controls_1.png" alt="First step in Azure Access Controls" title="First step in Azure Access Controls"><small class="img-caption">First step in Azure Access Controls</small></p>
+
+<p>This is pretty much were we left off with the previous post, so let’s add in those less-confusing building blocks to complete the picture.<br>
+The next piece in the puzzle is the concept of <strong>Directory Roles</strong>, which you surely have already encountered with or without knowing the name for it. Ever heard of these <em>roles</em> in your Azure tenant?</p>
+
+<ul>
+  <li>Global Administrator</li>
+  <li>Global Reader</li>
+  <li>Billing Administrator</li>
+  <li>Teams Administrator</li>
+  <li>…</li>
+</ul>
+
+<p>All of these are examples for a “Directory Role”. Putting that in a bit more technical terms one could say a <strong>Directory Role</strong> is a fixed set of permissions defined globally for your tenant. Let me draw a line here to on-premise Active Directory to emphasize the differences for this specific access building block between Active Directory and Azure Active Directory:</p>
+
+<p>If you’re coming from an on-premise Active Directory home base, you will know the “Domain Administrators” and “Enterprise Administrators” groups. In (on-premise) Active Directory these are groups with high privilege permissions.<br>
+In Azure Active Directory Microsoft wanted a similar experience of granting administrative users (high) privileges by connecting these users to a privileged container, but <strong>in Azure AD Microsoft wanted to decouple the concept of a group from the concept of a role</strong> (<em>my interpretation/assumption</em>). While a group is container that clusters users based on a specific attribute, a role is a privilege assignment that can be more ephemeral. A role can be added temporarily or only under specific conditions.</p>
+
+<p>Long story short: A <strong>Directory Role</strong> is not a group in Azure AD, but an independent building block to capsulate access grants. Moreover there are default, already built-in directory roles, such as “Global Reader”, “Global Administrator”, etc., and there are also <strong>Custom Directory Roles</strong> that a high privileged user - more precisely a user that holds the “Privileged Role Administrator” or “Global Administrator” default directory role - can create to customize access to objects. These latter “custom directory roles”, however, come with a literal price tag, as they are only available in Azure Premium P1 or P2 licensed tenants.</p>
+
+<p>Alright, let’s add those <strong>Directory Roles</strong> into the picture:</p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_Access_Controls_2.png" alt="Second step in Azure Access Controls" title="Second step in Azure Access Controls"><small class="img-caption">Second step in Azure Access Controls</small></p>
+
+<p>As you can see above, <strong>Directory Roles can only be assigned to Users and Groups</strong>, but not to Service Principals.<br>
+As a side note: If you want to add a Directory Role to a group, you have to make that decision when you create the group. Only during group creation you can set <code class="language-plaintext highlighter-rouge">isAssignableToRole</code> property, which is then immutable. Moreover, <strong>the feature to assign a directory role to a group requires a Azure Premium P1 or P2 license</strong><br>
+If this is your first encounter with default and custom directory roles, you want these resource links in your back as a lookup reference:</p>
+
+<ul>
+  <li><a href="https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference">https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/azure/active-directory/roles/custom-create">https://learn.microsoft.com/en-us/azure/active-directory/roles/custom-create</a></li>
+</ul>
+
+<p>We’re getting close, there is one last building block to add - <em>at least to my current knowledge</em>, which is <strong>Ownership</strong>, where ownership grants control over an object.<br>
+As there is no big secret in ownership, let’s add that right in:</p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_Access_Controls_3.png" alt="Third and final step in Azure Access Controls" title="Third and final step in Azure Access Controls"><small class="img-caption">Third and final step in Azure Access Controls</small></p>
+
+<p>While ownership is not a massively complex concept, it is not immediately obvious <strong>who can own what</strong>, so let me add a small table for <em>some</em> of the important Azure AD objects:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Who\What</strong></th>
+      <th style="text-align: center"><strong>User</strong></th>
+      <th style="text-align: center"><strong>Group</strong></th>
+      <th style="text-align: center"><strong>Service Principal</strong></th>
+      <th style="text-align: center"><strong>Application</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>User</strong></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><b><span style="color: #5ba666">Yes</span></b></td>
+      <td style="text-align: center"><b><span style="color: #5ba666">Yes</span></b></td>
+      <td style="text-align: center"><b><span style="color: #5ba666">Yes</span></b></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Group</strong></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Service Principal</strong></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><b><span style="color: #5ba666">Yes</span></b></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Application</strong></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+      <td style="text-align: center"><span style="color: #5b5a5a">No</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Looking at this, four things should be noted here:</p>
+
+<ol>
+  <li>No one can own a user object</li>
+  <li>Group and Application objects can’t own other objects</li>
+  <li>A service principal can own a group</li>
+  <li>This table does not contain all objects that can exists in an Azure Active Directory environment.</li>
+</ol>
+
+<p>Also the observant reader might have wondered why I included application objects in the table above, as applications aren’t principals that can access other things (as detailed in my <a href="/2022/10/19/Untangling-Azure-Permissions.html">previous post</a>).<br>
+I’m glad you asked, there are two reasons for this:</p>
+
+<ul>
+  <li>Looking at the table one should note that an application object can not own any other object, cause that would make no sense. An application object is not a ‘principal’ (in my terminology), but instead the service principal associated with the application object can own things. <em>But that is only a small side benefit of the actual reason, which is:</em></li>
+  <li>While an application object cannot own any other object it can be owned by other objects (e.g. Users) and on top of that <strong>an application object can have a different owner than its associated service principal</strong>. Meaning that a scenario could arise where you can’t control a service principal, but you can control its associated application object and thus could lead to privilege escalation opportunities towards the service principal object.</li>
+</ul>
+
+<p>Alright, that should be a good wrap to cover the building blocks for access permissions in Azure Active Directory. Now let’s turn to something more interesting…</p>
+
+<h2 id="privileged-access">Privileged Access<a href="#privileged-access" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>The reason I initially dived into all of this was because I wanted to figure who are the high privileged principals in an Azure Active Directory tenant.<br>
+Similar to on-premise Active Directory environments this questions is not always trivial to answer, primarily due to two reasons:</p>
+
+<ol>
+  <li>You have to figure out <strong>what makes someone ‘high privileged’</strong>, while considering all properties and conditions that could empower a principal.</li>
+  <li>Once you have carved out all the paths that could lead to high privileges, you have to walk all dependencies to other objects and principals to chain all principals with transitive and/or inherited privileges.</li>
+</ol>
+
+<p>As this is important for the following let me quickly pop two simple examples for these problems.</p>
+
+<p>Problem 1 - What makes someone ‘high privileged’: The by far most obvious attribute that makes someone high privilege is if this someone holds a <strong>high privileged default directory role</strong>, such as ‘Global Administrator’. The problem is finding the not obvious attributes, for example: What about AppRoles? Which AppRoles could make someone high privileged?</p>
+
+<p>Problem 2 - Transitive privileges: Imagine that by doing your magic you found a high privileged service principal. Before closing the book you have to answer if there is any principal that has control over the high privileged service user you just identified. If yes, then that someone must also be considered high privileged. In case a group has control over a privileged entity, then all members of that group might need to be considered high privileged and if that group contains other groups as members you might need traverse through all the nested group memberships and add all members as high privileged principals on the way…</p>
+
+<p>As you might agree at this point: Things can get messy quickly. To not get totally lost and add some structure and guidance on our path to find high privileged principals, I’ll map out some visual paths that address the two problems from above. But before I’ll get into that, it is important to note two important constraints that went into my mapping process:</p>
+
+<p>Ownership constraints: As said above not every object can be owned and not every principal can own an object. <strong>Most importantly a user object can own all other objects, but cannot be owned itself</strong>. This prevents circular dependencies which is good for our mapping process.</p>
+
+<p>Delegation-Type permissions constraints: In my current understanding of the Azure AD permission jungle a delegation-type permission grant will result in <strong>effective access permissions consisting of the least privileged intersection</strong> of the privileges assigned from the delegation and the privileges initially hold by the requesting principal. Therefore delegation-type permissions should not allow any escalation of privileges or grant any privileged access that the receiving principal did not already hold anyways. In other words: A delegated permission grant can’t make you more privileged. Therefore I ignored delegation-type permissions in my mapping process.</p>
+
+<p>Alright, that should be good enough. Let’s map out all the learnings from above and check how each principal can gain high privileges.</p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_AD_high_privileged_access_map.png" alt="Azure Active Directory Privileged Access Map" title="Azure Active Directory Privileged Access Map"><small class="img-caption">Azure Active Directory Privileged Access Map</small></p>
+
+<p>Studying this figure should also re-enforce some of the constraints mentioned above, and a few additional ones. For example you should see that:</p>
+
+<ul>
+  <li>Groups can’t own other objects</li>
+  <li>Delegation-Type permission grants should not be relevant for mapping high privileged principals</li>
+</ul>
+
+<p>Aside from these constraints there are should be at least two open questions for anyone wanting to implement this.<br>
+A.) Which are the high privileged (default) Directory Roles?<br>
+B.) Which are the high privileged Application-Type AppRoles?</p>
+
+<p>Glad you asked:</p>
+
+<p>A.) I doubt there ever will be a definitive answer to this. Over time additional roles will be added and privilege escalation vectors will be discovered for various roles, which Microsoft will deem to be “by design”. Anyhow, as of writing this post I considered the 15 roles that Microsoft lists <a href="https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-admin-mfa">here</a> to be high privileged.</p>
+
+<p>B.) The same disclaimer from bevor also applies for AppRoles, however there is an additional problem here: Every App developer can freely chose any AppRole value, hence there are only two options to determine if a given AppRole grants high privileged access. Either one could hunt down all the ‘typical’ high privileged AppRoles that are present in <em>most</em> Azure ADs, like ‘Directory.ReadWrite.All’… or one could try to programmatically guess the potential privilege value based on the value of an AppRole. I’ll took the latter path:</p>
+
+<div class="language-s highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">##</span><span class="w">
+</span><span class="c1">## confidence level </span><span class="w">
+</span><span class="c1">##  0 =&gt; Assumed Not high privilege</span><span class="w">
+</span><span class="c1">##  &gt;0 =&gt; Assumed high privilege</span><span class="w">
+</span><span class="c1">##  100 =&gt; Certainly high privilege</span><span class="w">
+</span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w">
+</span><span class="n">If</span><span class="p">(</span><span class="w"> </span><span class="o">$</span><span class="n">AppRoleObject.Value</span><span class="w"> </span><span class="p">){</span><span class="w">
+    </span><span class="n">If</span><span class="p">(</span><span class="w"> </span><span class="o">$</span><span class="n">AppRoleObject.Value</span><span class="w"> </span><span class="o">-</span><span class="n">eq</span><span class="w"> </span><span class="s1">'Directory.ReadWrite.All'</span><span class="w"> </span><span class="p">){</span><span class="w">
+        </span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">ElseIf</span><span class="p">(</span><span class="w"> </span><span class="o">$</span><span class="n">AppRoleObject.Value</span><span class="w"> </span><span class="o">-</span><span class="n">Like</span><span class="w"> </span><span class="s1">'*FullControl.All'</span><span class="w"> </span><span class="p">){</span><span class="w">
+        </span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">ElseIf</span><span class="p">(</span><span class="w"> </span><span class="o">$</span><span class="n">AppRoleObject.Value</span><span class="w"> </span><span class="o">-</span><span class="n">Like</span><span class="w"> </span><span class="s1">'*ReadWrite.All'</span><span class="w"> </span><span class="p">){</span><span class="w">
+        </span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">ElseIf</span><span class="p">(</span><span class="w"> </span><span class="o">$</span><span class="n">AppRoleObject.Value</span><span class="w"> </span><span class="o">-</span><span class="n">Like</span><span class="w"> </span><span class="s1">'full_access*'</span><span class="w"> </span><span class="p">){</span><span class="w">
+        </span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="c1">## Return condifence level </span><span class="w">
+</span><span class="n">return</span><span class="w"> </span><span class="o">$</span><span class="n">confidenceLevel</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="azure-accesspermissions-v02">Azure-AccessPermissions v.0.2<a href="#azure-accesspermissions-v02" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>As said in the beginning I’ve put all my learnings into a re-worked version of my PowerShell Script. You can find that updated version here: <a href="https://github.com/csandker/Azure-AccessPermissions">Azure-AccessPermissions</a></p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_Access_Permissions_v.0.2_Banner.png" alt="Azure-AccessPermissions.ps1 v.0.2" title="Azure-AccessPermissions.ps1 v.0.2"><small class="img-caption">Azure-AccessPermissions.ps1 v.0.2</small></p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_Access_Permissions_v.0.2_ShowCase.png" alt="Showcase of Azure-AccessPermissions.ps1 v.0.2" title="Showcase Azure-AccessPermissions.ps1 v.0.2"><small class="img-caption">Showcase Azure-AccessPermissions.ps1 v.0.2</small></p>
+
+<p>This update brings different enumeration methods for the three principal-types as well as two general enumeration functions, which <em>try</em> to dig out as many high privileged principals as I could find.<br>
+The important disclaimer here is: I have no illusions that this code (or my current understanding) will cover all cases of hidden privileges. There surely are a ton more privileged edges that I haven’t thought about.</p>
+
+<p>… Speaking of edges: Why not use <a href="https://github.com/BloodHoundAD/AzureHound">AzureHound</a> instead?<br>
+You absolutely should (see also next section), I just wanted my own learning path. I’ve not compared the output results, overlaps or blind spots.</p>
+
+<h2 id="adding-global-perspective">Adding Global Perspective<a href="#adding-global-perspective" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>You may have wondered what is with all the other Azure resources that you have read about in other blog posts, such as access to Azure VMs or what about read access to SharePoint sites and files, which might as well indicate high access privileges ?!</p>
+
+<p>As of now I’ve focused my learning path solely on Azure Active Directory. To put that into a visual perspective, be aware that this is what I’ve talked above:</p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/Azure_And_External_Cosmos.png" alt="Azure Active Directory In its global cosmos" title="Azure Active Directory In its global cosmos"><small class="img-caption">Azure Active Directory In its global cosmos</small></p>
+
+<p><img src="/public/img/2022-11-10-Untangling-Azure-II-Privileged-Access/lion_king_meme.jpg" alt="lion_king_meme"></p>
+
+  </div>
+</div>
+
+<div class="related">
+  <h2>Other Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2023/05/17/Active-Directory-Spotlight-Attacking-The-Microsoft-Configuration-Manager.html">
+            Active Directory Spotlight: Attacking Microsoft's Configuration Manager (SCCM/MECM)
+            <small>17 May 2023</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2023/02/09/Offphish-Phishing-revisited-in-2023.html">
+            Offphish - Phishing revisited in 2023
+            <small>09 Feb 2023</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2022/10/19/Untangling-Azure-Permissions.html">
+            Untangling Azure Active Directory Principals &amp; Access Permissions
+            <small>19 Oct 2022</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+      </div>
+      <div id="toc-container" class="toc-container"><ul id="markdown-toc" class="post-toc">
+  <li><a href="#tldr" id="markdown-toc-tldr">TL;DR</a></li>
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#aad-access-concepts" id="markdown-toc-aad-access-concepts">AAD Access Concepts</a></li>
+  <li><a href="#privileged-access" id="markdown-toc-privileged-access">Privileged Access</a></li>
+  <li><a href="#azure-accesspermissions-v02" id="markdown-toc-azure-accesspermissions-v02">Azure-AccessPermissions v.0.2</a></li>
+  <li><a href="#adding-global-perspective" id="markdown-toc-adding-global-perspective">Adding Global Perspective</a></li>
+</ul></div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="imageModal" class="modal">
+
+      <!-- The Close Button -->
+      <span class="close">×</span>
+
+      <!-- Modal Content (The Image) -->
+      <img class="modal-content" id="imgModal">
+    </div>
+  
+
+</body></html>

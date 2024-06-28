@@ -1,0 +1,242 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Impersonating Office 365 Users With&nbsp;Mimikatz | DSInternals</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="Impersonating Office 365 Users With&nbsp;Mimikatz">
+<meta name="author" content="Michael Grafnetter">
+<meta property="og:locale" content="en">
+<meta name="description" content="Last month, Microsoft has introduced a&nbsp;new feature of&nbsp;Azure AD Connect called Single Sign On. It&nbsp;allows companies to&nbsp;configure SSO between AD and&nbsp;AAD without the&nbsp;need to&nbsp;deploy ADFS, which&nbsp;makes it&nbsp;an&nbsp;ideal solution for&nbsp;SMEs. Here is&nbsp;a&nbsp;high-level diagram of&nbsp;this&nbsp;functionality: As we can&nbsp;see from&nbsp;the&nbsp;diagram above, Azure AD exposes a&nbsp;publicly available endpoint that&nbsp;accepts Kerberos tickets and&nbsp;translates them into SAML and&nbsp;JWT tokens, which&nbsp;are&nbsp;understood and&nbsp;trusted by&nbsp;other cloud services like Office 365, Azure or&nbsp;Salesforce. And&nbsp;wherever&nbsp;you have Kerberos-based authentication, it&nbsp;can&nbsp;be&nbsp;attacked using Silver Tickets. In&nbsp;usual circumstances this&nbsp;attack can&nbsp;only be&nbsp;performed from&nbsp;the&nbsp;intranet. But&nbsp;what really caught my attention is&nbsp;the&nbsp;fact that&nbsp;with&nbsp;this&nbsp;new SSO feature, Silver Tickets could be&nbsp;used from&nbsp;the&nbsp;entire internet. Let’s give it&nbsp;a&nbsp;try then!">
+<meta property="og:description" content="Last month, Microsoft has introduced a&nbsp;new feature of&nbsp;Azure AD Connect called Single Sign On. It&nbsp;allows companies to&nbsp;configure SSO between AD and&nbsp;AAD without the&nbsp;need to&nbsp;deploy ADFS, which&nbsp;makes it&nbsp;an&nbsp;ideal solution for&nbsp;SMEs. Here is&nbsp;a&nbsp;high-level diagram of&nbsp;this&nbsp;functionality: As we can&nbsp;see from&nbsp;the&nbsp;diagram above, Azure AD exposes a&nbsp;publicly available endpoint that&nbsp;accepts Kerberos tickets and&nbsp;translates them into SAML and&nbsp;JWT tokens, which&nbsp;are&nbsp;understood and&nbsp;trusted by&nbsp;other cloud services like Office 365, Azure or&nbsp;Salesforce. And&nbsp;wherever&nbsp;you have Kerberos-based authentication, it&nbsp;can&nbsp;be&nbsp;attacked using Silver Tickets. In&nbsp;usual circumstances this&nbsp;attack can&nbsp;only be&nbsp;performed from&nbsp;the&nbsp;intranet. But&nbsp;what really caught my attention is&nbsp;the&nbsp;fact that&nbsp;with&nbsp;this&nbsp;new SSO feature, Silver Tickets could be&nbsp;used from&nbsp;the&nbsp;entire internet. Let’s give it&nbsp;a&nbsp;try then!">
+<meta property="og:site_name" content="DSInternals">
+<meta property="og:image" content="/assets/images/aad_sso2.png">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2017-01-15T19:35:43+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:image" content="/assets/images/aad_sso2.png">
+<meta property="twitter:title" content="Impersonating Office 365 Users With&nbsp;Mimikatz">
+<meta name="twitter:site" content="@MGrafnetter">
+<meta name="twitter:creator" content="@MGrafnetter">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Michael Grafnetter"},"dateModified":"2017-01-15T19:35:43+00:00","datePublished":"2017-01-15T19:35:43+00:00","description":"Last month, Microsoft has introduced a new feature of Azure AD Connect called Single Sign On. It allows companies to configure SSO between AD and AAD without the need to deploy ADFS, which makes it an ideal solution for SMEs. Here is a high-level diagram of this functionality: As we can see from the diagram above, Azure AD exposes a publicly available endpoint that accepts Kerberos tickets and translates them into SAML and JWT tokens, which are understood and trusted by other cloud services like Office 365, Azure or Salesforce. And wherever you have Kerberos-based authentication, it can be attacked using Silver Tickets. In usual circumstances this attack can only be performed from the intranet. But what really caught my attention is the fact that with this new SSO feature, Silver Tickets could be used from the entire internet. Let’s give it a try then!","headline":"Impersonating Office 365 Users With Mimikatz","image":"/assets/images/aad_sso2.png","mainEntityOfPage":{"@type":"WebPage","@id":"/en/impersonating-office-365-users-mimikatz/"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/favicon.png"},"name":"Michael Grafnetter"},"url":"/en/impersonating-office-365-users-mimikatz/"}</script>
+<!-- End Jekyll SEO tag -->
+<script type="text/javascript">
+!(function (cfg){function e(){cfg.onInit&&cfg.onInit(i)}var S,u,D,t,n,i,C=window,x=document,w=C.location,I="script",b="ingestionendpoint",E="disableExceptionTracking",A="ai.device.";"instrumentationKey"[S="toLowerCase"](),u="crossOrigin",D="POST",t="appInsightsSDK",n=cfg.name||"appInsights",(cfg.name||C[t])&&(C[t]=n),i=C[n]||function(l){var d=!1,g=!1,f={initialize:!0,queue:[],sv:"7",version:2,config:l};function m(e,t){var n={},i="Browser";function a(e){e=""+e;return 1===e.length?"0"+e:e}return n[A+"id"]=i[S](),n[A+"type"]=i,n["ai.operation.name"]=w&&w.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(f.sv||f.version),{time:(i=new Date).getUTCFullYear()+"-"+a(1+i.getUTCMonth())+"-"+a(i.getUTCDate())+"T"+a(i.getUTCHours())+":"+a(i.getUTCMinutes())+":"+a(i.getUTCSeconds())+"."+(i.getUTCMilliseconds()/1e3).toFixed(3).slice(2,5)+"Z",iKey:e,name:"Microsoft.ApplicationInsights."+e.replace(/-/g,"")+"."+t,sampleRate:100,tags:n,data:{baseData:{ver:2}},ver:4,seq:"1",aiDataContract:undefined}}var h=-1,v=0,y=["js.monitor.azure.com","js.cdn.applicationinsights.io","js.cdn.monitor.azure.com","js0.cdn.applicationinsights.io","js0.cdn.monitor.azure.com","js2.cdn.applicationinsights.io","js2.cdn.monitor.azure.com","az416426.vo.msecnd.net"],k=l.url||cfg.src;if(k){if((n=navigator)&&(~(n=(n.userAgent||"").toLowerCase()).indexOf("msie")||~n.indexOf("trident/"))&&~k.indexOf("ai.3")&&(k=k.replace(/(\/)(ai\.3\.)([^\d]*)$/,function(e,t,n){return t+"ai.2"+n})),!1!==cfg.cr)for(var e=0;e<y.length;e++)if(0<k.indexOf(y[e])){h=e;break}var i=function(e){var a,t,n,i,o,r,s,c,p,u;f.queue=[],g||(0<=h&&v+1<y.length?(a=(h+v+1)%y.length,T(k.replace(/^(.*\/\/)([\w\.]*)(\/.*)$/,function(e,t,n,i){return t+y[a]+i})),v+=1):(d=g=!0,o=k,c=(p=function(){var e,t={},n=l.connectionString;if(n)for(var i=n.split(";"),a=0;a<i.length;a++){var o=i[a].split("=");2===o.length&&(t[o[0][S]()]=o[1])}return t[b]||(e=(n=t.endpointsuffix)?t.location:null,t[b]="https://"+(e?e+".":"")+"dc."+(n||"services.visualstudio.com")),t}()).instrumentationkey||l.instrumentationKey||"",p=(p=p[b])?p+"/v2/track":l.endpointUrl,(u=[]).push((t="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",n=o,r=p,(s=(i=m(c,"Exception")).data).baseType="ExceptionData",s.baseData.exceptions=[{typeName:"SDKLoadFailed",message:t.replace(/\./g,"-"),hasFullStack:!1,stack:t+"\nSnippet failed to load ["+n+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(w&&w.pathname||"_unknown_")+"\nEndpoint: "+r,parsedStack:[]}],i)),u.push((s=o,t=p,(r=(n=m(c,"Message")).data).baseType="MessageData",(i=r.baseData).message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+s+")").replace(/\"/g,"")+'"',i.properties={endpoint:t},n)),o=u,c=p,JSON&&((r=C.fetch)&&!cfg.useXhr?r(c,{method:D,body:JSON.stringify(o),mode:"cors"}):XMLHttpRequest&&((s=new XMLHttpRequest).open(D,c),s.setRequestHeader("Content-type","application/json"),s.send(JSON.stringify(o))))))},a=function(e,t){g||setTimeout(function(){!t&&f.core||i()},500),d=!1},T=function(e){var n=x.createElement(I),e=(n.src=e,cfg[u]);return!e&&""!==e||"undefined"==n[u]||(n[u]=e),n.onload=a,n.onerror=i,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||a(0,t)},cfg.ld&&cfg.ld<0?x.getElementsByTagName("head")[0].appendChild(n):setTimeout(function(){x.getElementsByTagName(I)[0].parentNode.appendChild(n)},cfg.ld||0),n};T(k)}try{f.cookie=x.cookie}catch(p){}function t(e){for(;e.length;)!function(t){f[t]=function(){var e=arguments;d||f.queue.push(function(){f[t].apply(f,e)})}}(e.pop())}var r,s,n="track",o="TrackPage",c="TrackEvent",n=(t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+o,"stop"+o,"start"+c,"stop"+c,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),f.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4},(l.extensionConfig||{}).ApplicationInsightsAnalytics||{});return!0!==l[E]&&!0!==n[E]&&(t(["_"+(r="onerror")]),s=C[r],C[r]=function(e,t,n,i,a){var o=s&&s(e,t,n,i,a);return!0!==o&&f["_"+r]({message:e,url:t,lineNumber:n,columnNumber:i,error:a,evt:C.event}),o},l.autoExceptionInstrumented=!0),f}(cfg.cfg),(C[n]=i).queue&&0===i.queue.length?(i.queue.push(e),i.trackPageView({})):e();})({
+src: "https://js.monitor.azure.com/scripts/b/ai.3.gbl.min.js",
+crossOrigin: "anonymous",
+cfg: { connectionString: "InstrumentationKey=09cc50fb-5ff9-43f5-9dee-313274ed35dc;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"}
+});
+</script><script src="https://js.monitor.azure.com/scripts/b/ai.3.gbl.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/assets/css/style.css?v=">
+  <!-- Favicons -->
+<meta name="msapplication-TileImage" content="/assets/images/logo_white.png">
+<link rel="shortcut icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon-precomposed" href="/assets/images/logo_white.png">
+<!-- Links -->
+<link rel="me" href="https://twitter.com/MGrafnetter">
+<link rel="alternate" type="application/atom+xml" href="/en/feed.xml" title="DSInternals (EN)">
+<link rel="alternate" hreflang="en" href="/en/impersonating-office-365-users-mimikatz/">
+<!-- Icons -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+</head>
+
+<body>
+  <header class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/en"><img src="/assets/images/logo_white.png" width="50px"> DSInternals</a>
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger">
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+          </svg>
+        </span>
+      </label>
+      <div class="trigger">
+        <!-- Menu Items -->
+  <a href="/en/" class="page-link"><i class="fas fa-home"></i>&nbsp;BLOG</a>
+  <a href="/en/videos/" class="page-link"><i class="fas fa-video"></i>&nbsp;VIDEOS</a>
+  <a href="/en/projects/" class="page-link"><i class="fas fa-download"></i>&nbsp;PROJECTS</a>
+  <a href="/en/about/" class="page-link"><i class="fas fa-user"></i>&nbsp;ABOUT</a>
+<!-- Language Link -->
+<a lang="sk" hreflang="sk" href="/sk/" class="page-link">
+  <i class="fas fa-globe"></i>&nbsp;SK
+</a>
+      </div>
+    </nav>
+  </div>
+</header>
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Impersonating Office 365 Users With&nbsp;Mimikatz</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2017-01-15T19:35:43+00:00" itemprop="datePublished">
+        <i class="fas fa-calendar"></i>&nbsp;Jan 15, 2017</time>
+      <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+        <span class="p-author h-card" itemprop="name">
+          <i class="fas fa-user"></i>&nbsp;<a href="/en/about/" rel="author">Michael Grafnetter</a>
+
+        </span>
+      </span>
+    </p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Last month, Microsoft has introduced a&nbsp;new feature of&nbsp;Azure AD Connect called <a href="https://docs.microsoft.com/en-us/azure/active-directory/connect/active-directory-aadconnect-sso">Single Sign On</a>. It&nbsp;allows companies to&nbsp;configure SSO between AD and&nbsp;AAD without the&nbsp;need to&nbsp;deploy <a href="https://learn.microsoft.com/en-us/windows-server/identity/active-directory-federation-services">ADFS</a>, which&nbsp;makes it&nbsp;an&nbsp;ideal solution for&nbsp;SMEs. Here is&nbsp;a&nbsp;high-level diagram of&nbsp;this&nbsp;functionality:</p>
+
+<p><img src="../../assets/images/aad_sso4.png" alt="Azure AD Connect SSO Diagram"></p>
+
+<p>As we can&nbsp;see from&nbsp;the&nbsp;diagram above, Azure AD exposes a&nbsp;<a href="https://autologon.microsoftazuread-sso.com">publicly available endpoint</a> that&nbsp;accepts Kerberos tickets and&nbsp;translates them into SAML and&nbsp;JWT tokens, which&nbsp;are&nbsp;understood and&nbsp;trusted by&nbsp;other cloud services like Office 365, Azure or&nbsp;Salesforce. And&nbsp;wherever&nbsp;you have Kerberos-based authentication, it&nbsp;can&nbsp;be&nbsp;attacked using <a href="https://adsecurity.org/?p=2011">Silver Tickets</a>.</p>
+
+<p>In&nbsp;usual circumstances this&nbsp;attack can&nbsp;only be&nbsp;performed from&nbsp;the&nbsp;intranet. But&nbsp;what really caught my attention is&nbsp;the&nbsp;fact that&nbsp;with&nbsp;this&nbsp;new SSO feature, <strong>Silver Tickets could be&nbsp;used from&nbsp;the&nbsp;entire internet</strong>. Let’s give it&nbsp;a&nbsp;try then!</p>
+
+<!--more-->
+<h2 id="thenasty-stuff">
+  
+  
+    The&nbsp;Nasty Stuff <a href="#thenasty-stuff" class="heading-link" title="Permalink"><i class="fa fa-link"></i></a>
+  
+  
+</h2>
+    
+
+<p>To&nbsp;test this&nbsp;technique, we need to&nbsp;retrieve some&nbsp;information from&nbsp;Active Directory first:</p>
+
+<ol>
+  <li>
+    <p>NTLM password hash of&nbsp;the&nbsp;<a href="https://docs.microsoft.com/en-us/azure/active-directory/connect/active-directory-aadconnect-sso#how-single-sign-on-works">AZUREADSSOACC$</a> account, e.g. <em>f9969e088b2c13d93833d0ce436c76dd</em>. This&nbsp;value can&nbsp;be&nbsp;retrieved from&nbsp;AD using <a href="https://github.com/gentilkiwi/mimikatz">mimikatz</a>:</p>
+
+    <div class="language-batchfile highlighter-rouge"><div class="highlight"><pre class="highlight"><button type="button" value="Copy" aria-label="Copy code to clipboard"><i class="far fa-copy"></i></button><code> <span class="kd">mimikatz</span><span class="err">.exe</span> <span class="s2">"lsadump::dcsync /user:AZUREADSSOACC$"</span> <span class="k">exit</span>
+</code></pre></div>    </div>
+
+    <p>My own <a href="https://github.com/MichaelGrafnetter/DSInternals">DSInternals PowerShell Module</a> could do&nbsp;the&nbsp;same job:</p>
+
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><button type="button" value="Copy" aria-label="Copy code to clipboard"><i class="far fa-copy"></i></button><code><span class="w"> </span><span class="n">Get-ADReplAccount</span><span class="w"> </span><span class="nt">-SamAccountName</span><span class="w"> </span><span class="s1">'AZUREADSSOACC$'</span><span class="w"> </span><span class="nt">-Domain</span><span class="w"> </span><span class="nx">contoso</span><span class="w"> </span><span class="se">`
+</span><span class="w"> </span><span class="nt">-Server</span><span class="w"> </span><span class="nx">lon-dc1.contoso.local</span><span class="w">
+</span></code></pre></div>    </div>
+
+    <p>Both of&nbsp;these commands need <em>Domain Admins</em> permissions.</p>
+  </li>
+  <li>Name of&nbsp;the&nbsp;AD domain, e.g. <em>contoso.local</em>.</li>
+  <li>AAD logon name of&nbsp;the&nbsp;user we want to&nbsp;impersonate, e.g. elrond@contoso.com. This&nbsp;is&nbsp;typically either his&nbsp;<em>userPrincipalName</em> or&nbsp;<em>mail</em> attribute from&nbsp;the&nbsp;on-prem AD.</li>
+  <li>SID of&nbsp;the&nbsp;user we want to&nbsp;impersonate, e.g. <em>S-1-5-21-2121516926-2695913149-3163778339-1234</em>.</li>
+</ol>
+
+<p>Having this&nbsp;information we can&nbsp;now&nbsp;create and&nbsp;use the&nbsp;Silver Ticket on any Windows computer connected to&nbsp;the&nbsp;internet. It&nbsp;does not even&nbsp;matter whether&nbsp;it&nbsp;is&nbsp;joined to&nbsp;a&nbsp;domain or&nbsp;a&nbsp;workgroup:</p>
+
+<ol>
+  <li>
+    <p>Create the&nbsp;Silver Ticket and&nbsp;inject it&nbsp;into Kerberos cache:</p>
+
+    <div class="language-batchfile highlighter-rouge"><div class="highlight"><pre class="highlight"><button type="button" value="Copy" aria-label="Copy code to clipboard"><i class="far fa-copy"></i></button><code> <span class="kd">mimikatz</span><span class="err">.exe</span> <span class="s2">"kerberos::golden /user:elrond /sid:S-1-5-21-2121516926-2695913149-3163778339 /id:1234 /domain:contoso.local /rc4:f9969e088b2c13d93833d0ce436c76dd /target:aadg.windows.net.nsatc.net /service:HTTP /ptt"</span> <span class="k">exit</span>
+</code></pre></div>    </div>
+
+    <p><img src="../../assets/images/aad_sso3.png" alt="Mimikatz Silver Ticket Screenshot"></p>
+  </li>
+  <li>Launch <em>Mozilla Firefox</em>.</li>
+  <li>Go to&nbsp;<code class="language-plaintext highlighter-rouge">about:config</code> and&nbsp;set the&nbsp;<a href="https://github.com/mozilla/policy-templates/blob/master/README.md#authentication">network.negotiate-auth.trusted-uris</a> preference to&nbsp;<a href="https://docs.microsoft.com/en-us/azure/active-directory/connect/active-directory-aadconnect-sso#ensuring-clients-sign-in-automatically">value</a> “https://aadg.windows.net.nsatc.net,https://autologon.microsoftazuread-sso.com”.</li>
+  <li>Navigate to&nbsp;any web application that&nbsp;is&nbsp;integrated with&nbsp;our AAD domain. We will use <a href="https://portal.office.com">Office 365</a>, which&nbsp;is&nbsp;the&nbsp;most commonly used one.</li>
+  <li>
+    <p>Once&nbsp;at the&nbsp;logon screen, fill in&nbsp;the&nbsp;user name, while&nbsp;leaving the&nbsp;password field empty. Then press TAB or&nbsp;ENTER.</p>
+
+    <p><img src="../../assets/images/aad_sso1.png" alt="Office 365 Sing-In Screen"></p>
+  </li>
+  <li>
+    <p>That’s it, we’re in!</p>
+
+    <p><img src="../../assets/images/aad_sso2.png" alt="Office 365 Home"></p>
+  </li>
+  <li>
+    <p>To&nbsp;log in&nbsp;as&nbsp;another user, run the&nbsp;command below and&nbsp;repeat steps 1-6.</p>
+
+    <div class="language-batchfile highlighter-rouge"><div class="highlight"><pre class="highlight"><button type="button" value="Copy" aria-label="Copy code to clipboard"><i class="far fa-copy"></i></button><code> <span class="kd">klist</span> <span class="kd">purge</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>It is&nbsp;also worth noting that&nbsp;the&nbsp;password of&nbsp;the&nbsp;<em>AZUREADSSOACC$</em> account never changes, so&nbsp;the&nbsp;stolen hash/key will work forever. It&nbsp;could therefore be&nbsp;misused by&nbsp;highly privileged employees to&nbsp;retain access to&nbsp;the&nbsp;IT&nbsp;environment after&nbsp;leaving the&nbsp;company. Dealing with&nbsp;such situations is&nbsp;a&nbsp;much broader problem, which&nbsp;is&nbsp;aptly depicted by&nbsp;the&nbsp;following old Narnian saying:</p>
+
+<p><img src="../../assets/images/narnia.png" alt="Once a&nbsp;Domain Admin, always a&nbsp;Domain Admin"></p>
+<h2 id="countermeasures">
+  
+  
+    Countermeasures <a href="#countermeasures" class="heading-link" title="Permalink"><i class="fa fa-link"></i></a>
+  
+  
+</h2>
+    
+
+<p>First of&nbsp;all, I&nbsp;have to&nbsp;point out that&nbsp;this&nbsp;technique would not be&nbsp;very practical in&nbsp;real-world situations due to&nbsp;these reasons:</p>
+
+<ul>
+  <li>The&nbsp;SSO feature is&nbsp;in&nbsp;Preview and&nbsp;has to&nbsp;be&nbsp;explicitly enabled by&nbsp;an&nbsp;AD admin. Just a&nbsp;handful of&nbsp;companies probably use it&nbsp;at the&nbsp;time of&nbsp;writing this&nbsp;article and&nbsp;enterprises will quite surely stick to&nbsp;their proven ADFS deployments even&nbsp;after&nbsp;this&nbsp;feature reaches GA.</li>
+  <li>The&nbsp;hash/key of&nbsp;the&nbsp;<em>AZUREADSSOACC$</em> account can&nbsp;only be&nbsp;retrieved by&nbsp;Domain Admins from&nbsp;DCs by&nbsp;default. But&nbsp;if&nbsp;an&nbsp;attacker had such highly privileged access to&nbsp;an&nbsp;Active Directory domain, he/she would be&nbsp;able to&nbsp;do&nbsp;some&nbsp;way nastier stuff than&nbsp;just replicating a&nbsp;single hash.</li>
+  <li>The&nbsp;password of&nbsp;the&nbsp;<em>AZUREADSSOACC$</em> account is&nbsp;randomly generated during the&nbsp;deployment of&nbsp;<em>Azure AD Connect</em>. It&nbsp;would therefore be&nbsp;impossible to&nbsp;guess this&nbsp;password.</li>
+</ul>
+
+<p>As&nbsp;you can&nbsp;see, there is&nbsp;simply no need to&nbsp;panic. But&nbsp;just to&nbsp;be&nbsp;safe, I&nbsp;would recommend these generic security measures:</p>
+
+<ul>
+  <li>Only delegate administrative access to&nbsp;trusted individuals and&nbsp;keep the&nbsp;number of&nbsp;members of&nbsp;the&nbsp;<em>Domain Admins</em> group (and other privileged groups) as&nbsp;low as&nbsp;possible.</li>
+  <li>Protect backups of&nbsp;Domain Controllers, so&nbsp;no-one could <a href="/en/dumping-ntds-dit-files-using-powershell/">extract sensitive information</a> from&nbsp;them.</li>
+  <li>Enable and&nbsp;enforce <a href="https://docs.microsoft.com/en-us/azure/multi-factor-authentication/multi-factor-authentication">Azure MFA</a> for&nbsp;users authenticating from&nbsp;external IP addresses. It&nbsp;is&nbsp;very straightforward and&nbsp;effective against many kinds of&nbsp;attacks.</li>
+  <li>Consider implementing <a href="https://docs.microsoft.com/cs-cz/azure/active-directory/active-directory-conditional-access">Azure AD conditional access</a>.</li>
+  <li>Deploy <a href="https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics">Microsoft Defender for&nbsp;Identity</a> to&nbsp;detect malicious replication and&nbsp;other threats to&nbsp;your AD infrastructure.</li>
+  <li>Force a&nbsp;password change on the&nbsp;<em>AZUREADSSOACC$</em> account by&nbsp;<del>re-deploying Azure AD Connect SSO</del> <a href="https://docs.microsoft.com/en-us/azure/active-directory/connect/active-directory-aadconnect-sso-faq#how-can-i-roll-over-the-kerberos-decryption-key-of-the-azureadssoacc-computer-account">running the&nbsp;Update-AzureSSOForest cmdlet</a> after&nbsp;a&nbsp;highly privileged employee leaves the&nbsp;company and/or on a&nbsp;regular basis. This&nbsp;should be&nbsp;done together with&nbsp;resetting the&nbsp;password of&nbsp;<em>krbtgt</em> and&nbsp;other sensitive accounts.</li>
+</ul>
+<h2 id="conclusion">
+  
+  
+    Conclusion <a href="#conclusion" class="heading-link" title="Permalink"><i class="fa fa-link"></i></a>
+  
+  
+</h2>
+    
+
+<p>Although&nbsp;the&nbsp;Silver Ticket attack has been here for&nbsp;some&nbsp;years, it&nbsp;is&nbsp;now&nbsp;probably the&nbsp;first time it&nbsp;can&nbsp;be&nbsp;used over the&nbsp;internet against a&nbsp;cloud service, which&nbsp;theoretically makes it&nbsp;even&nbsp;more potent. On the&nbsp;other hand, it&nbsp;would be&nbsp;quite hard to&nbsp; perform this&nbsp;technique in&nbsp;a&nbsp;real-world environment due to&nbsp;impracticalities discussed in&nbsp;the&nbsp;previous section, so&nbsp;there is&nbsp;no need to&nbsp;worry. The&nbsp;new Seamless SSO feature of&nbsp;Azure AD Connect can&nbsp;therefore be&nbsp;considered safe and&nbsp;preferred solution for&nbsp;SSO to&nbsp;Office 365.</p>
+
+  </div>
+</article>
+
+    </div>
+  </main>
+  <footer class="site-footer h-card">
+    <div class="wrapper">
+        <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/MichaelGrafnetter" target="_blank" title="GitHub: MichaelGrafnetter">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://twitter.com/MGrafnetter" target="_blank" title="Twitter: @MGrafnetter">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#x"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://www.linkedin.com/in/grafnetter/" target="_blank" title="LinkedIn: grafnetter">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#linkedin"></use>
+    </svg>
+  </a>
+</li>
+<li><a href="/en/feed.xml" title="RSS (EN)"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#rss"></use></svg></a></li></ul>
+</div>
+    </div>
+</footer>
+<script src="/assets/scripts/copy-code.js"></script>
+
+
+
+
+</body></html>

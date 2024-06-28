@@ -1,0 +1,450 @@
+<html lang="en-us"><head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <!-- Enable responsiveness on mobile devices-->
+  <meta data-rh="true" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  
+  <meta data-rh="true" property="og:image" content="https://csandker.io///public/img/2022-10-19-Untangling-Azure-Principals/Effective-API-Permissions-In-Azure.png">
+  <meta data-rh="true" name="twitter:image:src" content="https://csandker.io///public/img/2022-10-19-Untangling-Azure-Principals/Effective-API-Permissions-In-Azure.png">
+  <meta data-rh="true" name="twitter:tile:image" content="https://csandker.io///public/img/2022-10-19-Untangling-Azure-Principals/Effective-API-Permissions-In-Azure.png">
+  <meta data-rh="true" name="twitter:card" content="summary_large_image">
+  <meta data-rh="true" name="title" content="Untangling Azure Active Directory Principals &amp; Access Permissions">
+  <meta data-rh="true" property="og:title" content="Untangling Azure Active Directory Principals &amp; Access Permissions">
+  <meta data-rh="true" property="twitter:title" content="Untangling Azure Active Directory Principals &amp; Access Permissions">
+  <meta data-rh="true" name="description" content="This blog post will untangle the question of 'who has access to what' in an Azure Active Directory environment. A PowerShell tool will also be released to automatically enumerate this.">
+  <meta data-rh="true" property="og:description" content="This blog post will untangle the question of 'who has access to what' in an Azure Active Directory environment. A PowerShell tool will also be released to automatically enumerate this.">
+  <meta data-rh="true" property="og:type" content="article">
+  <meta data-rh="true" property="og:url" content="https://csandker.io///2022/10/19/Untangling-Azure-Permissions.html">
+  <meta data-rh="true" property="article:published_time" content="2022-10-19 08:00:00 +0000">
+  
+  <title>
+    
+      Untangling Azure Active Directory Principals &amp; Access Permissions · csandker.io
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="/public/css/poole.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/syntax.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/hyde.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/themes.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/toc.css ">
+  <link rel="stylesheet" type="text/css" href="/public/css/imagemodal.css ">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" type="text/css" href=" /public/css/fontawesome/all.min.css ">
+  
+  <!-- TimeLine -->
+  <link rel="stylesheet" type="text/css" href=" /public/css/timeline.min.css ">
+  <link rel="stylesheet" type="text/css" href=" /public/css/timeline-custom.css ">
+
+  <!-- JS -->
+  <script type="text/javascript" async="" src=" /public/js/jquery.min.js"></script>
+  <script type="text/javascript" async="" src=" /public/js/imagemodal.js"></script>
+  <script type="text/javascript" async="" src=" /public/js/main.js"></script>
+
+  <!-- Icons -->
+  <!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png"> -->
+  <link rel="shortcut icon" href="/public/img/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="">
+        <img class="sidebar-nav profile" src="/public/img/profile.png">
+      </a>
+      <div class="about-icons">
+          <a class="sidebar-nav icon" href="https://twitter.com/0xcsandker">
+            <span class="icon-span">
+              <i class="fab fa-twitter"></i>0xcsandker
+            </span>
+          </a>
+          <a class="sidebar-nav-item" href="https://github.com/csandker">
+            <span class="icon-span">
+              <i class="fab fa-github"></i>csandker
+            </span>
+          </a>
+          <a class="sidebar-nav-item" href="/feed.xml">
+            <span class="icon-span">
+              <i class="fas fa-rss-square"></i>RSS Feed
+            </span>
+          </a>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">//Posts</a>
+
+      
+      
+        
+          
+            <a class="sidebar-nav-item" href="/win-history/">//History of Windows</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/archive/">//Archive</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/find/">//Tags &amp; Search</a>
+          
+        
+      
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/me/">//ME</a>
+          
+        
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+
+    </nav>
+    <button class="switch-theme-btn">
+      <i class="fas fa-adjust"></i> 
+        Switch Theme
+    </button>
+
+  </div>
+</div>
+
+    <div class="sidebar-stripes"></div>
+
+    <div class="main-container">
+      <div class="content container">
+        <div class="post">
+  <h1 class="post-title">Untangling Azure Active Directory Principals &amp; Access Permissions</h1>
+  <div class="post-dates">
+    <span class="post-date">19 Oct 2022</span>
+    
+  </div>
+  <div id="post-content" class="post-content">
+    <h2 class="no_toc toc-header" id="contents">Contents:<a href="#contents" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+<ul id="markdown-toc" class="post-toc">
+  <li><a href="#tldr" id="markdown-toc-tldr">TL;DR</a></li>
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#access-permission-breakdown" id="markdown-toc-access-permission-breakdown">Access Permission Breakdown</a>    <ul>
+      <li><a href="#applications-and-enterprise-applications" id="markdown-toc-applications-and-enterprise-applications">Applications and Enterprise Applications</a></li>
+      <li><a href="#app-roles" id="markdown-toc-app-roles">App Roles</a></li>
+      <li><a href="#api-permissions" id="markdown-toc-api-permissions">API Permissions</a></li>
+      <li><a href="#application-and-delegated-api-permissions" id="markdown-toc-application-and-delegated-api-permissions">Application and Delegated API Permissions</a></li>
+    </ul>
+  </li>
+  <li><a href="#effective-access-permissions" id="markdown-toc-effective-access-permissions">Effective Access Permissions</a></li>
+  <li><a href="#applied-scenario-who-has-access-to-what" id="markdown-toc-applied-scenario-who-has-access-to-what">Applied Scenario: Who has access to what?</a></li>
+  <li><a href="#automation---introducing-azure-accesspermissionsps1" id="markdown-toc-automation---introducing-azure-accesspermissionsps1">Automation - Introducing: Azure-AccessPermissions.ps1</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<h2 id="tldr">TL;DR<a href="#tldr" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p><strong>I’ve released a PowerShell script to enumerate access permissions in an Azure AD tenant, if you just came for the tool, here’s your fast track: You can find the tool <a href="https://github.com/csandker/Azure-AccessPermissions">here</a>, see how it’s used and what the output looks like in the <a href="#automation---introducing-azure-accesspermissionsps1">last section</a>.</strong></p>
+
+<h2 id="intro">Intro<a href="#intro" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<blockquote>
+  <p>All my live is learning in progress:<br>
+If you spot something that is technically incorrect, misleading or unclear: <a href="https://twitter.com/0xcsandker">Let me know</a> about it and I’ll fix it.</p>
+</blockquote>
+
+<p>While preparing an Azure Active Directory engagement it took me a couple of days to untangle and structure the various actors in the game of “who has access to what” in Azure Active Directory, so I figured I’ll preserve my learnings for my older self and those that also need to get an (hopefully) easier start into this topic.</p>
+
+<p>Before diving into the matter, let me quickly note a few things that I found difficult to understand, to share what might get people lost:</p>
+<ul>
+  <li>The number one pain point for me was the lack of clear, uniformly naming and presentation schemes of different components, for example when comparing objects accessed through the Azure Portal with objects accessed via the <a href="https://github.com/microsoftgraph/msgraph-sdk-powershell">official Microsoft Graph PowerShell module</a>.</li>
+  <li>Additional when focusing only on a single source of access (Portal or PowerShell module) it’s hard to make sense of different attributes that all sound similar when looking for “who has access to this”.</li>
+  <li>Finally: When diving into these topics and reading documentation, it’s really hard to keep track of way to many acronyms, terms and concept/logic junctions that are introduced way to early.</li>
+</ul>
+
+<p>Enough whining, here’s my attempt to make thinks more understandable…</p>
+
+<h2 id="access-permission-breakdown">Access Permission Breakdown<a href="#access-permission-breakdown" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>Before anything else let’s define who are the actors in this game of “who has access to what”. Readers coming from an Active Directory (the on-premise thing) home base will know that not only your registered Users can have access to certain resources, but that also other identities exist that could have access to things. Therefore, an identity that can access something is usually not referred to as “User” (cause that would miss a few other actors), but as “Principal”. Using that notion there are 3x principals that can have access to things in Azure Active Directory:</p>
+<ul>
+  <li>Users</li>
+  <li>Groups</li>
+  <li>Service Principals</li>
+</ul>
+
+<p>To keep everyone on track early on: We’ll have a closer look on what “Service Principals” are, but to make this term ‘usable’ right from the start here’s the quick preview:</p>
+<blockquote>
+  <p>Service principals are entities that act on behalf of an application (e.g. Outlook). In a sense they represent an instantiated ‘user’ object bound to an application.</p>
+</blockquote>
+
+<p>To get a hold of what applications and service principals are, let’s assume we’re in an entirely empty Azure universe for a moment. We start to populate the environment by adding users and organize our users in groups. To get us productive and use our universe we’ll now add an application that will allow us to access and modify our environment.<br>
+We could start with an application that everyone knows, like “Outlook”, but we don’t want to send/receive mails, instead we want to have a unified API to access all the components in Azure, so we’ll start with the application “Microsoft Graph” (choosing Microsoft Graph will have reference benefits later on). When speaking about “the application” (Microsoft Graph in this case), this application will in some documentations also be referenced to as “Resource application”. I like this notion for our case as it indicates that our application holds resources that we (and others) later want to access, for example our “Microsoft Graph” application holds information about user and group resources (you will see how this notion comes in handy later on).</p>
+
+<p>We have coded the application and are now integrating it into our Azure environment, aka. in our Azure tenant. To do that we’re logging into the Azure Portal, head over to “Azure Active Directory” and click “App registrations”.</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/AppRegistration2.png" alt="Azure Portal App Registrations" title="Azure Portal App Registrations"><small class="img-caption">Azure Portal App Registrations</small></p>
+
+<p>When registering our “Microsoft Graph” application using this UI flow, we can set a name and a few other settings that are not too interesting for us in this moment. What is important though is that once you hit the “Register” button 2x new objects are created in your Azure tenant:</p>
+<ul>
+  <li>An <strong>application object</strong> that represents your application (“Microsoft Graph”). This object holds all the app settings you made.</li>
+  <li>A <strong>service principal</strong> that acts as an ‘‘identity entity’ for your application. If your application needs to access other resources it is not the application object that is interacting with the other resource, it is your application’s service principal.</li>
+</ul>
+
+<p>While the application object serves as a technical container to represent your application (and all its settings), the application’s service principal primarily acts as identity principal in the sense that it can make access requests and has access rights.</p>
+
+<p>Technically we could also impose these technical capabilities to the application object, so why do we need a second object?<br>
+In our current scenario there is only our Azure tenant in the universe, but sooner or later other customers will join the cloud party and will have their own tenants and we want them to be able to use our application. In order to operate in another tenant, our application needs an identity within that other tenant that can access objects and do stuff. This is where our application’s service principal as a standalone identity comes in handy. While the application objects only lives in the tenant that registered the application (its ‘home tenant’) a (application) <strong>service principal is created in any tenant that installs the application</strong>. By using the concept of a “service principal” we have an individual object in all tenants that use our application, which shares some common attributes derived from our application object. These service principals allow us to set up and operate our application in any given tenant.</p>
+
+<p>To summarize this is where we are at the moment:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/AppObject-and-ServicePrincipal.png" alt="Relationship of Application Object and Service Principal" title="Relationship of Application Object and Service Principal in an Azure tenant"><small class="img-caption">Relationship of Application Object and Service Principal in an Azure tenant</small></p>
+
+<h3 id="applications-and-enterprise-applications">Applications and Enterprise Applications<a href="#applications-and-enterprise-applications" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h3>
+
+<p>To recap and summarize from the previous section:</p>
+<ul>
+  <li>Registering <em>your</em> application in <em>your</em> tenant results in an application object and a service principal object being created in <em>your</em> (home) tenant.</li>
+  <li>Installing an application of someone else in your tenant results in (only) a service principal being created in your tenant.</li>
+</ul>
+
+<p>This helps to understand the difference between “Applications” or “App registrations” and “Enterprise Applications” when browsing through the Azure portal. The Azure Portal menu item <strong>“App registration”</strong> will <strong>show the application objects</strong> of your tenant.<br>
+The menu item <strong>“Enterprise applications”</strong> will <strong>show the service principals</strong> installed in your tenant.</p>
+
+<p>This is why the blue help button under “App registrations” (see first screenshot of the previous section) suggest to search under “Enterprise applications” if you can’t find the application that you’re looking as: “Apps owned by other organizations won’t appear here [under ‘App registrations’]”.</p>
+
+<p>But don’t fall into the “My objects are under ‘App registration’ and the objects of other organizations are under ‘Enterprise applications’” trap.<br>
+Remember: <strong>Once you register your application within your tenant you will find the application object of <em>your</em> app listed under “App registrations” and the service principal of <em>your</em> app listed under “Enterprise applications”.</strong></p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/AppObject-and-ServicePrincipal-Within-The-Azure-Portal.png" alt="Application Objects and Service Principals Within the Azure Portal" title="Application Objects and Service Principals Within the Azure Portal"><small class="img-caption">Application Objects and Service Principals Within the Azure Portal</small></p>
+
+<h3 id="app-roles">App Roles<a href="#app-roles" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h3>
+
+<p>Okay so far so good, we understood application objects and (application) service principals. For the next part of the puzzle let’s refer back to our <strong>resource application</strong>. Remember how we introduced this notion to indicate that our application holds resources (users, groups) that we’d like to access. So far, we have not specified any boundaries for that access in the sense of permissions, e.g. are all our service principals allowed to read and write to all the resources in our application? Certainly not. We want fine grained access control and that is what “AppRoles” are for.</p>
+
+<p><strong>An “AppRole” is an access permission grant defined as string</strong>, for example in the form of this: <code class="language-plaintext highlighter-rouge">User.ReadBasic.All</code><br>
+This AppRole is meant to express that whoever holds this “AppRole” should be allowed to <em>read</em> <em>basic information</em> (e.g. names) of <em>all</em> user objects from our resource application. As <a href="https://twitter.com/_wald0">Andy Robbins</a> puts it in his <a href="https://medium.com/specter-ops-posts/azure-privilege-escalation-via-azure-api-permissions-abuse-74aee1006f48">great blog post</a>, these “AppRole” permissions are usually expressed in the following format: <code class="language-plaintext highlighter-rouge">Resource.Operation.Constraint</code></p>
+
+<p>Alright, let’s add that to the picture:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/ApplicationObjects-ServicePrincipals-And-AppRoles.png" alt="Application Objects, Service Principals and AppRoles" title="Application Objects, Service Principals and AppRoles"><small class="img-caption">Application Objects, Service Principals and AppRoles</small></p>
+
+<p>To make an “AppRole” more understandable, AppRoles are not defined as simple string attributes, but are contained in a separate object where you can also add in a more user-friendly display name, a description and of course a unique ID (AppRoleId), in order to reference a specific AppRole.<br>
+We can find all of this in the Azure Portal under “App registrations”&nbsp;» &lt;YourApplication&gt;&nbsp;» “App Roles”:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/AppRoles-In-The-Azure-Portal.png" alt="Defined AppRoles in the Azure Portal" title="Defined AppRoles in the Azure Portal"><small class="img-caption">Defined AppRoles in the Azure Portal</small></p>
+
+<h3 id="api-permissions">API Permissions<a href="#api-permissions" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h3>
+
+<p>Everyone that had browsed to the “App registration” view in a quest to define access rights to their application must have wondered at some point what the “API permissions” menu item is for, which is also contained in the same menu blade that contains the “App roles”. At least this menu item does sound similar in regards to granting access to…something…</p>
+
+<p>The idea here is that while under <strong>“App roles”</strong> you can <strong>define access definitions to your own application</strong>.<br>
+The menu item <strong>“API permissions”</strong> on the other hand allows you to <strong>set</strong> in <strong>permissions</strong> for <em>your</em> application <strong>to access <em>other</em> public APIs</strong>.<br>
+This is the scene where you say “My application needs to access data from another resource application (managed within Azure) and I want to allow my application to do that”. If you’re now thinking: “My application is accessing something else, aka. making an authenticated access requests – that sounds like something the service principal of my application is responsible for”, then you are right on track. That is exactly what the service principal of your application is for.</p>
+
+<p>In order to make this scenario a bit more visual we will leave our previous scenario of managing the “Microsoft Graph” application and will now take a second seat where we are an ordinary company that has developed and registered their favorite “SampleApp” application into their Azure (home) tenant. In order for our “SampleApp” to function properly we need to query basic user information in the tenants of our clients. We decide the best way to do this is by querying a public Microsoft API and as the “Azure AD Graph API”, which had been the previous data authority, will be <a href="https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/azure-ad-change-management-simplified/ba-p/2967456?WT.mc_id=M365-MVP-9501">deprecated by the end of 2022</a>, we want to use the new Azure data authority, the “Microsoft Graph API”.</p>
+
+<p>In order to do that we click on “API Permissions” within the “App registration” view and then click on “Add a permission”, you can see that flow and the result below:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Setting-API-Permissions-In-The-Azure-Portal.png" alt="Setting API Permissions in the Azure Portal" title="Setting API Permissions in the Azure Portal"><small class="img-caption">Setting API Permissions in the Azure Portal</small></p>
+
+<p>Having a close look to the shown API Permissions we can spot that we don’t just specify broad access to the Microsoft Graph Resource application, but instead we use the exact “AppRole” definitions that have been specified in the previous section. These “AppRoles” of the Microsoft Graph resource are now used by our “SampleApp” to specify what access we need.</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/API-Permissions-Between-Two-Applications-In-Azure.png" alt="API Permissions Access in Azure" title="API Permissions Access in Azure"><small class="img-caption">API Permissions Access in Azure</small></p>
+
+<p>This would be a great spot to close the book, check off Azure access permissions and go for beers, but Microsoft won’t let us leave just yet as there is more to uncover…</p>
+
+<h3 id="application-and-delegated-api-permissions">Application and Delegated API Permissions<a href="#application-and-delegated-api-permissions" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h3>
+
+<p>When defining API Permissions for our “SampleApp” - as we just did - Azure will ask us what “type” of permissions we want to set, before we can chose <em>what</em> (in terms of AppRoles) we want to have access to.<br>
+There are two different types of API permissions:</p>
+<ul>
+  <li>Application permissions</li>
+  <li>Delegated permissions</li>
+</ul>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Choosing-The-API-Permission-Type-In-The-Azure-Portal.png" alt="Choosing the API Permission Type in the Azure Portal" title="Choosing the API Permission Type in the Azure Portal"><small class="img-caption">Choosing the API Permission Type in the Azure Portal</small></p>
+
+<p>A brief explanation to what these two types is given by Microsoft in the screenshot above. I’ll try to add a bit more context to this:</p>
+
+<p>Imagine our “SampleApp” would be a statistics application that shows basic user statics in our Azure dashboard, therefore our application would need to query basic user data from the Microsoft Graph API. Our application - and to be precise here: the service principal of our application - would need to directly access Microsoft Graph, saying: “Hey I’m the SampleApp I need some user data of my tenant users”. In this case we would chose <strong>“Application permissions”</strong> as our permission type, as our application (technically our application service principal) is the entity that will access the Microsoft Graph API.</p>
+
+<p>To paint the opposite picture: Imagine our SampleApp to be a document storage application (like Sharepoint), that needs to read and write user (and other) data from the tenant where our application is installed. Again, we chose to query the Microsoft Graph API to retrieve or place data into the tenant, but in this case we want the access permissions to be dependent on the user that initiated an action (e.g. reading/writing a file). We don’t want that our application service principal is generally allowed to read/write all files of all users, but that the access is actually dependent on the user that uses our application (aka is logged in to our application). In Microsoft’s terminology our application should act on behalf of the logged-in user, with delegated permissions. Therefore, we choose <strong>“Delegated permissions”</strong> as our permission type for this scenario.</p>
+
+<p>Knowing about these two API permission types finally completes the access picture:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/API-Permissions-Between-Two-Applications-With-Permission-Type-In-Azure.png" alt="API Permissions Access with Permission Type in Azure" title="API Permissions Access with Permission Type in Azure"><small class="img-caption">API Permissions Access with Permission Type in Azure</small></p>
+
+<h2 id="effective-access-permissions">Effective Access Permissions<a href="#effective-access-permissions" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>The concept of “Delegated access permissions” brings up a new “problem” that needs to be handled.<br>
+What if a user has been granted a permissions that does not match with the API permissions we just assigned to our application - more specifically to our application service principal.<br>
+Example: What if we assigned our application service principal “User.ReadBasic.All” permissions, but the user that is logged-in to our application is a ‘Global Administrator’ in the current tenant and would thereby have much broader permissions within the Microsoft Graph API?</p>
+
+<p>In an “on-premise” Active Directory environment this problem is solved through impersonation: A service impersonates a user and thereby takes all of the users access permissions and acts towards the resource as if being the user.</p>
+
+<p>In Azure things are different. <strong>In Azure neither the user’s, nor the service principal’s access permissions take precedence</strong>, instead <strong>the least privileged intersection</strong> between those permission sets is build and access is then granted or denied based on this intersection set. This set of permissions that is finally evaluated by the resource application is what is called <strong>“effective permission”</strong>.</p>
+
+<p>Okay, so when evaluating “delegated-type” permissions these resulting “effective permissions” are based on the user’s and service principal’s permissions. But what happens when evaluating “application”-type permissions?<br>
+As mentioned before “application”-type permissions define access scenarios in which there is no “logged-on” user and the service principal acts on its own. In this case the “effective permissions” are equal to the service principal’s “application”-type permissions.</p>
+
+<p>The figure below tries to visualize this concept:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Effective-API-Permissions-In-Azure.png" alt="Azure's Effective API Permissions" title="Azure's Effective API Permissions"><small class="img-caption">Azure's Effective API Permissions</small></p>
+
+<p>If you’re still puzzled on this concept and want to read this in another voice, I recommend a read through the <a href="https://learn.microsoft.com/en-us/graph/auth/auth-concepts#delegated-and-application-permissions">official documentation</a> of these concepts (there are also examples given).</p>
+
+<h2 id="applied-scenario-who-has-access-to-what">Applied Scenario: Who has access to what?<a href="#applied-scenario-who-has-access-to-what" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>To finally answer the question of “who has access to what”, let’s re-walk through our scenario from above to get an understanding of what steps are necessary for a principal to get access to a resource.</p>
+
+<p>Let’s get back to where we started from: We have coded the “Microsoft Graph” resource application and are now about to add this to our Azure tenant. We log into the Azure Portal, browse to the Azure Active Directory Menu, click “App registrations”, register our app and define all the AppRoles that we need for Microsoft Graph.<br>
+<strong>At this point in time no one has access to our application, as we haven’t assigned any permissions yet, we only defined access identifiers (AppRoles) to our application.</strong></p>
+
+<p>As we clicked “Register”, our Microsoft Graph application object and the corresponding service principal have been created in our tenant. We’re now switching over to the “Enterprise applications” view, to inspect our newly created service principal.<br>
+For testing purposes we now click on “Users and Groups” and add one of our tenant users to our “enterprise application”, which technically is our service principal. The UI will ask us which user we want to select, and which (App) role we want to assign to this user. We select any random user and any sample AppRole that we created in the previous step.</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Azure-Portal-Add-User-To-Enterprise-Application.png" alt="Adding a User to an Azure Enterprise Application/Service Principal" title="Adding a User to an Azure Enterprise Application/Service Principal"><small class="img-caption">Adding a User to an Azure Enterprise Application/Service Principal</small></p>
+
+<p>This user has now been granted to access the application using the defined AppRole, the resource application (Microsoft Graph in this case) is responsible for checking this AppRole when accessing a record. In this example I created and assigned the AppRole “User.ReadBasic.All”, which - if this would be really the Microsoft Graph API - would allow the chosen user in our local tenant to access basic user information, e.g. names, from all our tenant users.<br>
+<strong>At this point in time the user shown in the screenshot above has reading access permissions to the Microsoft Graph API</strong>.</p>
+
+<p>To continue experimenting we’re now switching into our seat, where we have registered our “SampleApp” application. We head over to the “App registrations” view within the Azure Portal, click on “API permissions” and add a new API permissions for our SampleApp to allow access to Microsoft Graph. We choose “application”-type permissions (as for this first case we want only the service principal to have access) and set the permission (AppRole) once again to “User.BasicRead.All”.</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Setting-API-Permissions-In-Azure-Portal-For-MS-Graph.png" alt="Setting API Permissions for our SampleApp in the Azure Portal" title="Setting API Permissions for our SampleApp in the Azure Portal"><small class="img-caption">Setting API Permissions for our SampleApp in the Azure Portal</small></p>
+
+<p>Once we click “Add permissions” the selected AppRole permissions are added for our SampleApp service principal, but as of now the service principal can’t use these permissions (yet), because for application-type permissions this AppRole requires “Admin consent”. That means an administrator has to explicitly allow this service principal to use these API permissions. Note the column that says “Admin consent required” and the orange warning sign in the status column.<br>
+If we connect to Microsoft Graph using this service principal in the current state we will be allowed to connect, but the ‘Scope’ of our access key will be empty, which results in no permissions for our service principal.</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/MSGraph-Connection-Using-Service-Principal-Without-Admin-Consent.png" alt="Connecting to Microsoft Graph without Admin Consent" title="Connecting to Microsoft Graph without Admin Consent"><small class="img-caption">Connecting to Microsoft Graph without Admin Consent</small></p>
+
+<p>Once we grant admin consent to these permissions through the “Grant admin consent” button, the UI shows a green checkmark in the status column, indicating that our service principal now holds the permissions we specified.<br></p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Granting-Admin-Consent-In-The-Azure-Portal.png" alt="Granting Admin Consent in the Azure Portal" title="Granting Admin Consent in the Azure Portal"><small class="img-caption">Granting Admin Consent in the Azure Portal</small></p>
+
+<p>Reconnecting to Microsoft Graph using PowerShell will now result in a token with the granted access permissions.<br>
+<em>Note: I changed the AppRole here to ‘User.Read.All’ in order to be able to read all user data, just for the sake of the demo.</em></p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/MSGraph-Connection-Using-Service-Principal-With-Admin-Consent.png" alt="Connecting to Microsoft Graph with Admin Consent" title="Connecting to Microsoft Graph with Admin Consent"><small class="img-caption">Connecting to Microsoft Graph with Admin Consent</small></p>
+
+<p><strong>At this point in time the service principal of our SampleApp has the effective permissions to read all the data of all the users in our tenant.</strong></p>
+
+<p>Lastly, let’s remove these application-type permissions and instead set in delegated-type permission to ‘User.ReadBasic.All’:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Setting-Delegated-API-Permissions-In-Azure-Portal-For-MS-Graph.png" alt="Setting Delegated-Type API permissions for the Microsoft Graph Application" title="Setting Delegated-Type API permissions for the Microsoft Graph Application"><small class="img-caption">Setting Delegated-Type API permissions for the Microsoft Graph Application</small></p>
+
+<p>The important difference to note here is the “Delegated” keyword in the “Type” column and that no admin consent is required for this API permission. Although it is the same AppRole (‘User.ReadBasic.All’), no admin consent is needed to acquire these permissions.</p>
+
+<p><strong>At this point in time no user in our tenant has (yet) requested these permissions (and therefore no one holds these permissions), but any user could from now on.</strong></p>
+
+<p>If a user signs in to the SampleApp and attempts to access Microsoft Graph the following consent prompt will be shown to the user:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/PowerShell-User-Consent-Prompt.png" alt="User Consent Prompt to allow API Permissions" title="User Consent Prompt to allow API Permissions"><small class="img-caption">User Consent Prompt to allow API Permissions</small></p>
+
+<p>Once the user accepts these consent prompt the user has obtained the specified, delegated permissions.<br>
+We can double check and confirm which users have obtained these permissions in the “Enterprise application” view in the Azure Portal under the “User Consent” tab within the “Permissions” menu item, as shown below:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Viewing-Granted-Delegated-API-Permissions-In-The-Azure-Portal.png" alt="Showing Granted Delegated API Permissions in the Azure Portal" title="Showing Granted Delegated API Permissions in the Azure Portal"><small class="img-caption">Showing Granted Delegated API Permissions in the Azure Portal</small></p>
+
+<h2 id="automation---introducing-azure-accesspermissionsps1">Automation - Introducing: Azure-AccessPermissions.ps1<a href="#automation---introducing-azure-accesspermissionsps1" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<p>I’ve build a PowerShell script to automate the learnings from above. You can find it <a href="https://github.com/csandker/Azure-AccessPermissions">here</a>.<br>
+This is what the output looks like:</p>
+
+<p><img src="/public/img/2022-10-19-Untangling-Azure-Principals/Azure-AccessPermissionsPS1.png" alt="Output of Azure-AccessPermissions.ps1" title="Output of Azure-AccessPermissions.ps1"><small class="img-caption">Output of Azure-AccessPermissions.ps1</small></p>
+
+<h2 id="references">References<a href="#references" aria-hidden="true" class="aal_anchor"><svg aria-hidden="true" class="aal_svg" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a></h2>
+
+<ul>
+  <li><a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent">Microsoft: Permissions and consent in the Microsoft identity platform</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0">Microsoft: Microsoft Graph REST API v1.0 endpoint reference</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/powershell/microsoftgraph/azuread-msoline-cmdlet-map?view=graph-powershell-beta#applications">Microsoft: Azure AD to Microsoft Graph PowerShell cmdlets</a></li>
+  <li><a href="https://posts.specterops.io/azure-privilege-escalation-via-azure-api-permissions-abuse-74aee1006f48">SpecterOps: Azure Privilege Escalation via Azure API Permissions Abuse by @_Wald0</a></li>
+</ul>
+
+  </div>
+</div>
+
+<div class="related">
+  <h2>Other Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2023/05/17/Active-Directory-Spotlight-Attacking-The-Microsoft-Configuration-Manager.html">
+            Active Directory Spotlight: Attacking Microsoft's Configuration Manager (SCCM/MECM)
+            <small>17 May 2023</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2023/02/09/Offphish-Phishing-revisited-in-2023.html">
+            Offphish - Phishing revisited in 2023
+            <small>09 Feb 2023</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2022/11/10/Untangling-Azure-II-Privileged-Access.html">
+            Untangling Azure Active Directory Permissions II: Privileged Access
+            <small>10 Nov 2022</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+      </div>
+      <div id="toc-container" class="toc-container"><ul id="markdown-toc" class="post-toc">
+  <li><a href="#tldr" id="markdown-toc-tldr">TL;DR</a></li>
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#access-permission-breakdown" id="markdown-toc-access-permission-breakdown">Access Permission Breakdown</a>    <ul>
+      <li><a href="#applications-and-enterprise-applications" id="markdown-toc-applications-and-enterprise-applications">Applications and Enterprise Applications</a></li>
+      <li><a href="#app-roles" id="markdown-toc-app-roles">App Roles</a></li>
+      <li><a href="#api-permissions" id="markdown-toc-api-permissions">API Permissions</a></li>
+      <li><a href="#application-and-delegated-api-permissions" id="markdown-toc-application-and-delegated-api-permissions">Application and Delegated API Permissions</a></li>
+    </ul>
+  </li>
+  <li><a href="#effective-access-permissions" id="markdown-toc-effective-access-permissions">Effective Access Permissions</a></li>
+  <li><a href="#applied-scenario-who-has-access-to-what" id="markdown-toc-applied-scenario-who-has-access-to-what">Applied Scenario: Who has access to what?</a></li>
+  <li><a href="#automation---introducing-azure-accesspermissionsps1" id="markdown-toc-automation---introducing-azure-accesspermissionsps1">Automation - Introducing: Azure-AccessPermissions.ps1</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul></div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="imageModal" class="modal">
+
+      <!-- The Close Button -->
+      <span class="close">×</span>
+
+      <!-- Modal Content (The Image) -->
+      <img class="modal-content" id="imgModal">
+    </div>
+  
+
+</body></html>

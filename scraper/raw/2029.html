@@ -1,0 +1,395 @@
+<html><head>
+<title>FotoForensics</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta name="referrer" content="same-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="/style.css?1714676020">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="Description" content="FotoForensics provides tools and training for digital picture analysis, including error level analysis, metadata, and tutorials."><meta name="keywords" content="foto forensics, photo forensics, error level analysis"></head>
+<body onunload="">
+<div class="pagebody"><div id="banner" class="banner" title="FotoForensics"><span><a href="/"><img src="/FotoForensics-Banner.png"></a></span></div>
+<script language="javascript">var HasHistory=0;if(window.self!=window.top){top.location.href=window.location.href;}
+if((typeof(Storage)!=='undefined')&&(localStorage!==null)){HasHistory=1;}
+var pvt='n';
+function r(a,b){var cu=0,it=false;var id=window.setInterval(function(){if(a()){window.clearInterval(id);b(it);}if(++cu>25){window.clearInterval(id);it=true;b(it);}},10);}function fchk(){var db=window.indexedDB;if(db&&db.open){try{db=db.open('ff');r(function(){return db.readyState==='done'?true:false;},function(x){if(!x){if(db.result){pvt='f';}else{pvt='F';}}});}catch(e){pvt='F';}}else{pvt='T';}}fchk();if(navigator.webdriver){pvt+='h';}n=["appCodeName","vendor","vendorSub","product","productSub","mozApps","language","geolocation","battery","plugins","mimeTypes"],c=["app","webstore","runtime","search"];var bp='',i;for(i in window.navigator){if(n.indexOf(i)>=0){bp+=','+i;}}if('chrome' in window){for(i in window.chrome){if(c.indexOf(i)>=0){bp+=','+i;}}}bp=bp.substr(1);
+var u='/leave.php?t2=ntK31qDJp8C83u7Yuoi6iLzA8Iy6jLre5tDp0KzQuMy4yLuBroHniPyT9ZrojeOQ_Zrpx6TLpon1&m=';
+function hashcode(s){var h=0,i;if(!s.length)return 0;for(i=0;i<s.length;i++){h=h*31+s.charCodeAt(i);h=h&h;}if(h<0){h=0xffffffff+h+1;}return h.toString(16);}
+window.onbeforeunload = function(e)
+  {
+  // I don't care where you go. When did you leave?
+  var c=new XMLHttpRequest();
+  c.onreadystatechange=function(){var d='';};
+  var hc="&h="+hashcode(bp)+"&b="+bp;
+  c.open('HEAD',u+pvt+hc,false);
+  c.send();
+  return;
+  }
+document.addEventListener('touchstart',function(){},true);</script><div class="menu noprint"><ul style="z-index:21"><li><h class="bgmenu">≡</h><ul style="z-index:22"><li><a href="/">Upload</a></li><li><a target="Recent Views" href="/accesshistory.php">Recent Views<d>⋯</d></a></li><hr><li><a href="/tutorial.php">Tutorials</a></li><li><a href="/faq.php">FAQ</a></li></ul></li></ul></div><div class="page" onclick="void(0)"><noscript>
+<div class='biggap bglightpink black center round'><br>FotoForensics requires JavaScript. Please enable JavaScript and then reload this page.<br><br></div>
+</noscript>
+<script language="javascript">
+if (document.documentMode)
+  {
+  var d=parseInt(document.documentMode);
+  if (d && (d < 9)) { document.write("<div class='biggap bglightpink black center round'><br>FotoForensics requires a contemporary web browser. Consider using a recent version of Firefox, Chrome, or Safari. If you are using Internet Explorer 9 or later, then press F12 and select a document mode that is newer than IE8.<br><br></div>\n"); }
+  }
+</script>
+<script language="javascript">
+var History=[];
+var HistoryKey="ffhistory";
+var HistoryKeyNext="ffhistory";
+function HistorySort(field)
+  {
+  History.sort(function(a,b)
+    {
+    var rc = b[field] - a[field];
+    if (rc==0) { rc = b[4]-a[4]; }
+    return(rc);
+    });
+  }
+function HistoryGetKey()
+  {
+  if (!HasHistory) return;
+  HistoryKey=false;
+  for(var key in localStorage)
+    { if (key.substring(0,9)=="ffhistory") { HistoryKey=key; } }
+  HistoryKeyNext="ffhistory." + new Date().getTime();
+  }
+function HistoryGetAll()
+  {
+  if (!HasHistory) return;
+  var Match=0;
+  for(var key in localStorage)
+    {
+    if (key.substring(0,9)=="ffhistory")
+      {
+      HistoryKey=key;
+      History=History.concat(JSON.parse(localStorage.getItem(key)));
+      Match++;
+      }
+    }
+  if (Match > 1) // merge any multiple History records (happens with multiple windows)
+    {
+    HistorySort(0);
+    var H=[];
+    for(var key in History)
+      {
+      if ((key > 0) && (History[key][0]==History[key-1][0])) { continue; }
+      H.push(History[key]);
+      }
+    History=H; H=[];
+    HistorySort(3);
+    var J = JSON.stringify(History);
+    while(J.length > 2900000) { History.pop(); J = JSON.stringify(History); }
+    for(var key in localStorage) { if (key.substring(0,9)=="ffhistory") { localStorage.removeItem(key); } }
+    localStorage.setItem(HistoryKeyNext + "a",J);
+    }
+  HistoryGetKey();
+  }
+HistoryGetAll();
+function HistoryWrite()
+  {
+  HistorySort(3);
+  var J = JSON.stringify(History);
+  while(J.length > 2900000) { History.pop(); J = JSON.stringify(History); }
+  HistoryGetKey();
+  if (HistoryKey) { localStorage.removeItem(HistoryKey); }
+  var success = false;
+  while (!success)
+    {
+    try { 
+	localStorage.setItem(HistoryKeyNext,J);
+        // Successful insert if no error occurred
+        success = true;
+        }
+    catch (error)
+	{
+	if (error.name == "NS_ERROR_FILE_CORRUPTED")
+	  {
+	  // Firefox broke.
+          success = true;
+	  }
+        // Error occurred. Insert failed.
+        else if (localStorage.length < 1) {
+          // There are no more entries that can be removed so there's
+          // nothing else we can do to try to handle this failure.
+          success = true;
+          }
+	else
+	  {
+          // Remove the next item in History, reset J
+          // Success will still be false so the loop will repeat
+          // and attempt to add again.
+          History.pop();
+          J = JSON.stringify(History);
+          }
+        }
+    }
+  }
+function HistoryAdd(id,c)
+  {
+  if (!HasHistory) { return; }
+  var uri = new XMLHttpRequest();;
+  uri.open("GET","/analysis.php?fmt=orig&size=128&enc=inline&id="+id,true);
+  uri.did=id;
+  uri.dc=c;
+  uri.onreadystatechange = function()
+    {
+    if ((this.readyState==4) && (this.status==200))
+	{
+	var H = new Array();
+	H[0] = this.did;
+	H[1] = this.responseText;
+	H[2] = H[3] = new Date().getTime();
+	H[4] = this.dc;
+	if (History===null) { History=[]; }
+	History.push(H);
+	HistoryWrite();
+        }
+    }
+  uri.send();
+  }
+function HistoryUpdate(id)
+  {
+  if (!HasHistory) { return; }
+  if (History !== null)
+    {
+    for(var i=0; i < History.length; i++)
+      {
+      if (History[i][0]==id)
+	{
+	History[i][3] = new Date().getTime();
+	History[i][4]++;
+	HistoryWrite();
+	return;
+	}
+      }
+    }
+  HistoryAdd(id,1);
+  }
+function HistoryDel(id)
+  {
+  if (!HasHistory || (History===null)) { return; }
+  for(var i=0; i < History.length; i++)
+    {
+    if (History[i][0]==id)
+	{
+	History.splice(i,1);
+	HistoryWrite();
+	return;
+	}
+    }
+  }
+</script>
+<div id="Messages"></div><div class="biggap mbox"><div id="uploadtable"><div style="text-align:center;padding:0.5em;">Submit a <span class="anchor" onmouseover="document.getElementById(&quot;supported&quot;).style.display=&quot;block&quot;">picture</span> for Forensic Analysis<br>
+<span style="display:none" id="supported"><br>Supported formats: JPEG, PNG, WebP, HEIC, and AVIF</span>
+<br>
+</div><div id="grpurl"><form id="uploadurl" onsubmit="return ValidateURL();" action="upload-url.php" method="POST" accept-charset="UTF-8"><div class="upload1 middle">Image URL:</div><div class="upload3 middle"><input class="uploadbtn" id="UploadURLBtn" value="Upload URL" type="submit"></div><div class="upload2 middle"><input autocapitalize="none" id="uploadURLForm" name="url" placeholder="https://" type="text"></div></form></div><div style="text-align:center;">or</div><div id="grpfile"><form id="uploadFileForm" name="uploadFileForm" onsubmit="return ValidateFile();" enctype="multipart/form-data" action="upload-file.php" method="POST" accept-charset="UTF-8"><div class="upload1 middle">Upload File:</div><div class="upload3 middle"><input class="uploadbtn" id="UploadFileBtn" value="Upload File" type="submit"></div><div class="upload2 middle" id="uploadfile"><input id="UploadFile" name="file" type="file" accept="image/*,.webp,.heic,.avif" onchange="SetPreview()"></div><input type="hidden" name="MAX_FILE_SIZE" value="10485760">
+<input type="hidden" id="SelectTime" name="SelectTime" value="0">
+<input type="hidden" id="FullPath" name="FullPath" value=""><input type="hidden" id="Last-Modified" name="Last-Modified" value=""></form></div><div id="preview"></div><br></div></div><br></div><div class="pagemid"></div><div class="pagelower"><span class="block">See the <a href="faq.php?show=General&amp;c=guidelines">FAQ</a> for <a href="faq.php?c=guidelines&amp;show=General#What can I upload for analysis">submission guidelines</a>.
+See the <a href="tutorial.php">tutorials</a> for analysis instructions.
+</span>
+<span class="block right" style="float:right;padding:0.5em"><font class="green">Unique images: 7,073,631</font>
+<br><a class="pink" href="/faq.php?show=General&amp;c=b#What can I upload for analysis">Banned</a> <font class="pink">users: 11,146</font>
+<br>Statistics last updated 17 minutes ago</span>
+<script type="text/javascript">
+MaxUploads=1;
+function ValidateURL()
+  {
+  var v=document.getElementById('uploadURLForm').value;
+  if (v.length < 1) { alert("No URL provided."); return false; }
+  if (v.length < 5) { alert("Invalid URL"); return false; }
+  var vl=v.substr(0,15).toLowerCase();
+  if (vl.indexOf("http:")===0) { ; }
+  else if (vl.indexOf("https:")===0) { ; }
+  else if (vl.indexOf("data:")===0) { ; }
+  else if (vl.indexOf("s3:")===0) { ; }
+  else { alert("The URL should begin with http: or https:"); return false; }
+  DisableForm('UploadURLBtn');
+  return true;
+  }
+function ValidateFile()
+  {
+  // Some browsers lie.  Some bots lie.  But they lie differently.
+  // Set up the form to detect the type of lie.
+  // Detect bot lies and filter out bot abuse on the server-side.
+  //
+  // Uh, shouldn't this comment be secret?
+  // No!  I want those bot writers to know that I see them.
+  // And let them scratch their heads as they try to find out what I'm seeing.
+  var x = document.getElementById('UploadFile');
+  if (x.value.length <= 0) { alert("No file selected."); return false; }
+  document.getElementById('FullPath').value = x.value;
+  var d = x.files[0];
+  if ('lastModified' in d) { d=d.lastModified; }
+  else if ('lastModifiedDate' in d) { d=d.lastModifiedDate; }
+  else { d=false; }
+  if (d) { document.getElementById('Last-Modified').value = new Date(d).toISOString().replace('T',' ').replace('Z',' GMT'); }
+  if (x.files[0].size <= 1024) { alert("The file is too small to analyze."); return false; }
+  if (x.files[0].size > 10485760) { alert("The file is too large to analyze."); return false; }
+  DisableForm('UploadFileBtn');
+  return true;
+  }
+function SetClassVal(c,v)
+  {
+  // Disable double-click submissions
+  var e=document.getElementsByClassName(c);
+  for(var i=0; i < e.length; i++) { e[i].value=v; }
+  return true;
+  }
+
+function htmlEntities(str)
+  {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+function RemoveFile(del)
+  {
+  var dt = new DataTransfer()
+  var f=document.getElementById('UploadFile');
+  for(var i=0; i < f.files.length; i++)
+    {
+    if (i!=del) { dt.items.add(f.files[i]); }
+    }
+  f.files=dt.files;
+  SetPreview();
+  }
+function SetPreview()
+  {
+  document.getElementById('SelectTime').value=new Date().toISOString().replace('T',' ').replace('Z',' GMT');
+  var p=document.getElementById('preview');
+  var f=document.getElementById('UploadFile');
+  p.innerHTML='';
+  for(var i=0; i < f.files.length; i++)
+    {
+    if (f.files[i].type.match('^(audio|video)/'))
+      {
+      var thumb = document.createElement('img');
+      thumb.classList.add("imgfmt");
+      thumb.classList.add("imgpreview");
+      thumb.title=htmlEntities(f.files[i].name);
+      if (f.files[i].type) { thumb.title += ' (' + htmlEntities(f.files[i].type) + ')'; }
+      thumb.src='/img.php?img=media-' + f.files[i].type.substr(0,5);
+      thumb.onclick=function(){RemoveFile(i);};
+      p.appendChild(thumb);
+      }
+    else // if (f.files[i].type.match('^image/'))
+      {
+      // Render thumbnail.
+      var reader = new FileReader();
+      reader.onload = (function(f1,idx) {
+	return(function(e){
+	  var thumb = document.createElement('img');
+	  thumb.classList.add("imgfmt");
+	  thumb.classList.add("imgpreview");
+	  thumb.title=htmlEntities(f1.name);
+	  if (f1.type) { thumb.title += ' (' + htmlEntities(f1.type) + ')'; }
+	  thumb.onerror=function(){this.src='/img/ipv4x-64.png';};
+	  thumb.src=e.target.result;
+	  thumb.onclick=function(){RemoveFile(idx);};
+	  p.appendChild(thumb);
+	  });
+	})(f.files[i],i);
+      reader.readAsDataURL(f.files[i]);
+      }
+    }
+  }
+
+document.body.ondragover=document.body.ondragcenter=function(e){e.preventDefault();}
+document.body.ondrop=function(e){
+  e.preventDefault();
+  var dt=new DataTransfer();
+  var fc=0,maxfile=1;
+  for(var i=0; (i < e.dataTransfer.items.length); i++)
+    {
+    try { if (!e.dataTransfer.files[i].type) { continue; } }
+    catch(e) { continue; }
+    var m=e.dataTransfer.files[i].name;
+    if (!m.match(/[.](jpg|jpeg|jfif|fif|png|webp|heic|heif|avif)$/i)) { continue; }
+    dt.items.add(e.dataTransfer.files[i]);
+    fc++; if (fc >= maxfile) { break; }
+    }
+  document.getElementById('UploadFile').files=dt.files;
+  if (fc > 1) { document.getElementById('UploadFileBtn').value='Upload Files'; }
+  else { document.getElementById('UploadFileBtn').value='Upload File'; }
+  SetPreview();
+}
+document.body.onpaste=function(e){
+  if (e.srcElement.getAttribute('type')==='text') { return; }
+  e.stopPropagation();
+  var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+
+  // Check for strings
+  for(i=0; i < items.length; i++)
+    {
+    if (items[i].kind === 'string')
+      {
+      function PasteStringCallback(s)
+        {
+	re1= /(http(s?):\/\/[0-9a-z_+.-]+\/[!#-&(-;=\?-~]*)/i;
+	re2= /(data:image\/[a-z]+;base64,([0-9a-zA-Z+\/]|(%2B))+(=){0,2})/i;
+	url=re1.exec(s);
+	if (!url) { url=re2.exec(s); }
+	if (url)
+	  {
+	  document.getElementById('uploadURLForm').value=url[1]; // keep first url
+	  document.getElementById('UploadURLBtn').focus();
+	  return;
+	  }
+	if (s.match(/file:\/\/\//) && s.match(/[.](jpg|jpeg|jfif|fif|png|webp|heic|heif|avif)$/i))
+	  {
+	  var df=item[i].getAsFile();
+	  if (df)
+	    {
+	    var dt=new DataTransfer();
+	    dt.items.add(df);
+	    document.getElementById('UploadFile').files=dt.files;
+	    document.getElementById('UploadFileBtn').focus();
+	    SetPreview();
+	    }
+	  return;
+	  }
+	}
+      items[i].getAsString(PasteStringCallback);
+      return;
+      }
+    }
+  // Check for files
+  for(i=0; i < items.length; i++)
+    {
+    if (items[i].kind === 'file')
+      {
+      var dt=new DataTransfer();
+      dt.items.add(items[i].getAsFile());
+      if (dt)
+	{
+	if (dt.files[0].lastModified+1 >= Date.now())
+	  {
+	  alert("Pasting an image removes metadata, converts the picture to a PNG, and may contain alterations from your operating system.");
+	  }
+	document.getElementById('UploadFile').files=dt.files;
+	document.getElementById('UploadFileBtn').focus();
+	SetPreview();
+	return;
+	}
+      }
+    }
+};
+
+function DisableForm(name)
+  {
+  // Disable double-click submissions
+  var e=document.getElementsByClassName('uploadbtn');
+  for(var i=0; i < e.length; i++) { e[i].disabled=true; }
+  document.getElementById(name).value='Uploading';
+  return true;
+  }
+function EnableForm()
+  {
+  var e=document.getElementsByClassName('uploadbtn');
+  for(var i=0; i < e.length; i++) { e[i].disabled=false; }
+  }
+EnableForm();</script>
+</div><div class="footer">Copyright 2012-2024 Hacker Factor, All Rights Reserved.<span style="float:right"><a title="Network Connectivity" id="ipv" href="tutorial.php?tt=ipv6"><img class="middle" src="https://ipv4.fotoforensics.com/img/ipv4-16.png?v=r_a2wLze7ti6iLqIvMDyl_vd6925gbeOt8u3" onerror="this.onerror=null;this.src=&quot;https://ipv4.fotoforensics.com/img/ipv4-16.png?v=r_a2wLze7ti6iLqIvMDyl_vd6925gbeOt8u3&quot;;"></a><script language="javascript">var timeoutid;function testipv() { document.getElementById('ipv').innerHTML="<img class='middle' src='https://ipv6.fotoforensics.com/img/ipv46-16.png?v=oOm5z7PR4de1h7WHs8.9mOTUqNSu' onError='this.onerror=null;this.src=\"https://ipv4.fotoforensics.com/img/ipv4-16.png?v=r_a2wLze7ti6iLqIvMDyl_vd6925gbeOt8u3\";' />"; clearTimeout(timeoutid); }timeoutid=setTimeout(testipv,100);</script> • <a href="/status.php"><b>System Status</b></a> • <a href="https://www.hackerfactor.com/blog/index.php?/categories/17-FotoForensics">Blog</a> • <a href="/faq.php">FAQ</a> • <a href="/requestform.php">Contact</a></span></div></div>
+
+
+</body></html>

@@ -1,0 +1,1029 @@
+<html class="overflow-x-hidden fontawesome-i2svg-active fontawesome-i2svg-complete" lang="en"><head>
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <title>Siemens PLC Software Vulnerabilities Uncovered | Team82 | Claroty</title>
+<meta name="description" content="Claroty has found a severe memory protection bypass vulnerability (CVE-2020-15782) in Siemens PLC Software, the SIMATIC S7-1200 and S7-1500. Learn more.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Siemens PLC Software Vulnerabilities Uncovered | Team82">
+<meta property="og:description" content="Claroty has found a severe memory protection bypass vulnerability (CVE-2020-15782) in Siemens PLC Software, the SIMATIC S7-1200 and S7-1500. Learn more.">
+<meta property="og:url" content="https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs">
+<meta property="og:site_name" content="Claroty">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@Claroty">
+<meta name="twitter:title" content="Siemens PLC Software Vulnerabilities Uncovered | Team82">
+<meta name="twitter:description" content="Claroty has found a severe memory protection bypass vulnerability (CVE-2020-15782) in Siemens PLC Software, the SIMATIC S7-1200 and S7-1500. Learn more.">
+<meta property="og:image" content="https://claroty.com/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy84MmZiOGZkYTI2ZGZmNGViMGM5ZmVjYTliOTc5OWIxMy1UaGUtUmFjZS10by1OYXRpdmUtQ29kZS1FeGVjdXRpb24taW4tU2llbWVucy1QTENzLnBuZw==?p=seo_pro_og&amp;s=3c6fb2f8c8d81b3a05fd4aa5298279e0">
+<meta property="og:image:width" content="1146">
+<meta property="og:image:height" content="600">
+<meta property="og:image:alt" content="Siemens PLC Software Vulnerabilities Uncovered">
+<meta name="twitter:image" content="https://claroty.com/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy84MmZiOGZkYTI2ZGZmNGViMGM5ZmVjYTliOTc5OWIxMy1UaGUtUmFjZS10by1OYXRpdmUtQ29kZS1FeGVjdXRpb24taW4tU2llbWVucy1QTENzLnBuZw==?p=seo_pro_twitter&amp;s=c02bc7890bd3ac161066c45af3d61f80">
+<meta name="twitter:image:alt" content="Siemens PLC Software Vulnerabilities Uncovered">
+<style type="text/css">:host,:root{--fa-font-solid:normal 900 1em/1 "Font Awesome 6 Solid";--fa-font-regular:normal 400 1em/1 "Font Awesome 6 Regular";--fa-font-light:normal 300 1em/1 "Font Awesome 6 Light";--fa-font-thin:normal 100 1em/1 "Font Awesome 6 Thin";--fa-font-duotone:normal 900 1em/1 "Font Awesome 6 Duotone";--fa-font-sharp-solid:normal 900 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-regular:normal 400 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-light:normal 300 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-thin:normal 100 1em/1 "Font Awesome 6 Sharp";--fa-font-brands:normal 400 1em/1 "Font Awesome 6 Brands"}svg:not(:host).svg-inline--fa,svg:not(:root).svg-inline--fa{overflow:visible;box-sizing:content-box}.svg-inline--fa{display:var(--fa-display,inline-block);height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-2xs{vertical-align:.1em}.svg-inline--fa.fa-xs{vertical-align:0}.svg-inline--fa.fa-sm{vertical-align:-.0714285705em}.svg-inline--fa.fa-lg{vertical-align:-.2em}.svg-inline--fa.fa-xl{vertical-align:-.25em}.svg-inline--fa.fa-2xl{vertical-align:-.3125em}.svg-inline--fa.fa-pull-left{margin-right:var(--fa-pull-margin,.3em);width:auto}.svg-inline--fa.fa-pull-right{margin-left:var(--fa-pull-margin,.3em);width:auto}.svg-inline--fa.fa-li{width:var(--fa-li-width,2em);top:.25em}.svg-inline--fa.fa-fw{width:var(--fa-fw-width,1.25em)}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:var(--fa-counter-background-color,#ff253a);border-radius:var(--fa-counter-border-radius,1em);box-sizing:border-box;color:var(--fa-inverse,#fff);line-height:var(--fa-counter-line-height,1);max-width:var(--fa-counter-max-width,5em);min-width:var(--fa-counter-min-width,1.5em);overflow:hidden;padding:var(--fa-counter-padding,.25em .5em);right:var(--fa-right,0);text-overflow:ellipsis;top:var(--fa-top,0);-webkit-transform:scale(var(--fa-counter-scale,.25));transform:scale(var(--fa-counter-scale,.25));-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:var(--fa-bottom,0);right:var(--fa-right,0);top:auto;-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:var(--fa-bottom,0);left:var(--fa-left,0);right:auto;top:auto;-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{top:var(--fa-top,0);right:var(--fa-right,0);-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:var(--fa-left,0);right:auto;top:var(--fa-top,0);-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:top left;transform-origin:top left}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-2xs{font-size:.625em;line-height:.1em;vertical-align:.225em}.fa-xs{font-size:.75em;line-height:.0833333337em;vertical-align:.125em}.fa-sm{font-size:.875em;line-height:.0714285718em;vertical-align:.0535714295em}.fa-lg{font-size:1.25em;line-height:.05em;vertical-align:-.075em}.fa-xl{font-size:1.5em;line-height:.0416666682em;vertical-align:-.125em}.fa-2xl{font-size:2em;line-height:.03125em;vertical-align:-.1875em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:var(--fa-li-margin,2.5em);padding-left:0}.fa-ul>li{position:relative}.fa-li{left:calc(var(--fa-li-width,2em) * -1);position:absolute;text-align:center;width:var(--fa-li-width,2em);line-height:inherit}.fa-border{border-color:var(--fa-border-color,#eee);border-radius:var(--fa-border-radius,.1em);border-style:var(--fa-border-style,solid);border-width:var(--fa-border-width,.08em);padding:var(--fa-border-padding,.2em .25em .15em)}.fa-pull-left{float:left;margin-right:var(--fa-pull-margin,.3em)}.fa-pull-right{float:right;margin-left:var(--fa-pull-margin,.3em)}.fa-beat{-webkit-animation-name:fa-beat;animation-name:fa-beat;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,ease-in-out);animation-timing-function:var(--fa-animation-timing,ease-in-out)}.fa-bounce{-webkit-animation-name:fa-bounce;animation-name:fa-bounce;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.28,.84,.42,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.28,.84,.42,1))}.fa-fade{-webkit-animation-name:fa-fade;animation-name:fa-fade;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1))}.fa-beat-fade{-webkit-animation-name:fa-beat-fade;animation-name:fa-beat-fade;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1))}.fa-flip{-webkit-animation-name:fa-flip;animation-name:fa-flip;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,ease-in-out);animation-timing-function:var(--fa-animation-timing,ease-in-out)}.fa-shake{-webkit-animation-name:fa-shake;animation-name:fa-shake;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,linear);animation-timing-function:var(--fa-animation-timing,linear)}.fa-spin{-webkit-animation-name:fa-spin;animation-name:fa-spin;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,2s);animation-duration:var(--fa-animation-duration,2s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,linear);animation-timing-function:var(--fa-animation-timing,linear)}.fa-spin-reverse{--fa-animation-direction:reverse}.fa-pulse,.fa-spin-pulse{-webkit-animation-name:fa-spin;animation-name:fa-spin;-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,steps(8));animation-timing-function:var(--fa-animation-timing,steps(8))}@media (prefers-reduced-motion:reduce){.fa-beat,.fa-beat-fade,.fa-bounce,.fa-fade,.fa-flip,.fa-pulse,.fa-shake,.fa-spin,.fa-spin-pulse{-webkit-animation-delay:-1ms;animation-delay:-1ms;-webkit-animation-duration:1ms;animation-duration:1ms;-webkit-animation-iteration-count:1;animation-iteration-count:1;-webkit-transition-delay:0s;transition-delay:0s;-webkit-transition-duration:0s;transition-duration:0s}}@-webkit-keyframes fa-beat{0%,90%{-webkit-transform:scale(1);transform:scale(1)}45%{-webkit-transform:scale(var(--fa-beat-scale,1.25));transform:scale(var(--fa-beat-scale,1.25))}}@keyframes fa-beat{0%,90%{-webkit-transform:scale(1);transform:scale(1)}45%{-webkit-transform:scale(var(--fa-beat-scale,1.25));transform:scale(var(--fa-beat-scale,1.25))}}@-webkit-keyframes fa-bounce{0%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}10%{-webkit-transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0);transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0)}30%{-webkit-transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em));transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em))}50%{-webkit-transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0);transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0)}57%{-webkit-transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em));transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em))}64%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}100%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}}@keyframes fa-bounce{0%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}10%{-webkit-transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0);transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0)}30%{-webkit-transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em));transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em))}50%{-webkit-transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0);transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0)}57%{-webkit-transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em));transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em))}64%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}100%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}}@-webkit-keyframes fa-fade{50%{opacity:var(--fa-fade-opacity,.4)}}@keyframes fa-fade{50%{opacity:var(--fa-fade-opacity,.4)}}@-webkit-keyframes fa-beat-fade{0%,100%{opacity:var(--fa-beat-fade-opacity,.4);-webkit-transform:scale(1);transform:scale(1)}50%{opacity:1;-webkit-transform:scale(var(--fa-beat-fade-scale,1.125));transform:scale(var(--fa-beat-fade-scale,1.125))}}@keyframes fa-beat-fade{0%,100%{opacity:var(--fa-beat-fade-opacity,.4);-webkit-transform:scale(1);transform:scale(1)}50%{opacity:1;-webkit-transform:scale(var(--fa-beat-fade-scale,1.125));transform:scale(var(--fa-beat-fade-scale,1.125))}}@-webkit-keyframes fa-flip{50%{-webkit-transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg));transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg))}}@keyframes fa-flip{50%{-webkit-transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg));transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg))}}@-webkit-keyframes fa-shake{0%{-webkit-transform:rotate(-15deg);transform:rotate(-15deg)}4%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}24%,8%{-webkit-transform:rotate(-18deg);transform:rotate(-18deg)}12%,28%{-webkit-transform:rotate(18deg);transform:rotate(18deg)}16%{-webkit-transform:rotate(-22deg);transform:rotate(-22deg)}20%{-webkit-transform:rotate(22deg);transform:rotate(22deg)}32%{-webkit-transform:rotate(-12deg);transform:rotate(-12deg)}36%{-webkit-transform:rotate(12deg);transform:rotate(12deg)}100%,40%{-webkit-transform:rotate(0);transform:rotate(0)}}@keyframes fa-shake{0%{-webkit-transform:rotate(-15deg);transform:rotate(-15deg)}4%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}24%,8%{-webkit-transform:rotate(-18deg);transform:rotate(-18deg)}12%,28%{-webkit-transform:rotate(18deg);transform:rotate(18deg)}16%{-webkit-transform:rotate(-22deg);transform:rotate(-22deg)}20%{-webkit-transform:rotate(22deg);transform:rotate(22deg)}32%{-webkit-transform:rotate(-12deg);transform:rotate(-12deg)}36%{-webkit-transform:rotate(12deg);transform:rotate(12deg)}100%,40%{-webkit-transform:rotate(0);transform:rotate(0)}}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-both,.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}.fa-rotate-by{-webkit-transform:rotate(var(--fa-rotate-angle,0));transform:rotate(var(--fa-rotate-angle,0))}.fa-stack{display:inline-block;vertical-align:middle;height:2em;position:relative;width:2.5em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0;z-index:var(--fa-stack-z-index,auto)}.svg-inline--fa.fa-stack-1x{height:1em;width:1.25em}.svg-inline--fa.fa-stack-2x{height:2em;width:2.5em}.fa-inverse{color:var(--fa-inverse,#fff)}.fa-sr-only,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.fa-sr-only-focusable:not(:focus),.sr-only-focusable:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.svg-inline--fa .fa-primary{fill:var(--fa-primary-color,currentColor);opacity:var(--fa-primary-opacity,1)}.svg-inline--fa .fa-secondary{fill:var(--fa-secondary-color,currentColor);opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-primary{opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-secondary{opacity:var(--fa-primary-opacity,1)}.svg-inline--fa mask .fa-primary,.svg-inline--fa mask .fa-secondary{fill:#000}.fa-duotone.fa-inverse,.fad.fa-inverse{color:var(--fa-inverse,#fff)}</style><link href="https://claroty.com/" rel="home">
+<link href="https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" rel="canonical">
+<link type="text/plain" rel="author" href="https://claroty.com/humans.txt">
+        <link rel="alternate" type="application/atom+xml" title="Team82 Disclosure Dashboard" href="/team82/disclosure-dashboard/feed/atom">
+<link rel="alternate" type="application/rss+xml" title="Team82 Disclosure Dashboard" href="/team82/disclosure-dashboard/feed">
+    
+    <link rel="icon" href="/img/favicon.svg">
+
+    <link rel="preload" as="style" href="https://claroty.com/build/assets/claroty-DCIIfyVI.css"><link rel="modulepreload" href="https://claroty.com/build/assets/claroty-CHtQdpw3.js"><link rel="stylesheet" href="https://claroty.com/build/assets/claroty-DCIIfyVI.css" data-navigate-track="reload"><script src="https://js.hs-banner.com/v2/20307279/banner.js" type="text/javascript" data-hs-saved-type="text/javascript" id="cookieBanner-20307279" data-cookieconsent="ignore" data-hs-ignore="true" data-loader="hs-scriptloader" data-hsjs-portal="20307279" data-hsjs-env="prod" data-hsjs-hublet="na1"></script><script src="https://js.hubspot.com/web-interactives-embed.js" type="text/javascript" data-hs-saved-type="text/javascript" id="hubspot-web-interactives-loader" crossorigin="anonymous" data-loader="hs-scriptloader" data-hsjs-portal="20307279" data-hsjs-env="prod" data-hsjs-hublet="na1"></script><script src="https://js.hsadspixel.net/fb.js" type="text/javascript" data-hs-saved-type="text/javascript" id="hs-ads-pixel-20307279" data-ads-portal-id="20307279" data-ads-env="prod" data-loader="hs-scriptloader" data-hsjs-portal="20307279" data-hsjs-env="prod" data-hsjs-hublet="na1"></script><script src="https://js.hs-analytics.net/analytics/1718453400000/20307279.js" type="text/javascript" data-hs-saved-type="text/javascript" id="hs-analytics"></script><script src="https://js.hscollectedforms.net/collectedforms.js" type="text/javascript" data-hs-saved-type="text/javascript" id="CollectedForms-20307279" crossorigin="anonymous" data-leadin-portal-id="20307279" data-leadin-env="prod" data-loader="hs-scriptloader" data-hsjs-portal="20307279" data-hsjs-env="prod" data-hsjs-hublet="na1"></script><script type="text/javascript" data-hs-saved-type="text/javascript" async="" referrerpolicy="unsafe-url" src="https://ws.zoominfo.com/pixel/jilEnH5CqVK0j3M3GHR5"></script><script async="" src="https://static.oktopost.com/oktrk.js"></script><script type="text/javascript" data-hs-saved-type="text/javascript" async="" src="https://static.hotjar.com/c/hotjar-3443429.js?sv=7"></script><script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-MWHFVG2"></script><script type="module" src="https://claroty.com/build/assets/claroty-CHtQdpw3.js" data-navigate-track="reload"></script>
+    
+    <!-- Livewire Styles --><style>[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}</style>
+    
+    <style>
+        :root {
+            --accent-color: 
+    
+    #cc0030
+;
+        }
+    </style>
+
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MWHFVG2');</script>
+<!-- End Google Tag Manager -->
+
+<script src="https://cdn.bizible.com/scripts/bizible.js" async="" id="bizible-settings" data-form-provider="discover.claroty.com"></script>
+
+<meta name="google-site-verification" content="r30S7x7xVlJwZSgWdeXToxMEsKD8_V3LPx3D691sVhU">
+
+<!-- Start of HubSpot Cookie Blocking Code -->
+<script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/20307279/d44331c910ed5795dcf0803f1f8c018d0b78673e308a02768f49c5dce853cf48.js"></script>
+<!-- End of HubSpot Cookie Blocking Code -->
+
+
+<style>/* Make clicks pass-through */
+
+    #nprogress {
+      pointer-events: none;
+    }
+
+    #nprogress .bar {
+      background: var(--livewire-progress-bar-color, #29d);
+
+      position: fixed;
+      z-index: 1031;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 2px;
+    }
+
+    /* Fancy blur effect */
+    #nprogress .peg {
+      display: block;
+      position: absolute;
+      right: 0px;
+      width: 100px;
+      height: 100%;
+      box-shadow: 0 0 10px var(--livewire-progress-bar-color, #29d), 0 0 5px var(--livewire-progress-bar-color, #29d);
+      opacity: 1.0;
+
+      -webkit-transform: rotate(3deg) translate(0px, -4px);
+          -ms-transform: rotate(3deg) translate(0px, -4px);
+              transform: rotate(3deg) translate(0px, -4px);
+    }
+
+    /* Remove these to get rid of the spinner */
+    #nprogress .spinner {
+      display: block;
+      position: fixed;
+      z-index: 1031;
+      top: 15px;
+      right: 15px;
+    }
+
+    #nprogress .spinner-icon {
+      width: 18px;
+      height: 18px;
+      box-sizing: border-box;
+
+      border: solid 2px transparent;
+      border-top-color: var(--livewire-progress-bar-color, #29d);
+      border-left-color: var(--livewire-progress-bar-color, #29d);
+      border-radius: 50%;
+
+      -webkit-animation: nprogress-spinner 400ms linear infinite;
+              animation: nprogress-spinner 400ms linear infinite;
+    }
+
+    .nprogress-custom-parent {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .nprogress-custom-parent #nprogress .spinner,
+    .nprogress-custom-parent #nprogress .bar {
+      position: absolute;
+    }
+
+    @-webkit-keyframes nprogress-spinner {
+      0%   { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    @keyframes nprogress-spinner {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style><style id="_goober"> .go2933276541{position:fixed;display:block;width:100%;height:0px;margin:0px;padding:0px;overflow:visible;transform-style:preserve-3d;background:transparent;backface-visibility:hidden;pointer-events:none;left:0px;z-index:9998;}.go2369186930{top:0px;z-index:9999;height:100%;width:100%;}.go1348078617{bottom:0px;}.go2417249464{position:fixed;z-index:9989;}.go3921366393{left:0;bottom:0;}.go3967842156{right:0;bottom:0;}.go613305155{left:0;top:0;}.go471583506{right:0;top:0;}.go3670563033{position:relative;overflow:hidden;display:none;}.go1041095097{display:block;}.go1632949049{position:absolute;pointer-events:none;width:101vw;height:101vh;background:rgba(0,0,0,0.7);opacity:0;z-index:-1;}.go2512015367{z-index:99998;opacity:0.8;visibility:visible;pointer-events:all;cursor:pointer;}.go1432718904{overflow:hidden;}.go812842568{display:block !important;position:static !important;box-sizing:border-box !important;background:transparent !important;border:none;min-height:0px !important;max-height:none !important;margin:0px;padding:0px !important;height:100% !important;width:1px !important;max-width:100% !important;min-width:100% !important;}.go2729809544{z-index:99999;visibility:hidden;position:absolute;inset:50vh auto auto 50%;transform:translate(-50%,-50%);left:50%;top:50%;opacity:0;pointer-events:none;max-height:95%;max-width:95%;}.go1011812720{pointer-events:auto !important;visibility:visible;opacity:1;transition:opacity 1s ease-in;}.go456419034{transition:opacity 0.3s ease-in;}.go3128134379{pointer-events:auto !important;visibility:visible !important;max-height:95vh !important;transition:max-height 1s ease-in;}.go494047706{z-index:9999;width:100%;max-height:95%;position:fixed;visibility:hidden;}.go2481764524{z-index:9999;width:100%;max-height:95%;position:fixed;visibility:hidden;bottom:0px;}.go2685733372{visibility:hidden;}.go2985984737{visibility:visible !important;}.go3281949485{pointer-events:auto !important;visibility:visible !important;max-height:95vh !important;transform:none !important;}.go3539422596{z-index:9999;width:100%;max-height:95%;position:fixed;visibility:hidden;transition:transform 0.5s cubic-bezier(0.31,-0.2,0.04,1.47);}.go988075951{z-index:9999;position:fixed;left:10px;top:10px;max-height:95vh !important;max-width:95%;visibility:hidden;}.go2699082514{z-index:9999;position:fixed;right:10px;top:10px;max-height:95vh !important;max-width:95%;visibility:hidden;}.go1595992025{z-index:9999;position:fixed;left:10px;bottom:10px;max-height:95vh !important;max-width:95%;visibility:hidden;}.go1222083472{z-index:9999;position:fixed;right:10px;bottom:10px;max-height:95vh !important;max-width:95%;visibility:hidden;}.go722322694{transition:none !important;}.go26732895{cursor:pointer;}.go2083580917{display:flex;justify-content:center;align-items:center;}</style><link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" class="hs-banner-google-font"><style type="text/css" id="hs-banner-style">#hs-banner-parent div,#hs-banner-parent p{color:inherit}#hs-banner-parent *{font-size:inherit;font-family:inherit;background:none;border:none;box-shadow:none;box-sizing:border-box;margin:0;padding:0;display:inline-block;line-height:1.75em}#hs-banner-parent ul{display:block}#hs-banner-parent li{display:list-item;list-style-position:inside}#hs-banner-parent li *{display:inline}#hs-banner-parent .hs-hidden{display:none!important}#hs-banner-parent #hs-banner-gpc{font-size:var(--hs-banner-font-size,14px);font-family:var(--hs-banner-font-family,"Lato"),sans-serif;font-weight:400;color:var(--hs-banner-text-color,#15295a);background:var(--hs-banner-color,#fff);border-radius:var(--hs-banner-corners,12px);box-shadow:0 8px 28px rgba(0,0,0,.28);position:fixed;width:var(--hs-banner-width,67em);max-width:calc(100% - 64px);max-height:calc(100% - 64px);overflow:auto;inset:var(--hs-banner-inset,32px 0 auto 50%);z-index:3000000000;transform:translate(var(--hs-banner-translate-x,-50%),200vh);-webkit-transform:translate(var(--hs-banner-translate-x,-50%),200vh) translateZ(3000000000px);animation:banner_animation .5s forwards}#hs-banner-gpc #hs-banner-gpc-inner{display:flex;gap:1em;flex-direction:column;padding:var(--hs-banner-padding,2.2em)}#hs-banner-gpc #hs-banner-gpc-header{display:flex;flex-direction:row;justify-content:flex-end}#hs-banner-gpc #hs-banner-gpc-close-button{cursor:pointer;display:block}#hs-banner-gpc #hs-banner-gpc-close-button svg{width:var(--hs-banner-font-size,14px);height:var(--hs-banner-font-size,14px);color:var(--hs-banner-text-color,#15295a)}#hs-banner-parent #hs-eu-cookie-confirmation{font-size:var(--hs-banner-font-size,14px);font-family:var(--hs-banner-font-family,"Lato"),sans-serif;font-weight:400;color:var(--hs-banner-text-color,#15295a);background:var(--hs-banner-color,#fff);border-radius:var(--hs-banner-corners,12px);box-shadow:0 8px 28px rgba(0,0,0,.28);position:fixed;width:var(--hs-banner-width,67em);max-width:calc(100% - 64px);max-height:calc(100% - 64px);overflow:auto;inset:var(--hs-banner-inset,32px 0 auto 50%);z-index:3000000000;transform:translate(var(--hs-banner-translate-x,-50%),200vh);-webkit-transform:translate(var(--hs-banner-translate-x,-50%),200vh) translateZ(3000000000px);animation:banner_animation .5s forwards}@keyframes banner_animation{0%{transform:translate(var(--hs-banner-translate-x,-50%),200vh);-webkit-transform:translate(var(--hs-banner-translate-x,-50%),200vh) translateZ(3000000000px);opacity:0}99%{opacity:0}to{transform:translate(var(--hs-banner-translate-x,-50%),var(--hs-banner-translate-y,0));-webkit-transform:translate(var(--hs-banner-translate-x,-50%),var(--hs-banner-translate-y,0)) translateZ(3000000000px);opacity:1}}#hs-eu-cookie-confirmation #hs-eu-cookie-confirmation-inner{display:flex;gap:1em;flex-direction:column;padding:var(--hs-banner-padding,2.2em)}#hs-eu-cookie-confirmation #hs-eu-cookie-confirmation-inner button:focus{box-shadow:0 0 0 2px rgba(0,128,255,.5);box-shadow:0 0 0 2px -webkit-focus-ring-color}#hs-eu-cookie-confirmation #hs-eu-header-container{display:var(--hs-banner-close-button-display,none);flex-direction:row;justify-content:flex-end}#hs-eu-cookie-confirmation #hs-eu-close-button{cursor:pointer;display:block}#hs-eu-cookie-confirmation #hs-eu-close-button svg{width:var(--hs-banner-font-size,14px);height:var(--hs-banner-font-size,14px);color:var(--hs-banner-text-color,#15295a)}#hs-eu-cookie-confirmation #hs-eu-cookie-confirmation-buttons-area{display:flex;flex-flow:row wrap;justify-content:flex-end;align-items:baseline}#hs-eu-cookie-confirmation #hs-eu-confirmation-button-group,#hs-eu-cookie-confirmation #hs-eu-opt-in-buttons{display:flex;justify-content:center;flex-flow:row wrap;gap:.5em}#hs-eu-cookie-confirmation #hs-eu-opt-in-buttons{flex-grow:1}#hs-eu-cookie-confirmation #hs-eu-confirmation-button,#hs-eu-cookie-confirmation #hs-eu-cookie-settings-button,#hs-eu-cookie-confirmation #hs-eu-decline-button{flex:1;cursor:pointer;border-radius:var(--hs-banner-button-corners,3em);min-width:11em;height:3.3em}#hs-eu-cookie-confirmation #hs-eu-confirmation-button{color:var(--hs-banner-accept-text-color,#fff);background:var(--hs-banner-accept-color,var(--hs-banner-accentColor,#425b76));border:1px solid var(--hs-banner-accept-border-color,var(--hs-banner-accentColor,#425b76))}#hs-eu-cookie-confirmation #hs-eu-decline-button{color:var(--hs-banner-decline-text-color,var(--hs-banner-accentColor,#425b76));background:var(--hs-banner-decline-color,#fff);border:1px solid var(--hs-banner-decline-border-color,var(--hs-banner-accentColor,#425b76))}#hs-eu-cookie-confirmation #hs-eu-cookie-settings-button{text-decoration:underline;font-weight:800;color:var(--hs-banner-settings-text-color,var(--hs-banner-accentColor,#425b76))}@media print{#hs-banner-gpc,#hs-eu-cookie-confirmation{display:none!important}}</style></head>
+<body class="flex flex-col min-h-screen overflow-x-hidden bg-black text-light team82"><div id="hs-banner-parent" style="--hs-banner-accentColor:#E20AB7;--hs-banner-inset:32px auto auto 50%;--hs-banner-translate-x:-50%;--hs-banner-translate-y:0;--hs-banner-close-button-display:none"><div id="hs-eu-cookie-confirmation" class="" data-nosnippet="true" role="dialog" aria-describedby="hs-eu-policy-wording" aria-label="Cookie banner" tabindex="0"><div id="hs-eu-cookie-confirmation-inner"><div id="hs-eu-header-container"><button id="hs-eu-close-button" class="hs-close-button" aria-label="Dismiss cookie banner" tabindex="0"><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 32 32"><path fill="currentColor" d="M4.3,27.7c0.2,0.2,0.6,0.5,1,0.5c0.4,0,0.8-0.2,1-0.5l9.6-9.5l9.6,9.5c0.2,0.2,0.6,0.5,1,0.5 c0.8,0,1.5-0.6,1.5-1.5c0-0.4-0.2-0.8-0.5-1L18.2,16l9.5-9.5c0.2-0.2,0.4-0.6,0.4-1c0-0.8-0.6-1.5-1.5-1.5c-0.4,0-0.7,0.2-1,0.4l0,0 L16,13.8L6.5,4.3C6.2,4,5.8,3.8,5.4,3.8c-0.8,0-1.5,0.6-1.5,1.5c0,0.5,0.2,0.8,0.5,1.1l0,0l9.5,9.5l-9.5,9.6c-0.2,0.2-0.5,0.6-0.5,1 S4.1,27.4,4.3,27.7L4.3,27.7z"></path></svg></button></div><div id="hs-eu-policy-wording" tabindex="0"><p>This website stores cookies on your computer. These cookies are used to collect information about how you interact with our website and allow us to remember you. We use this information in order to improve and customize your browsing experience and for analytics and metrics about our visitors both on this website and other media. To find out more about how we use cookies, see our <a href="https://claroty.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>. </p></div><p id="hs-eu-cookie-disclaimer" tabindex="0">If you decline the use of cookies, your information won’t be tracked when you visit this website. A single cookie will be used in your browser to remember your preference not to be tracked.</p><div id="hs-eu-cookie-confirmation-buttons-area"><div id="hs-eu-confirmation-button-group"><div id="hs-eu-opt-in-buttons"><button id="hs-eu-confirmation-button" aria-label="Accept" tabindex="0">Accept</button><button id="hs-eu-decline-button" aria-label="Decline" tabindex="0">Decline</button></div></div></div></div></div></div><div id="hs-web-interactives-top-push-anchor" class="go3670563033"></div>
+    
+    
+    <div class="container flex flex-wrap items-center py-4">
+    <a href="/team82" class="mr-auto">
+        <img src="https://claroty.com/build/assets/team82-logo-white-BGiCQ9zb.svg" class="h-16" alt="Team82 Logo">
+    </a>
+
+    
+    <ul class="relative flex flex-wrap items-center gap-x-4 md-max:order-last md-max:w-full md-max:-mx-2 md-max:mt-4">
+        
+    <li class="">
+        <a href="/team82/research" class="flex items-center gap-2 p-2">Research</a>
+    </li>
+
+        
+    <li class="">
+        <a href="/team82/disclosure-dashboard" class="flex items-center gap-2 p-2">Vulnerability Dashboard</a>
+    </li>
+
+        
+    <li class="">
+        <a href="/team82/talks" class="flex items-center gap-2 p-2">Talks</a>
+    </li>
+
+        
+    <li class="">
+        <a href="/team82/#tools" class="flex items-center gap-2 p-2">Tools</a>
+    </li>
+
+        
+    <li class="">
+        <a href="/team82/#about" class="flex items-center gap-2 p-2">About</a>
+    </li>
+
+    </ul>
+
+    <span class="h-8 ml-8 mr-2 border-l md-max:hidden border-white/20"></span>
+
+    <a href="/">
+        <img src="https://claroty.com/build/assets/logo-solid-white-DcRiqKcD.svg" class="h-6 ml-6" alt="Claroty">
+    </a>
+</div>
+    <div class="grow">
+        <div class="py-20 bg-black text-light">
+    <div class="container grid grid-cols-1 md:grid-cols-2 gap-28">
+        <div class="space-y-6">
+    <p class="text-subtle">Team82 Research
+</p>
+    <h1 class="h-6xl">The Race to Native Code Execution in PLCs</h1>
+    <div class="flex flex-wrap items-center font-semibold gap-x-2">
+    
+        
+            <div class="flex items-center gap-4">
+                
+                <span>
+                    Tal Keren
+                </span>
+            </div>
+        
+
+        <span class="mx-2 text-subtle">/</span>
+    
+    <span>May 28th, 2021</span>
+</div>
+</div>
+        
+            <div>
+                
+                    <img src="/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy84MmZiOGZkYTI2ZGZmNGViMGM5ZmVjYTliOTc5OWIxMy1UaGUtUmFjZS10by1OYXRpdmUtQ29kZS1FeGVjdXRpb24taW4tU2llbWVucy1QTENzLnBuZw==?fm=webp&amp;fit=crop&amp;w=800&amp;h=450&amp;s=11e388aaee915bc45718a295345c465b" width="800" height="450" class="object-cover mb-10 aspect-video" alt="Siemens PLC Software Vulnerabilities Uncovered">
+                
+            </div>
+        
+    </div>
+</div>
+
+<div class="py-20 bg-gray-900 text-light">
+    <div class="container grid grid-cols-1 gap-20 md:grid-cols-3 md:gap-28">
+        <div class="md:col-span-2">
+            <div class="rich-text lg:text-lg">
+    
+    
+    
+        <h2>Executive Summary</h2><ul><li><p>Claroty has found a severe memory protection bypass vulnerability (<a href="https://claroty.com/team82/disclosure-dashboard/cve-2020-15782">CVE-2020-15782</a>) in Siemens PLCs, the SIMATIC S7-1200 and S7-1500.</p></li><li><p>An attacker could abuse this vulnerability on PLCs with disabled access protection to gain read and write access anywhere on the PLC and remotely execute malicious code.</p></li><li><p>Siemens has updated the firmware for both the SIMATIC S7-1200 and S7-1500 PLCs to address this vulnerability and informs customers about the details in its advisory, <a href="https://cert-portal.siemens.com/productcert/pdf/ssa-434534.pdf">SSA-434534</a>.</p></li><li><p>Users are urged to update to current versions.</p></li><li><p>Claroty is not aware of any public exploitation of this vulnerability.</p></li></ul><h2>Siemens PLC Software Vulnerabilities Uncovered</h2><p>Achieving native code execution on an industrial control system such as a programmable logic controller (PLC) is an end-goal relatively few advanced attackers have achieved. These complex systems have numerous in-memory protections that would have to be hurdled in order for an attacker to not only run code of their choice, but also remain undetected.</p><p>Previous work has required physical access and connections to the PLC, or techniques that target engineering workstations and other links to the PLC in order to gain that level of code execution. Claroty, meanwhile, has taken those efforts a step further using a newly discovered vulnerability that bypasses the PLC sandbox within Siemens' SIMATIC S7-1200 and S7-1500 PLC CPUs to run native code in protected areas of memory. An attacker could use this vulnerability, <a href="https://claroty.com/team82/disclosure-dashboard/cve-2020-15782">CVE-2020-15782</a>, to remotely obtain read-write memory access that would be difficult to detect and remove.</p><p>This disclosure is an outcome of Siemens' and Claroty's existing partnership, which fosters not only tight cooperation between our research team and the vendor on disclosures, but also in the security of the overall industrial ecosystem. The close coordination between Siemens and Claroty included an exchange of technical details, attack techniques, and mitigation advice that helped shape the patches available in today's update from Siemens. Siemens and Claroty wish to emphasize that users apply the S7-1200 and S7-1500 CPU updates as well as those for other affected products given the critical nature of this vulnerability.</p><h2>Previous Attempts to Uncover Siemens PLC Software Vulnerabilities</h2><p>The holy grail in PLC vulnerability research, from the attacker perspective, is to achieve unrestricted and undetected code execution on the PLC. This means, being able to hide code deep inside the PLC that will be undetected by the operating system, or any diagnostic software.</p><p>Over the years we've seen many attempts to achieve such a capability on Siemens PLCs given the company's position among the market's leaders. First, we had <a target="_blank" href="http://www.cse.psu.edu/~trj1/cse598-f11/slides/stuxnet.pdf">Stuxnet</a>, which gained user-level code execution on the old SIMATIC S7-300 and S7-400. The code alteration itself was done by manipulating the local Step 7 projects files. Then, Stuxnet was able to hide the code alteration on the PLC by manipulating the WinCC binaries on the local engineering station. Doing so allowed the malware to not only stealthily install itself on PLCs, but also shield itself from WinCC when the control software attempted to read infected memory blocks from the PLC. This issue was resolved with a combination of Microsoft updates to its Windows operating system and Siemens product updates as documented in SSA-110665 and SSA-027884.</p><p>Next, we witnessed the <a target="_blank" href="https://engineering.tau.ac.il/sites/engineering.tau.ac.il/files/media_server/Engineering/Elect/us-19-Bitan-Rogue7-Rogue-Engineering-Station-Attacks-On-S7-Simatic-PLCs-wp.pdf">Rogue7 attack</a>. The researchers behind Rogue7 were able to create a rogue engineering station which can masquerade as the TIA portal to the PLC and inject any messages favorable to the attacker. By understanding how cryptographical messages were exchanged, they were able to hide code in user memory, which is invisible to the TIA engineering station. Siemens partially resolved this issue and provided mitigations, as documented in SSA-232418.</p><p>The same year Ali Abbasi and Tobias Scharnowski presented how they <a target="_blank" href="https://i.blackhat.com/eu-19/Wednesday/eu-19-Abbasi-Doors-Of-Durin-The-Veiled-Gate-To-Siemens-S7-Silicon.pdf">physically attacked the SIMATIC 1200</a> to gain code execution on Siemens S7 PLCs. They used a UART physical connection to dump the firmware and found an exploit chain that enabled them to hide code in a deeper place within the system and obtain code execution without restrictions. Siemens resolved this issue in SSA-686531.</p><p>Today, we take this research one step further and demonstrate a new and sophisticated remote attack that allows us to gain native code execution on Siemens S7 PLCs. Our attack targets deep in the kernel and avoids any detection because we are able to escape the user sandbox and write a shellcode into protected memory regions.</p>
+    
+        
+
+<figure class="relative flex flex-wrap ">
+    
+        <img src="/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy84MmZiOGZkYTI2ZGZmNGViMGM5ZmVjYTliOTc5OWIxMy1UaGUtUmFjZS10by1OYXRpdmUtQ29kZS1FeGVjdXRpb24taW4tU2llbWVucy1QTENzLnBuZw==?fm=webp&amp;fit=crop&amp;s=be87d4a3b774253ab719530289f00551" width="1034" height="662" class="  " style="width: ; max-width: ; height: ; mix-blend-mode: ; object-fit: ;" loading="lazy" alt="Siemens PLC Software Vulnerabilities Uncovered">
+        
+    
+    
+</figure>
+
+
+    
+
+    
+        <h2>Understanding—and Jailbreaking—the PLC Sandbox</h2><p>The integrity of a PLC is crucial to operators and engineers, and an attacker's goal would be to damage that integrity by hiding code on the controller and elevating privileges. Our vulnerability, <a href="https://claroty.com/team82/disclosure-dashboard/cve-2020-15782">CVE-2020-15782</a>, bypasses existing protections within the execution environment of the PLC, including a sandbox where engineering code would normally run. Claroty was able to use this vulnerability to escape the sandbox in order to gain direct access to memory, then write and inject shellcode to execute our attack on Siemens 1200/1500 PLCs.</p><p>In order to execute this attack, one would need network access to the PLC. In addition, the attacker would need PLC download rights. Since TIA Portal V12, Siemens provides various mitigation controls to limit user network and read/write access to the PLC, especially the password protection mechanism. Additionally, starting with V17, Siemens introduces TLS communication using individual certificates between PLCs, HMIs and TIA Portal, which reduces the potential attack surface significantly.</p><p>To understand our specific attack, we first want to outline the generic structure of a standard PLC. Its CPU is either a 16- or 32-bit microprocessor consisting of a memory chip and integrated circuits that manage control logic, process monitoring, and communication. The CPU directs the PLC to execute control instructions, communicate with other devices, carry out logic and arithmetic operations, and perform internal diagnostics.</p><p>It also runs memory routines, constantly checking the PLC to avoid programming errors, and ensure the memory is undamaged.The logic runs in a sandbox environment,—sometimes referred to as "jail." The logic being transferred to the controller is limited to specific memory regions and APIs provided by the vendor.</p><p>In the case of the Siemens S7 PLCs—which runs on the <a target="_blank" href="https://www.youtube.com/watch?v=SvoZextDCRQ">ADONIS kernel</a> and an ARM or MIPS processor—there are numerous programming languages available to configure the controller, including Statement List (STL), Ladder Diagram (LD), Function Block Diagram (FBD), and Structured Control Language (SCL).</p><p>Regardless of input sources, the PLC program will be compiled into <a target="_blank" href="https://support.industry.siemens.com/cs/document/16521694/comparing-executable-code-(mc7-code)-in-step-7-v5-2?dti=0&amp;lc=en-WW">MC7 / MC7+ bytecode</a>, which is a lower-level representation of the code. After being compiled by the engineering station—the Siemens TIA Portal—code blocks (in MC7/MC7+ format) are downloaded and installed into a PLC via Siemens' S7Comm / S7Comm+ protocol. Then, the MC7 virtual machine in the PLC will dispatch the code blocks and interpret and execute the bytecode.</p>
+    
+        
+
+<figure class="relative flex flex-wrap ">
+    
+        <img src="/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy81MjY4ZDY1NDcyMjhhNGJkNzkwY2VkYzdhMDMxMDM2Zi1TaWVtZW5zLVBMQy1ncmFwaGljLTIucG5nLWFsdC5wbmc=?fm=webp&amp;fit=crop&amp;s=32c7595c72914bf380d5d2f9516999c0" width="960" height="302" class="  " style="width: ; max-width: ; height: ; mix-blend-mode: ; object-fit: ;" loading="lazy" alt="Siemens PLC Code flow">
+        
+    
+    
+</figure>
+
+
+    
+
+    
+        <p>It is not possible to decode MC7/MC7+ bytecode without reverse engineering, because Siemens has not publicly provided documentation to do so. Therefore, we had to reverse engineer the MC7/MC7+ bytecode language set in order to understand its internal mechanism and find bugs.</p><p>Since the virtual machine restricts the resources accessed by the users' programs, the compiled bytecode can only be used for access to the allowed resources by the operating system rather than direct hardware operation. This is to restrict the user and the running code to a defined set of actions that are considered safe. For example, the operating system will restrict any direct access to protected memory, but will allow the use of any function from the <a target="_blank" href="https://cache.industry.siemens.com/dl/files/487/45522487/att_61497/v1/s7fup__b.pdf">standard library provided by Siemens</a> (e.g. ADD_I - Add Integer subroutine). In other words, the operating system is "locking" the user's code in a sandbox/container with a limited access to resources, memory, and functionality that could potentially damage the PLC and/or the entire process.</p><p>In order to escape, or "jailbreak," the native SIMATIC S7-1200 and S7-1500 sandboxes, Claroty used its memory protection bypass vulnerability. The vulnerability enables an attacker to write arbitrary data and code to supposedly protected memory areas, or read sensitive data to launch further attacks.</p>
+    
+        
+
+<figure class="relative flex flex-wrap ">
+    
+        <img src="/img/asset/YXNzZXRzL2ltcG9ydGVkLWltYWdlcy8zYTkxZmNjNzY5NmUwNDI1ZGU2YTllMzNiMmQxODZmMy1TaWVtZW5zLVBMQy1ncmFwaGljLTMucG5n?fm=webp&amp;fit=crop&amp;s=1ac0a3188f62ffd377b9c20e9ccf1c3b" width="960" height="540" class="  " style="width: ; max-width: ; height: ; mix-blend-mode: ; object-fit: ;" loading="lazy" alt="SIMATIC S7 Memory Layout">
+        
+    
+    
+</figure>
+
+
+    
+
+    
+        <p>Escaping the sandbox means an attacker would be able to read and write from anywhere on the PLC, and could patch an existing VM opcode in memory with malicious code to root the device. Claroty, for example, was able to inject ARM/MIPS shellcode directly to an internal operating system structure in such a way that when the operating system uses a specific opcode that we chose, our malicious shellcode would execute, giving us remote code execution. We used this technique to install a kernel-level program with some functionality that is completely hidden to the operating system.</p><h2>The Vulnerability</h2><h3><a target="_blank" href="https://claroty.com/team82/disclosure-dashboard/cve-2020-15782">CVE-2020-15782</a></h3><h4><a target="_blank" href="https://claroty.com/team82/disclosure-dashboard/cve-2020-15782">CWE-119 Improper Restriction of Operations within the Bounds of a Memory Buffer</a></h4><p><strong>CVSS v3.1 Score: 8.1</strong></p><p>Affected devices are vulnerable to a memory protection bypass through a specific operation. A remote unauthenticated attacker with network access to TCP port 102 could potentially write arbitrary data and code to protected memory areas or read sensitive data to launch further attacks.</p><p>Today, Siemens released advisory <a target="_blank" href="https://cert-portal.siemens.com/productcert/pdf/ssa-434534.pdf">SSA-434534</a> that notifies its users of this vulnerability. Siemens also released updates for various products, including S7-1500 and S7-1200, that remediate the vulnerability. Users are urged to update to the latest versions. The company said it is preparing further updates for products where updates are not yet available; Siemens also provided specific mitigation measures that users can apply to reduce the risk.</p>
+    
+
+</div>
+
+<div class="flex items-center justify-between pt-10 mt-10 border-t">
+    <div>
+        <div class="text-base flex items-center gap-4">
+    <div>Share</div>
+
+    <div class="flex flex-wrap gap-2">
+        <a href="https://www.linkedin.com/shareArticle/?url=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-linkedin m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="m-auto fa-brands fa-linkedin"></i> -->
+            <span class="sr-only">LinkedIn</span>
+        </a>
+
+        <a href="https://twitter.com/intent/post?text=The Race to Native Code Execution in PLCs&amp;url=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-square-x-twitter m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="square-x-twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"></path></svg><!-- <i class="m-auto fa-brands fa-square-x-twitter"></i> -->
+            <span class="sr-only">Twitter</span>
+        </a>
+
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-facebook m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"></path></svg><!-- <i class="m-auto fa-brands fa-facebook"></i> -->
+            <span class="sr-only">Facebook</span>
+        </a>
+
+        <a href="mailto:?subject=The Race to Native Code Execution in PLCs&amp;body=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-envelope m-auto" aria-hidden="true" focusable="false" data-prefix="far" data-icon="envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"></path></svg><!-- <i class="m-auto fa-regular fa-envelope"></i> -->
+            <span class="sr-only"></span>
+        </a>
+    </div>
+</div>
+    </div>
+
+    
+</div>
+
+            <div class="relative mt-10 text-white md:mt-16">
+    <img src="https://claroty.com/build/assets/team82-newsletter-bg-BlXIsUMi.jpg" class="object-cover layer" loading="lazy" alt="">
+
+    <div class="absolute top-0 w-8 bg-gray-900 right-8 aspect-square"></div>
+    <div class="absolute right-0 w-8 bg-gray-900 top-8 aspect-square"></div>
+
+    <div class="relative p-10 md:p-16">
+        <h5 class="h-xs">Stay in the know</h5>
+        <h2 class="mt-4 mb-10 h-4xl">Get the Team82 Newsletter</h2>
+        <div class="" x-data="hubspotForm('4ec0d86c-87f7-4863-8c01-93bea20ffd85')" id="hubspot-form-1" data-hs-forms-root="true"><form id="hsForm_4ec0d86c-87f7-4863-8c01-93bea20ffd85" method="POST" accept-charset="UTF-8" enctype="multipart/form-data" novalidate="" action="https://forms.hsforms.com/submissions/v3/public/submit/formsnext/multipart/20307279/4ec0d86c-87f7-4863-8c01-93bea20ffd85" class="hs-form-private hsForm_4ec0d86c-87f7-4863-8c01-93bea20ffd85 hs-form-4ec0d86c-87f7-4863-8c01-93bea20ffd85 hs-form-4ec0d86c-87f7-4863-8c01-93bea20ffd85_ea7709a1-3ef6-4564-a42d-61cbb5dcb9d6 hs-form stacked hs-custom-style" target="target_iframe_4ec0d86c-87f7-4863-8c01-93bea20ffd85" data-instance-id="ea7709a1-3ef6-4564-a42d-61cbb5dcb9d6" data-form-id="4ec0d86c-87f7-4863-8c01-93bea20ffd85" data-portal-id="20307279" data-test-id="hsForm_4ec0d86c-87f7-4863-8c01-93bea20ffd85" __bizdiag="-1229585290" __biza="W___"><div class="hs_utm_campaign hs-utm_campaign hs-fieldtype-text field hs-form-field" style="display: none;"><label id="label-utm_campaign-4ec0d86c-87f7-4863-8c01-93bea20ffd85" class="" placeholder="Enter your UTM Campaign" for="utm_campaign-4ec0d86c-87f7-4863-8c01-93bea20ffd85"><span>UTM Campaign</span></label><legend class="hs-field-desc" style="display: none;"></legend><div class="input"><input name="utm_campaign" class="hs-input" type="hidden" value=""></div></div><div class="hs_email hs-email hs-fieldtype-text field hs-form-field"><label id="label-email-4ec0d86c-87f7-4863-8c01-93bea20ffd85" class="" placeholder="Enter your Email" for="email-4ec0d86c-87f7-4863-8c01-93bea20ffd85"><span>Email</span><span class="hs-form-required">*</span></label><legend class="hs-field-desc" style="display: none;"></legend><div class="input"><input id="email-4ec0d86c-87f7-4863-8c01-93bea20ffd85" name="email" required="" placeholder="Work email" type="email" class="hs-input" inputmode="email" autocomplete="email" value=""></div></div><div class="legal-consent-container"><div class="hs-richtext"><p>Claroty needs the contact information you provide to us to contact you about our products and services. You may unsubscribe from these communications at any time. For information on how to unsubscribe, as well as our privacy practices and commitment to protecting your privacy, please review our Privacy Policy.</p></div></div><div class="hs_submit hs-submit"><div class="hs-field-desc" style="display: none;"></div><div class="actions"><input type="submit" class="hs-button primary large" value="Subscribe"></div></div><input name="hs_context" type="hidden" value="{&quot;embedAtTimestamp&quot;:&quot;1718453438512&quot;,&quot;formDefinitionUpdatedAt&quot;:&quot;1692225748268&quot;,&quot;lang&quot;:&quot;en&quot;,&quot;legalConsentOptions&quot;:&quot;{\&quot;legitimateInterestSubscriptionTypes\&quot;:[16592845],\&quot;communicationConsentCheckboxes\&quot;:[{\&quot;communicationTypeId\&quot;:16592845,\&quot;label\&quot;:\&quot;<p>I agree to receive other communications from Claroty. </p>\&quot;,\&quot;required\&quot;:false}],\&quot;legitimateInterestLegalBasis\&quot;:\&quot;LEGITIMATE_INTEREST_PQL\&quot;,\&quot;communicationConsentText\&quot;:\&quot;<p>Claroty.com is committed to protecting and respecting your privacy, and we’ll only use your personal information to administer your account and to provide the products and services you requested from us. From time to time, we would like to contact you about our products and services, as well as other content that may be of interest to you. If you consent to us contacting you for this purpose, please tick below to say how you would like us to contact you:</p>\&quot;,\&quot;processingConsentType\&quot;:\&quot;IMPLICIT\&quot;,\&quot;processingConsentText\&quot;:\&quot;In order to provide you the content requested, we need to store and process your personal data. If you consent to us storing your personal data for this purpose, please tick the checkbox below.\&quot;,\&quot;processingConsentCheckboxLabel\&quot;:\&quot;<p>I agree to allow Claroty to store and process my personal data.</p>\&quot;,\&quot;privacyPolicyText\&quot;:\&quot;<p>Claroty needs the contact information you provide to us to contact you about our products and services. You may unsubscribe from these communications at any time. For information on how to unsubscribe, as well as our privacy practices and commitment to protecting your privacy, please review our Privacy Policy.</p>\&quot;,\&quot;isLegitimateInterest\&quot;:true}&quot;,&quot;embedType&quot;:&quot;REGULAR&quot;,&quot;disableCookieSubmission&quot;:&quot;true&quot;,&quot;clonedFromForm&quot;:&quot;4676c62f-00c9-42ab-a3f8-69f12a64525c&quot;,&quot;userAgent&quot;:&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0&quot;,&quot;pageTitle&quot;:&quot;Siemens PLC Software Vulnerabilities Uncovered | Team82 | Claroty&quot;,&quot;pageUrl&quot;:&quot;https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs&quot;,&quot;isHubSpotCmsGeneratedPage&quot;:false,&quot;hutk&quot;:&quot;bbce0500c955a57ceca8d7e6f8ad1667&quot;,&quot;__hsfp&quot;:2893364673,&quot;__hssc&quot;:&quot;125082197.1.1718453440990&quot;,&quot;__hstc&quot;:&quot;125082197.bbce0500c955a57ceca8d7e6f8ad1667.1718453440990.1718453440990.1718453440990.1&quot;,&quot;formTarget&quot;:&quot;#hubspot-form-1&quot;,&quot;rumScriptExecuteTime&quot;:6327,&quot;rumTotalRequestTime&quot;:6721,&quot;rumTotalRenderTime&quot;:6777,&quot;rumServiceResponseTime&quot;:394,&quot;rumFormRenderTime&quot;:56,&quot;connectionType&quot;:&quot;&quot;,&quot;firstContentfulPaint&quot;:0,&quot;largestContentfulPaint&quot;:0,&quot;locale&quot;:&quot;en&quot;,&quot;timestamp&quot;:1718453441005,&quot;originalEmbedContext&quot;:{&quot;portalId&quot;:&quot;20307279&quot;,&quot;formId&quot;:&quot;4ec0d86c-87f7-4863-8c01-93bea20ffd85&quot;,&quot;region&quot;:&quot;na1&quot;,&quot;target&quot;:&quot;#hubspot-form-1&quot;,&quot;isBuilder&quot;:false,&quot;isTestPage&quot;:false,&quot;isPreview&quot;:false,&quot;css&quot;:&quot;&quot;,&quot;isMobileResponsive&quot;:true},&quot;correlationId&quot;:&quot;ea7709a1-3ef6-4564-a42d-61cbb5dcb9d6&quot;,&quot;renderedFieldsIds&quot;:[&quot;utm_campaign&quot;,&quot;email&quot;],&quot;captchaStatus&quot;:&quot;NOT_APPLICABLE&quot;,&quot;emailResubscribeStatus&quot;:&quot;NOT_APPLICABLE&quot;,&quot;isInsideCrossOriginFrame&quot;:false,&quot;source&quot;:&quot;forms-embed-1.5387&quot;,&quot;sourceName&quot;:&quot;forms-embed&quot;,&quot;sourceVersion&quot;:&quot;1.5387&quot;,&quot;sourceVersionMajor&quot;:&quot;1&quot;,&quot;sourceVersionMinor&quot;:&quot;5387&quot;,&quot;allPageIds&quot;:{},&quot;_debug_embedLogLines&quot;:[{&quot;clientTimestamp&quot;:1718453439411,&quot;level&quot;:&quot;INFO&quot;,&quot;message&quot;:&quot;Retrieved customer callbacks used on embed context: [\&quot;onFormReady\&quot;,\&quot;onFormSubmitted\&quot;]&quot;},{&quot;clientTimestamp&quot;:1718453439412,&quot;level&quot;:&quot;INFO&quot;,&quot;message&quot;:&quot;Retrieved pageContext values which may be overriden by the embed context: {\&quot;pageTitle\&quot;:\&quot;Siemens PLC Software Vulnerabilities Uncovered | Team82 | Claroty\&quot;,\&quot;pageUrl\&quot;:\&quot;https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs\&quot;,\&quot;userAgent\&quot;:\&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0\&quot;,\&quot;isHubSpotCmsGeneratedPage\&quot;:false}&quot;},{&quot;clientTimestamp&quot;:1718453439414,&quot;level&quot;:&quot;INFO&quot;,&quot;message&quot;:&quot;Retrieved countryCode property from normalized embed definition response: \&quot;PL\&quot;&quot;},{&quot;clientTimestamp&quot;:1718453440996,&quot;level&quot;:&quot;INFO&quot;,&quot;message&quot;:&quot;Retrieved analytics values from API response which may be overriden by the embed context: {\&quot;hutk\&quot;:\&quot;bbce0500c955a57ceca8d7e6f8ad1667\&quot;}&quot;}]}"><iframe name="target_iframe_4ec0d86c-87f7-4863-8c01-93bea20ffd85" style="display: none;"></iframe></form></div>
+
+
+    
+
+    </div>
+</div>
+        </div>
+
+        <div>
+            <div class="mb-16 sm-max:hidden">
+    <div class="text-base space-y-2">
+    <div>Share</div>
+
+    <div class="flex flex-wrap gap-2">
+        <a href="https://www.linkedin.com/shareArticle/?url=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-linkedin m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="m-auto fa-brands fa-linkedin"></i> -->
+            <span class="sr-only">LinkedIn</span>
+        </a>
+
+        <a href="https://twitter.com/intent/post?text=The Race to Native Code Execution in PLCs&amp;url=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-square-x-twitter m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="square-x-twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"></path></svg><!-- <i class="m-auto fa-brands fa-square-x-twitter"></i> -->
+            <span class="sr-only">Twitter</span>
+        </a>
+
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-facebook m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"></path></svg><!-- <i class="m-auto fa-brands fa-facebook"></i> -->
+            <span class="sr-only">Facebook</span>
+        </a>
+
+        <a href="mailto:?subject=The Race to Native Code Execution in PLCs&amp;body=https://claroty.com/team82/research/the-race-to-native-code-execution-in-plcs" class="flex w-10 h-8 border rounded hover:border-gray-400" target="_blank">
+            <svg class="svg-inline--fa fa-envelope m-auto" aria-hidden="true" focusable="false" data-prefix="far" data-icon="envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"></path></svg><!-- <i class="m-auto fa-regular fa-envelope"></i> -->
+            <span class="sr-only"></span>
+        </a>
+    </div>
+</div>
+</div>
+
+<div>
+    <h4 class="h-xl">Related Vulnerability Disclosures</h4>
+    
+    <ul class="mt-6 text-sm">
+        
+            <li class="py-4 border-t">
+                <a href="/team82/disclosure-dashboard/cve-2020-15782" class="space-y-4 group">
+                    <h5 class="duration-150 h-lg group-hover:text-red">CVE-2020-15782</h5>
+                    </a><p><a href="/team82/disclosure-dashboard/cve-2020-15782" class="space-y-4 group">CWE-119: IMPROPER RESTRICTION OF OPERATIONS WITHIN THE BOUNDS OF A MEMORY BUFFER: <br>The software performs operations on a memory buffer, but it can read from or write to a memory location that is outside of the intended boundary of the buffer.<br>Read more: "</a><a href="https://www.claroty.com/2021/05/28/blog-research-race-to-native-code-execution-in-plcs/">"The Race to Native Code Execution in PLCs"</a></p>
+
+                    <p class="h-xs">CVSS v3: 8.1</p>
+                
+            </li>
+        
+    </ul>
+</div>
+        </div>
+    </div>
+</div>
+    </div>
+
+    
+    <footer class="py-20 lg:py-28 bg-gray-900 text-light">
+        <div class="container">
+            
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12">
+                    
+                        <div class="space-y-4">
+                            <h5 class="h-xs text-subtle">Solutions</h5>
+
+                            <ul class="space-y-2">
+                                
+                                    <li>
+                                        <a href="/platform" target="">Claroty xDome Platform</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/industrial-cybersecurity" target="">Industrial Cybersecurity</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/healthcare-cybersecurity" target="">Healthcare Cybersecurity</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/commercial-cybersecurity" target="">Commercial Cybersecurity</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/public-sector-cybersecurity" target="">Public Sector Cybersecurity</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    
+                        <div class="space-y-4">
+                            <h5 class="h-xs text-subtle">Threat Research</h5>
+
+                            <ul class="space-y-2">
+                                
+                                    <li>
+                                        <a href="/team82" target="">Team82 Home</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/team82/disclosure-dashboard" target="">Vulnerability Disclosure Dashboard</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/team82/research" target="">Research</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/team82/pgp-key" target="">PGP Key</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    
+                        <div class="space-y-4">
+                            <h5 class="h-xs text-subtle">Partners</h5>
+
+                            <ul class="space-y-2">
+                                
+                                    <li>
+                                        <a href="/partners" target="">Partners</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/partners/technology-alliances" target="">Technology Alliance Partners</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/partners/channel-partners" target="">Channel Partners</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/partners/channel-partners/managed-security-service-providers" target="">Managed Security Service Providers</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="https://portal.claroty.com/English/register_email.aspx" target="_blank">Become a Partner</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="https://portal.claroty.com/English/directory/" target="_blank">Find a Partner</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="https://portal.claroty.com/" target="_blank">Partner Login</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    
+                        <div class="space-y-4">
+                            <h5 class="h-xs text-subtle">Resources</h5>
+
+                            <ul class="space-y-2">
+                                
+                                    <li>
+                                        <a href="/resources" target="">Resource Library</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/blog" target="">Blog</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/white-papers" target="">White Papers</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/reports" target="">Reports</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/case-studies" target="">Case Studies</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/datasheets" target="">Datasheets</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/integration-briefs" target="">Integration Briefs</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="https://nexusconnect.io/podcasts" target="_blank">Podcasts</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/resources/videos" target="">Videos</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    
+                        <div class="space-y-4">
+                            <h5 class="h-xs text-subtle">Company</h5>
+
+                            <ul class="space-y-2">
+                                
+                                    <li>
+                                        <a href="/company" target="">About Us</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/careers" target="">Careers</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/leadership" target="">Leadership</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/newsroom" target="">Newsroom</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/trust" target="">Trust Center</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/customer-experience" target="">Customer Experience</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/event-listing" target="">Events</a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/contact-us" target="">Contact Us</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    
+                </div>
+                <div class="my-10 border-t lg:mt-16"></div>
+            
+            <div class="flex flex-wrap justify-between gap-10 text-sm">
+                <div class="flex flex-col items-start gap-4 xs-max:w-full">
+                    <img src="https://claroty.com/build/assets/logo-white-VeF9EwMy.svg" width="160" height="32" class="h-8" alt="Claroty">
+
+                    <p class="text-subtle">© 2024 Claroty. All rights reserved.</p>
+                </div>
+
+                <div class="flex flex-col gap-4 sm:items-end">
+                    
+    <div class="flex gap-2">
+        
+        
+            <a href="https://www.linkedin.com/company/claroty/" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#0a66c2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-linkedin m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fa-brands fa-linkedin m-auto"></i> -->
+                <span class="sr-only">LinkedIn</span>
+            </a>
+        
+            <a href="https://twitter.com/claroty" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#1da1f2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-square-x-twitter m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="square-x-twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"></path></svg><!-- <i class="fa-brands fa-square-x-twitter m-auto"></i> -->
+                <span class="sr-only">Twitter</span>
+            </a>
+        
+            <a href="https://www.youtube.com/@claroty20" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#f00] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-youtube m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fa-brands fa-youtube m-auto"></i> -->
+                <span class="sr-only">YouTube</span>
+            </a>
+        
+            <a href="https://www.facebook.com/ClarotyOT/" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#1778f2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-facebook m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"></path></svg><!-- <i class="fa-brands fa-facebook m-auto"></i> -->
+                <span class="sr-only">Facebook</span>
+            </a>
+        
+    </div>
+
+                    <div class="flex gap-2">
+                        
+                            
+                            <a href="/terms-conditions" target="">Terms &amp; Conditions</a>
+                        
+                            
+                                <span class="text-subtle">/</span>
+                            
+                            <a href="/privacy-policy" target="">Privacy Policy</a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    
+<div>
+    
+</div>
+<div class="mobile-menu fixed inset-0 overflow-auto p-[10%] bg-black text-light space-y-10 z-50">
+    <div class="flex items-center justify-between">
+        <img src="https://claroty.com/build/assets/logo-white-VeF9EwMy.svg" width="160" height="32" class="h-8" alt="Claroty">
+
+        <button type="button" class="btn btn-gradient !h-10 !w-10 min-h-0 !p-0" x-data="mobileMenuToggle" @click="toggle()">
+            <svg class="svg-inline--fa fa-xmark-large" aria-hidden="true" focusable="false" data-prefix="far" data-icon="xmark-large" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M41 39C31.6 29.7 16.4 29.7 7 39S-2.3 63.6 7 73l183 183L7 439c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l183-183L407 473c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-183-183L441 73c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-183 183L41 39z"></path></svg><!-- <i class="fa-regular fa-xmark-large"></i> -->
+            <span class="sr-only">Close Menu</span>
+        </button>
+    </div>
+
+    <ul class="text-lg">
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/platform" class="flex items-center gap-2 leading-10 border-r grow">Platform</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/platform" class="block py-2" target="">The Claroty Platform</a>
+        
+            <a href="/platform/asset-inventory" class="block py-2" target="">Asset Inventory</a>
+        
+            <a href="/platform/exposure-management" class="block py-2" target="">Exposure Management</a>
+        
+            <a href="/platform/network-protection" class="block py-2" target="">Network Protection</a>
+        
+            <a href="/platform/secure-access" class="block py-2" target="">Secure Access</a>
+        
+            <a href="/platform/threat-detection" class="block py-2" target="">Threat Detection</a>
+        
+            <a href="/platform/operational-efficiency" class="block py-2" target="">Operational Efficiency</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/industrial-cybersecurity" class="flex items-center gap-2 leading-10 border-r grow">Industrial</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/industrial-cybersecurity" class="block py-2" target="">Industrial Home</a>
+        
+            <a href="/industrial-cybersecurity/xdome" class="block py-2" target="">Claroty xDome</a>
+        
+            <a href="/industrial-cybersecurity/xdome-secure-access" class="block py-2" target="">Claroty xDome Secure Access</a>
+        
+            <a href="/industrial-cybersecurity/ctd" class="block py-2" target="">Claroty Continuous Threat Detection (CTD)</a>
+        
+            <a href="/industrial-cybersecurity/cyber-resilience" class="block py-2" target="">Cyber Resilience</a>
+        
+            <a href="/industrial-cybersecurity/operational-resilience" class="block py-2" target="">Operational Resilience</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/healthcare-cybersecurity" class="flex items-center gap-2 leading-10 border-r grow">Healthcare</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/healthcare-cybersecurity" class="block py-2" target="">Healthcare Home</a>
+        
+            <a href="/healthcare-cybersecurity/medigate" class="block py-2" target="">Medigate by Claroty</a>
+        
+            <a href="/healthcare-cybersecurity/cyber-resilience" class="block py-2" target="">Cyber Resilience</a>
+        
+            <a href="/healthcare-cybersecurity/operational-resilience" class="block py-2" target="">Operational Resilience</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/commercial-cybersecurity" class="flex items-center gap-2 leading-10 border-r grow">Commercial</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/commercial-cybersecurity" class="block py-2" target="">Commercial Home</a>
+        
+            <a href="/commercial-cybersecurity/xdome" class="block py-2" target="">Claroty xDome</a>
+        
+            <a href="/commercial-cybersecurity/xdome-secure-access" class="block py-2" target="">Claroty xDome Secure Access</a>
+        
+            <a href="/commercial-cybersecurity/ctd" class="block py-2" target="">Claroty Continuous Threat Detection (CTD)</a>
+        
+            <a href="/commercial-cybersecurity/cyber-resilience" class="block py-2" target="">Cyber Resilience</a>
+        
+            <a href="/commercial-cybersecurity/operational-resilience" class="block py-2" target="">Operational Resilience</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/public-sector-cybersecurity" class="flex items-center gap-2 leading-10 border-r grow">Public Sector</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/public-sector-cybersecurity" class="block py-2" target="">Public Sector Home</a>
+        
+            <a href="/public-sector-cybersecurity/us-government-cybersecurity" class="block py-2" target="">U.S. Federal Government</a>
+        
+            <a href="/public-sector-cybersecurity/sltt-government-cybersecurity" class="block py-2" target="">State, Local, Tribal, and Territorial (SLTT)</a>
+        
+            <a href="/public-sector-cybersecurity/national-and-international-government-cybersecurity" class="block py-2" target="">National and International Government</a>
+        
+            <a href="/public-sector-cybersecurity/enabling-government-regulatory-and-policy-compliance" class="block py-2" target="">Government Regulatory &amp; Policy Compliance</a>
+        
+            <a href="/public-sector-cybersecurity/us-government-cybersecurity/the-team" class="block py-2" target="">The Federal Team</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/team82" class="flex items-center gap-2 leading-10 border-r grow">Threat Research</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/team82" class="block py-2" target="">Team82 Home</a>
+        
+            <a href="/team82/disclosure-dashboard" class="block py-2" target="">Vulnerability Disclosure Dashboard</a>
+        
+            <a href="/team82/research" class="block py-2" target="">Research</a>
+        
+            <a href="/team82/talks" class="block py-2" target="">Talks</a>
+        
+            <a href="/team82/pgp-key" class="block py-2" target="">PGP Key</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/partners" class="flex items-center gap-2 leading-10 border-r grow">Partners</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/partners" class="block py-2" target="">Partners</a>
+        
+            <a href="/partners/technology-alliances" class="block py-2" target="">Technology Alliance Partners</a>
+        
+            <a href="/partners/channel-partners" class="block py-2" target="">Channel Partners</a>
+        
+            <a href="/partners/channel-partners/managed-security-service-providers" class="block py-2" target="">Managed Security Service Providers</a>
+        
+            <a href="https://portal.claroty.com/English/register_email.aspx" class="block py-2" target="_blank">Become a Partner</a>
+        
+            <a href="https://portal.claroty.com/English/directory/" class="block py-2" target="_blank">Find a Partner</a>
+        
+            <a href="https://portal.claroty.com/English/" class="block py-2" target="_blank">Partner Login</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/resources" class="flex items-center gap-2 leading-10 border-r grow">Resources</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/blog" class="block py-2" target="">Blog</a>
+        
+            <a href="/resources/reports" class="block py-2" target="">Reports</a>
+        
+            <a href="/resources/white-papers" class="block py-2" target="">White Papers</a>
+        
+            <a href="/resources/datasheets" class="block py-2" target="">Datasheets &amp; Solution Overviews</a>
+        
+            <a href="/resources/integration-briefs" class="block py-2" target="">Integration Briefs</a>
+        
+            <a href="/resources/case-studies" class="block py-2" target="">Case Studies</a>
+        
+            <a href="/resources/webinars" class="block py-2" target="">On-Demand Webinars</a>
+        
+            <a href="https://nexusconnect.io/podcasts" class="block py-2" target="_blank">Podcasts</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+            
+                
+    
+        <li class="border-t" x-data="{ open: false }">
+            <div class="flex">
+                <a href="/company" class="flex items-center gap-2 leading-10 border-r grow">Company</a>
+
+                <button type="button" class="flex w-10 h-10 shrink-0" @click="open = !open">
+                    <svg class="svg-inline--fa fa-angle-down block m-auto text-xs duration-150 opacity-50" :class="{ 'rotate-180': open }" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg><!-- <i class="block m-auto text-xs duration-150 opacity-50 fa-solid fa-angle-down" :class="{ 'rotate-180': open }"></i> -->
+                </button>
+            </div>
+
+            
+    <div class="h-xs" x-show="open" x-collapse="" style="display: none; height: 0px; overflow: hidden;" hidden="">
+        
+            <a href="/company" class="block py-2" target="">About Us</a>
+        
+            <a href="/careers" class="block py-2" target="">Careers</a>
+        
+            <a href="/leadership" class="block py-2" target="">Leadership</a>
+        
+            <a href="/newsroom" class="block py-2" target="">Newsroom</a>
+        
+            <a href="/trust" class="block py-2" target="">Trust Center</a>
+        
+            <a href="/event-listing" class="block py-2" target="">Events</a>
+        
+            <a href="/contact-us" class="block py-2" target="">Contact Us</a>
+        
+
+        <div class="h-3"></div>
+    </div>
+
+        </li>
+    
+
+            
+        
+
+        
+    
+        <li class="border-t">
+            <a href="/search" class="flex items-center gap-2 leading-10"><svg class="svg-inline--fa fa-search" aria-hidden="true" focusable="false" data-prefix="far" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M368 208A160 160 0 1 0 48 208a160 160 0 1 0 320 0zM337.1 371.1C301.7 399.2 256.8 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 48.8-16.8 93.7-44.9 129.1L505 471c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L337.1 371.1z"></path></svg><!-- <i class="fa-regular fa-search"></i> -->Search</a>
+        </li>
+    
+
+    </ul>
+
+    
+    <div class="flex gap-2">
+        
+        
+            <a href="https://www.linkedin.com/company/claroty/" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#0a66c2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-linkedin m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fa-brands fa-linkedin m-auto"></i> -->
+                <span class="sr-only">LinkedIn</span>
+            </a>
+        
+            <a href="https://twitter.com/claroty" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#1da1f2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-square-x-twitter m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="square-x-twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"></path></svg><!-- <i class="fa-brands fa-square-x-twitter m-auto"></i> -->
+                <span class="sr-only">Twitter</span>
+            </a>
+        
+            <a href="https://www.youtube.com/@claroty20" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#f00] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-youtube m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fa-brands fa-youtube m-auto"></i> -->
+                <span class="sr-only">YouTube</span>
+            </a>
+        
+            <a href="https://www.facebook.com/ClarotyOT/" class="flex w-8 h-8 bg-gray-800/50 hover:bg-[#1778f2] rounded" target="_blank">
+                <svg class="svg-inline--fa fa-facebook m-auto" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"></path></svg><!-- <i class="fa-brands fa-facebook m-auto"></i> -->
+                <span class="sr-only">Facebook</span>
+            </a>
+        
+    </div>
+
+</div>
+<script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"7USn8qpWThIjS66zZLQaIPnE3ZCKhbi72BjeWDSM","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
+
+        <script src="//js.hsforms.net/forms/embed/v2.js"></script>
+    
+<script>
+    let ClarotyHubspot = {}
+</script>
+
+<script src="https://kit.fontawesome.com/da9381b325.js" crossorigin="anonymous" data-hubspot-rendered="true"></script><script referrerpolicy="strict-origin" id="fa-main" data-auto-a11y="true" data-auto-fetch-svg="" data-fetch-svg-from="https://ka-p.fontawesome.com/releases/v6.5.2/svgs" data-fetch-uploaded-svg-from="https://kit-uploads.fontawesome.com">!function(){"use strict";function n(a,t){var e,n=Object.keys(a);return Object.getOwnPropertySymbols&&(e=Object.getOwnPropertySymbols(a),t&&(e=e.filter(function(t){return Object.getOwnPropertyDescriptor(a,t).enumerable})),n.push.apply(n,e)),n}function k(a){for(var t=1;t<arguments.length;t++){var e=null!=arguments[t]?arguments[t]:{};t%2?n(Object(e),!0).forEach(function(t){u(a,t,e[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(a,Object.getOwnPropertyDescriptors(e)):n(Object(e)).forEach(function(t){Object.defineProperty(a,t,Object.getOwnPropertyDescriptor(e,t))})}return a}function r(t){return(r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function t(){t=function(t,a){return new n(t,void 0,a)};var r=RegExp.prototype,i=new WeakMap;function n(t,a,e){a=new RegExp(t,a);return i.set(a,e||i.get(t)),s(a,n.prototype)}function o(e,t){var n=i.get(t);return Object.keys(n).reduce(function(t,a){return t[a]=e[n[a]],t},Object.create(null))}return function(t,a){if("function"!=typeof a&&null!==a)throw new TypeError("Super expression must either be null or a function");t.prototype=Object.create(a&&a.prototype,{constructor:{value:t,writable:!0,configurable:!0}}),Object.defineProperty(t,"prototype",{writable:!1}),a&&s(t,a)}(n,RegExp),n.prototype.exec=function(t){t=r.exec.call(this,t);return t&&(t.groups=o(t,this)),t},n.prototype[Symbol.replace]=function(t,a){if("string"==typeof a){var e=i.get(this);return r[Symbol.replace].call(this,t,a.replace(/\$<([^>]+)>/g,function(t,a){return"$"+e[a]}))}if("function"!=typeof a)return r[Symbol.replace].call(this,t,a);var n=this;return r[Symbol.replace].call(this,t,function(){var t=arguments;return"object"!=typeof t[t.length-1]&&(t=[].slice.call(t)).push(o(t,n)),a.apply(this,t)})},t.apply(this,arguments)}function i(t,a){for(var e=0;e<a.length;e++){var n=a[e];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}function u(t,a,e){return a in t?Object.defineProperty(t,a,{value:e,enumerable:!0,configurable:!0,writable:!0}):t[a]=e,t}function s(t,a){return(s=Object.setPrototypeOf||function(t,a){return t.__proto__=a,t})(t,a)}function m(t,a){return function(t){if(Array.isArray(t))return t}(t)||function(t,a){var e=null==t?null:"undefined"!=typeof Symbol&&t[Symbol.iterator]||t["@@iterator"];if(null!=e){var n,r,i=[],o=!0,s=!1;try{for(e=e.call(t);!(o=(n=e.next()).done)&&(i.push(n.value),!a||i.length!==a);o=!0);}catch(t){s=!0,r=t}finally{try{o||null==e.return||e.return()}finally{if(s)throw r}}return i}}(t,a)||e(t,a)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function l(t){return function(t){if(Array.isArray(t))return o(t)}(t)||function(t){if("undefined"!=typeof Symbol&&null!=t[Symbol.iterator]||null!=t["@@iterator"])return Array.from(t)}(t)||e(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function e(t,a){if(t){if("string"==typeof t)return o(t,a);var e=Object.prototype.toString.call(t).slice(8,-1);return"Map"===(e="Object"===e&&t.constructor?t.constructor.name:e)||"Set"===e?Array.from(t):"Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e)?o(t,a):void 0}}function o(t,a){(null==a||a>t.length)&&(a=t.length);for(var e=0,n=new Array(a);e<a;e++)n[e]=t[e];return n}function a(){}var c={},f={},d=null,p={mark:a,measure:a};try{"undefined"!=typeof window&&(c=window),"undefined"!=typeof document&&(f=document),"undefined"!=typeof MutationObserver&&(d=MutationObserver),"undefined"!=typeof performance&&(p=performance)}catch(t){}var v=(c.navigator||{}).userAgent,v=void 0===v?"":v,g=c,b=f,h=d,c=p,y=!!g.document,w=!!b.documentElement&&!!b.head&&"function"==typeof b.addEventListener&&"function"==typeof b.createElement,x=~v.indexOf("MSIE")||~v.indexOf("Trident/"),f="___FONT_AWESOME___",S=16,A="svg-inline--fa",O="data-fa-i2svg",N="data-fa-pseudo-element",P="data-fa-pseudo-element-pending",C="data-prefix",j="data-icon",E="fontawesome-i2svg",z="async",M=["HTML","HEAD","STYLE","SCRIPT"],F=function(){try{return!0}catch(t){return!1}}(),R="classic",I="sharp",L=[R,I];function Y(t){return new Proxy(t,{get:function(t,a){return a in t?t[a]:t[R]}})}var T={fas:"solid",far:"regular",fal:"light",fat:"thin",fad:"duotone",fab:"brands",fass:"sharp-solid",fasr:"sharp-regular",fasl:"sharp-light",fast:"sharp-thin"},D=Y((u(d={},R,{fa:"solid",fas:"solid","fa-solid":"solid",far:"regular","fa-regular":"regular",fal:"light","fa-light":"light",fat:"thin","fa-thin":"thin",fad:"duotone","fa-duotone":"duotone",fab:"brands","fa-brands":"brands",fak:"kit",fakd:"kit","fa-kit":"kit","fa-kit-duotone":"kit"}),u(d,I,{fa:"solid",fass:"solid","fa-solid":"solid",fasr:"regular","fa-regular":"regular",fasl:"light","fa-light":"light",fast:"thin","fa-thin":"thin"}),d)),U=Y((u(p={},R,{solid:"fas",regular:"far",light:"fal",thin:"fat",duotone:"fad",brands:"fab",kit:"fak"}),u(p,I,{solid:"fass",regular:"fasr",light:"fasl",thin:"fast"}),p)),_=Y((u(v={},R,{fab:"fa-brands",fad:"fa-duotone",fak:"fa-kit",fal:"fa-light",far:"fa-regular",fas:"fa-solid",fat:"fa-thin"}),u(v,I,{fass:"fa-solid",fasr:"fa-regular",fasl:"fa-light",fast:"fa-thin"}),v)),H=Y((u(d={},R,{"fa-brands":"fab","fa-duotone":"fad","fa-kit":"fak","fa-light":"fal","fa-regular":"far","fa-solid":"fas","fa-thin":"fat"}),u(d,I,{"fa-solid":"fass","fa-regular":"fasr","fa-light":"fasl","fa-thin":"fast"}),d)),W=/fa(s|r|l|t|d|b|k|ss|sr|sl|st)?[\-\ ]/,V="fa-layers-text",B=/Font ?Awesome ?([56 ]*)(Solid|Regular|Light|Thin|Duotone|Brands|Free|Pro|Sharp|Kit)?.*/i,G=Y((u(p={},R,{900:"fas",400:"far",normal:"far",300:"fal",100:"fat"}),u(p,I,{900:"fass",400:"fasr",300:"fasl",100:"fast"}),p)),v=[1,2,3,4,5,6,7,8,9,10],d=v.concat([11,12,13,14,15,16,17,18,19,20]),X=["class","data-prefix","data-icon","data-fa-transform","data-fa-mask"],K={GROUP:"duotone-group",SWAP_OPACITY:"swap-opacity",PRIMARY:"primary",SECONDARY:"secondary"},p=new Set;Object.keys(U[R]).map(p.add.bind(p)),Object.keys(U[I]).map(p.add.bind(p));var q=[].concat(L,l(p),["2xs","xs","sm","lg","xl","2xl","beat","border","fade","beat-fade","bounce","flip-both","flip-horizontal","flip-vertical","flip","fw","inverse","layers-counter","layers-text","layers","li","pull-left","pull-right","pulse","rotate-180","rotate-270","rotate-90","rotate-by","shake","spin-pulse","spin-reverse","spin","stack-1x","stack-2x","stack","ul",K.GROUP,K.SWAP_OPACITY,K.PRIMARY,K.SECONDARY]).concat(v.map(function(t){return"".concat(t,"x")})).concat(d.map(function(t){return"w-".concat(t)})),$=g.FontAwesomeConfig||{};b&&"function"==typeof b.querySelector&&((Q=[["data-family-prefix","familyPrefix"],["data-css-prefix","cssPrefix"],["data-family-default","familyDefault"],["data-style-default","styleDefault"],["data-replacement-class","replacementClass"],["data-auto-replace-svg","autoReplaceSvg"],["data-auto-add-css","autoAddCss"],["data-auto-a11y","autoA11y"],["data-search-pseudo-elements","searchPseudoElements"],["data-observe-mutations","observeMutations"],["data-mutate-approach","mutateApproach"],["data-keep-original-source","keepOriginalSource"],["data-measure-performance","measurePerformance"],["data-show-missing-icons","showMissingIcons"]]).push(["data-auto-fetch-svg","autoFetchSvg"],["data-fetch-svg-from","fetchSvgFrom"],["data-fetch-uploaded-svg-from","fetchUploadedSvgFrom"]),Q.forEach(function(t){var a=m(t,2),t=a[0],a=a[1],t=""===(t=function(t){var a=b.querySelector("script["+t+"]");if(a)return a.getAttribute(t)}(t))||"false"!==t&&("true"===t||t);null!=t&&($[a]=t)}));p={styleDefault:"solid",familyDefault:"classic",cssPrefix:"fa",replacementClass:A,autoReplaceSvg:!0,autoAddCss:!0,autoA11y:!0,searchPseudoElements:!1,observeMutations:!0,mutateApproach:"async",keepOriginalSource:!0,measurePerformance:!1,showMissingIcons:!0,autoFetchSvg:!1,fetchSvgFrom:null,fetchUploadedSvgFrom:null};$.familyPrefix&&($.cssPrefix=$.familyPrefix);var J=k(k({},p),$);J.autoReplaceSvg||(J.observeMutations=!1);var Q,v=/\/js\/.*\.js.*/,d='Manually set config.fetchSvgFrom = "URL" or use <script data-fetch-svg-from="URL" ...> to explicitly configure.';J.autoFetchSvg&&!J.fetchSvgFrom&&b&&b.currentScript&&(-1<(Q=b.currentScript.getAttribute("src")).search(v)&&(F||console.info("Font Awesome SVG Auto-fetching URL has been determined using document.currentScript. This features is not supported in any version of Internet Explorer. ".concat(d)),J.fetchSvgFrom=Q.replace(v,"/svgs"))),J.fetchSvgFrom&&((dt=b.createElement("a")).href=J.fetchSvgFrom,J.fetchSvgFrom=dt.href),!J.autoFetchSvg||J.fetchSvgFrom||F||(console.error("Disabling Font Awesome auto-fetching of SVG icons (it was enabled) because we could not guess the correct URL to load them from. ".concat(d)),J.autoFetchSvg=!1);var Z={};Object.keys(p).forEach(function(a){Object.defineProperty(Z,a,{enumerable:!0,set:function(t){J[a]=t,tt.forEach(function(t){return t(Z)})},get:function(){return J[a]}})}),Object.defineProperty(Z,"familyPrefix",{enumerable:!0,set:function(t){J.cssPrefix=t,tt.forEach(function(t){return t(Z)})},get:function(){return J.cssPrefix}}),g.FontAwesomeConfig=Z;var tt=[];var at=S,et={size:16,x:0,y:0,rotate:0,flipX:!1,flipY:!1};var nt="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";function rt(){for(var t=12,a="";0<t--;)a+=nt[62*Math.random()|0];return a}function it(t){for(var a=[],e=(t||[]).length>>>0;e--;)a[e]=t[e];return a}function ot(t){return t.classList?it(t.classList):(t.getAttribute("class")||"").split(" ").filter(function(t){return t})}function st(t){return"".concat(t).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}function ct(e){return Object.keys(e||{}).reduce(function(t,a){return t+"".concat(a,": ").concat(e[a].trim(),";")},"")}function ft(t){return t.size!==et.size||t.x!==et.x||t.y!==et.y||t.rotate!==et.rotate||t.flipX||t.flipY}function lt(){var t,a,e=A,n=Z.cssPrefix,r=Z.replacementClass,i=':host,:root{--fa-font-solid:normal 900 1em/1 "Font Awesome 6 Solid";--fa-font-regular:normal 400 1em/1 "Font Awesome 6 Regular";--fa-font-light:normal 300 1em/1 "Font Awesome 6 Light";--fa-font-thin:normal 100 1em/1 "Font Awesome 6 Thin";--fa-font-duotone:normal 900 1em/1 "Font Awesome 6 Duotone";--fa-font-sharp-solid:normal 900 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-regular:normal 400 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-light:normal 300 1em/1 "Font Awesome 6 Sharp";--fa-font-sharp-thin:normal 100 1em/1 "Font Awesome 6 Sharp";--fa-font-brands:normal 400 1em/1 "Font Awesome 6 Brands"}svg:not(:host).svg-inline--fa,svg:not(:root).svg-inline--fa{overflow:visible;box-sizing:content-box}.svg-inline--fa{display:var(--fa-display,inline-block);height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-2xs{vertical-align:.1em}.svg-inline--fa.fa-xs{vertical-align:0}.svg-inline--fa.fa-sm{vertical-align:-.0714285705em}.svg-inline--fa.fa-lg{vertical-align:-.2em}.svg-inline--fa.fa-xl{vertical-align:-.25em}.svg-inline--fa.fa-2xl{vertical-align:-.3125em}.svg-inline--fa.fa-pull-left{margin-right:var(--fa-pull-margin,.3em);width:auto}.svg-inline--fa.fa-pull-right{margin-left:var(--fa-pull-margin,.3em);width:auto}.svg-inline--fa.fa-li{width:var(--fa-li-width,2em);top:.25em}.svg-inline--fa.fa-fw{width:var(--fa-fw-width,1.25em)}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:var(--fa-counter-background-color,#ff253a);border-radius:var(--fa-counter-border-radius,1em);box-sizing:border-box;color:var(--fa-inverse,#fff);line-height:var(--fa-counter-line-height,1);max-width:var(--fa-counter-max-width,5em);min-width:var(--fa-counter-min-width,1.5em);overflow:hidden;padding:var(--fa-counter-padding,.25em .5em);right:var(--fa-right,0);text-overflow:ellipsis;top:var(--fa-top,0);-webkit-transform:scale(var(--fa-counter-scale,.25));transform:scale(var(--fa-counter-scale,.25));-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:var(--fa-bottom,0);right:var(--fa-right,0);top:auto;-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:var(--fa-bottom,0);left:var(--fa-left,0);right:auto;top:auto;-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{top:var(--fa-top,0);right:var(--fa-right,0);-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:var(--fa-left,0);right:auto;top:var(--fa-top,0);-webkit-transform:scale(var(--fa-layers-scale,.25));transform:scale(var(--fa-layers-scale,.25));-webkit-transform-origin:top left;transform-origin:top left}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-2xs{font-size:.625em;line-height:.1em;vertical-align:.225em}.fa-xs{font-size:.75em;line-height:.0833333337em;vertical-align:.125em}.fa-sm{font-size:.875em;line-height:.0714285718em;vertical-align:.0535714295em}.fa-lg{font-size:1.25em;line-height:.05em;vertical-align:-.075em}.fa-xl{font-size:1.5em;line-height:.0416666682em;vertical-align:-.125em}.fa-2xl{font-size:2em;line-height:.03125em;vertical-align:-.1875em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:var(--fa-li-margin,2.5em);padding-left:0}.fa-ul>li{position:relative}.fa-li{left:calc(var(--fa-li-width,2em) * -1);position:absolute;text-align:center;width:var(--fa-li-width,2em);line-height:inherit}.fa-border{border-color:var(--fa-border-color,#eee);border-radius:var(--fa-border-radius,.1em);border-style:var(--fa-border-style,solid);border-width:var(--fa-border-width,.08em);padding:var(--fa-border-padding,.2em .25em .15em)}.fa-pull-left{float:left;margin-right:var(--fa-pull-margin,.3em)}.fa-pull-right{float:right;margin-left:var(--fa-pull-margin,.3em)}.fa-beat{-webkit-animation-name:fa-beat;animation-name:fa-beat;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,ease-in-out);animation-timing-function:var(--fa-animation-timing,ease-in-out)}.fa-bounce{-webkit-animation-name:fa-bounce;animation-name:fa-bounce;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.28,.84,.42,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.28,.84,.42,1))}.fa-fade{-webkit-animation-name:fa-fade;animation-name:fa-fade;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1))}.fa-beat-fade{-webkit-animation-name:fa-beat-fade;animation-name:fa-beat-fade;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1));animation-timing-function:var(--fa-animation-timing,cubic-bezier(.4,0,.6,1))}.fa-flip{-webkit-animation-name:fa-flip;animation-name:fa-flip;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,ease-in-out);animation-timing-function:var(--fa-animation-timing,ease-in-out)}.fa-shake{-webkit-animation-name:fa-shake;animation-name:fa-shake;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,linear);animation-timing-function:var(--fa-animation-timing,linear)}.fa-spin{-webkit-animation-name:fa-spin;animation-name:fa-spin;-webkit-animation-delay:var(--fa-animation-delay,0s);animation-delay:var(--fa-animation-delay,0s);-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,2s);animation-duration:var(--fa-animation-duration,2s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,linear);animation-timing-function:var(--fa-animation-timing,linear)}.fa-spin-reverse{--fa-animation-direction:reverse}.fa-pulse,.fa-spin-pulse{-webkit-animation-name:fa-spin;animation-name:fa-spin;-webkit-animation-direction:var(--fa-animation-direction,normal);animation-direction:var(--fa-animation-direction,normal);-webkit-animation-duration:var(--fa-animation-duration,1s);animation-duration:var(--fa-animation-duration,1s);-webkit-animation-iteration-count:var(--fa-animation-iteration-count,infinite);animation-iteration-count:var(--fa-animation-iteration-count,infinite);-webkit-animation-timing-function:var(--fa-animation-timing,steps(8));animation-timing-function:var(--fa-animation-timing,steps(8))}@media (prefers-reduced-motion:reduce){.fa-beat,.fa-beat-fade,.fa-bounce,.fa-fade,.fa-flip,.fa-pulse,.fa-shake,.fa-spin,.fa-spin-pulse{-webkit-animation-delay:-1ms;animation-delay:-1ms;-webkit-animation-duration:1ms;animation-duration:1ms;-webkit-animation-iteration-count:1;animation-iteration-count:1;-webkit-transition-delay:0s;transition-delay:0s;-webkit-transition-duration:0s;transition-duration:0s}}@-webkit-keyframes fa-beat{0%,90%{-webkit-transform:scale(1);transform:scale(1)}45%{-webkit-transform:scale(var(--fa-beat-scale,1.25));transform:scale(var(--fa-beat-scale,1.25))}}@keyframes fa-beat{0%,90%{-webkit-transform:scale(1);transform:scale(1)}45%{-webkit-transform:scale(var(--fa-beat-scale,1.25));transform:scale(var(--fa-beat-scale,1.25))}}@-webkit-keyframes fa-bounce{0%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}10%{-webkit-transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0);transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0)}30%{-webkit-transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em));transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em))}50%{-webkit-transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0);transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0)}57%{-webkit-transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em));transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em))}64%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}100%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}}@keyframes fa-bounce{0%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}10%{-webkit-transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0);transform:scale(var(--fa-bounce-start-scale-x,1.1),var(--fa-bounce-start-scale-y,.9)) translateY(0)}30%{-webkit-transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em));transform:scale(var(--fa-bounce-jump-scale-x,.9),var(--fa-bounce-jump-scale-y,1.1)) translateY(var(--fa-bounce-height,-.5em))}50%{-webkit-transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0);transform:scale(var(--fa-bounce-land-scale-x,1.05),var(--fa-bounce-land-scale-y,.95)) translateY(0)}57%{-webkit-transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em));transform:scale(1,1) translateY(var(--fa-bounce-rebound,-.125em))}64%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}100%{-webkit-transform:scale(1,1) translateY(0);transform:scale(1,1) translateY(0)}}@-webkit-keyframes fa-fade{50%{opacity:var(--fa-fade-opacity,.4)}}@keyframes fa-fade{50%{opacity:var(--fa-fade-opacity,.4)}}@-webkit-keyframes fa-beat-fade{0%,100%{opacity:var(--fa-beat-fade-opacity,.4);-webkit-transform:scale(1);transform:scale(1)}50%{opacity:1;-webkit-transform:scale(var(--fa-beat-fade-scale,1.125));transform:scale(var(--fa-beat-fade-scale,1.125))}}@keyframes fa-beat-fade{0%,100%{opacity:var(--fa-beat-fade-opacity,.4);-webkit-transform:scale(1);transform:scale(1)}50%{opacity:1;-webkit-transform:scale(var(--fa-beat-fade-scale,1.125));transform:scale(var(--fa-beat-fade-scale,1.125))}}@-webkit-keyframes fa-flip{50%{-webkit-transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg));transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg))}}@keyframes fa-flip{50%{-webkit-transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg));transform:rotate3d(var(--fa-flip-x,0),var(--fa-flip-y,1),var(--fa-flip-z,0),var(--fa-flip-angle,-180deg))}}@-webkit-keyframes fa-shake{0%{-webkit-transform:rotate(-15deg);transform:rotate(-15deg)}4%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}24%,8%{-webkit-transform:rotate(-18deg);transform:rotate(-18deg)}12%,28%{-webkit-transform:rotate(18deg);transform:rotate(18deg)}16%{-webkit-transform:rotate(-22deg);transform:rotate(-22deg)}20%{-webkit-transform:rotate(22deg);transform:rotate(22deg)}32%{-webkit-transform:rotate(-12deg);transform:rotate(-12deg)}36%{-webkit-transform:rotate(12deg);transform:rotate(12deg)}100%,40%{-webkit-transform:rotate(0);transform:rotate(0)}}@keyframes fa-shake{0%{-webkit-transform:rotate(-15deg);transform:rotate(-15deg)}4%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}24%,8%{-webkit-transform:rotate(-18deg);transform:rotate(-18deg)}12%,28%{-webkit-transform:rotate(18deg);transform:rotate(18deg)}16%{-webkit-transform:rotate(-22deg);transform:rotate(-22deg)}20%{-webkit-transform:rotate(22deg);transform:rotate(22deg)}32%{-webkit-transform:rotate(-12deg);transform:rotate(-12deg)}36%{-webkit-transform:rotate(12deg);transform:rotate(12deg)}100%,40%{-webkit-transform:rotate(0);transform:rotate(0)}}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-both,.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}.fa-rotate-by{-webkit-transform:rotate(var(--fa-rotate-angle,0));transform:rotate(var(--fa-rotate-angle,0))}.fa-stack{display:inline-block;vertical-align:middle;height:2em;position:relative;width:2.5em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0;z-index:var(--fa-stack-z-index,auto)}.svg-inline--fa.fa-stack-1x{height:1em;width:1.25em}.svg-inline--fa.fa-stack-2x{height:2em;width:2.5em}.fa-inverse{color:var(--fa-inverse,#fff)}.fa-sr-only,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.fa-sr-only-focusable:not(:focus),.sr-only-focusable:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.svg-inline--fa .fa-primary{fill:var(--fa-primary-color,currentColor);opacity:var(--fa-primary-opacity,1)}.svg-inline--fa .fa-secondary{fill:var(--fa-secondary-color,currentColor);opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-primary{opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-secondary{opacity:var(--fa-primary-opacity,1)}.svg-inline--fa mask .fa-primary,.svg-inline--fa mask .fa-secondary{fill:#000}.fa-duotone.fa-inverse,.fad.fa-inverse{color:var(--fa-inverse,#fff)}';return"fa"===n&&r===e||(t=new RegExp("\\.".concat("fa","\\-"),"g"),a=new RegExp("\\--".concat("fa","\\-"),"g"),e=new RegExp("\\.".concat(e),"g"),i=i.replace(t,".".concat(n,"-")).replace(a,"--".concat(n,"-")).replace(e,".".concat(r))),i}var ut=!1;function mt(){Z.autoAddCss&&!ut&&(function(t){if(t&&w){var a=b.createElement("style");a.setAttribute("type","text/css"),a.innerHTML=t;for(var e=b.head.childNodes,n=null,r=e.length-1;-1<r;r--){var i=e[r],o=(i.tagName||"").toUpperCase();-1<["STYLE","LINK"].indexOf(o)&&(n=i)}b.head.insertBefore(a,n)}}(lt()),ut=!0)}var v={mixout:function(){return{dom:{css:lt,insertCss:mt}}},hooks:function(){return{beforeDOMElementCreation:function(){mt()},beforeI2svg:function(){mt()}}}},dt=g||{};dt[f]||(dt[f]={}),dt[f].styles||(dt[f].styles={}),dt[f].hooks||(dt[f].hooks={}),dt[f].shims||(dt[f].shims=[]);function pt(){b.removeEventListener("DOMContentLoaded",pt),bt=1,gt.map(function(t){return t()})}var vt=dt[f],gt=[],bt=!1;function ht(t){w&&(bt?setTimeout(t,0):gt.push(t))}function yt(t){var e,a=t.tag,n=t.attributes,r=void 0===n?{}:n,n=t.children,n=void 0===n?[]:n;return"string"==typeof t?st(t):"<".concat(a," ").concat((e=r,Object.keys(e||{}).reduce(function(t,a){return t+"".concat(a,'="').concat(st(e[a]),'" ')},"").trim()),">").concat(n.map(yt).join(""),"</").concat(a,">")}function kt(t,a,e){if(t&&t[a]&&t[a][e])return{prefix:a,iconName:e,icon:t[a][e]}}w&&((bt=(b.documentElement.doScroll?/^loaded|^c/:/^loaded|^i|^c/).test(b.readyState))||b.addEventListener("DOMContentLoaded",pt));function wt(t,a,e,n){for(var r,i,o=Object.keys(t),s=o.length,c=void 0!==n?xt(a,n):a,f=void 0===e?(r=1,t[o[0]]):(r=0,e);r<s;r++)f=c(f,t[i=o[r]],i,t);return f}var xt=function(r,i){return function(t,a,e,n){return r.call(i,t,a,e,n)}};function St(t){t=function(t){for(var a=[],e=0,n=t.length;e<n;){var r,i=t.charCodeAt(e++);55296<=i&&i<=56319&&e<n?56320==(64512&(r=t.charCodeAt(e++)))?a.push(((1023&i)<<10)+(1023&r)+65536):(a.push(i),e--):a.push(i)}return a}(t);return 1===t.length?t[0].toString(16):null}function At(t,a){var e,n=t.length,r=t.charCodeAt(a);return 55296<=r&&r<=56319&&a+1<n&&56320<=(e=t.charCodeAt(a+1))&&e<=57343?1024*(r-55296)+e-56320+65536:r}function Ot(t){if(1===t.length){t=At(t,0);return 57344<=t&&t<=63743}}function Nt(n){return Object.keys(n).reduce(function(t,a){var e=n[a];return!!e.icon?t[e.iconName]=e.icon:t[a]=e,t},{})}function Pt(t,a,e){var n=(2<arguments.length&&void 0!==e?e:{}).skipHooks,e=void 0!==n&&n,n=Nt(a);"function"!=typeof vt.hooks.addPack||e?vt.styles[t]=k(k({},vt.styles[t]||{}),n):vt.hooks.addPack(t,Nt(a)),"fas"===t&&Pt("fa",a)}var Ct=/viewBox="0 0 ([0-9]+) ([0-9]+)"/,jt=/path d="([^"]+)"/,Et=[t(/path d="((?:(?!")[\s\S])+)".*path d="((?:(?!")[\s\S])+)"/,{d1:1,d2:2}),t(/path class="((?:(?!")[\s\S])+)".*d="((?:(?!")[\s\S])+)".*path class="((?:(?!")[\s\S])+)".*d="((?:(?!")[\s\S])+)"/,{cls1:1,d1:2,cls2:3,d2:4}),t(/path class="((?:(?!")[\s\S])+)".*d="((?:(?!")[\s\S])+)"/,{cls1:1,d1:2})];var zt=vt.styles,Mt=vt.shims,Ft=(u(d={},R,Object.values(_[R])),u(d,I,Object.values(_[I])),d),Rt=null,It={},Lt={},Yt={},Tt={},Dt={},Ut=(u(p={},R,Object.keys(D[R])),u(p,I,Object.keys(D[I])),p);function _t(t,a,e){var n,r,i,o,s,c,f,l=(o=i=null,s=(n=e).match(Ct),c=n.match(jt),(f=n.match(Et[0])||n.match(Et[1])||n.match(Et[2]))?(e=(r=f.groups).cls1,n=r.d1,f=r.cls2,r=r.d2,n&&r&&!e&&!f?o=[n,r]:n&&e&&!r?o=-1<e.indexOf("primary")?["",n]:[n,""]:n&&r&&e&&f&&(o=-1<e.indexOf("primary")?[r,n]:[n,r])):c&&2===c.length&&(o=c[1]),i=s&&o?[parseInt(s[1],10),parseInt(s[2],10),[],null,o]:i);l&&!Ot(a)&&(Pt(t,u({},a,l),{skipHooks:!0}),Bt()),Ht[t][a].map(function(t){t(l)}),delete Ht[t][a]}var Ht={};function Wt(t,a){return(Ot(t)?"unicode/".concat(St(t)):"".concat(t)).concat(void 0===a?"":"-".concat(a),".svg")}function Vt(t,a){var e=a.split("-"),a=e[0],e=e.slice(1).join("-");return a!==t||""===e||~q.indexOf(e)?null:e}function Bt(){function t(n){return wt(zt,function(t,a,e){return t[e]=wt(a,n,{}),t},{})}It=t(function(a,t,e){return t[3]&&(a[t[3]]=e),t[2]&&t[2].filter(function(t){return"number"==typeof t}).forEach(function(t){a[t.toString(16)]=e}),a}),Lt=t(function(a,t,e){return a[e]=e,t[2]&&t[2].filter(function(t){return"string"==typeof t}).forEach(function(t){a[t]=e}),a}),Dt=t(function(a,t,e){t=t[2];return a[e]=e,t.forEach(function(t){a[t]=e}),a});var r="far"in zt||Z.autoFetchSvg,a=wt(Mt,function(t,a){var e=a[0],n=a[1],a=a[2];return"far"!==n||r||(n="fas"),"string"==typeof e&&(t.names[e]={prefix:n,iconName:a}),"number"==typeof e&&(t.unicodes[e.toString(16)]={prefix:n,iconName:a}),t},{names:{},unicodes:{}});Yt=a.names,Tt=a.unicodes,Rt=$t(Z.styleDefault,{family:Z.familyDefault})}function Gt(t,a){return(It[t]||{})[a]}function Xt(t,a){return(Dt[t]||{})[a]}function Kt(t){return Yt[t]||{prefix:null,iconName:null}}dt=function(t){Rt=$t(t.styleDefault,{family:Z.familyDefault})},tt.push(dt),Bt();function qt(){return{prefix:null,iconName:null,rest:[]}}function $t(t,a){var e=(1<arguments.length&&void 0!==a?a:{}).family,a=void 0===e?R:e,e=D[a][t],e=U[a][t]||U[a][e],t=t in vt.styles?t:null;return e||t||null}var Jt=(u(f={},R,Object.keys(_[R])),u(f,I,Object.keys(_[I])),f);function Qt(t,a){var a=(1<arguments.length&&void 0!==a?a:{}).skipLookups,n=void 0!==a&&a,r=(u(a={},R,"".concat(Z.cssPrefix,"-").concat(R)),u(a,I,"".concat(Z.cssPrefix,"-").concat(I)),a),i=null,o=R;(t.includes(r[R])||t.some(function(t){return Jt[R].includes(t)}))&&(o=R),(t.includes(r[I])||t.some(function(t){return Jt[I].includes(t)}))&&(o=I);a=t.reduce(function(t,a){var e=Vt(Z.cssPrefix,a);return zt[a]?(a=Ft[o].includes(a)?H[o][a]:a,i=a,t.prefix=a):-1<Ut[o].indexOf(a)?(i=a,t.prefix=$t(a,{family:o})):e?t.iconName=e:a!==Z.replacementClass&&a!==r[R]&&a!==r[I]&&t.rest.push(a),!n&&t.prefix&&t.iconName&&(e="fa"===i?Kt(t.iconName):{},a=Xt(t.prefix,t.iconName),e.prefix&&(i=null),t.iconName=e.iconName||a||t.iconName,t.prefix=e.prefix||t.prefix,"far"!==t.prefix||zt.far||!zt.fas||Z.autoFetchSvg||(t.prefix="fas")),t},qt());return(t.includes("fa-brands")||t.includes("fab"))&&(a.prefix="fab"),(t.includes("fa-duotone")||t.includes("fad"))&&(a.prefix="fad"),a.prefix||o!==I||!zt.fass&&!Z.autoFetchSvg||(a.prefix="fass",a.iconName=Xt(a.prefix,a.iconName)||a.iconName),"fa"!==a.prefix&&"fa"!==i||(a.prefix=Rt||"fas"),a}var d=function(){function t(){!function(t,a){if(!(t instanceof a))throw new TypeError("Cannot call a class as a function")}(this,t),this.definitions={}}var a,e,n;return a=t,(e=[{key:"add",value:function(){for(var e=this,t=arguments.length,a=new Array(t),n=0;n<t;n++)a[n]=arguments[n];var r=a.reduce(this._pullDefinitions,{});Object.keys(r).forEach(function(t){e.definitions[t]=k(k({},e.definitions[t]||{}),r[t]),Pt(t,r[t]);var a=_[R][t];a&&Pt(a,r[t]),Bt()})}},{key:"reset",value:function(){this.definitions={}}},{key:"_pullDefinitions",value:function(r,t){var i=t.prefix&&t.iconName&&t.icon?{0:t}:t;return Object.keys(i).map(function(t){var a=i[t],e=a.prefix,t=a.iconName,n=a.icon,a=n[2];r[e]||(r[e]={}),0<a.length&&a.forEach(function(t){"string"==typeof t&&(r[e][t]=n)}),r[e][t]=n}),r}}])&&i(a.prototype,e),n&&i(a,n),Object.defineProperty(a,"prototype",{writable:!1}),t}(),p=[],Zt={},ta={},aa=Object.keys(ta);function ea(t,a){for(var e=arguments.length,n=new Array(2<e?e-2:0),r=2;r<e;r++)n[r-2]=arguments[r];return(Zt[t]||[]).forEach(function(t){a=t.apply(null,[a].concat(n))}),a}function na(t){for(var a=arguments.length,e=new Array(1<a?a-1:0),n=1;n<a;n++)e[n-1]=arguments[n];(Zt[t]||[]).forEach(function(t){t.apply(null,e)})}function ra(t){var a=t,t=Array.prototype.slice.call(arguments,1);return ta[a]?ta[a].apply(null,t):void 0}function ia(t){"fa"===t.prefix&&(t.prefix="fas");var a=t.iconName,t=t.prefix||Rt;if(a)return a=Xt(t,a)||a,kt(oa.definitions,t,a)||kt(vt.styles,t,a)}var oa=new d,sa={noAuto:function(){Z.autoReplaceSvg=!1,Z.observeMutations=!1,na("noAuto")},config:Z,dom:{i2svg:function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{};return w?(na("beforeI2svg",t),ra("pseudoElements2svg",t),ra("i2svg",t)):Promise.reject("Operation requires a DOM of some kind.")},watch:function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},a=t.autoReplaceSvgRoot;!1===Z.autoReplaceSvg&&(Z.autoReplaceSvg=!0),Z.observeMutations=!0,ht(function(){ca({autoReplaceSvgRoot:a}),na("watch",t)})}},parse:{icon:function(t){if(null===t)return null;if("object"===r(t)&&t.prefix&&t.iconName)return{prefix:t.prefix,iconName:Xt(t.prefix,t.iconName)||t.iconName};if(Array.isArray(t)&&2===t.length){var a=0===t[1].indexOf("fa-")?t[1].slice(3):t[1],e=$t(t[0]);return{prefix:e,iconName:Xt(e,a)||a}}if("string"==typeof t&&(-1<t.indexOf("".concat(Z.cssPrefix,"-"))||t.match(W))){a=Qt(t.split(" "),{skipLookups:!0});return{prefix:a.prefix||Rt,iconName:Xt(a.prefix,a.iconName)||a.iconName}}return"string"==typeof t?{prefix:Rt,iconName:Xt(Rt,t)||t}:void 0}},library:oa,findIconDefinition:ia,toHtml:yt},ca=function(){var t=(0<arguments.length&&void 0!==arguments[0]?arguments[0]:{}).autoReplaceSvgRoot,t=void 0===t?b:t;(0<Object.keys(vt.styles).length||Z.autoFetchSvg)&&w&&Z.autoReplaceSvg&&sa.dom.i2svg({node:t})};function fa(a,t){return Object.defineProperty(a,"abstract",{get:t}),Object.defineProperty(a,"html",{get:function(){return a.abstract.map(yt)}}),Object.defineProperty(a,"node",{get:function(){if(w){var t=b.createElement("div");return t.innerHTML=a.html,t.children}}}),a}function la(t){var a=t.icons,e=a.main,n=a.mask,r=t.prefix,i=t.iconName,o=t.transform,s=t.symbol,c=t.title,f=t.maskId,l=t.titleId,u=t.extra,m=t.watchable,d=void 0!==m&&m,p=n.found?n:e,a=p.width,t=p.height,m="fak"===r,p=[Z.replacementClass,i?"".concat(Z.cssPrefix,"-").concat(i):""].filter(function(t){return-1===u.classes.indexOf(t)}).filter(function(t){return""!==t||!!t}).concat(u.classes).join(" "),p={children:[],attributes:k(k({},u.attributes),{},{"data-prefix":r,"data-icon":i,class:p,role:u.attributes.role||"img",xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 ".concat(a," ").concat(t)})},t=m&&!~u.classes.indexOf("fa-fw")?{width:"".concat(a/t*16*.0625,"em")}:{};d&&(p.attributes[O]=""),c&&(p.children.push({tag:"title",attributes:{id:p.attributes["aria-labelledby"]||"title-".concat(l||rt())},children:[c]}),delete p.attributes.title);var v,g,b,h,y,t=k(k({},p),{},{prefix:r,iconName:i,main:e,mask:n,maskId:f,transform:o,symbol:s,styles:k(k({},t),u.styles)}),n=n.found&&e.found?ra("generateAbstractMask",t)||{children:[],attributes:{}}:ra("generateAbstractIcon",t)||{children:[],attributes:{}},e=n.children,n=n.attributes;return t.children=e,t.attributes=n,s?(g=(v=t).prefix,b=v.iconName,h=v.children,y=v.attributes,v=!0===(v=v.symbol)?"".concat(g,"-").concat(Z.cssPrefix,"-").concat(b):v,[{tag:"svg",attributes:{style:"display: none;"},children:[{tag:"symbol",attributes:k(k({},y),{},{id:v}),children:h}]}]):(b=(g=t).children,y=g.main,v=g.mask,h=g.attributes,t=g.styles,ft(g=g.transform)&&y.found&&!v.found&&(v=y.width/y.height/2,y=.5,h.style=ct(k(k({},t),{},{"transform-origin":"".concat(v+g.x/16,"em ").concat(y+g.y/16,"em")}))),[{tag:"svg",attributes:h,children:b}])}function ua(t){var a=t.content,e=t.width,n=t.height,r=t.transform,i=t.title,o=t.extra,s=t.watchable,c=void 0!==s&&s,t=k(k(k({},o.attributes),i?{title:i}:{}),{},{class:o.classes.join(" ")});c&&(t[O]="");s=k({},o.styles);ft(r)&&(s.transform=(o=(c={transform:r,startCentered:!0,width:e,height:n}).transform,r=c.width,n=void 0===(e=c.height)?S:e,c=void 0!==(e=c.startCentered)&&e,e="",e+=c&&x?"translate(".concat(o.x/at-(void 0===r?S:r)/2,"em, ").concat(o.y/at-n/2,"em) "):c?"translate(calc(-50% + ".concat(o.x/at,"em), calc(-50% + ").concat(o.y/at,"em)) "):"translate(".concat(o.x/at,"em, ").concat(o.y/at,"em) "),e+="scale(".concat(o.size/at*(o.flipX?-1:1),", ").concat(o.size/at*(o.flipY?-1:1),") "),e+="rotate(".concat(o.rotate,"deg) ")),s["-webkit-transform"]=s.transform);s=ct(s);0<s.length&&(t.style=s);s=[];return s.push({tag:"span",attributes:t,children:[a]}),i&&s.push({tag:"span",attributes:{class:"sr-only"},children:[i]}),s}var ma=vt.styles;function da(t){var a=t[0],e=t[1],t=m(t.slice(4),1)[0];return{found:!0,width:a,height:e,icon:Array.isArray(t)?{tag:"g",attributes:{class:"".concat(Z.cssPrefix,"-").concat(K.GROUP)},children:[{tag:"path",attributes:{class:"".concat(Z.cssPrefix,"-").concat(K.SECONDARY),fill:"currentColor",d:t[0]}},{tag:"path",attributes:{class:"".concat(Z.cssPrefix,"-").concat(K.PRIMARY),fill:"currentColor",d:t[1]}}]}:{tag:"path",attributes:{fill:"currentColor",d:t}}}}var pa={found:!1,width:512,height:512};function va(t,a){F||Z.showMissingIcons||!t||console.error('Icon with name "'.concat(t,'" and prefix "').concat(a,'" is missing.'))}function ga(r,i){var o=i;return"fa"===i&&null!==Z.styleDefault&&(i=Rt),new Promise(function(a,t){ra("missingIconAbstract");if("fa"===o&&(n=Kt(r)||{},r=n.iconName||r,i=n.prefix||i),r&&i&&ma[i]&&ma[i][r]){var e=ma[i][r];return a(da(e))}var n={},e=function(t,a){var t=0<arguments.length&&void 0!==t?t:{},e=1<arguments.length?a:void 0;if(e&&Ot(e)){if(t&&t.iconUploads){var n=t.iconUploads,a=Object.keys(n).find(function(t){return n[t]&&n[t].u&&n[t].u===St(e)});if(a)return n[a].v}}else if(t&&t.iconUploads&&t.iconUploads[e]&&t.iconUploads[e].v)return t.iconUploads[e].v}(g.FontAwesomeKitConfig,r);if(g.FontAwesomeKitConfig&&g.FontAwesomeKitConfig.token&&(n.token=g.FontAwesomeKitConfig.token),"fak"===i&&(n.version=e),r&&i&&Z.autoFetchSvg)return function(e,n){var t=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{},r="fak"===e,a=t.url,i=void 0===a?Z.fetchSvgFrom:a,a=t.uploadedSvgUrl,o=void 0===a?Z.fetchUploadedSvgFrom:a,s=t.token,c=t.version;return Ht[e]&&Ht[e][n]||(Ht[e]=k(k({},Ht[e]||{}),u({},n,[]))),new Promise(function(a,t){if(!i)return t(new Error("No URL available to fetch SVGs from. Specify in params or by setting config.fetchSvgFrom"));if(r&&!o)return t(new Error("No URL available to fetch kit SVGs from. Specify in params or by setting config.fetchKitSvgFrom"));t=r?"".concat(o,"/").concat(s,"/icons/").concat(Wt(n,c)):"".concat(i,"/").concat(T[e],"/").concat(Wt(n));if(s&&(t="".concat(t,"?token=").concat(s)),vt.styles[e]&&vt.styles[e][n])return a(vt.styles[e][n]);Ht[e][n].push(function(t){a(t)}),1===Ht[e][n].length&&("function"==typeof fetch?fetch(t,{mode:"cors"}).then(function(t){return t.text()}).then(function(t){_t(e,n,t)}).catch(function(){_t(e,n,"")}):_t(e,n,""))})}(i,r,k({},n)).then(function(t){t?a(da(t)):(va(r,i),a(k(k({},pa),{},{icon:Z.showMissingIcons&&r&&ra("missingIconAbstract")||{}})))}).catch(t);va(r,i),a(k(k({},pa),{},{icon:Z.showMissingIcons&&r&&ra("missingIconAbstract")||{}}))})}function ba(){}function ha(t){ya.mark("".concat(ka," ").concat(t," ends")),ya.measure("".concat(ka," ").concat(t),"".concat(ka," ").concat(t," begins"),"".concat(ka," ").concat(t," ends"))}var ya=Z.measurePerformance&&c&&c.mark&&c.measure?c:{mark:ba,measure:ba},ka='FA "6.5.2"',wa={begin:function(t){return ya.mark("".concat(ka," ").concat(t," begins")),function(){return ha(t)}},end:ha},xa=function(){};function Sa(t){return"string"==typeof(t.getAttribute?t.getAttribute(O):null)}function Aa(t){return b.createElementNS("http://www.w3.org/2000/svg",t)}function Oa(t){return b.createElement(t)}var Na={replace:function(t){var a=t[0];a.parentNode&&(t[1].forEach(function(t){a.parentNode.insertBefore(function a(e,t){var t=(1<arguments.length&&void 0!==t?t:{}).ceFn,n=void 0===t?"svg"===e.tag?Aa:Oa:t;if("string"==typeof e)return b.createTextNode(e);var r=n(e.tag);return Object.keys(e.attributes||[]).forEach(function(t){r.setAttribute(t,e.attributes[t])}),(e.children||[]).forEach(function(t){r.appendChild(a(t,{ceFn:n}))}),r}(t),a)}),null===a.getAttribute(O)&&Z.keepOriginalSource?(t=b.createComment(" ".concat(a.outerHTML," ")),a.parentNode.replaceChild(t,a)):a.remove())},nest:function(t){var a=t[0],e=t[1];if(~ot(a).indexOf(Z.replacementClass))return Na.replace(t);var n=new RegExp("".concat(Z.cssPrefix,"-.*"));delete e[0].attributes.id,e[0].attributes.class&&(t=e[0].attributes.class.split(" ").reduce(function(t,a){return(a===Z.replacementClass||a.match(n)?t.toSvg:t.toNode).push(a),t},{toNode:[],toSvg:[]}),e[0].attributes.class=t.toSvg.join(" "),0===t.toNode.length?a.removeAttribute("class"):a.setAttribute("class",t.toNode.join(" ")));e=e.map(yt).join("\n");a.setAttribute(O,""),a.innerHTML=e}};function Pa(t){t()}function Ca(e,t){var n="function"==typeof t?t:xa;0===e.length?n():(Z.mutateApproach===z?g.requestAnimationFrame||Pa:Pa)(function(){var t=!0!==Z.autoReplaceSvg&&Na[Z.autoReplaceSvg]||Na.replace,a=wa.begin("mutate");e.map(t),a(),n()})}var ja=!1;function Ea(){ja=!0}function za(){ja=!1}var Ma=null;function Fa(t){var i,o,a,s;h&&Z.observeMutations&&(a=t.treeCallback,i=void 0===a?xa:a,a=t.nodeCallback,o=void 0===a?xa:a,a=t.pseudoElementsCallback,s=void 0===a?xa:a,t=void 0===(t=t.observeMutationsRoot)?b:t,Ma=new h(function(t){var r;ja||(r=Rt,it(t).forEach(function(t){var a,e,n;"childList"===t.type&&0<t.addedNodes.length&&!Sa(t.addedNodes[0])&&(Z.searchPseudoElements&&s(t.target),i(t.target)),"attributes"===t.type&&t.target.parentNode&&Z.searchPseudoElements&&s(t.target.parentNode),"attributes"===t.type&&Sa(t.target)&&~X.indexOf(t.attributeName)&&("class"===t.attributeName&&(e=t.target,n=e.getAttribute?e.getAttribute(C):null,e=e.getAttribute?e.getAttribute(j):null,n&&e)?(e=(a=Qt(ot(t.target))).prefix,a=a.iconName,t.target.setAttribute(C,e||r),a&&t.target.setAttribute(j,a)):(a=t.target)&&a.classList&&a.classList.contains&&a.classList.contains(Z.replacementClass)&&o(t.target))}))}),w&&Ma.observe(t,{childList:!0,attributes:!0,characterData:!0,subtree:!0}))}function Ra(t){var a=t.getAttribute("data-prefix"),e=t.getAttribute("data-icon"),n=void 0!==t.innerText?t.innerText.trim():"",r=Qt(ot(t));return r.prefix||(r.prefix=Rt),a&&e&&(r.prefix=a,r.iconName=e),r.iconName&&r.prefix||(r.prefix&&0<n.length&&(r.iconName=(e=r.prefix,n=t.innerText,(Lt[e]||{})[n]||Gt(r.prefix,St(t.innerText)))),!r.iconName&&Z.autoFetchSvg&&t.firstChild&&t.firstChild.nodeType===Node.TEXT_NODE&&(r.iconName=t.firstChild.data)),r}function Ia(t,a){var e=1<arguments.length&&void 0!==a?a:{styleParser:!0},n=Ra(t),r=n.iconName,i=n.prefix,o=n.rest,s=(a=it((s=t).attributes).reduce(function(t,a){return"class"!==t.name&&"style"!==t.name&&(t[a.name]=a.value),t},{}),n=s.getAttribute("title"),s=s.getAttribute("data-fa-title-id"),Z.autoA11y&&(n?a["aria-labelledby"]="".concat(Z.replacementClass,"-title-").concat(s||rt()):(a["aria-hidden"]="true",a.focusable="false")),a),a=ea("parseNodeAttributes",{},t),c=e.styleParser?(e=(c=t).getAttribute("style"),c=[],c=e?e.split(";").reduce(function(t,a){var e=a.split(":"),a=e[0],e=e.slice(1);return a&&0<e.length&&(t[a]=e.join(":").trim()),t},{}):c):[];return k({iconName:r,title:t.getAttribute("title"),titleId:t.getAttribute("data-fa-title-id"),prefix:i,transform:et,mask:{iconName:null,prefix:null,rest:[]},maskId:null,symbol:!1,extra:{classes:o,styles:c,attributes:s}},a)}var La=vt.styles;function Ya(t){var a="nest"===Z.autoReplaceSvg?Ia(t,{styleParser:!1}):Ia(t);return~a.extra.classes.indexOf(V)?ra("generateLayersText",t,a):ra("generateSvgReplacementMutation",t,a)}var Ta=new Set;function Da(t){var n=1<arguments.length&&void 0!==arguments[1]?arguments[1]:null;if(!w)return Promise.resolve();function r(t){return a.add("".concat(E,"-").concat(t))}function i(t){return a.remove("".concat(E,"-").concat(t))}var a=b.documentElement.classList,e=Z.autoFetchSvg?Ta:L.map(function(t){return"fa-".concat(t)}).concat(Object.keys(La));e.includes("fa")||e.push("fa");var o=[".".concat(V,":not([").concat(O,"])")].concat(e.map(function(t){return".".concat(t,":not([").concat(O,"])")})).join(", ");if(0===o.length)return Promise.resolve();e=[];try{e=it(t.querySelectorAll(o))}catch(t){}if(!(0<e.length))return Promise.resolve();r("pending"),i("complete");var s=wa.begin("onTree"),c=e.reduce(function(t,a){try{var e=Ya(a);e&&t.push(e)}catch(t){F||"MissingIcon"===t.name&&console.error(t)}return t},[]);return new Promise(function(a,e){Promise.all(c).then(function(t){Ca(t,function(){r("active"),r("complete"),i("pending"),"function"==typeof n&&n(),s(),a()})}).catch(function(t){s(),e(t)})})}function Ua(t){var a=1<arguments.length&&void 0!==arguments[1]?arguments[1]:null;Ya(t).then(function(t){t&&Ca([t],a)})}L.map(function(t){Ta.add("fa-".concat(t))}),Object.keys(D[R]).map(Ta.add.bind(Ta)),Object.keys(D[I]).map(Ta.add.bind(Ta));function _a(t){var a=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},e=a.transform,n=void 0===e?et:e,r=void 0!==(e=a.symbol)&&e,i=void 0===(e=a.mask)?null:e,o=void 0===(e=a.maskId)?null:e,s=void 0===(e=a.title)?null:e,c=void 0===(e=a.titleId)?null:e,f=void 0===(e=a.classes)?[]:e,l=void 0===(e=a.attributes)?{}:e,u=void 0===(e=a.styles)?{}:e;if(t){var m=t.prefix,d=t.iconName,p=t.icon;return fa(k({type:"icon"},t),function(){return na("beforeDOMElementCreation",{iconDefinition:t,params:a}),Z.autoA11y&&(s?l["aria-labelledby"]="".concat(Z.replacementClass,"-title-").concat(c||rt()):(l["aria-hidden"]="true",l.focusable="false")),la({icons:{main:da(p),mask:i?da(i.icon):{found:!1,width:null,height:null,icon:{}}},prefix:m,iconName:d,transform:k(k({},et),n),symbol:r,title:s,maskId:o,titleId:c,extra:{attributes:l,styles:u,classes:f}})})}}var Ta=l(Ta),dt={mixout:function(){return{icon:(n=_a,function(t){var a=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},e=(t||{}).icon?t:ia(t||{}),t=(t=a.mask)&&((t||{}).icon?t:ia(t||{}));return n(e,k(k({},a),{},{mask:t}))})};var n},hooks:function(){return{mutationObserverCallbacks:function(t){return t.treeCallback=Da,t.nodeCallback=Ua,t}}},provides:function(t){t.i2svg=function(t){var a=t.node,t=t.callback;return Da(void 0===a?b:a,void 0===t?function(){}:t)},t.generateSvgReplacementMutation=function(n,t){var r=t.iconName,i=t.title,o=t.titleId,s=t.prefix,c=t.transform,f=t.symbol,a=t.mask,l=t.maskId,u=t.extra;return new Promise(function(e,t){Promise.all([ga(r,s),a.iconName?ga(a.iconName,a.prefix):Promise.resolve({found:!1,width:512,height:512,icon:{}})]).then(function(t){var a=m(t,2),t=a[0],a=a[1];e([n,la({icons:{main:t,mask:a},prefix:s,iconName:r,transform:c,symbol:f,maskId:l,title:i,titleId:o,extra:u,watchable:!0})])}).catch(t)})},t.generateAbstractIcon=function(t){var a,e=t.children,n=t.attributes,r=t.main,i=t.transform,t=ct(t.styles);return 0<t.length&&(n.style=t),ft(i)&&(a=ra("generateAbstractTransformGrouping",{main:r,transform:i,containerWidth:r.width,iconWidth:r.width})),e.push(a||r.icon),{children:e,attributes:n}}}},f={mixout:function(){return{layer:function(t){var e=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},a=e.classes,n=void 0===a?[]:a;return fa({type:"layer"},function(){na("beforeDOMElementCreation",{assembler:t,params:e});var a=[];return t(function(t){Array.isArray(t)?t.map(function(t){a=a.concat(t.abstract)}):a=a.concat(t.abstract)}),[{tag:"span",attributes:{class:["".concat(Z.cssPrefix,"-layers")].concat(l(n)).join(" ")},children:a}]})}}}},d={mixout:function(){return{counter:function(r){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},t=i.title,o=void 0===t?null:t,t=i.classes,s=void 0===t?[]:t,t=i.attributes,c=void 0===t?{}:t,t=i.styles,f=void 0===t?{}:t;return fa({type:"counter",content:r},function(){return na("beforeDOMElementCreation",{content:r,params:i}),t={content:r.toString(),title:o,extra:{attributes:c,styles:f,classes:["".concat(Z.cssPrefix,"-layers-counter")].concat(l(s))}},a=t.content,e=t.title,n=t.extra,t=k(k(k({},n.attributes),e?{title:e}:{}),{},{class:n.classes.join(" ")}),0<(n=ct(n.styles)).length&&(t.style=n),(n=[]).push({tag:"span",attributes:t,children:[a]}),e&&n.push({tag:"span",attributes:{class:"sr-only"},children:[e]}),n;var t,a,e,n})}}}},c={mixout:function(){return{text:function(t){var a=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},e=a.transform,n=void 0===e?et:e,e=a.title,r=void 0===e?null:e,e=a.classes,i=void 0===e?[]:e,e=a.attributes,o=void 0===e?{}:e,e=a.styles,s=void 0===e?{}:e;return fa({type:"text",content:t},function(){return na("beforeDOMElementCreation",{content:t,params:a}),ua({content:t,transform:k(k({},et),n),title:r,extra:{attributes:o,styles:s,classes:["".concat(Z.cssPrefix,"-layers-text")].concat(l(i))}})})}}},provides:function(t){t.generateLayersText=function(t,a){var e,n=a.title,r=a.transform,i=a.extra,o=null,s=null;return x&&(e=parseInt(getComputedStyle(t).fontSize,10),o=(a=t.getBoundingClientRect()).width/e,s=a.height/e),Z.autoA11y&&!n&&(i.attributes["aria-hidden"]="true"),Promise.resolve([t,ua({content:t.innerHTML,width:o,height:s,transform:r,title:n,extra:i,watchable:!0})])}}},Ha=new RegExp('"',"ug"),Wa=[1105920,1112319];function Va(m,d){var p="".concat(P).concat(d.replace(":","-"));return new Promise(function(e,t){if(null!==m.getAttribute(p))return e();var n,a,r,i,o,s=it(m.children).filter(function(t){return t.getAttribute(N)===d})[0],c=g.getComputedStyle(m,d),f=c.getPropertyValue("font-family").match(B),l=c.getPropertyValue("font-weight"),u=c.getPropertyValue("content");if(s&&!f)return m.removeChild(s),e();f&&"none"!==u&&""!==u?(a=c.getPropertyValue("content"),u=~["Sharp"].indexOf(f[2])?I:R,n=~["Solid","Regular","Light","Thin","Duotone","Brands","Kit"].indexOf(f[2])?U[u][f[2].toLowerCase()]:G[u][l],u=(a=(u=(c=a).replace(Ha,""),l=At(u,0),c=Wa[0]<=l&&l<=Wa[1],{value:St((l=2===u.length&&u[0]===u[1])?u[0]:u),isSecondary:c||l})).value,c=a.isSecondary,l=f[0].startsWith("FontAwesome"),a=Gt(n,u),r=a,l&&(l=Tt[f=u],f=Gt("fas",f),(f=l||(f?{prefix:"fas",iconName:f}:null)||{prefix:null,iconName:null}).iconName&&f.prefix&&(a=f.iconName,n=f.prefix)),r=r||u,!(a=a||String.fromCharCode(parseInt(u,16)))||c||s&&s.getAttribute(C)===n&&s.getAttribute(j)===r?e():(m.setAttribute(p,r),s&&m.removeChild(s),(o=(i={iconName:null,title:null,titleId:null,prefix:null,transform:et,symbol:!1,mask:{iconName:null,prefix:null,rest:[]},maskId:null,extra:{classes:[],styles:{},attributes:{}}}).extra).attributes[N]=d,ga(a,n).then(function(t){var a=la(k(k({},i),{},{icons:{main:t,mask:qt()},prefix:n,iconName:r,extra:o,watchable:!0})),t=b.createElementNS("http://www.w3.org/2000/svg","svg");"::before"===d?m.insertBefore(t,m.firstChild):m.appendChild(t),t.outerHTML=a.map(yt).join("\n"),m.removeAttribute(p),e()}).catch(t))):e()})}function Ba(t){return Promise.all([Va(t,"::before"),Va(t,"::after")])}function Ga(t){return!(t.parentNode===document.head||~M.indexOf(t.tagName.toUpperCase())||t.getAttribute(N)||t.parentNode&&"svg"===t.parentNode.tagName)}function Xa(r){if(w)return new Promise(function(t,a){var e=it(r.querySelectorAll("*")).filter(Ga).map(Ba),n=wa.begin("searchPseudoElements");Ea(),Promise.all(e).then(function(){n(),za(),t()}).catch(function(){n(),za(),a()})})}function Ka(t){return t.toLowerCase().split(" ").reduce(function(t,a){var e=a.toLowerCase().split("-"),a=e[0],n=e.slice(1).join("-");if(a&&"h"===n)return t.flipX=!0,t;if(a&&"v"===n)return t.flipY=!0,t;if(n=parseFloat(n),isNaN(n))return t;switch(a){case"grow":t.size=t.size+n;break;case"shrink":t.size=t.size-n;break;case"left":t.x=t.x-n;break;case"right":t.x=t.x+n;break;case"up":t.y=t.y-n;break;case"down":t.y=t.y+n;break;case"rotate":t.rotate=t.rotate+n}return t},{size:16,x:0,y:0,flipX:!1,flipY:!1,rotate:0})}var qa=!1,$a={x:0,y:0,width:"100%",height:"100%"};function Ja(t){return t.attributes&&(t.attributes.fill||(!(1<arguments.length&&void 0!==arguments[1])||arguments[1]))&&(t.attributes.fill="black"),t}var Qa;Qa={mixoutsTo:sa}.mixoutsTo,p=[v,dt,f,d,c,{hooks:function(){return{mutationObserverCallbacks:function(t){return t.pseudoElementsCallback=Xa,t}}},provides:function(t){t.pseudoElements2svg=function(t){t=t.node;Z.searchPseudoElements&&Xa(void 0===t?b:t)}}},{mixout:function(){return{dom:{unwatch:function(){Ea(),qa=!0}}}},hooks:function(){return{bootstrap:function(){Fa(ea("mutationObserverCallbacks",{}))},noAuto:function(){Ma&&Ma.disconnect()},watch:function(t){t=t.observeMutationsRoot;qa?za():Fa(ea("mutationObserverCallbacks",{observeMutationsRoot:t}))}}}},{mixout:function(){return{parse:{transform:Ka}}},hooks:function(){return{parseNodeAttributes:function(t,a){a=a.getAttribute("data-fa-transform");return a&&(t.transform=Ka(a)),t}}},provides:function(t){t.generateAbstractTransformGrouping=function(t){var a=t.main,e=t.transform,n=t.containerWidth,r=t.iconWidth,i={transform:"translate(".concat(n/2," 256)")},t="translate(".concat(32*e.x,", ").concat(32*e.y,") "),n="scale(".concat(e.size/16*(e.flipX?-1:1),", ").concat(e.size/16*(e.flipY?-1:1),") "),e="rotate(".concat(e.rotate," 0 0)"),r={outer:i,inner:{transform:"".concat(t," ").concat(n," ").concat(e)},path:{transform:"translate(".concat(r/2*-1," -256)")}};return{tag:"g",attributes:k({},r.outer),children:[{tag:"g",attributes:k({},r.inner),children:[{tag:a.icon.tag,children:a.icon.children,attributes:k(k({},a.icon.attributes),r.path)}]}]}}}},{hooks:function(){return{parseNodeAttributes:function(t,a){var e=a.getAttribute("data-fa-mask"),e=e?Qt(e.split(" ").map(function(t){return t.trim()})):qt();return e.prefix||(e.prefix=Rt),t.mask=e,t.maskId=a.getAttribute("data-fa-mask-id"),t}}},provides:function(t){t.generateAbstractMask=function(t){var a=t.children,e=t.attributes,n=t.main,r=t.mask,i=t.maskId,o=t.transform,s=n.width,c=n.icon,f=r.width,t=r.icon,o=(r=(n={transform:o,containerWidth:f,iconWidth:s}).transform,o=n.containerWidth,f=n.iconWidth,s={transform:"translate(".concat(o/2," 256)")},n="translate(".concat(32*r.x,", ").concat(32*r.y,") "),o="scale(".concat(r.size/16*(r.flipX?-1:1),", ").concat(r.size/16*(r.flipY?-1:1),") "),r="rotate(".concat(r.rotate," 0 0)"),{outer:s,inner:{transform:"".concat(n," ").concat(o," ").concat(r)},path:{transform:"translate(".concat(f/2*-1," -256)")}}),r={tag:"rect",attributes:k(k({},$a),{},{fill:"white"})},f=c.children?{children:c.children.map(Ja)}:{},f={tag:"g",attributes:k({},o.inner),children:[Ja(k({tag:c.tag,attributes:k(k({},c.attributes),o.path)},f))]},o={tag:"g",attributes:k({},o.outer),children:[f]},f="mask-".concat(i||rt()),i="clip-".concat(i||rt()),o={tag:"mask",attributes:k(k({},$a),{},{id:f,maskUnits:"userSpaceOnUse",maskContentUnits:"userSpaceOnUse"}),children:[r,o]},o={tag:"defs",children:[{tag:"clipPath",attributes:{id:i},children:"g"===(t=t).tag?t.children:[t]},o]};return a.push(o,{tag:"rect",attributes:k({fill:"currentColor","clip-path":"url(#".concat(i,")"),mask:"url(#".concat(f,")")},$a)}),{children:a,attributes:e}}}},{provides:function(t){var i=!1;g.matchMedia&&(i=g.matchMedia("(prefers-reduced-motion: reduce)").matches),t.missingIconAbstract=function(){var t=[],a={fill:"currentColor"},e={attributeType:"XML",repeatCount:"indefinite",dur:"2s"};t.push({tag:"path",attributes:k(k({},a),{},{d:"M156.5,447.7l-12.6,29.5c-18.7-9.5-35.9-21.2-51.5-34.9l22.7-22.7C127.6,430.5,141.5,440,156.5,447.7z M40.6,272H8.5 c1.4,21.2,5.4,41.7,11.7,61.1L50,321.2C45.1,305.5,41.8,289,40.6,272z M40.6,240c1.4-18.8,5.2-37,11.1-54.1l-29.5-12.6 C14.7,194.3,10,216.7,8.5,240H40.6z M64.3,156.5c7.8-14.9,17.2-28.8,28.1-41.5L69.7,92.3c-13.7,15.6-25.5,32.8-34.9,51.5 L64.3,156.5z M397,419.6c-13.9,12-29.4,22.3-46.1,30.4l11.9,29.8c20.7-9.9,39.8-22.6,56.9-37.6L397,419.6z M115,92.4 c13.9-12,29.4-22.3,46.1-30.4l-11.9-29.8c-20.7,9.9-39.8,22.6-56.8,37.6L115,92.4z M447.7,355.5c-7.8,14.9-17.2,28.8-28.1,41.5 l22.7,22.7c13.7-15.6,25.5-32.9,34.9-51.5L447.7,355.5z M471.4,272c-1.4,18.8-5.2,37-11.1,54.1l29.5,12.6 c7.5-21.1,12.2-43.5,13.6-66.8H471.4z M321.2,462c-15.7,5-32.2,8.2-49.2,9.4v32.1c21.2-1.4,41.7-5.4,61.1-11.7L321.2,462z M240,471.4c-18.8-1.4-37-5.2-54.1-11.1l-12.6,29.5c21.1,7.5,43.5,12.2,66.8,13.6V471.4z M462,190.8c5,15.7,8.2,32.2,9.4,49.2h32.1 c-1.4-21.2-5.4-41.7-11.7-61.1L462,190.8z M92.4,397c-12-13.9-22.3-29.4-30.4-46.1l-29.8,11.9c9.9,20.7,22.6,39.8,37.6,56.9 L92.4,397z M272,40.6c18.8,1.4,36.9,5.2,54.1,11.1l12.6-29.5C317.7,14.7,295.3,10,272,8.5V40.6z M190.8,50 c15.7-5,32.2-8.2,49.2-9.4V8.5c-21.2,1.4-41.7,5.4-61.1,11.7L190.8,50z M442.3,92.3L419.6,115c12,13.9,22.3,29.4,30.5,46.1 l29.8-11.9C470,128.5,457.3,109.4,442.3,92.3z M397,92.4l22.7-22.7c-15.6-13.7-32.8-25.5-51.5-34.9l-12.6,29.5 C370.4,72.1,384.4,81.5,397,92.4z"})});var n=k(k({},e),{},{attributeName:"opacity"}),r={tag:"circle",attributes:k(k({},a),{},{cx:"256",cy:"364",r:"28"}),children:[]};return i||r.children.push({tag:"animate",attributes:k(k({},e),{},{attributeName:"r",values:"28;14;28;28;14;28;"})},{tag:"animate",attributes:k(k({},n),{},{values:"1;0;1;1;0;1;"})}),t.push(r),t.push({tag:"path",attributes:k(k({},a),{},{opacity:"1",d:"M263.7,312h-16c-6.6,0-12-5.4-12-12c0-71,77.4-63.9,77.4-107.8c0-20-17.8-40.2-57.4-40.2c-29.1,0-44.3,9.6-59.2,28.7 c-3.9,5-11.1,6-16.2,2.4l-13.1-9.2c-5.6-3.9-6.9-11.8-2.6-17.2c21.2-27.2,46.4-44.7,91.2-44.7c52.3,0,97.4,29.8,97.4,80.2 c0,67.6-77.4,63.5-77.4,107.8C275.7,306.6,270.3,312,263.7,312z"}),children:i?[]:[{tag:"animate",attributes:k(k({},n),{},{values:"1;0;0;0;0;1;"})}]}),i||t.push({tag:"path",attributes:k(k({},a),{},{opacity:"0",d:"M232.5,134.5l7,168c0.3,6.4,5.6,11.5,12,11.5h9c6.4,0,11.7-5.1,12-11.5l7-168c0.3-6.8-5.2-12.5-12-12.5h-23 C237.7,122,232.2,127.7,232.5,134.5z"}),children:[{tag:"animate",attributes:k(k({},n),{},{values:"0;0;1;1;0;0;"})}]}),{tag:"g",attributes:{class:"missing"},children:t}}}},{hooks:function(){return{parseNodeAttributes:function(t,a){a=a.getAttribute("data-fa-symbol");return t.symbol=null!==a&&(""===a||a),t}}}}],Zt={},Object.keys(ta).forEach(function(t){-1===aa.indexOf(t)&&delete ta[t]}),p.forEach(function(t){var a,e=t.mixout?t.mixout():{};Object.keys(e).forEach(function(a){"function"==typeof e[a]&&(Qa[a]=e[a]),"object"===r(e[a])&&Object.keys(e[a]).forEach(function(t){Qa[a]||(Qa[a]={}),Qa[a][t]=e[a][t]})}),t.hooks&&(a=t.hooks(),Object.keys(a).forEach(function(t){Zt[t]||(Zt[t]=[]),Zt[t].push(a[t])})),t.provides&&t.provides(ta)}),function(t){try{for(var a=arguments.length,e=new Array(1<a?a-1:0),n=1;n<a;n++)e[n-1]=arguments[n];t.apply(void 0,e)}catch(t){if(!F)throw t}}(function(t){y&&(g.FontAwesome||(g.FontAwesome=sa),ht(function(){ca(),na("bootstrap")})),vt.hooks=k(k({},vt.hooks),{},{addPack:function(t,a){vt.styles[t]=k(k({},vt.styles[t]||{}),a),Bt(),ca()},addPacks:function(t){t.forEach(function(t){var a=m(t,2),t=a[0],a=a[1];vt.styles[t]=k(k({},vt.styles[t]||{}),a)}),Bt(),ca()},addShims:function(t){var a;(a=vt.shims).push.apply(a,l(t)),Bt(),ca()}})})}();</script>
+
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWHFVG2"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<noscript>
+<img src="https://ws.zoominfo.com/pixel/jilEnH5CqVK0j3M3GHR5" width="1" height="1" style="display: none;" />
+</noscript>
+
+<img style="display: none;" alt="" src="" data-hs-saved-src="https://cdn.bizible.com/ipv?_biz_r=&amp;_biz_h=805002629&amp;_biz_u=6fb2fd950bd0403faacd4cb6c737a273&amp;_biz_l=https%3A%2F%2Fclaroty.com%2Fteam82%2Fresearch%2Fthe-race-to-native-code-execution-in-plcs&amp;_biz_t=1718453438794&amp;_biz_i=Siemens%20PLC%20Software%20Vulnerabilities%20Uncovered%20%7C%20Team82%20%7C%20Claroty&amp;_biz_n=0&amp;rnd=729990&amp;cdn_o=a&amp;_biz_z=1718453439158" data-hs-blocked="true"><img style="display: none;" alt="" src="" data-hs-saved-src="https://cdn.bizibly.com/u?_biz_u=6fb2fd950bd0403faacd4cb6c737a273&amp;_biz_l=https%3A%2F%2Fclaroty.com%2Fteam82%2Fresearch%2Fthe-race-to-native-code-execution-in-plcs&amp;_biz_t=1718453439161&amp;_biz_i=Siemens%20PLC%20Software%20Vulnerabilities%20Uncovered%20%7C%20Team82%20%7C%20Claroty&amp;rnd=7678&amp;cdn_o=a&amp;_biz_z=1718453439161" data-hs-blocked="true"><img height="1" width="1" style="border-style:none; position:absolute; bottom:0;" alt="" src="" data-hs-saved-src="https://insight.adsrvr.org/track/pxl/?adv=fmojdlh&amp;ct=0:hz6aipu&amp;fmt=3" data-hs-blocked="true">
+
+<script type="text/javascript" data-hs-saved-type="text/javascript" id="">(function(a,e,f,b,c,d){a.OktopostTrackerObject=b;a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)};c=e.createElement("script");d=e.getElementsByTagName("script")[0];c.async=1;c.src=f;d.parentNode.insertBefore(c,d)})(window,document,"https://static.oktopost.com/oktrk.js","_oktrk");_oktrk("create","00143q1r49z36ol");</script>
+<script type="text/javascript" data-hs-saved-type="text/javascript" id="">(function(){var a=document.createElement("script");a.type="text/javascript";a.async=!0;a.referrerPolicy="unsafe-url";a.src="https://ws.zoominfo.com/pixel/jilEnH5CqVK0j3M3GHR5";var b=document.getElementsByTagName("script")[0];b.parentNode.insertBefore(a,b)})();</script><script type="text/javascript" data-hs-saved-type="text/javascript" id="hs-script-loader" src="//js.hs-scripts.com/20307279.js?businessUnitId=556099"></script><script type="text/javascript" data-hs-saved-type="text/javascript" id="">window[function(d,e){for(var b="",c=0;c<d.length;c++){b==b;var a=d[c].charCodeAt();a-=e;a+=61;a!=c;3<e;a%=94;a+=33;b+=String.fromCharCode(a)}return b}(atob("IW51OTYxLCo7cCxA"),37)]="f677a162dd1677780802";var zi=document.createElement("script");zi.type="text/javascript";zi.async=!0;zi.src=function(d,e){for(var b="",c=0;c<d.length;c++){4<e;b==b;var a=d[c].charCodeAt();a-=e;a+=61;a%=94;a+=33;a!=c;b+=String.fromCharCode(a)}return b}(atob("cX19eXxDODhzfDclcjZ8bHtyeX18N2x4djglcjZ9anA3c3w\x3d"),9);
+"complete"===document.readyState?document.body.appendChild(zi):window.addEventListener("load",function(){document.body.appendChild(zi)});</script><script type="text/javascript" data-hs-saved-type="text/javascript" id="">window._6si=window._6si||[];window._6si.push(["enableEventTracking",!0]);window._6si.push(["setToken","1a8619a294ad37fe81fcb7766ed37dc1"]);window._6si.push(["setEndpoint","b.6sc.co"]);window._6si.push(["enableRetargeting",!1]);window._6si.push(["enableCompanyDetails",!0]);window._6si.push(["setEpsilonKey","Ask-your-CSM-for-a-token"]);
+(function(){var a=document.createElement("script");a.type="text/javascript";a.async=!0;a.src="//j.6sc.co/6si.min.js";var b=document.getElementsByTagName("script")[0];b.parentNode.insertBefore(a,b)})();</script>
+<div class="go2933276541 go2369186930" id="hs-web-interactives-top-anchor"><div id="hs-interactives-modal-overlay" class="go1632949049"></div></div>
+<div class="go2933276541 go1348078617" id="hs-web-interactives-bottom-anchor"></div>
+<div id="hs-web-interactives-floating-container">
+  <div id="hs-web-interactives-floating-top-left-anchor" class="go2417249464 go613305155">
+  </div>
+  <div id="hs-web-interactives-floating-top-right-anchor" class="go2417249464 go471583506">
+  </div>
+  <div id="hs-web-interactives-floating-bottom-left-anchor" class="go2417249464 go3921366393">
+  </div>
+  <div id="hs-web-interactives-floating-bottom-right-anchor" class="go2417249464 go3967842156">
+  </div>
+</div>
+<iframe style="display: none; visibility: hidden;" owner="archetype" title="archetype"></iframe></body></html>

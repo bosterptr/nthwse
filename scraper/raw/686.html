@@ -1,0 +1,477 @@
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml"><head>
+    <title>Flash Dumping - Part I - Quarkslab's blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="./extras/favicon.png" rel="icon">
+
+<link rel="canonical" href="./flash-dumping-part-i.html">
+
+        <meta name="author" content="Emma Benoit">
+        <meta name="keywords" content="PCB,flash,KiCAD,hardware,2017">
+        <meta name="description" content="First part of a blog post series about our approach to dump a flash chip. In this article we describe how to desolder the flash, design and build the corresponding breakout board.">
+
+        <meta property="og:site_name" content="Quarkslab's blog">
+        <meta property="og:type" content="article">
+        <meta property="og:title" content="Flash Dumping - Part I">
+        <meta property="og:url" content="./flash-dumping-part-i.html">
+        <meta property="og:description" content="First part of a blog post series about our approach to dump a flash chip. In this article we describe how to desolder the flash, design and build the corresponding breakout board.">
+        <meta property="article:published_time" content="2017-09-05">
+            <meta property="article:section" content="Hardware">
+            <meta property="article:tag" content="PCB">
+            <meta property="article:tag" content="flash">
+            <meta property="article:tag" content="KiCAD">
+            <meta property="article:tag" content="hardware">
+            <meta property="article:tag" content="2017">
+            <meta property="article:author" content="Emma Benoit">
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="./theme/css/bootstrap.min.css" type="text/css">
+    <link href="./theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./theme/css/font-awesome-brands.min.css" rel="stylesheet">
+    <link href="./theme/css/font-awesome-solid.min.css" rel="stylesheet">
+
+    <link href="./theme/css/pygments/default.css" rel="stylesheet">
+    <link rel="stylesheet" href="./theme/css/style.css" type="text/css">
+        <link href="./static/css/custom.css" rel="stylesheet">
+
+        <link href="./feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Quarkslab's blog ATOM Feed">
+
+        <link href="./feeds/hardware.atom.xml" type="application/atom+xml" rel="alternate" title="Quarkslab's blog Hardware ATOM Feed">
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="./" class="navbar-brand">
+Quarkslab's blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="./archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+<!-- Content Container -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-7 col-sm-push-3">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="./flash-dumping-part-i.html" rel="bookmark" title="Permalink to Flash Dumping - Part I">
+                        Flash Dumping - Part I
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-09-05T00:00:00+02:00"> Tue 05 September 2017</time>
+    </span>
+
+
+            <span class="label label-default">By</span>
+                <a href="./author/emma-benoit.html"><i class="fa fa-user"></i> Emma Benoit</a>
+                <a href="./author/guillaume-heilles.html"><i class="fa fa-user"></i> Guillaume Heilles</a>
+                <a href="./author/philippe-teuwen.html"><i class="fa fa-user"></i> Philippe Teuwen</a>
+
+        <span class="label label-default">Category</span>
+        <a href="./category/hardware.html">Hardware</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="./tag/pcb.html"><i class="fa fa-solid fa-tag"></i>PCB</a>
+	<a href="./tag/flash.html"><i class="fa fa-solid fa-tag"></i>flash</a>
+	<a href="./tag/kicad.html"><i class="fa fa-solid fa-tag"></i>KiCAD</a>
+	<a href="./tag/hardware.html"><i class="fa fa-solid fa-tag"></i>hardware</a>
+	<a href="./tag/2017.html"><i class="fa fa-solid fa-tag"></i>2017</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="summary"><p class="first last">First part of a blog post series about our approach to dump a flash chip. In this article we describe how to desolder the flash, design and build the corresponding breakout board.</p>
+</div>
+                <p>This blog post series will detail simple yet effective attacks against embedded devices non-volatile memories.
+This type of attack enables you to do the following:</p>
+<ul>
+<li><p class="first">read the content of a memory chip;</p>
+</li>
+<li><p class="first">modify the content of a memory chip;</p>
+</li>
+<li><p class="first">monitor the accesses from/to a memory chip and modifying them on the fly (Man-In-The-Middle attack).</p>
+</li>
+</ul>
+<p>In particular, the following topics will be discussed:</p>
+<ul>
+<li><p class="first">Desoldering of a flash chip;</p>
+</li>
+<li><p class="first">Conception of a breakout board with KiCAD;</p>
+</li>
+<li><p class="first">PCB fabrication and microsoldering;</p>
+</li>
+<li><p class="first">Addition of a breakout board on an IoT device;</p>
+</li>
+<li><p class="first">Dump of a SPI flash;</p>
+</li>
+<li><p class="first">Dump of a parallel flash;</p>
+</li>
+<li><p class="first">Man-in-the-Middle attacks.</p>
+</li>
+</ul>
+<p>Let's say you opened up yet-another-IoT-device and stumbled on a flash chip
+inside. Curious as you are, you obviously want to know what's going on inside.</p>
+<div class="section" id="desoldering-the-flash-chip">
+<h2>Desoldering the flash chip</h2>
+<p>To read the content of the flash chip, there are basically two options :</p>
+<ul>
+<li><p class="first">connecting wires directly on the pins of the chip;</p>
+</li>
+<li><p class="first">desoldering the flash and plug it on another board.</p>
+</li>
+</ul>
+<p>One of the things to consider when choosing a method to read the chip is the
+packaging of the integrated circuit (IC). For example, connecting wires directly on the pins of the
+chip works well with chips using a quad flat pack (QFP) packaging, but it's
+less adapted if there are no visible pins. In the following case, the flash chip uses a
+ball grid array (BGA) packaging, which means no visible pin to fiddle with,
+so we choose to desolder the IC.</p>
+<p>Picture of our target chip:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_before.jpg" alt="Flash chip" width="600"><p>On the bright side:</p>
+<ul>
+<li><p class="first">Since we're extracting the flash, all possible interferences with
+the onboard microcontroller are avoided.</p>
+</li>
+<li><p class="first">The chip is removed completely from the board, which gives us the ability to
+study the PCB underneath and find out the routing to the flash chip.</p>
+</li>
+<li><p class="first">The original chip can be replaced with something else (another chip, a
+microcontroller, ...).</p>
+</li>
+</ul>
+<p>On the less bright side:</p>
+<ul>
+<li><p class="first">The board cannot run without all of its components, you'll have to solder it
+back if you want to use it in the future.</p>
+</li>
+<li><p class="first">Some nearby components could be damaged during the extraction.</p>
+</li>
+<li><p class="first">The flash chip itself could be damaged if it's done improperly.</p>
+</li>
+</ul>
+<p>So... desoldering flash, right? If you never tried desoldering electronic
+components before, the tricky part is to melt the solder on all pins at the same
+time. There are several techniques to do that. We choose to go with the heat gun.
+The goal is to heat the area where the chip is, wait for the solder to melt and
+remove the chip.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_desoldering.jpg" alt="Desoldering flahs" width="600"><p>This technique is simple and rapid but it tends to desolder
+adjacent components, so be careful not to move them (i.e. this is exactly the
+worst moment to sneeze).</p>
+<p>The picture below shows our chip out of its
+emplacement and we can now have a look at the PCB routing. We can already
+make some hypothesis, like the two bottom rows which are likely unused
+since they are not routed.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_desoldered.jpg" alt="Desoldered flash" width="600"></div>
+<div class="section" id="conception-of-a-breakout-board-with-kicad">
+<h2>Conception of a breakout board with KiCAD</h2>
+<p>What do we do now with that chip? BGA layouts are a mess, you can have a 5x5
+grid or a 4x6 grid for the exact same chip. Pinouts are equally fun, and usually
+specific to the chip. Another thing you might be wondering is how to access a
+particular pin when they are all packed together in a grid like that?</p>
+<p>One solution is to make a breakout board! Basically, a breakout board mirrors
+all the pins of the chip but with more space between them, so you can access them easily.</p>
+<p>To realize this, we first need to gather some information about the chip
+itself. Most of the time, the brand and/or model are written on the chip and help identifying it.
+With this information, one can look for the corresponding datasheets.
+If you can't identify the chip or if you can't find the datasheet, you will have to do some reverse engineering on the PCB to identify each signal.</p>
+<p>The brand is indicated on the first line of our chip: MXIC stands for Macronix
+International. The second line is the model of the chip, which leads us to the <a class="reference external" href="https://media.digikey.com/pdf/Data%20Sheets/Macronix/MX25L3255E.pdf">MX25L3255EXCI datasheet</a>.</p>
+<p>The section that is of interest to us is the pin layout, page 7 of the
+datasheet. Both BGA configurations (4x6 and 5x5) are described as well as a SOP8 package. We can see that
+only eight pins are useful, other pins are tagged "NC" which means "no connection".</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_pin_layout.png" alt="Flash pin layout" width="600"><p>To communicate with the flash chip, we need a PCB exporting all the required pins to some easy-to-access header.</p>
+<p>The design of the PCB can be realized using <a class="reference external" href="http://kicad-pcb.org/">KiCAD</a>, one of the most popular electronics design automation (EDA) software.</p>
+<p>If you are not familiar with KiCAD, many great tutorials are available like <a class="reference external" href="https://www.youtube.com/watch?v=zK3rDhJqMu0">KiCAD Quick-Start Tutorial</a>.</p>
+<p>The design of a breakout board follows the same process as for any other board:</p>
+<ol class="arabic">
+<li><p class="first">Create an electronic schematic for your board in eeschema, and define the
+components that are specific to your project, for example your flash chip.</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_eeschema.png" alt="Flash schematics" width="600"><ol class="arabic" start="2">
+<li><p class="first">Create the specific footprint for your flash chip in pcbnew. This is where
+the information from the datasheet that we looked earlier is useful. We
+will add a 4x6 grid representing the BGA grid, and two 1x4 connectors linked
+to the 8 useful pins.
+The final step is to add routes to connect our components</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_pcbnew_routes.png" alt="Flash PCB routing" width="600"><p>Our design is done, how do we transform a KiCAD project into a working
+PCB?</p>
+</div>
+<div class="section" id="pcb-fabrication">
+<h2>PCB fabrication</h2>
+<p>A PCB is basically a sandwich made of a layer of substrate between two layers of copper.
+The substrate is usually made of FR-4 (glass-reinforced epoxy laminate) but other cheaper materials
+can also be found. Routes are traced on the copper layer and the excess
+copper is then removed.</p>
+<p>Several techniques exist to remove the unwanted copper, we tried the following:</p>
+<ul>
+<li><p class="first">Etching;</p>
+</li>
+<li><p class="first">CNC milling.</p>
+</li>
+</ul>
+<p>Both techniques are detailed, as we used the etching technique to build the 4x6
+BGA PCB and the milling technique was used to build the 5x5 BGA PCB.</p>
+<div class="section" id="etching">
+<h3>Etching</h3>
+<p>Etching refers to the process of using a chemical component to "bite" into the
+unprotected surface of a metal. We use ink as a way to delimit the traces
+and protect the bits of copper to keep.</p>
+<ol class="arabic">
+<li><p class="first">We use the toner transfer method to reproduce the design on copper. The
+design is printed on a glossy sheet of paper using a laser printer.
+The sheet of paper is then taped to the piece of copper/fiber glass
+substrate, and heat and pressure are applied to get the design out of the paper onto the
+copper board. Usually, this technique uses a regular clothes iron to apply
+heat and pressure. We found out that using a laminator is way more
+efficient as the heat and the pressure applied are more uniform.</p>
+</li>
+<li><p class="first">Next step is the actual etching. The board is immersed into a chemical solution
+which will remove excess copper, except where the toner is.</p>
+</li>
+</ol>
+<p>Our breakout board after etching, still with the transferred toner attached:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_pcb_1.jpg" alt="PCB after etching" width="600"><p>And after removing the toner with acetone:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_pcb_2.jpg" alt="PCB after removing toner" width="600"><p>The PCB board is now ready for microsoldering. Microsoldering is like soldering
+but with tiny components, hence it requires a microscope.</p>
+<p>Another difference with traditional soldering is the packaging of the solder.
+Traditional soldering uses solder in the form of wire while BGA microsoldering uses
+solder balls.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_board_soldering_0.jpg" alt="BGA pads" width="600"><p>Next, we can start reballing:</p>
+<ul>
+<li><p class="first">put a new solder ball in each slot and apply heat to melt the solder balls in place;</p>
+</li>
+<li><p class="first">align the chip and the board;</p>
+</li>
+<li><p class="first">reflow.</p>
+</li>
+</ul>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_reballing.gif" alt="BGA reballing" width="600"><p>The board being reballed:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_board_soldering_1.jpg" alt="BGA reballed" width="600"><p>And the final result with the chip and the board after microsoldering:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/flash_pcb_3.jpg" alt="Final result" width="600"></div>
+<div class="section" id="cnc-milling">
+<h3>CNC Milling</h3>
+<p>Alternatively, a CNC milling machine can be used to carve out bits of unwanted copper.
+Actually rather than removing all the unwanted copper, the CNC will simply isolate the required tracks and leave the excess of copper in place.</p>
+<p>1. The 5x5 BGA format was used to build a PCB.
+While the 4x6 version was a breakout board, we designed the 5x5 version such that it can be directly plugged in a universal EEPROM programmer ZIF socket.
+As we've seen in the datasheet, this chip also exists in SOP8 package, so we've chosen to mimic a DIP8 pin header reproducing the same pin layout as for the SOP8. So for the universal EEPROM programmer, this setup will be virtually the same as reading the SOP8 chip via a classic SOP8-DIP8 adapter.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_01_kicad_eeschema.png" alt="Flash adapter schematics" width="600"><p>2. The footprint for the chip is somehow similar to the one we designed for the 4x6 but with a 5x5 grid, the 1x4 connectors closer, as for a DIP8,
+and a somehow more tortuous routing to respect the SOP8 layout which is unfortunately completely different from the BGA one.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_02_kicad_pcbnew.png" alt="Flash adapter routing" width="600"><p>3. KiCAD is not able to produce directly a file compatible with a CNC, therefore we'll use Flatcam which takes a Gerber file
+and allows to define a path for the CNC to isolate the desired copper tracks.
+To avoid shortage issues, we also define an area under the BGA chip to remove entirely the unwanted copper.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_02_flatcam_geometry.png" alt="Flash adapter in Flatcam: geometry" width="600"><img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_02_flatcam_cnc.png" alt="Flash adapter in Flatcam: CNC path" width="600"><p>4. And we pass the produced STL file to bCNC, in charge of controlling the CNC.
+It has some nice features such as auto-levelling, i.e. measuring the actual height of the board in several points (because nothing is perfectly flat), and producing the heat map you can see in the snapshot below.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_03_bcnc.png" alt="Flash adapter in bCNC" width="600"><p>Milling in action, corresponding to the tracks highlighted in green in bCNC:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_04_milling.jpg" alt="Flash adapter milling" width="600"><ol class="arabic" start="5">
+<li><p class="first">Board fully milled:</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_05_fcu_1.jpg" alt="Flash adapter milled" width="600"><p>Close up of the final result where we can distinguish the pattern of the
+flatcam geometry path under the BGA:</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_05_fcu_2.jpg" alt="Flash adapter milled under the BGA" width="600"><p>6. Next, we apply some solder mask, which is the characteristic green layer
+protecting the copper from oxidation, and cure it with UV light.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_06_fmask_1.jpg" alt="Flash adapter solder mask being applied" width="600"><img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_06_fmask_2.jpg" alt="Flash adapter solder mask being applied" width="600"><p>7. The solder mask covered the pads of the BGA and of the 1x4 connectors, they
+are unusable like this. We scratch manually the thin layer of paint to free the pads.</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_07_fmask_removal.jpg" alt="Flash adapter solder mask being removed on pads" width="600"><ol class="arabic" start="8">
+<li><p class="first">Tinning step, where we apply solder on all pads:</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_08_tinning.jpg" alt="Flash adapter pads tinning" width="600"><img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_08_tinning_bga.jpg" alt="Flash adapter BGA pads tinning" width="600"><ol class="arabic" start="9">
+<li><p class="first">Back to the CNC to drill the holes and cut the edges of the board:</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_09_cutout_1.jpg" alt="Flash adapter PCB cutting" width="600"><img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_09_cutout_2.jpg" alt="Flash adapter PCB cutting" width="600"><ol class="arabic" start="10">
+<li><p class="first">Final board with the BGA chip soldered and ready to be inserted in a universal EEPROM programmer:</p>
+</li>
+</ol>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/adapter_5x5_10_finished.jpg" alt="Flash adapter final board" width="600"><p>As we've chosen to mimic the SOP8 pinout, we've simply to tell to the programmer that our chip is the SOP8 version!</p>
+</div>
+</div>
+<div class="section" id="bonus-the-horror-show">
+<h2>Bonus: the horror show</h2>
+<p>Here is a compilation of our best failures, because things don't always go as planned, but we learned a lot through these experimentations and we are now ready for the next IoT stuff :)</p>
+<p>Toner transfer is not always as easy as it sounds...</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_toner.jpg" alt="Failed attempt: bad toner transfer" width="600"><p>Milling on the CNC with the right depth neither...</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_milling.jpg" alt="Failed attempt: bad milling" width="600"><p>Failing at finding a plastic that doesn't adhere to the green mask... (eventually IKEA freezing bags revealed to work very well :) )</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_fmask.jpg" alt="Failed attempt: bad mask" width="600"><p>Attempt to mill the green mask...</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_fmask_milling_spring1.jpg" alt="Failed attempt: bad milling" width="600"><p>Second attempt with a tool mounted on a spring: looks almost good but actually all tracks were cut from the pads...</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_fmask_milling_spring2.jpg" alt="Failed attempt: bad milling" width="600"><p>Third attempt by adding first some solder in the hope to make them thicker</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_fmask_tin_ahead1.jpg" alt="Failed attempt: tinning" width="600"><p>Created a lake of green mask too thick to cure with UV light, and when the surface of the icy lake breaks...</p>
+<img class="align-center" src="resources/2017-08-06-flash-dumping-1/fail_fmask_tin_ahead2.jpg" alt="Failed attempt: too much solder mask" width="600"></div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>That concludes our first article where we saw how to desolder a flash, design a PCB
+and detailed two techniques of PCB fabrication.</p>
+</div>
+<div class="section" id="acknowledgements">
+<h2>Acknowledgements</h2>
+<p>Thanks to all Quarkslab colleagues who proofread this article and provided
+valuable feedback.</p>
+</div>
+
+            </div>
+            <hr>
+            <p>If you would like to learn more about our security audits and explore how we can help you, <a href="https://content.quarkslab.com/talk-to-our-experts-blog">get in touch with us</a>!</p>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3 col-sm-pull-7" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+<!-- Sidebar/Quarkslab -->
+<li class="list-group-item">
+    <h4>
+        <i class="fa-solid fa-earth-europe fa-lg"></i>
+        <a href="https://quarkslab.com">
+            Quarkslab's Website
+        </a>
+    </h4>
+</li>
+<!-- End Sidebar/Quarklab -->
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4>SOCIAL</h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a class="text-capitalize" href="https://twitter.com/quarkslab"><i class="fa-brands fa-twitter fa-lg"></i> twitter</a></li>
+    <li class="list-group-item"><a class="text-capitalize" href="https://infosec.exchange/@quarkslab"><i class="fa-brands fa-mastodon fa-lg"></i> mastodon</a></li>
+    <li class="list-group-item"><a class="text-capitalize" href="https://github.com/quarkslab"><i class="fa-brands fa-github fa-lg"></i> github</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Categories -->
+<li class="list-group-item">
+  <h4>CATEGORIES</h4>
+  <ul class="list-group" id="categories">
+    <li class="list-group-item">
+      <a href="./category/android.html"><i>•</i>Android</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/automotive.html"><i>•</i>Automotive</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/blockchain.html"><i>•</i>Blockchain</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/challenge.html"><i>•</i>Challenge</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/containers.html"><i>•</i>Containers</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/cryptography.html"><i>•</i>Cryptography</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/exploitation.html"><i>•</i>Exploitation</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/file-formats.html"><i>•</i>File Formats</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/fuzzing.html"><i>•</i>Fuzzing</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/hardware.html"><i>•</i>Hardware</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/kernel-debugging.html"><i>•</i>Kernel Debugging</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/life-at-quarkslab.html"><i>•</i>Life at Quarkslab</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/math.html"><i>•</i>Math</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/pentest.html"><i>•</i>Pentest</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/program-analysis.html"><i>•</i>Program Analysis</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/programming.html"><i>•</i>Programming</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/reverse-engineering.html"><i>•</i>Reverse-Engineering</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/software.html"><i>•</i>Software</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/vulnerability.html"><i>•</i>Vulnerability</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Categories -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">© 2024 Quarkslab
+            · Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="./theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="./theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="./theme/js/respond.min.js"></script>
+
+    <script src="./static/js/misc.js"></script>
+
+
+
+
+</body></html>

@@ -1,0 +1,611 @@
+<html lang="en-US"><!--<![endif]--><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>
+Writing better Yara rules in 2023… | Hexacorn	</title>
+<link rel="profile" href="https://gmpg.org/xfn/11">
+<link rel="stylesheet" type="text/css" media="all" href="https://www.hexacorn.com/blog/wp-content/themes/twentyeleven/style.css?ver=20221126">
+<link rel="pingback" href="https://www.hexacorn.com/blog/xmlrpc.php">
+<!--[if lt IE 9]>
+<script src="https://www.hexacorn.com/blog/wp-content/themes/twentyeleven/js/html5.js?ver=3.7.0" type="text/javascript"></script>
+<![endif]-->
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="Hexacorn » Feed" href="https://www.hexacorn.com/blog/feed/">
+<link rel="alternate" type="application/rss+xml" title="Hexacorn » Comments Feed" href="https://www.hexacorn.com/blog/comments/feed/">
+<script type="text/javascript">
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/www.hexacorn.com\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.2.5"}};
+/*! This file is auto-generated */
+!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){p.clearRect(0,0,i.width,i.height),p.fillText(e,0,0);e=i.toDataURL();return p.clearRect(0,0,i.width,i.height),p.fillText(t,0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(p&&p.fillText)switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s("\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!s("\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!s("\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!s("\ud83e\udef1\ud83c\udffb\u200d\ud83e\udef2\ud83c\udfff","\ud83e\udef1\ud83c\udffb\u200b\ud83e\udef2\ud83c\udfff")}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(e=t.source||{}).concatemoji?c(e.concatemoji):e.wpemoji&&e.twemoji&&(c(e.twemoji),c(e.wpemoji)))}(window,document,window._wpemojiSettings);
+</script>
+<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 0.07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+	<link rel="stylesheet" id="wp-block-library-css" href="https://www.hexacorn.com/blog/wp-includes/css/dist/block-library/style.min.css?ver=6.2.5" type="text/css" media="all">
+<style id="wp-block-library-theme-inline-css" type="text/css">
+.wp-block-audio figcaption{color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-audio figcaption{color:hsla(0,0%,100%,.65)}.wp-block-audio{margin:0 0 1em}.wp-block-code{border:1px solid #ccc;border-radius:4px;font-family:Menlo,Consolas,monaco,monospace;padding:.8em 1em}.wp-block-embed figcaption{color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-embed figcaption{color:hsla(0,0%,100%,.65)}.wp-block-embed{margin:0 0 1em}.blocks-gallery-caption{color:#555;font-size:13px;text-align:center}.is-dark-theme .blocks-gallery-caption{color:hsla(0,0%,100%,.65)}.wp-block-image figcaption{color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-image figcaption{color:hsla(0,0%,100%,.65)}.wp-block-image{margin:0 0 1em}.wp-block-pullquote{border-bottom:4px solid;border-top:4px solid;color:currentColor;margin-bottom:1.75em}.wp-block-pullquote cite,.wp-block-pullquote footer,.wp-block-pullquote__citation{color:currentColor;font-size:.8125em;font-style:normal;text-transform:uppercase}.wp-block-quote{border-left:.25em solid;margin:0 0 1.75em;padding-left:1em}.wp-block-quote cite,.wp-block-quote footer{color:currentColor;font-size:.8125em;font-style:normal;position:relative}.wp-block-quote.has-text-align-right{border-left:none;border-right:.25em solid;padding-left:0;padding-right:1em}.wp-block-quote.has-text-align-center{border:none;padding-left:0}.wp-block-quote.is-large,.wp-block-quote.is-style-large,.wp-block-quote.is-style-plain{border:none}.wp-block-search .wp-block-search__label{font-weight:700}.wp-block-search__button{border:1px solid #ccc;padding:.375em .625em}:where(.wp-block-group.has-background){padding:1.25em 2.375em}.wp-block-separator.has-css-opacity{opacity:.4}.wp-block-separator{border:none;border-bottom:2px solid;margin-left:auto;margin-right:auto}.wp-block-separator.has-alpha-channel-opacity{opacity:1}.wp-block-separator:not(.is-style-wide):not(.is-style-dots){width:100px}.wp-block-separator.has-background:not(.is-style-dots){border-bottom:none;height:1px}.wp-block-separator.has-background:not(.is-style-wide):not(.is-style-dots){height:2px}.wp-block-table{margin:0 0 1em}.wp-block-table td,.wp-block-table th{word-break:normal}.wp-block-table figcaption{color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-table figcaption{color:hsla(0,0%,100%,.65)}.wp-block-video figcaption{color:#555;font-size:13px;text-align:center}.is-dark-theme .wp-block-video figcaption{color:hsla(0,0%,100%,.65)}.wp-block-video{margin:0 0 1em}.wp-block-template-part.has-background{margin-bottom:0;margin-top:0;padding:1.25em 2.375em}
+</style>
+<link rel="stylesheet" id="classic-theme-styles-css" href="https://www.hexacorn.com/blog/wp-includes/css/classic-themes.min.css?ver=6.2.5" type="text/css" media="all">
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #fff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--blue: #1982d1;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #666;--wp--preset--color--light-gray: #e2e2e2;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--duotone--dark-grayscale: url('#wp-duotone-dark-grayscale');--wp--preset--duotone--grayscale: url('#wp-duotone-grayscale');--wp--preset--duotone--purple-yellow: url('#wp-duotone-purple-yellow');--wp--preset--duotone--blue-red: url('#wp-duotone-blue-red');--wp--preset--duotone--midnight: url('#wp-duotone-midnight');--wp--preset--duotone--magenta-yellow: url('#wp-duotone-magenta-yellow');--wp--preset--duotone--purple-green: url('#wp-duotone-purple-green');--wp--preset--duotone--blue-orange: url('#wp-duotone-blue-orange');--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="twentyeleven-block-style-css" href="https://www.hexacorn.com/blog/wp-content/themes/twentyeleven/blocks.css?ver=20230122" type="text/css" media="all">
+<link rel="https://api.w.org/" href="https://www.hexacorn.com/blog/wp-json/"><link rel="alternate" type="application/json" href="https://www.hexacorn.com/blog/wp-json/wp/v2/posts/8661"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.hexacorn.com/blog/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://www.hexacorn.com/blog/wp-includes/wlwmanifest.xml">
+<meta name="generator" content="WordPress 6.2.5">
+<link rel="canonical" href="https://www.hexacorn.com/blog/2023/08/26/writing-better-yara-rules-in-2023/">
+<link rel="shortlink" href="https://www.hexacorn.com/blog/?p=8661">
+<link rel="alternate" type="application/json+oembed" href="https://www.hexacorn.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.hexacorn.com%2Fblog%2F2023%2F08%2F26%2Fwriting-better-yara-rules-in-2023%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://www.hexacorn.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.hexacorn.com%2Fblog%2F2023%2F08%2F26%2Fwriting-better-yara-rules-in-2023%2F&amp;format=xml">
+		<style type="text/css" id="twentyeleven-header-css">
+				#site-title,
+		#site-description {
+			position: absolute;
+			clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+			clip: rect(1px, 1px, 1px, 1px);
+		}
+				</style>
+		</head>
+
+<body class="post-template-default single single-post postid-8661 single-format-standard wp-embed-responsive single-author singular one-column content">
+<div class="skip-link"><a class="assistive-text" href="#content">Skip to primary content</a></div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-dark-grayscale"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0 0.49803921568627"></feFuncR><feFuncG type="table" tableValues="0 0.49803921568627"></feFuncG><feFuncB type="table" tableValues="0 0.49803921568627"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-grayscale"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0 1"></feFuncR><feFuncG type="table" tableValues="0 1"></feFuncG><feFuncB type="table" tableValues="0 1"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-purple-yellow"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.54901960784314 0.98823529411765"></feFuncR><feFuncG type="table" tableValues="0 1"></feFuncG><feFuncB type="table" tableValues="0.71764705882353 0.25490196078431"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-blue-red"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0 1"></feFuncR><feFuncG type="table" tableValues="0 0.27843137254902"></feFuncG><feFuncB type="table" tableValues="0.5921568627451 0.27843137254902"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-midnight"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0 0"></feFuncR><feFuncG type="table" tableValues="0 0.64705882352941"></feFuncG><feFuncB type="table" tableValues="0 1"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-magenta-yellow"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.78039215686275 1"></feFuncR><feFuncG type="table" tableValues="0 0.94901960784314"></feFuncG><feFuncB type="table" tableValues="0.35294117647059 0.47058823529412"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-purple-green"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.65098039215686 0.40392156862745"></feFuncR><feFuncG type="table" tableValues="0 1"></feFuncG><feFuncB type="table" tableValues="0.44705882352941 0.4"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"><defs><filter id="wp-duotone-blue-orange"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values=" .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 "></feColorMatrix><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="table" tableValues="0.098039215686275 1"></feFuncR><feFuncG type="table" tableValues="0 0.66274509803922"></feFuncG><feFuncB type="table" tableValues="0.84705882352941 0.41960784313725"></feFuncB><feFuncA type="table" tableValues="1 1"></feFuncA></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"></feComposite></filter></defs></svg><div id="page" class="hfeed">
+	<header id="branding">
+			<hgroup>
+				<h1 id="site-title"><span><a href="https://www.hexacorn.com/blog/" rel="home">Hexacorn</a></span></h1>
+				<h2 id="site-description">Hexacorn</h2>
+			</hgroup>
+
+			
+						<div class="only-search">
+					<form method="get" id="searchform" action="https://www.hexacorn.com/blog/">
+		<label for="s" class="assistive-text">Search</label>
+		<input type="text" class="field" name="s" id="s" placeholder="Search">
+		<input type="submit" class="submit" name="submit" id="searchsubmit" value="Search">
+	</form>
+			</div>
+				
+			<nav id="access">
+				<h3 class="assistive-text">Main menu</h3>
+				<div class="menu-hexacorn-site-navigation-container"><ul id="menu-hexacorn-site-navigation" class="menu"><li id="menu-item-6" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6"><a href="https://www.hexacorn.com/">Home</a></li>
+<li id="menu-item-7" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-7"><a href="https://www.hexacorn.com/services.html">Services</a></li>
+<li id="menu-item-8" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-8"><a href="https://www.hexacorn.com/products_and_freebies.html">Products &amp; Freebies</a></li>
+<li id="menu-item-9" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9"><a href="https://www.hexacorn.com/case_studies.html">Case Studies</a></li>
+<li id="menu-item-10" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10"><a href="https://www.hexacorn.com/contact.html">Contact Us</a></li>
+</ul></div>			</nav><!-- #access -->
+	</header><!-- #branding -->
+
+
+	<div id="main">
+
+		<div id="primary">
+			<div id="content" role="main">
+
+				
+					<nav id="nav-single">
+						<h3 class="assistive-text">Post navigation</h3>
+						<span class="nav-previous"><a href="https://www.hexacorn.com/blog/2023/08/25/lolbins-for-connoisseurs/" rel="prev"><span class="meta-nav">←</span> Previous</a></span>
+						<span class="nav-next"><a href="https://www.hexacorn.com/blog/2023/09/03/the-secret-of-961c151d2e87f2686a955a9be24d316f1362bf21/" rel="next">Next <span class="meta-nav">→</span></a></span>
+					</nav><!-- #nav-single -->
+
+					
+<article id="post-8661" class="post-8661 post type-post status-publish format-standard hentry category-yara-sigs">
+	<header class="entry-header">
+		<h1 class="entry-title">Writing better Yara rules in 2023…</h1>
+
+				<div class="entry-meta">
+			<span class="sep">Posted on </span><a href="https://www.hexacorn.com/blog/2023/08/26/writing-better-yara-rules-in-2023/" title="12:15 am" rel="bookmark"><time class="entry-date" datetime="2023-08-26T00:15:33+00:00">2023-08-26</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="https://www.hexacorn.com/blog/author/adam/" title="View all posts by adam" rel="author">adam</a></span></span>		</div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		
+<p><strong>Update</strong></p>
+
+
+
+<p>This post has been featured in Josh Hammond’s <a href="https://www.youtube.com/watch?v=fu71CljrxsU">video</a>! Yay, thanks Josh!</p>
+
+
+
+<p>Also, you should know that there are many other great resources online focusing on Yara performance improvements, efficiency, etc. f.ex:</p>
+
+
+
+<ul>
+<li><a href="https://github.com/InQuest/awesome-yara">https://github.com/InQuest/awesome-yara</a></li>
+
+
+
+<li><a href="https://engineering.avast.io/category/know-your-yara-rules/">https://engineering.avast.io/category/know-your-yara-rules/</a></li>
+
+
+
+<li><a href="https://engineering.avast.io/yaramod-inspect-analyze-and-modify-your-yara-rules-with-ease/">https://engineering.avast.io/yaramod-inspect-analyze-and-modify-your-yara-rules-with-ease/</a></li>
+
+
+
+<li><a href="https://docs.google.com/presentation/d/1efe57L44WHZFJLNX2Ir-E4SOMFGK6eUzVsFiBOgOF-U/edit?usp=sharing">https://docs.google.com/presentation/d/1efe57L44WHZFJLNX2Ir-E4SOMFGK6eUzVsFiBOgOF-U/edit?usp=sharing</a></li>
+
+
+
+<li><a href="https://help.stairwell.com/en/knowledge/what-are-yara-rule-best-practices">https://help.stairwell.com/en/knowledge/what-are-yara-rule-best-practices</a></li>
+
+
+
+<li><a href="https://github.com/nbareil/yara-dedup">https://github.com/nbareil/yara-dedup</a></li>
+</ul>
+
+
+
+<p><strong>Old Post</strong></p>
+
+
+
+<p>In my <a href="https://www.hexacorn.com/blog/2023/01/21/yara-rules-pageant/" data-type="post" data-id="8386">previous post</a> I mused about an impossible task – how to consolidate a large, unorganized yara ruleset (that lots of us, admittedly, collect and hoard – just downloading it all, randomly, from all the corners of the internet w/o much thinking…) into a single, monolith, ready-to-use-for-a-quick-triage yara rule set…</p>
+
+
+
+<p>Trust me: it’s not easy, but still doable, and in my previous post I kinda outlined a process that extracts, isolates and classifies each rule one by one, so that once they are all in separate files, we strip their metadata, deduplicate them, check their syntax for errors, find hidden duplicates (via compilation), and finally merge the surviving ones into a one, gigantic rule set that can be used directly with yara.exe (or compiled with yarac.exe for faster processing). </p>
+
+
+
+<p>Yup, it’s not perfect, but this is one of these “it kinda worked for me” situations… </p>
+
+
+
+<p>Since my last post I made lots of improvements to that idea and I can now painlessly merge any set of random yara rules with a minimal manual input, but with a caveat that I brutally ditch many of the ‘bad rules’ ‘in the process’… It’s their authors’ fault though 😉 Yup, I am serious – if your rule is kinda over-engineered – no one wants it, and this is why I also kill it at source cuz I don’t want it either 😉</p>
+
+
+
+<p>Anyway… this post is not about automation. It’s about quality. A subject close to my heart, because this is my second post on yara rule writing ‘best practices’ – the first one was a disaster, because I was wrong on many fronts, and was corrected by the actual Yara devs… It was an eye-opening experience, for sure. That old post – I took it down.</p>
+
+
+
+<p>And I do hope this post will be a bit better!</p>
+
+
+
+<p>Reviewing many Yara rules written by others is a great researching adventure… You learn a lot not only about various optimization tricks, but also Yara syntax that you were not even aware existed… And yes, nothing works better for learning than a corpora of good examples… You can RTFM all day long and then someone breaks the rules (sic!) and uses the language syntax in a way no one ever thought of before… And yes, looking at all these rules you find mistakes too 🙂 Not only bad strings, but also wrong assumptions, bad copypasta, and sometimes a certain level of laziness…</p>
+
+
+
+<p>So, let’s cover a few things that I learned from eyeballing of these 40K+ yara rules:</p>
+
+
+
+<ul>
+<li>ditch PEiD-based yara rules – they are truly obsolete in 2023 and many of them are simply naive; also, 32-bit packers and protectors prevalent in 1990s and 2000s are not interesting anymore</li>
+
+
+
+<li>ditch file properties and feature extraction-oriented rules – better tools exist today f.ex. <a href="https://github.com/horsicq/Detect-It-Easy">DiE</a>, <a href="https://github.com/mandiant/capa">capa</a>; detecting that a file is a PE, PE.NET, ELF, MSI or DOC/X, or XLS/X via yara is simply NOT the best use of yara and IT IS AN ALREADY SOLVED PROBLEM on a modular level (see f.ex. <em>dotnet.is_dotnet</em> discussion below)</li>
+
+
+
+<li>separate specific (client-specific, scope-specific, threat actor-specific, etc) and generic rules – the generic ones may be useful for scoped DFIR/loose triage/sweeps, or targeted VM assessment engagements, but you don’t want these FP-prone rules to be used on every ‘light’ scan across the fleet of many endpoints, and for many customers; there simply is a really high cost associated with reviewing results of many of these wishy-washy ‘detections’, and I guarantee you – you will find a lot of results… nowadays many DF/IR companies rely on yara-based scanners for their triage activities and trust me, reviewing the results that these tools produce is a very time-consuming task — notably, most of the hits are False Positives</li>
+
+
+
+<li>separate public rules you want to share and private rules you want to keep to yourself</li>
+
+
+
+<li>separate in-memory and file-specific yara rules; memory-only rules are great, but when ran against a file system, even on a clean installation of Windows 10 or 11 they may produce FPs; I have seen that happening; and then you have your TEMP and CACHE directories of your browsers; they will store snapshots of pages including websites/blogs/social media pages hosted by security vendors, yourself, etc. and if there is no file-specific conditions in your yara rule, you will get hits (FPs!); last, but not least – if your yara rule hits on itself, it is probably not a good yara rule at all, so add this self-check to your test routine!</li>
+
+
+
+<li>ditch rules dependent on other rules – it’s really hard to process these in bulk; to merge these with a larger yara rules corpora w/o breaking something is impossible; yara rule dependencies are nothing but a fancy-pantsy show-off of one’s skillset, and – while they will surely find some local appeal – the moment you share them widely… such monstrosities will surely break many yara rules aggregating builds… that is – simple is BETTER, use KISS principle and avoid nesting conditions</li>
+
+
+
+<li>keep rules high-fidelity, as much as you can…</li>
+
+
+
+<li>but then again, for DFIR, Threat Hunting/Triage, and often incident-, or even client-, or scope-specific rules, keep them very wide-open and allow low-fidelity, if needed – in such cases it is actually acceptable and welcome, because the scope and objective is different… I must confess I literally wrote a very controversial yara rule for a very specific APT case — it was then published online and all hell broke loose when people started b*g about its quality; I still stand by it though, it was a beautiful example of a targeted yara rule that was detecting ‘surgical’ patches to a code introducing a skeleton key functionality to a logon request processing binary – it was horrendous on a grand scheme of things though, so it would produce a lot of FPs if you wanted to use it in retroscans on VT, but on systems of interest — it was detecting patches beautifully, and with 100% accuracy</li>
+
+
+
+<li>if you can, keep a list of sample hashes you used for writing the rule inside the rule meta section; your internal QC process can use them for verification, and… you can also use an external QC process relying on <a href="https://yara-ci.cloud.virustotal.com/">yara-ci</a> that can extract these for automated QC…; it takes care of both False Positives (via NSRL set) and False Negatives (via hashes you pass in the meta data)</li>
+
+
+
+<li>having said that, remember that I <a href="https://www.hexacorn.com/blog/2022/02/04/analysing-nsrl-data-set-for-fun-and-because-curious/" data-type="post" data-id="7968">exposed the NSRL set</a> as being err.. a bit limited and quite outdated!</li>
+
+
+
+<li>when you write rules, add as many conditions as possible, including a distinction between a non-MZ and MZ file, non-PE and PE file, an EXE and a DLL, 32- and 64-bit; .net and non-.net executables, driver and non-driver – yes, this may be an overkill sometimes, but we do want that precision, long-term; think of it – just checking ‘MZ’ at the top of the files is NOT enough; we don’t want to include Dos or Windows 3.1/Dos4GW MZ/NE/LE executables in any sampleset ‘caught by yara rules’ written in 2023…; plus, more file types and subtypes appear out there on regular basis, so we need to keep some focus – as a result, we do want to keep libraries of yara rules that target different architectures (Intel, ARM), OSes (Windows, Linux, macOS), different programming languages (non-.NET vs. .NET, C, Delphi, VB, Go, Rust, Nim, etc.), wrappers (autoit, pyinstaller, pyarmor, ps2exe, etc.), webshells (php, asp, jsp, etc.) separate and easily recognizable (that granularity may help to surgically deploy subset of yara rules against specific file types, too)</li>
+
+
+
+<li>keep rules readable – these cryptic oneliner conditions, no comments at all — it’s just a poor hygiene, so:
+<ul>
+<li>add as many comments to explain logic as you can</li>
+
+
+
+<li>explain / include printable version of values of hexadecimal strings &amp; the reason they were chosen (include printable versions of these!)</li>
+
+
+
+<li>comment on code snippets to explain uniqueness of these code sequences… </li>
+</ul>
+</li>
+
+
+
+<li>keep yourself up to date with yara documentation – it changes often, and this project keeps on delivering lots of new features all the time – often, these ‘novelties’ simplify writing a lot of detections that used to be tough to write in the past (and are now simplified using file- type-specific modules, loops, ranges, console module, etc.); for example, ‘pe.pdb_path icontains’ may be better today than a PDB string found inside the binary _anywhere_</li>
+
+
+
+<li>stop using ‘stupid’ strings for detections; they may look good at the time of targeted rule-writing, but they are not so good in the grand scheme of things; c’mon… rules that use strings like these should be literally banned!:
+<ul>
+<li>KERNEL32</li>
+
+
+
+<li>NTDLL</li>
+
+
+
+<li>USER32</li>
+
+
+
+<li>WININET</li>
+
+
+
+<li>WS2_32</li>
+
+
+
+<li>SHLWAPI</li>
+
+
+
+<li>ADVAPI32</li>
+
+
+
+<li>NSS3</li>
+
+
+
+<li>rundll32.exe</li>
+
+
+
+<li>.text</li>
+
+
+
+<li>&lt;input type=\”</li>
+
+
+
+<li>GlobalSign</li>
+
+
+
+<li>Thawte</li>
+
+
+
+<li>Response.Write</li>
+
+
+
+<li>BSJB // this is .NET PE file ‘magic’</li>
+
+
+
+<li>#Strings</li>
+
+
+
+<li>#GUID</li>
+
+
+
+<li>C#</li>
+
+
+
+<li>cmd.exe</li>
+
+
+
+<li>powershell</li>
+
+
+
+<li>POST</li>
+
+
+
+<li>Content-Type: application/x-www-form-urlencoded</li>
+
+
+
+<li>VirtualProtect</li>
+
+
+
+<li>DecryptFileA</li>
+
+
+
+<li>CreateThread</li>
+
+
+
+<li>WriteProcessMemory</li>
+
+
+
+<li>echo</li>
+
+
+
+<li>path</li>
+
+
+
+<li>AssemblyTitle</li>
+
+
+
+<li>cookies.sqlite</li>
+
+
+
+<li>&lt;?php</li>
+
+
+
+<li>JScript</li>
+
+
+
+<li>&lt;?xml version</li>
+
+
+
+<li>request</li>
+
+
+
+<li>java.lang.</li>
+
+
+
+<li>public</li>
+
+
+
+<li>server</li>
+
+
+
+<li>CreateObject</li>
+
+
+
+<li>[InternetShortcut]</li>
+
+
+
+<li>and many more…</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p>All of these strings will hit gazillion of clean files and are POOR string detection choices. Yes, we need some of them to determine a file type, and yes, we need some of them to confirm the file is a scripting language, but be aware that many of these strings exist inside looooots of clean files! This means that using them is an equivalent of lots of wasted CPU cycles!</p>
+
+
+
+<ul>
+<li>Improve your wildcard/regex-fu:
+<ul>
+<li>stop using regex wildcards haphazardly… in the worst case scenario, your “.*” or “.+” may end up slowing the scanning process substantially if it is applied to a large file (f.ex. 300MB MZ/PE); use .{0,30}, .{4,16} instead… that is… smaller, more practical and controlled ranges – let that regex engine breathe, and exit gracefully, and… relatively early</li>
+</ul>
+</li>
+
+
+
+<li>do not rely on ‘pe.imports(“mscoree.dll”)’ to determine if the MZ executable is a .NET executable; many modern .NET executable DO NOT import ‘mscoree.dll’!  f.ex. see 323d7b7d1eb3501e183c7d58bcb46c0e12f56e432765cfcb6302b8e4fe49842d</li>
+
+
+
+<li>Better rely on the following <a href="https://github.com/mikesxrs/Open-Source-YARA-rules/blob/39f33a829cb887d6ecf96c63cc98f312c82eeefd/crowdstrike/Crowdstrike_index.yara#L229">construct</a> that ensures the NETTblRVA is not empty for both 32- and 64- bit MZ/PE executables:</li>
+</ul>
+
+
+
+<pre class="wp-block-code"><code>        uint16(0) == 0x5A4D and
+        (uint32(uint32(0x3C)) == 0x00004550) and 
+        ((uint16(uint32(0x3C)+24) == 0x010B and uint32(uint32(0x3C)+232) &gt; 0) or (uint16(uint32(0x3C)+24) == 0x020B and uint32(uint32(0x3C)+248) &gt; 0)) and</code></pre>
+
+
+
+<ul>
+<li>or, in newer versions of yara/dotnet, you can simply use</li>
+</ul>
+
+
+
+<pre class="wp-block-preformatted">	  dotnet.is_dotnet == 1</pre>
+
+
+
+<ul>
+<li>try this on your sample zoo – you will get surprised:</li>
+</ul>
+
+
+
+<pre class="wp-block-preformatted">import "pe"
+import "console"
+rule isdotnet_no_mscoree : windows
+{
+	condition:
+	  (dotnet.is_dotnet == 1) and
+	  (not (pe.imports("mscoree.dll")))
+}</pre>
+
+
+
+<ul>
+<li>build an awareness of how popular NULL character is; avoid using it as an anchor/atom that ‘prefixes’ your ‘unique’ strings</li>
+
+
+
+<li>learn machine opcodes for the most common CPU instructions (and if you are into S/M: MMX, SSE, AVX)
+<ul>
+<li>you don’t need to rely on ‘strings’ only – learn at least basic code opcodes &amp; recognize variable parts of machine instructions and their sequences — this will help you to choose better, more unique code blocks as solid detections f.ex. functions responsible for calculating API hashes, RC4 or Luhn formula calculating routines, config decryption routines specific to a malware family, threat author, shared code, etc. – surprisingly, they often stay the same across many compilations/builds (on a binary level)</li>
+</ul>
+</li>
+
+
+
+<li>don’t use these, please…
+<ul>
+<li>pe.imports(“kernel32.dll”,”CreateFileA”)’</li>
+
+
+
+<li>pe.imports(“user32.dll”,”FindWindowA”)</li>
+
+
+
+<li>pe.imports(“kernel32.dll”,”GetModuleHandleA”)</li>
+
+
+
+<li>pe.imports(“kernel32.dll”,”GetModuleFileNameA”)</li>
+
+
+
+<li>pe.imports(“kernel32.dll”,”IsDebuggerPresent”)</li>
+
+
+
+<li>pe.imports(“kernel32.dll”,”TerminateProcess”)</li>
+
+
+
+<li>pe.imports(“kernel32.dll”,”GetTickCount”)<br>seriously…</li>
+</ul>
+</li>
+
+
+
+<li>Look at clean files, on regular basis:
+<ul>
+<li>Rust, Go, Nim executable files – they are “different” — they include lots of garbage, lots of nothingness (from a yara perspective, at least); if you are not familiar with their clean sampleset, you may choose wrong strings that may hit on many clean files!</li>
+
+
+
+<li>Signed executables are not always GOOD; many threat actors use stolen certificates to sign their malicious productions</li>
+
+
+
+<li>Javascript files that look GOOD may not be GOOD — threat actors are clever and poison legitimate code with their injects; ‘at first glance’ the javascript may look ‘ok’ but it’s not</li>
+
+
+
+<li>Newer native Windows executables destroyed the meaning of a <a href="https://devblogs.microsoft.com/oldnewthing/20180103-00/?p=97705">PE compilation timestamp</a> ! So, now we have exceptions for native OS executables and older <a href="https://www.hexacorn.com/blog/2014/12/05/the-not-so-boring-land-of-borland-executables-part-1/">Delphi files</a>. Still, it may be a good yara condition to include only these files with a compilation stamp within a certain timeframe</li>
+
+
+
+<li>Use new compiler and linker-specific artifacts to your advantage – many new file properties that TAs have not caught up with yet; these may be good inclusions or exclusions!</li>
+
+
+
+<li>Even your best code-based signature cannot escape the scrutiny of gazillion of clean samples compiled with the same binary string present in it; for example, some very popular public yara repositories use ‘unique’ code strings to detect a certain code condition in a binary; yes, it works on a cluster of that particular malware family samples, but this condition and its binary representation is also shared by a lot of clean files; as a result, FPs all over the place — so, when you decide to do code-based sigs make sure you are hitting the code of a Threat Actor and not a run-of-the-mill legit code sample that is being copied, pasted and compiled all over the internet!</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p>Finally… </p>
+
+
+
+<ul>
+<li>make sure you peer review your rules, and then do retrohunts or do content:&lt;hex string&gt; searches on VT to confirm your hunches…</li>
+
+
+
+<li>if you have a sampleset of clean files, run your rules against them</li>
+</ul>
+
+
+
+<p>Newer yara builds support ‘Console’ module allowing you to print out the values extracted from, and conditions applied to the files. The yara’s -D arguments allows you to extract the values as ‘seen’ by yara modules f.ex. ‘elf’, ‘pefile’, ‘dotnet’. Use them, use them across many samples, compare the results, build some stats around these results, and then find unique similarities within clusters of samples and then codify it. Then again, test against VT, test against clean files  corpora, then (if no FP detected) push to production.</p>
+
+
+
+<p>The very last point I want to cover is esthetics. Many people who hunt for new malware fail at the most crucial point: communication about their detection methodology. And in a case of Yara rules, let’s be honest – writing these is not easy. BUT. Yara rules analysis is…. even harder. Especially if the writer omits details. And you name it… if they are not beautified, if their strings are not readable, if their conditions are not explained, if they look esoteric, cryptic, or otherwise ‘3l33t’ they are not useful at all! Let’s face it… the best yara rules are the ones that are telling some sort of a story and/or help all the other yara writers to build better yara writing habits…</p>
+
+
+
+<p>And in the interest of full disclosure, i hope I stick to at least 50% of what I preach here… 🙂</p>
+
+
+
+<p>. </p>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="https://www.hexacorn.com/blog/category/yara-sigs/" rel="category tag">Yara sigs</a> by <a href="https://www.hexacorn.com/blog/author/adam/">adam</a>. Bookmark the <a href="https://www.hexacorn.com/blog/2023/08/26/writing-better-yara-rules-in-2023/" title="Permalink to Writing better Yara rules in 2023…" rel="bookmark">permalink</a>.
+		
+			</footer><!-- .entry-meta -->
+</article><!-- #post-8661 -->
+
+						<div id="comments">
+	
+	
+	
+	
+</div><!-- #comments -->
+
+				
+			</div><!-- #content -->
+		</div><!-- #primary -->
+
+
+	</div><!-- #main -->
+
+	<footer id="colophon">
+
+			
+
+			<div id="site-generator">
+								<a class="privacy-policy-link" href="https://www.hexacorn.com/blog/privacy-policy/" rel="privacy-policy">Privacy Policy</a><span role="separator" aria-hidden="true"></span>				<a href="https://wordpress.org/" class="imprint" title="Semantic Personal Publishing Platform">
+					Proudly powered by WordPress				</a>
+			</div>
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<script type="text/javascript" src="https://www.hexacorn.com/blog/wp-includes/js/comment-reply.min.js?ver=6.2.5" id="comment-reply-js"></script>
+
+
+
+</body></html>

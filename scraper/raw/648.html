@@ -1,0 +1,721 @@
+<html class="" lang="en"><!--<![endif]--><head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css">
+
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="Prevent cloud misconfigurations and find vulnerabilities during build-time in infrastructure as code, container images and open source packages with Checkov by Bridgecrew.">
+
+
+<meta name="author" content="Bridgecrew">
+
+
+
+
+<link rel="shortcut icon" href="https://www.checkov.io/assets/img/favicon.png">
+
+
+<title>checkov</title>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-YV3H6Y5F2K&amp;l=dataLayer&amp;cx=c"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-156134275-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-156134275-1'
+         );
+</script>
+
+
+<style></style><meta class="foundation-mq"></head><body role="document" class="home"><div class="cc-revoke cc-bottom cc-animate cc-color-override--1762072787" style="display: none;">Cookie Policy</div><div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window cc-banner cc-type-opt-in cc-theme-block cc-bottom cc-color-override--1762072787 " style=""><!--googleoff: all--><span id="cookieconsent:desc" class="cc-message">This website uses cookies to ensure you get the best experience on our website. <a aria-label="learn more about cookies" role="button" tabindex="0" class="cc-link" href="https://www.paloaltonetworks.com/legal-notices/trust-center/privacy" rel="noopener noreferrer nofollow" target="_blank">Learn more</a></span><div class="cc-compliance cc-highlight"><a aria-label="deny cookies" role="button" tabindex="0" class="cc-btn cc-deny">Decline</a><a aria-label="allow cookies" role="button" tabindex="0" class="cc-btn cc-allow">Allow cookies</a></div><!--googleon: all--></div><svg width="0" height="0" class="hide">
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 19" id="github-logo">
+    <path d="M12.487 18v-3.129a2.687 2.687 0 00-.155-1.137 2.718 2.718 0 00-.616-.973C14.292 12.478 17 11.516 17 7.101a4.36 4.36 0 00-1.23-3.031 4.043 4.043 0 00-.075-3.048s-.968-.283-3.208 1.196a11.136 11.136 0 00-5.743 0C4.504.738 3.535 1.022 3.535 1.022a4.043 4.043 0 00-.073 3.048A4.364 4.364 0 002.23 7.126c0 4.382 2.707 5.344 5.284 5.66a2.688 2.688 0 00-.771 2.086V18m0-2.425C2.64 16.787 2.64 13.553 1 13.149l5.744 2.426z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+  </symbol>
+
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" id="arrow">
+    <path d="M1 1l6 6 6-6" stroke="#052882" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+  </symbol>
+
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 13" id="star">
+    <path d="M7 1l1.854 3.62L13 5.205 10 8.02l.708 3.98L7 10.12 3.292 12 4 8.021 1 5.205l4.146-.585L7 1z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+  </symbol>
+
+  <symbol fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 207 40" id="bridge-footer">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M143.984 10.726c-1.89 1.708-2.889 4.211-2.889 7.237v12.862h4.987V17.963c0-1.584.413-2.767 1.228-3.518.895-.826 2.716-1.168 4.566-1.01l2.76-4.718-2.786-.172c-3.202-.332-5.922.423-7.866 2.18zm-116.675 0c-1.891 1.708-2.89 4.211-2.89 7.237v12.862h4.987V17.963c0-1.584.413-2.767 1.228-3.518.895-.826 2.716-1.168 4.566-1.01l2.76-4.718-2.785-.172c-3.203-.332-5.922.423-7.866 2.18zm12.522 20.099h4.99V8.89h-4.99v21.935zm162.15-21.61v12.904c0 2.187-1.255 3.714-3.457 3.714-2.181 0-3.421-1.527-3.421-3.714V9.215h-4.937v12.904c0 2.187-1.255 3.714-3.456 3.714-2.216 0-3.422-1.493-3.422-3.714V9.215h-4.972v12.904c0 4.96 3.448 8.7 8.394 8.7 2.412 0 4.348-.921 5.919-2.553 1.58 1.632 3.508 2.554 5.895 2.554 5.027 0 8.393-3.66 8.393-8.701V9.215h-4.936z" fill="#8293C0"></path>
+    <mask id="a" maskUnits="userSpaceOnUse" x="0" y="0" width="23" height="31">
+      <path d="M.001 0h22.13v30.698H0V0z" fill="#fff"></path>
+    </mask>
+    <g mask="url(#a)">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M11.066 8.504c-2.168 0-4.282.641-6.078 1.827V0H0v17.648c0 3.065.306 5.85 2.136 8.407 1.562 2.183 3.89 3.775 6.508 4.371a10.84 10.84 0 002.42.27c6.102 0 11.065-4.977 11.065-11.096S17.167 8.504 11.066 8.504zm6.143 11.097c0 3.397-2.756 6.16-6.143 6.16-3.388 0-6.144-2.763-6.144-6.16 0-3.397 2.756-6.16 6.144-6.16 3.387 0 6.143 2.763 6.143 6.16z" fill="#8293C0"></path>
+    </g>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M64.187 10.33a11.043 11.043 0 00-6.078-1.826c-6.101 0-11.065 4.978-11.065 11.097s4.964 11.097 11.065 11.097c5.376 0 10.809-4.41 10.936-10 .093-4.105.04-8.223.069-12.33L69.174 0h-4.987v10.33zm.065 9.271c0 3.397-2.756 6.16-6.143 6.16s-6.143-2.763-6.143-6.16c0-3.397 2.756-6.16 6.143-6.16s6.143 2.763 6.143 6.16z" fill="#8293C0"></path>
+    <mask id="b" maskUnits="userSpaceOnUse" x="71" y="8" width="23" height="32">
+      <path d="M71.18 8.543h22.21v31.192H71.18V8.543z" fill="#fff"></path>
+    </mask>
+    <g mask="url(#b)">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M93.35 19.454c-.02-.343-.05-.682-.09-1.018-.68-5.516-5.351-9.853-10.936-9.892h-.079c-6.1 0-11.064 4.977-11.064 11.096s4.963 11.097 11.064 11.097c2.192 0 4.33-.656 6.14-1.867-.123 3.29-2.83 5.929-6.14 5.929a6.126 6.126 0 01-5.134-2.787l-.446-.68-3.571 3.564.352.463c2.113 2.78 5.32 4.376 8.8 4.376 5.504 0 10.238-4.319 10.982-9.75.225-1.634.082-3.349.082-4.996 0-1.801.15-3.71.04-5.535zm-4.962.186c0 3.397-2.755 6.16-6.143 6.16-3.387 0-6.143-2.763-6.143-6.16 0-3.397 2.756-6.16 6.143-6.16 3.388 0 6.143 2.763 6.143 6.16z" fill="#8293C0"></path>
+    </g>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M134.813 24.487a6.066 6.066 0 01-3.735 1.275c-3.388 0-6.144-2.764-6.144-6.161s2.756-6.16 6.144-6.16c1.21 0 2.366.352 3.365 1.014l.746.546 3.488-3.498-.562-.465a11.065 11.065 0 00-7.037-2.534c-6.102 0-11.065 4.978-11.065 11.097s4.963 11.097 11.065 11.097a11.06 11.06 0 007.099-2.587l.578-.488-3.481-3.49-.461.354zM102.736 9.173c-5.733 2.093-8.7 8.473-6.613 14.223 2.087 5.75 8.449 8.725 14.182 6.633a11.092 11.092 0 005.698-4.71c-.241-.294-4.075-2.088-4.368-2.312a6.083 6.083 0 01-3.013 2.383c-2.236.816-4.757.231-6.423-1.413l10.526-3.842.002.013 4.806-1.755-.086-.542c-.112-.7-.29-1.387-.529-2.045-2.087-5.75-8.449-8.725-14.182-6.633zm-2.353 10.145a6.16 6.16 0 014.036-5.506 6.134 6.134 0 016.622 1.615l-10.658 3.89zm60.514-10.145c-5.733 2.093-8.7 8.473-6.613 14.223 2.087 5.75 8.449 8.725 14.182 6.633a11.092 11.092 0 005.698-4.71c-.241-.294-4.075-2.088-4.368-2.312a6.083 6.083 0 01-3.013 2.383c-2.236.816-4.756.231-6.422-1.413l10.526-3.842.001.013 4.807-1.755-.087-.542c-.112-.7-.29-1.387-.529-2.045-2.087-5.75-8.449-8.725-14.182-6.633zm-2.353 10.145a6.16 6.16 0 014.037-5.506 6.132 6.132 0 016.621 1.615l-10.658 3.89zM40.05 6.185s0 .4.399.4h4.19s.4 0 .4-.4V1.984s0-.4-.4-.4l-4.59 4.601z" fill="#8293C0"></path>
+  </symbol>
+
+  <symbol fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="right-arrow">
+    <path d="M3.333 8h9.333M8 3.333L12.667 8 8 12.667" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+  </symbol>
+
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 500" id="waves">
+    <path d="M-126.16 60.77C-562.86 48.89-879 439.5-879 439.5h2736s-459.89-175.85-768.75-188.74c-215.37-9-331.6 66.63-549.4 53.24-284-17.46-287.96-233-665.01-243.23z" fill="#d5dbeb"></path>
+    <path d="M-127.16 114.57C-563.86 102.69-880 493.31-880 493.31h2736s-459.89-175.85-768.75-188.74c-215.37-9-331.6 66.63-549.4 53.24-284-17.47-287.96-232.98-665.01-243.24z" fill="#dbe1ee"></path>
+    <path d="M-123.16 165.57C-559.86 153.69-876 544.31-876 544.31h2736s-459.89-175.85-768.75-188.74c-215.37-9-331.6 66.63-549.4 53.24-284-17.47-287.96-232.98-665.01-243.24z" fill="#e4e8f2"></path>
+    <path d="M-126.16 219.57C-562.86 207.69-879 598.31-879 598.31h2736s-459.89-175.85-768.75-188.74c-215.37-9-331.6 66.63-549.4 53.24-284-17.47-287.96-232.98-665.01-243.24z" fill="#f0f2f8"></path>
+  </symbol>
+</svg>
+
+<link rel="stylesheet" href="https://use.typekit.net/yqa0lvi.css">
+<link rel="stylesheet" href="https://www.checkov.io/assets/css/app.css">
+<script defer="" src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script defer="" type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+<script defer="" type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/foundation-sites@6.6.3/dist/js/foundation.min.js" integrity="sha256-pRF3zifJRA9jXGv++b06qwtSqX1byFQOLjqa2PTEb2o=" crossorigin="anonymous"></script>
+<script defer="" src="https://www.checkov.io/assets/js/app.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github-gist.min.css">
+
+
+
+
+
+<header class="header">
+    <div class="header-nav" id="sticky-nav">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x grid-padding-y align-middle">
+                <div class="cell small-auto shrink">
+                    <a href="https://www.checkov.io/" target="_blank" class="logo-wrapper">
+                        <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="2381" height="712" viewBox="0 0 2381 712" fill="none" version="1.1" id="svg14" sodipodi:docname="checkov.svg" inkscape:version="1.0.2 (e86c8708, 2021-01-15)">
+  <metadata id="metadata20">
+    <rdf:rdf>
+      <cc:work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+      </cc:work>
+    </rdf:rdf>
+  </metadata>
+  <defs id="defs18">
+    <style id="style561">
+      .cls-1 {
+        fill: #072882;
+      }
+    </style>
+  </defs>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1252" inkscape:window-height="766" id="namedview16" showgrid="false" inkscape:zoom="0.24917163" inkscape:cx="1486.4471" inkscape:cy="163.23133" inkscape:window-x="61" inkscape:window-y="826" inkscape:window-maximized="0" inkscape:current-layer="svg14" inkscape:document-rotation="0"></sodipodi:namedview>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M2255.22 467.306H2169.25L2041.39 132.253H2138.38L2211.13 340.566L2283.87 132.253H2380.88L2255.22 467.306ZM1987.38 423.218C1921.24 490.447 1814.32 490.447 1747.08 425.423C1730.55 408.897 1717.31 389.052 1708.5 367.014C1699.68 344.964 1695.27 320.721 1695.27 297.58C1695.27 273.325 1699.68 249.082 1708.5 227.044C1717.31 206.096 1729.45 187.366 1744.88 170.828C1760.31 155.405 1779.04 142.175 1798.89 133.355C1819.83 124.547 1842.97 120.137 1865.02 120.137C1888.17 120.137 1910.21 124.547 1932.26 132.253C1952.1 139.97 1970.83 152.098 1986.27 168.623C2001.7 185.161 2014.93 203.891 2022.64 224.839C2031.46 247.98 2035.88 272.223 2035.88 297.58C2035.88 321.823 2031.46 344.964 2022.64 367.014C2014.93 387.95 2002.8 406.692 1987.38 423.218ZM1944.38 260.107C1939.98 249.082 1934.47 239.16 1925.65 231.454C1917.93 223.737 1909.11 217.121 1898.09 212.711C1877.15 203.891 1852.9 203.891 1831.95 212.711C1822.03 217.121 1812.11 222.634 1805.5 231.454C1797.79 240.262 1791.18 249.082 1787.87 260.107C1783.45 272.223 1781.24 284.35 1781.24 297.58C1781.24 309.696 1783.45 321.823 1787.87 333.951C1792.28 344.964 1797.79 354.887 1805.5 362.604C1813.22 370.322 1822.03 376.937 1831.95 381.335C1841.87 385.745 1854 387.95 1865.02 387.95C1876.05 387.95 1887.07 385.745 1898.09 381.335C1908 376.937 1917.93 370.322 1925.65 362.604C1933.36 353.784 1939.98 344.964 1944.38 333.951C1953.2 310.798 1953.2 284.35 1944.38 260.107ZM1592.76 467.306L1524.42 346.067L1464.9 424.32V467.306H1378.93V0H1464.9V295.375L1591.66 134.458H1689.76L1578.43 273.325L1689.76 468.409L1592.76 467.306ZM1262.08 239.16C1256.57 232.557 1251.06 225.942 1243.35 221.532C1236.74 217.121 1229.02 212.711 1221.31 210.506C1213.58 208.301 1204.77 207.199 1197.05 207.199C1186.03 207.199 1173.91 209.404 1163.99 214.916C1154.06 219.327 1144.14 227.044 1137.53 234.75C1129.81 243.57 1123.2 254.595 1119.9 265.62C1115.49 277.735 1113.28 292.068 1113.28 305.298C1113.28 316.311 1115.49 327.336 1119.9 338.361C1124.3 348.272 1129.81 357.092 1137.53 364.809C1145.24 372.527 1154.06 379.13 1163.99 382.437C1181.62 390.155 1202.56 391.257 1221.31 385.745C1229.02 383.54 1236.74 380.232 1243.35 375.834C1249.96 371.424 1256.57 365.912 1260.98 360.399C1266.49 353.784 1270.9 347.169 1274.21 339.464L1337.04 402.282C1329.32 413.295 1320.51 423.218 1309.48 433.14C1299.57 441.961 1288.55 449.666 1276.41 456.281C1264.29 462.896 1252.17 467.306 1238.94 470.614C1225.72 473.921 1211.38 475.024 1198.15 475.024C1175.01 475.024 1152.96 470.614 1132.02 461.794C1091.23 444.166 1058.17 412.205 1040.54 371.424C1031.71 350.477 1027.3 328.439 1027.3 305.298C1027.3 281.043 1031.71 256.8 1040.54 233.647C1049.35 211.609 1061.48 192.878 1076.9 175.238C1092.33 158.713 1111.08 145.483 1130.92 135.56C1151.86 125.638 1173.91 121.24 1197.05 121.24C1211.38 121.24 1224.62 123.445 1237.84 126.74C1265.39 133.355 1289.65 147.688 1309.48 167.521C1319.4 177.443 1329.32 188.468 1335.93 201.686L1273.11 264.517C1272 253.492 1267.59 245.775 1262.08 239.16ZM855.357 387.95C858.663 387.95 861.969 387.95 865.275 387.95C872.99 387.95 881.806 386.847 889.52 384.642C897.235 382.437 904.949 379.13 911.573 374.732C924.798 365.912 935.818 353.784 942.431 338.361L1005.26 401.18C997.545 412.205 988.729 422.115 977.708 432.038C967.778 440.858 956.757 448.576 944.635 455.179C932.512 461.794 920.39 466.204 907.153 469.511C892.827 472.819 878.5 473.921 865.275 473.921C820.079 473.921 775.986 456.281 744.026 424.32C728.598 407.795 715.361 389.052 707.647 368.117C698.83 346.067 694.422 321.823 694.422 296.478C694.422 271.12 698.83 246.877 707.647 223.737C724.189 181.853 757.251 148.79 799.141 132.253C820.079 123.445 843.222 119.035 865.275 119.035C879.602 119.035 892.827 120.137 906.051 124.547C945.737 134.458 981.014 158.713 1005.26 192.878L845.427 385.745C848.745 386.847 852.051 387.95 855.357 387.95ZM888.418 209.404C885.112 208.301 880.704 207.199 876.296 206.096C871.888 206.096 868.582 204.994 864.173 204.994C853.153 204.994 842.12 207.199 831.1 211.609C821.181 216.019 811.263 221.532 804.651 230.352C796.936 238.057 790.324 247.98 787.018 259.005C782.598 271.12 780.394 283.248 780.394 296.478C780.394 299.785 780.394 303.093 780.394 307.491C780.394 311.901 781.496 315.208 781.496 319.618C781.496 324.028 782.598 327.336 783.712 331.746C784.814 335.054 785.916 338.361 788.12 341.656L888.418 209.404ZM565.458 276.633C566.56 267.825 564.356 260.107 561.05 251.287C554.438 235.852 542.315 223.737 526.875 217.121C519.16 213.814 510.344 211.609 502.63 211.609C476.181 211.609 453.026 227.044 443.107 251.287C439.801 259.005 437.597 267.825 437.597 276.633V467.306H352.727V0H437.597V147.688C447.515 139.97 457.434 134.458 469.568 131.15C480.589 127.843 491.609 126.74 502.63 126.74C522.467 126.74 542.315 130.048 561.05 138.868C578.683 146.585 595.226 157.61 608.45 170.828C621.675 185.161 632.695 200.584 640.41 218.224C648.124 236.955 652.532 256.8 652.532 276.633V467.306H566.56L565.458 276.633ZM235.886 239.16C230.376 232.557 224.866 225.942 217.139 221.532C210.527 217.121 202.813 212.711 195.098 210.506C187.384 208.301 178.568 207.199 170.853 207.199C159.833 207.199 147.698 209.404 137.78 214.916C127.862 219.327 117.943 227.044 111.331 234.75C103.617 242.467 97.0042 253.492 92.584 264.517C88.1758 276.633 85.9717 290.965 85.9717 304.195C85.9717 315.208 88.1758 326.233 92.584 337.259C97.0042 347.169 102.514 355.989 110.229 363.707C117.943 371.424 126.759 378.027 136.678 381.335C154.311 389.052 175.262 390.155 193.996 384.642C201.711 382.437 209.425 379.13 216.037 374.732C222.662 370.322 229.274 364.809 233.682 359.297C239.192 352.682 243.601 346.067 246.907 338.361L309.735 401.18C302.021 412.205 293.205 422.115 282.184 432.038C272.254 440.858 261.233 448.576 249.111 455.179C236.988 461.794 224.866 466.204 211.629 469.511C198.405 472.819 184.078 473.921 170.853 473.921C147.698 473.921 125.657 469.511 104.719 460.691C63.9308 443.063 30.8573 411.102 13.2245 370.322C4.40818 349.374 0 327.336 0 304.195C0 279.94 4.40818 255.697 13.2245 232.557C22.0409 210.506 34.1755 191.776 49.6042 174.136C65.0328 157.61 83.7676 144.38 103.617 134.458C124.555 124.547 146.596 120.137 169.751 120.137C184.078 120.137 197.303 122.342 210.527 125.65C238.09 132.253 262.335 146.585 282.184 166.418C292.103 176.341 302.021 187.366 308.633 200.584L245.805 263.415C245.805 253.492 241.396 245.775 235.886 239.16Z" fill="#052882" id="path10"></path>
+  <path id="path647" fill="black" d="m 2270.7095,580.96545 h 50.587 c 33.6532,0 53.588,19.72036 53.588,52.94488 0,33.22452 -19.7204,53.37359 -53.588,53.37359 h -50.587 z m 50.3727,88.74162 c 21.6495,0 33.6532,-11.57499 33.6532,-35.36804 0,-23.79304 -12.2181,-35.79674 -33.6532,-35.79674 h -31.081 v 71.16478 z m -182.8421,-23.14999 v -65.59163 h 19.506 v 64.51987 c 0,19.72037 13.9329,26.36527 30.6523,26.36527 16.7195,0 30.438,-6.43055 30.438,-25.72221 v -65.16293 h 19.506 v 64.94858 c 0,32.15276 -21.6495,43.94211 -50.3727,43.94211 -28.7231,0 -49.7296,-11.78935 -49.7296,-43.29906 z m -142.5439,-12.4324 c 0,-33.65322 22.7213,-55.73145 58.3037,-55.73145 35.5824,0 58.0893,21.86388 58.0893,55.73145 0,33.86758 -22.5069,55.73146 -58.0893,55.73146 -35.5824,0 -58.3037,-21.86388 -58.3037,-55.73146 z m 96.6727,0 c 0,-23.57869 -13.9329,-38.15461 -38.1547,-38.15461 -24.2217,0 -38.3689,14.57592 -38.3689,38.15461 0,23.57869 13.9328,38.15461 38.1546,38.15461 24.2217,0 38.369,-14.57592 38.369,-38.15461 z m -191.2018,-53.15923 h 19.506 v 88.52727 h 63.0194 l -0.643,18.00555 h -81.8824 V 581.1798 Z m -126.6819,53.58794 c 0,-30.00925 20.7921,-55.94581 59.5898,-55.94581 17.3625,0 31.081,6.43055 39.4407,12.8611 v 19.93472 0 c -11.1463,-7.71667 -22.9356,-15.00463 -39.8694,-15.00463 -24.6505,0 -39.012,16.50509 -39.012,38.15462 0,21.64952 13.5041,37.51155 38.7976,37.51155 16.7195,0 28.9375,-6.2162 40.0838,-14.57592 v 0 19.93472 c -8.1454,6.00184 -22.7213,12.21805 -41.5842,12.21805 -39.6551,0 -57.6606,-25.29351 -57.6606,-55.0884 z m -107.8189,-40.08378 c 0,-14.14722 10.0745,-23.79305 25.7222,-23.79305 15.6477,0 25.9365,9.64583 25.9365,23.79305 0,14.14721 -10.2888,24.00739 -25.9365,24.00739 -15.6477,0 -25.7222,-9.64582 -25.7222,-24.00739 z m 44.7995,0 c 0,-11.14629 -7.5023,-18.00555 -19.0773,-18.00555 -11.575,0 -19.0773,6.85926 -19.0773,18.00555 0,11.14629 7.5023,18.00554 19.0773,18.00554 11.575,0 19.0773,-6.85925 19.0773,-18.00554 z m -29.1518,-11.14629 h 11.7893 c 6.8593,0 9.6458,3.00092 9.6458,8.14536 0,2.78658 -1.5004,5.7875 -4.9301,6.85926 l 5.5732,6.6449 v 0 c 0,0 -6.2162,0.21436 -6.2162,0.21436 l -4.9301,-6.21621 h -5.5732 v 6.21621 h -5.5731 v -21.86388 z m 11.5749,11.14629 c 3.001,0 4.5014,-0.85741 4.5014,-3.21528 0,-2.35787 -1.2861,-3.21527 -4.287,-3.21527 h -6.2162 v 6.6449 h 6.2162 z m -111.6772,-13.50416 h 31.5097 l 42.0129,106.31847 h -20.3634 l -10.7176,-27.00832 h -54.231 l -10.7175,27.00832 h -20.1491 l 42.2273,-106.31847 z m -4.9301,62.37636 h 40.9412 l -17.3625,-44.15646 h -6.0019 z m -181.1272,-62.37636 h 23.15 l 37.7259,65.80598 36.8685,-65.80598 h 23.5787 v 106.31847 h -19.2917 V 611.4034 h -1.0718 l -39.8694,68.80691 h -1.5004 l -39.4408,-68.80691 h -1.0717 v 75.88052 h -19.0773 z m -117.8935,97.53004 v -19.93471 0 c 15.0046,8.35972 32.3671,13.28981 47.8004,13.28981 16.5051,0 25.0792,-5.57315 25.0792,-14.36157 0,-8.78842 -6.6449,-11.57499 -32.1528,-15.86203 -21.2208,-3.85833 -39.8694,-9.64583 -39.8694,-29.58054 0,-17.57684 14.7903,-33.65322 46.3,-33.65322 13.5041,0 28.7231,3.64398 40.0838,10.28888 v 19.93471 0 c -12.2181,-7.93101 -27.6514,-12.21805 -41.5843,-12.21805 -16.5051,0 -24.4361,5.57315 -24.4361,13.71852 0,9.86018 12.4324,11.78934 31.5097,15.43332 21.2209,3.85833 40.5125,9.43148 40.5125,31.08101 0,13.71851 -8.5741,33.22452 -45.6569,33.22452 -19.9347,0 -35.368,-4.93009 -47.8004,-11.14629 z m -48.6578,-97.53004 h 19.506 v 106.31847 h -19.506 z m -122.6092,0 h 55.5171 c 26.5796,0 39.655,12.8611 39.655,35.79674 0,17.57684 -8.3597,29.36619 -24.2217,33.65322 l 28.2944,36.86851 h -22.9356 l -24.6505,-33.43888 h -32.1527 v 33.43888 h -19.506 z m 54.874,55.73145 c 15.0046,0 20.5778,-8.35972 20.5778,-19.0773 0,-10.71759 -5.5732,-19.07731 -20.5778,-19.07731 h -35.368 V 636.6969 Z M 989.31475,580.96545 h 54.01665 c 25.9365,0 39.4407,13.93286 39.4407,37.2972 0,25.93656 -16.5051,38.36897 -41.1555,38.36897 h -32.5815 v 30.43794 h -19.506 V 580.7511 Z m 52.51615,58.30367 c 14.5759,0 21.2208,-8.14536 21.2208,-20.36341 0,-13.28981 -7.0736,-20.36342 -21.4351,-20.36342 h -32.5815 v 40.72683 h 33.0102 z M 860.06064,650.62977 812.2602,580.96545 h 22.72129 l 34.29628,51.01571 h 1.50046 l 34.72498,-51.01571 h 22.07823 l -48.01479,69.44996 v 36.86851 H 860.06064 Z M 703.79821,580.96545 h 59.16109 c 21.64952,0 34.72498,9.21712 34.72498,26.79397 0,12.21805 -5.57314,21.00647 -19.50601,24.4361 14.36157,4.93009 21.64953,12.64675 21.64953,25.50785 0,21.43518 -15.86203,29.58055 -39.44072,29.58055 h -56.58887 z m 56.58887,44.15646 c 12.21805,0 17.79119,-4.28704 17.79119,-13.71851 0,-9.43148 -6.00185,-13.28981 -17.36249,-13.28981 h -38.36896 v 27.22267 h 37.94026 z m 0.4287,44.79951 c 13.71851,0 19.50601,-4.71573 19.50601,-14.79027 0,-9.21712 -5.57315,-14.57592 -19.07731,-14.57592 h -38.79766 v 29.58055 h 38.36896 z"></path>
+</svg>
+
+                        <span class="show-for-sr">Checkov home</span>
+                    </a>
+                </div>
+                <div class="cell large-auto show-for-large shrink main-nav align-middle">
+                    <ul class="dropdown menu" data-dropdown-menu="40oa9v-dropdown-menu" role="menubar">
+                        <li role="none" class="is-dropdown-submenu-parent opens-right" aria-haspopup="true" aria-label="Docs">
+                            <a href="/1.Welcome/Quick%20Start.html" role="menuitem">Docs</a>
+                            <ul class="menu submenu is-dropdown-submenu first-sub vertical" data-submenu="" role="menubar">
+                                <li role="none" class="is-submenu-item is-dropdown-submenu-item">
+                                    <a href="/1.Welcome/Quick%20Start.html" role="menuitem">Quick start</a>
+                                </li>
+                                <li role="none" class="is-submenu-item is-dropdown-submenu-item">
+                                    <a href="/1.Welcome/What%20is%20Checkov.html" role="menuitem">Overview</a>
+                                </li>
+                                <li role="none" class="is-submenu-item is-dropdown-submenu-item">
+                                    <a href="/1.Welcome/Feature%20Descriptions.html#integrating-with-cicd" role="menuitem">Integrations</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="github-stars" role="none">
+                            <a href="https://www.github.com/bridgecrewio/checkov" target="_blank" role="menuitem">
+                                <svg class="icon">
+                                    <use xlink:href="#github-logo"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="button-container" role="none">
+                            <a href="/1.Welcome/Quick%20Start.html" class="button primary rounded" role="menuitem">Download</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="cell small-auto hide-for-large shrink hamburger align-middle">
+                    <button class="hamburger-button" onclick="this.classList.toggle('opened');this.setAttribute('aria-expanded', this.classList.contains('opened'))" aria-label="Main Menu">
+    <svg width="60" height="60" viewBox="0 0 100 100">
+        <path class="line line1" d="M 20,29.000046 H 80.000231 C 80.000231,29.000046 94.498839,28.817352 94.532987,66.711331 94.543142,77.980673 90.966081,81.670246 85.259173,81.668997 79.552261,81.667751 75.000211,74.999942 75.000211,74.999942 L 25.000021,25.000058"></path>
+        <path class="line line2" d="M 20,50 H 80"></path>
+        <path class="line line3" d="M 20,70.999954 H 80.000231 C 80.000231,70.999954 94.498839,71.182648 94.532987,33.288669 94.543142,22.019327 90.966081,18.329754 85.259173,18.331003 79.552261,18.332249 75.000211,25.000058 75.000211,25.000058 L 25.000021,74.999942"></path>
+    </svg>
+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-nav hide-for-large">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x grid-padding-y align-middle">
+                <div class="cell small-auto align-middle">
+                    <ul class="accordion-menu vertical menu" data-accordion-menu="4piib7-accordion-menu" role="tree" aria-multiselectable="true">
+                        <li role="treeitem" class="is-accordion-submenu-parent" aria-controls="mxwfb9-acc-menu" aria-expanded="false" id="h3ipcd-acc-menu-link">
+                            <a href="/1.Welcome/Quick%20Start.html" role="menuitem">Docs</a>
+                            <ul class="menu submenu is-accordion-submenu" data-submenu="" role="group" style="display: none;" aria-labelledby="h3ipcd-acc-menu-link" aria-hidden="true" id="mxwfb9-acc-menu">
+                                <li role="treeitem" class="is-submenu-item is-accordion-submenu-item">
+                                    <a href="/1.Welcome/Quick%20Start.html" role="menuitem">Quick start</a>
+                                </li>
+                                <li role="treeitem" class="is-submenu-item is-accordion-submenu-item">
+                                    <a href="/1.Welcome/What%20is%20Checkov.html" role="menuitem">Overview</a>
+                                </li>
+                                <li role="treeitem" class="is-submenu-item is-accordion-submenu-item">
+                                    <a href="/1.Welcome/Feature%20Descriptions.html#integrating-with-cicd" role="menuitem">Integrations</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div class="wy-grid-for-nav">
+
+    <div class="main-content">
+        <section class="home-hero">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-y grid-padding-x">
+                    <div class="cell medium-7 large-6 home-hero__content">
+                        <h1 class="home-hero__content-title">Policy-as-code for everyone</h1>
+                        <p class="home-hero__content-subtitle">Checkov scans cloud infrastructure configurations to find misconfigurations before they're deployed.</p>
+                        <p class="home-hero__content-content">Checkov uses a common command line interface to manage and analyze infrastructure as code (IaC) scan results across platforms such as Terraform, CloudFormation, Kubernetes, Helm, ARM Templates and Serverless framework.</p>
+                        <a href="/1.Welcome/What%20is%20Checkov.html" class="button white rounded">Get started<svg class="icon"><use xlink:href="#right-arrow"></use></svg></a>
+                    </div>
+                    <div class="cell medium-5 large-6 home-hero__media">
+                        <div class="home-hero__media-image">
+                            <img width="100%" src="/assets/vid/hero_video.gif">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="home-hero__bg">
+                <span class="circle circle_1"></span>
+                <span class="circle circle_2"></span>
+                <span class="circle circle_3"></span>
+            </div>
+        </section>
+
+        <section class="home-cta">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x grid-padding-y align-center home-hero__cta-container">
+                    <div class="cell small-auto shrink" style="max-width: 100%;">
+                        <a href="https://www.paloaltonetworks.com/blog/prisma-cloud/checkov-2-deepening-open-source-iac-security/?utm_source=checkovio&amp;utm_medium=organic_oss&amp;utm_campaign=checkov" target="_blank" class="button gray rounded home-cta__anchor">Introducing Checkov 2.0! Read about the biggest update to Checkov on our blog.</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-supported">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x grid-padding-y align-middle home-supported__container">
+                    <div class="cell medium-5 medium-offset-1 medium-order-2 home-supported__content">
+                        <h2 class="home-supported__title">Supported clouds and frameworks</h2>
+                        <p class="home-supported__subtitle subtitle">
+                            Verify changes to hundreds of supported resource types in all major cloud providers.
+                        </p>
+                        <p class="home-supported__text">
+                            Checkov supports developers using Terraform, Terraform plan, CloudFormation, Kubernetes, ARM Templates, Serverless, Helm, and AWS CDK.
+                        </p>
+                        <p>
+                            <a href="https://www.checkov.io/1.Welcome/Feature%20Descriptions.html#integrating-with-cicd" style="text-decoration:underline;font-weight:500;">Learn More</a>
+                        </p>
+                    </div>
+                    <div class="cell medium-6 medium-order-1">
+                        <figure class="home-supported__image">
+                            <img src="/assets/img/supported.png">
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            <figure class="waves-container" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 500" class="waves"><path d="M-126.16,60.77C-562.86,48.89-879,439.5-879,439.5H1857s-459.89-175.85-768.75-188.74c-215.37-9-331.6,66.63-549.4,53.24C254.85,286.54,250.89,71-126.16,60.77Z" style="fill:#d5dbeb"></path><path d="M-127.16,114.57C-563.86,102.69-880,493.31-880,493.31H1856s-459.89-175.85-768.75-188.74c-215.37-9-331.6,66.63-549.4,53.24C253.85,340.34,249.89,124.83-127.16,114.57Z" style="fill:#dbe1ee"></path><path d="M-123.16,165.57C-559.86,153.69-876,544.31-876,544.31H1860s-459.89-175.85-768.75-188.74c-215.37-9-331.6,66.63-549.4,53.24C257.85,391.34,253.89,175.83-123.16,165.57Z" style="fill:#e4e8f2"></path><path d="M-126.16,219.57C-562.86,207.69-879,598.31-879,598.31H1857s-459.89-175.85-768.75-188.74c-215.37-9-331.6,66.63-549.4,53.24C254.85,445.34,250.89,229.83-126.16,219.57Z" style="fill:#f0f2f8"></path></svg>
+            </figure>
+        </section>
+
+        <section class="value-prop">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-y grid-padding-x value-prop__container">
+                    <div class="cell small-12 text-center align-center-middle">
+                        <h2 class="value-prop__heading">Fully-featured policy-as-code</h2>
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-y grid-padding-x value-prop__columns">
+                    <div class="cell medium-6 value-prop__accordion">
+                        <ul class="accordion" data-accordion="vd7tvy-accordion" role="tablist">
+                            <li class="accordion-item is-active" data-accordion-item="" role="presentation">
+                                <a href="#" class="accordion-title" aria-controls="zlgo4t-accordion" role="tab" id="zlgo4t-accordion-label" aria-expanded="true" aria-selected="true">Attribute-based policies</a>
+                                <div class="accordion-content" data-tab-content="" role="tabpanel" aria-labelledby="zlgo4t-accordion-label" aria-hidden="false" id="zlgo4t-accordion" style="display: block;">
+                                    <p>
+                                        Scan cloud resources in build-time for misconfigured attributes with a simple Python policy-as-code framework.
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="accordion-item" data-accordion-item="" role="presentation">
+                                <a href="#" class="accordion-title" aria-controls="tg80iu-accordion" role="tab" id="tg80iu-accordion-label" aria-expanded="false" aria-selected="false">Graph-based policies</a>
+                                <div class="accordion-content" data-tab-content="" role="tabpanel" aria-labelledby="tg80iu-accordion-label" aria-hidden="true" id="tg80iu-accordion">
+                                    <p>
+                                        Analyze relationships between cloud resources using Checkov’s graph-based YAML policies.
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="accordion-item" data-accordion-item="" role="presentation">
+                                <a href="#" class="accordion-title" aria-controls="iuglxf-accordion" role="tab" id="iuglxf-accordion-label" aria-expanded="false" aria-selected="false">Live Terminal Execution</a>
+                                <div class="accordion-content" data-tab-content="" role="tabpanel" aria-labelledby="iuglxf-accordion-label" aria-hidden="true" id="iuglxf-accordion">
+                                    <p>
+                                        Execute, test, and modify runner parameters in the context of a subject repository CI/CD and version control integrations.
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="accordion-item" data-accordion-item="" role="presentation">
+                                <a href="#" class="accordion-title" aria-controls="r9mum5-accordion" role="tab" id="r9mum5-accordion-label" aria-expanded="false" aria-selected="false">Extensible policy management interfaces</a>
+                                <div class="accordion-content" data-tab-content="" role="tabpanel" aria-labelledby="r9mum5-accordion-label" aria-hidden="true" id="r9mum5-accordion">
+                                    <p>
+                                        Extend Checkov to define your own custom policies, providers, and suppressions terms.
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="cell medium-6 relative">
+                        <ul class="fade-carousel value-prop__carousel">
+                            <li class="slick-item">
+                                <img src="/assets/img/value_prop_1.png" alt="Checkov CLI screenshot">
+                            </li>
+                            <li class="slick-item">
+                                <img src="/assets/img/value_prop_2.png" alt="Checkov CLI screenshot">
+                            </li>
+                            <li class="slick-item">
+                                <img src="/assets/img/value_prop_3.png" alt="Checkov CLI screenshot">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-integrations">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x grid-padding-y align-middle">
+                    <div class="cell medium-6 home-integrations__content">
+                        <h2 class="home-integrations__heading">Extensible integration interface</h2>
+                        <p class="home-supported__subtitle subtitle">
+                            Prevent misconfigurations from being deployed by embedding it into existing developer workflows.
+                        </p>
+                        <p class="home-supported__text">
+                            Checkov can be integrated with custom support for platforms, build processes, and release systems.
+                        </p>
+                        <p>
+                            <a href="https://www.checkov.io/1.Welcome/Feature%20Descriptions.html" style="text-decoration:underline;font-weight:500;">Learn More</a>
+                        </p>
+                    </div>
+                    <div class="cell medium-6 integrations__icons">
+                        <figure class="home-integrations__image">
+                            <img src="/assets/img/integrations.png">
+                        </figure>
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-x grid-padding-y home-contributing text-center align-center-middle">
+                    <div class="cell medium-10 home-contributing__wrap">
+                        <div class="home-contributing__content">
+                            <h2 class="home-contributing__content-title">Contributing to Checkov</h2>
+                            <p class="home-contributing__content-subtitle subtitle">Checkov is built and maintained thanks to a network of supporters worldwide.</p>
+                        </div>
+                        <div class="grid-x grid-margin-x grid-margin-y text-center align-center-middle">
+                            <div class="cell medium-4">
+                                <a href="https://github.com/bridgecrewio/checkov/blob/master/CONTRIBUTING.md" target="_blank" class="card">
+                                    <div class="card-image" aria-hidden="true">
+                                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M104.928 23.4785H15.0727C11.8596 23.4785 9.25488 26.0832 9.25488 29.2963V90.7005C9.25488 93.9136 11.8596 96.5183 15.0727 96.5183H104.928C108.141 96.5183 110.746 93.9136 110.746 90.7005V29.2963C110.746 26.0832 108.141 23.4785 104.928 23.4785Z" fill="#092C80"></path>
+                                            <path d="M110.746 82.489V90.7005C110.746 91.4652 110.595 92.2224 110.302 92.9288C110.009 93.6353 109.58 94.2771 109.04 94.8177C108.499 95.3582 107.857 95.7869 107.15 96.0793C106.443 96.3716 105.686 96.5219 104.921 96.5215H15.0785C13.5353 96.5206 12.0555 95.907 10.9645 94.8155C9.87359 93.7239 9.26074 92.2438 9.26074 90.7005V82.489H110.746Z" fill="#092C80"></path>
+                                            <path d="M74.8708 90.1916C74.8699 90.8476 75.0681 91.4884 75.4394 92.0293H23.6226C23.3751 92.0395 23.1281 91.9996 22.8964 91.912C22.6647 91.8243 22.4531 91.6907 22.2744 91.5192C22.0956 91.3477 21.9534 91.1418 21.8562 90.9139C21.7591 90.6861 21.709 90.4409 21.709 90.1932C21.709 89.9454 21.7591 89.7003 21.8562 89.4724C21.9534 89.2445 22.0956 89.0386 22.2744 88.8671C22.4531 88.6956 22.6647 88.562 22.8964 88.4744C23.1281 88.3867 23.3751 88.3468 23.6226 88.357H75.4551C75.0782 88.8948 74.8743 89.5349 74.8708 90.1916Z" fill="#092C80"></path>
+                                            <path d="M98.9058 90.1916C98.9071 90.4339 98.8605 90.674 98.7687 90.8982C98.6769 91.1225 98.5418 91.3264 98.3711 91.4983C98.2004 91.6702 97.9974 91.8067 97.7738 91.9C97.5502 91.9932 97.3104 92.0415 97.0681 92.0419H75.4399C75.0694 91.5012 74.8711 90.8612 74.8711 90.2058C74.8711 89.5503 75.0694 88.9103 75.4399 88.3696H97.0681C97.5521 88.3721 98.0157 88.5643 98.3594 88.905C98.703 89.2457 98.8992 89.7077 98.9058 90.1916Z" fill="#092C80"></path>
+                                            <path d="M104.784 23.4785H14.9281C11.7151 23.4785 9.11035 26.0832 9.11035 29.2963V90.7005C9.11035 93.9136 11.7151 96.5183 14.9281 96.5183H104.784C107.997 96.5183 110.601 93.9136 110.601 90.7005V29.2963C110.601 26.0832 107.997 23.4785 104.784 23.4785Z" fill="url(#paint0_linear)"></path>
+                                            <path style="mix-blend-mode:lighten" d="M104.928 23.4785H15.0727C11.8596 23.4785 9.25488 26.0832 9.25488 29.2963V90.7005C9.25488 93.9136 11.8596 96.5183 15.0727 96.5183H104.928C108.141 96.5183 110.746 93.9136 110.746 90.7005V29.2963C110.746 26.0832 108.141 23.4785 104.928 23.4785Z" stroke="url(#paint1_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <path d="M110.746 82.489V90.7005C110.746 91.4652 110.595 92.2224 110.302 92.9288C110.009 93.6353 109.58 94.2771 109.04 94.8177C108.499 95.3582 107.857 95.7869 107.15 96.0793C106.443 96.3716 105.686 96.5219 104.921 96.5215H15.0785C13.5353 96.5206 12.0555 95.907 10.9645 94.8155C9.87359 93.7239 9.26074 92.2438 9.26074 90.7005V82.489H110.746Z" fill="url(#paint2_linear)"></path>
+                                            <path d="M74.8708 90.1916C74.8699 90.8476 75.0681 91.4884 75.4394 92.0293H23.6226C23.3751 92.0395 23.1281 91.9996 22.8964 91.912C22.6647 91.8243 22.4531 91.6907 22.2744 91.5192C22.0956 91.3477 21.9534 91.1418 21.8562 90.9139C21.7591 90.6861 21.709 90.4409 21.709 90.1932C21.709 89.9454 21.7591 89.7003 21.8562 89.4724C21.9534 89.2445 22.0956 89.0386 22.2744 88.8671C22.4531 88.6956 22.6647 88.562 22.8964 88.4744C23.1281 88.3867 23.3751 88.3468 23.6226 88.357H75.4551C75.0782 88.8948 74.8743 89.5349 74.8708 90.1916Z" fill="#092C80"></path>
+                                            <path d="M98.9058 90.1916C98.9071 90.4339 98.8605 90.674 98.7687 90.8982C98.6769 91.1225 98.5418 91.3264 98.3711 91.4983C98.2004 91.6702 97.9974 91.8067 97.7738 91.9C97.5502 91.9932 97.3104 92.0415 97.0681 92.0419H75.4399C75.0694 91.5012 74.8711 90.8612 74.8711 90.2058C74.8711 89.5503 75.0694 88.9103 75.4399 88.3696H97.0681C97.5521 88.3721 98.0157 88.5643 98.3594 88.905C98.703 89.2457 98.8992 89.7077 98.9058 90.1916Z" fill="#1648CA"></path>
+                                            <path style="mix-blend-mode:lighten" d="M9.25488 82.489H110.746" stroke="url(#paint3_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <path opacity="0.52" d="M42.8742 53.6802L51.5641 57.1923V59.913L40.209 54.6519V52.6252L51.5641 47.378V50.0988L42.8742 53.6802ZM56.1311 64.3551H53.9239L62.3639 42.4084H64.5571L56.1311 64.3551ZM76.4259 53.5969L67.2502 50.0016V47.3641L79.1048 52.6113V54.6381L67.2502 59.8991V57.2339L76.4259 53.5969Z" fill="#497AFA"></path>
+                                            <defs>
+                                                <linearGradient id="paint0_linear" x1="17.9282" y1="18.0722" x2="101.784" y2="101.928" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint1_linear" x1="8.95959" y1="60" x2="111.041" y2="60" gradientUnits="userSpaceOnUse">
+                                                    <stop offset="0.11" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                    <stop offset="0.13" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="0.159484" stop-color="#C2D3FF" stop-opacity="0.1"></stop>
+                                                    <stop offset="0.2" stop-color="#C2D3FF" stop-opacity="0.21"></stop>
+                                                    <stop offset="0.24" stop-color="#C2D3FF" stop-opacity="0.38"></stop>
+                                                    <stop offset="0.28" stop-color="#C2D3FF" stop-opacity="0.59"></stop>
+                                                    <stop offset="0.33" stop-color="#C2D3FF" stop-opacity="0.84"></stop>
+                                                    <stop offset="0.35" stop-color="#C2D3FF"></stop>
+                                                    <stop offset="0.49" stop-color="#C2D3FF" stop-opacity="0.72"></stop>
+                                                    <stop offset="0.63" stop-color="#C2D3FF" stop-opacity="0.46"></stop>
+                                                    <stop offset="0.75" stop-color="#C2D3FF" stop-opacity="0.26"></stop>
+                                                    <stop offset="0.86" stop-color="#C2D3FF" stop-opacity="0.12"></stop>
+                                                    <stop offset="0.94" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint2_linear" x1="9.25446" y1="89.5037" x2="110.746" y2="89.5037" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.09" stop-color="#1648CA" stop-opacity="0.96"></stop>
+                                                    <stop offset="0.23" stop-color="#1648CA" stop-opacity="0.86"></stop>
+                                                    <stop offset="0.42" stop-color="#1648CA" stop-opacity="0.69"></stop>
+                                                    <stop offset="0.63" stop-color="#1648CA" stop-opacity="0.45"></stop>
+                                                    <stop offset="0.88" stop-color="#1648CA" stop-opacity="0.16"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint3_linear" x1="-nan" y1="-nan" x2="-nan" y2="-nan" gradientUnits="userSpaceOnUse">
+                                                    <stop offset="0.11" stop-color="#C8C2FD" stop-opacity="0"></stop>
+                                                    <stop offset="0.13" stop-color="#C8C2FD" stop-opacity="0.03"></stop>
+                                                    <stop offset="0.16" stop-color="#C8C2FD" stop-opacity="0.1"></stop>
+                                                    <stop offset="0.2" stop-color="#C8C2FD" stop-opacity="0.21"></stop>
+                                                    <stop offset="0.24" stop-color="#C8C2FD" stop-opacity="0.38"></stop>
+                                                    <stop offset="0.28" stop-color="#C8C2FD" stop-opacity="0.59"></stop>
+                                                    <stop offset="0.33" stop-color="#C8C2FD" stop-opacity="0.84"></stop>
+                                                    <stop offset="0.35" stop-color="#C8C2FD"></stop>
+                                                    <stop offset="0.49" stop-color="#C8C2FD" stop-opacity="0.72"></stop>
+                                                    <stop offset="0.63" stop-color="#C8C2FD" stop-opacity="0.46"></stop>
+                                                    <stop offset="0.75" stop-color="#C8C2FD" stop-opacity="0.26"></stop>
+                                                    <stop offset="0.86" stop-color="#C8C2FD" stop-opacity="0.12"></stop>
+                                                    <stop offset="0.94" stop-color="#C8C2FD" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C8C2FD" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                    <div class="card-section card-content">
+                                        <p class="h4">Developer guide</p>
+                                        <span class="home-contributing__link-text">Learn more <svg class="icon"><use xlink:href="#right-arrow"></use></svg></span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cell medium-4">
+                                <a href="https://www.checkov.io/6.Contribution/Contribute%20Python-Based%20Policies.html" class="card">
+                                    <div class="card-image" aria-hidden="true">
+                                        <svg width="121" height="120" viewBox="0 0 121 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M108 29.2423V87.298C108 88.0146 107.712 88.7019 107.2 89.2086C106.687 89.7153 105.992 90 105.267 90H15.7328C15.008 90 14.3129 89.7153 13.8004 89.2086C13.2879 88.7019 13 88.0146 13 87.298V29.2423C13 27.5867 13.6652 25.999 14.8491 24.8283C16.0331 23.6577 17.639 23 19.3134 23H101.687C103.361 23 104.967 23.6577 106.151 24.8283C107.335 25.999 108 27.5867 108 29.2423Z" fill="url(#paint0_linear)"></path>
+                                            <path d="M93 37.2908V77.1458C93 77.6375 92.8031 78.1092 92.4525 78.4569C92.102 78.8046 91.6265 79 91.1308 79H29.8692C29.3735 79 28.898 78.8046 28.5475 78.4569C28.1969 78.1092 28 77.6375 28 77.1458V37.2908C27.9989 36.7258 28.1104 36.1662 28.3283 35.6442C28.5462 35.1222 28.866 34.6481 29.2694 34.2493C29.6728 33.8504 30.1517 33.5347 30.6787 33.3203C31.2056 33.1059 31.7701 32.9971 32.3396 33.0001H88.6946C89.839 33.0031 90.9353 33.4567 91.7427 34.2613C92.55 35.0659 93.0023 36.1556 93 37.2908Z" fill="url(#paint1_linear)"></path>
+                                            <path style="mix-blend-mode:lighten" d="M93 37.2908V77.1458C93 77.6375 92.8031 78.1092 92.4525 78.4569C92.102 78.8047 91.6265 79 91.1308 79H29.8692C29.3735 79 28.898 78.8047 28.5475 78.4569C28.1969 78.1092 28 77.6375 28 77.1458V37.2908C27.9989 36.7258 28.1104 36.1662 28.3283 35.6442C28.5462 35.1222 28.866 34.6481 29.2694 34.2493C29.6728 33.8504 30.1517 33.5347 30.6787 33.3203C31.2056 33.1059 31.7701 32.9971 32.3396 33.0001H88.6946C89.839 33.0031 90.9353 33.4567 91.7427 34.2613C92.55 35.0659 93.0023 36.1556 93 37.2908Z" stroke="url(#paint2_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <path d="M108 28.7577V29H13V28.7577C13 28.0016 13.1633 27.2529 13.4806 26.5543C13.7979 25.8558 14.2629 25.2211 14.8491 24.6864C15.4354 24.1517 16.1314 23.7276 16.8973 23.4383C17.6633 23.1489 18.4843 23 19.3134 23H101.687C103.361 23 104.967 23.6066 106.151 24.6864C107.335 25.7662 108 27.2307 108 28.7577Z" fill="url(#paint3_linear)"></path>
+                                            <path d="M108 84V87.4075C108 88.0951 107.712 88.7545 107.2 89.2407C106.687 89.7269 105.992 90 105.267 90H15.7328C15.008 90 14.3129 89.7269 13.8004 89.2407C13.2879 88.7545 13 88.0951 13 87.4075V84H108Z" fill="url(#paint4_linear)"></path>
+                                            <path d="M84 37C84 37.1978 83.9413 37.3911 83.8315 37.5556C83.7216 37.72 83.5654 37.8482 83.3827 37.9239C83.2 37.9996 82.9989 38.0194 82.8049 37.9808C82.6109 37.9422 82.4327 37.847 82.2929 37.7071C82.153 37.5673 82.0578 37.3891 82.0192 37.1951C81.9806 37.0011 82.0004 36.8 82.0761 36.6173C82.1518 36.4346 82.28 36.2784 82.4444 36.1685C82.6089 36.0586 82.8022 36 83 36C83.1313 36 83.2614 36.0259 83.3827 36.0761C83.504 36.1264 83.6142 36.2 83.7071 36.2929C83.8 36.3858 83.8736 36.496 83.9239 36.6173C83.9741 36.7386 84 36.8687 84 37Z" fill="#092C80"></path>
+                                            <path d="M87 36.9971C87.0006 37.195 86.9424 37.3887 86.8329 37.5535C86.7233 37.7183 86.5674 37.8469 86.3847 37.9231C86.202 37.9992 86.0008 38.0194 85.8067 37.9811C85.6125 37.9429 85.4341 37.8479 85.2939 37.7081C85.1538 37.5684 85.0582 37.3902 85.0194 37.1962C84.9806 37.0021 85.0002 36.8009 85.0758 36.618C85.1514 36.4351 85.2796 36.2787 85.4441 36.1687C85.6086 36.0587 85.8021 36 86 36C86.1312 35.9996 86.2612 36.0251 86.3825 36.0751C86.5038 36.125 86.614 36.1984 86.7069 36.291C86.7998 36.3837 86.8735 36.4937 86.9238 36.6149C86.9741 36.736 87 36.8659 87 36.9971Z" fill="#092C80"></path>
+                                            <path d="M90 37C90 37.1978 89.9413 37.3911 89.8315 37.5556C89.7216 37.72 89.5654 37.8482 89.3827 37.9239C89.2 37.9996 88.9989 38.0194 88.8049 37.9808C88.6109 37.9422 88.4327 37.847 88.2929 37.7071C88.153 37.5673 88.0578 37.3891 88.0192 37.1951C87.9806 37.0011 88.0004 36.8 88.0761 36.6173C88.1518 36.4346 88.28 36.2784 88.4444 36.1685C88.6089 36.0586 88.8022 36 89 36C89.2652 36 89.5196 36.1054 89.7071 36.2929C89.8946 36.4804 90 36.7348 90 37Z" fill="#092C80"></path>
+                                            <path d="M4 90H117V93.3217C117 93.8048 116.906 94.2831 116.724 94.7294C116.541 95.1756 116.273 95.5811 115.936 95.9227C115.599 96.2642 115.199 96.5352 114.758 96.72C114.317 96.9049 113.845 97 113.368 97H7.632C7.15504 97 6.68275 96.9049 6.2421 96.72C5.80144 96.5352 5.40105 96.2642 5.06379 95.9227C4.72653 95.5811 4.459 95.1756 4.27647 94.7294C4.09395 94.2831 4 93.8048 4 93.3217V90Z" fill="url(#paint5_linear)"></path>
+                                            <path d="M53 46.4167C53.0007 45.6325 52.7882 44.8622 52.3845 44.1852C51.9808 43.5081 51.4003 42.9489 50.703 42.5649C50.0056 42.181 49.2165 41.9863 48.4168 42.0008C47.6172 42.0152 46.836 42.2385 46.1535 42.6474C45.4711 43.0564 44.9122 43.6363 44.5342 44.3274C44.1563 45.0186 43.973 45.7961 44.0032 46.5798C44.0335 47.3635 44.2762 48.1252 44.7063 48.7863C45.1365 49.4475 45.7385 49.9843 46.4506 50.3415V62.6585C45.5512 63.1096 44.8329 63.8444 44.4111 64.7445C43.9893 65.6446 43.8886 66.6577 44.1252 67.6208C44.3618 68.5838 44.922 69.4408 45.7155 70.0537C46.5091 70.6667 47.4898 71 48.5 71C49.5102 71 50.4909 70.6667 51.2845 70.0537C52.078 69.4408 52.6382 68.5838 52.8748 67.6208C53.1114 66.6577 53.0107 65.6446 52.5889 64.7445C52.1671 63.8444 51.4488 63.1096 50.5494 62.6585V50.3415C51.2872 49.9725 51.9066 49.4106 52.339 48.718C52.7715 48.0253 53.0003 47.2289 53 46.4167Z" fill="#092C80"></path>
+                                            <path d="M74.6918 62.6243V53.5023C74.6896 51.228 73.8238 49.0475 72.2844 47.439C70.7451 45.8306 68.6578 44.9255 66.4804 44.9225H64.6415V41.9924C64.641 41.7961 64.585 41.6044 64.4805 41.4414C64.3759 41.2783 64.2276 41.1512 64.0541 41.076C63.8805 41.0008 63.6896 40.9808 63.5052 41.0187C63.3209 41.0565 63.1514 41.1505 63.018 41.2887L58.28 46.2405C58.1913 46.3324 58.1209 46.4418 58.0728 46.5623C58.0247 46.6829 58 46.8121 58 46.9427C58 47.0733 58.0247 47.2026 58.0728 47.3231C58.1209 47.4436 58.1913 47.553 58.28 47.645L63.018 52.5939C63.1963 52.7789 63.4376 52.8826 63.689 52.8823C63.814 52.883 63.938 52.8575 64.0534 52.8073C64.2283 52.7329 64.3777 52.6055 64.4826 52.4415C64.5874 52.2775 64.6428 52.0845 64.6415 51.8873V48.9601H66.4804C67.6328 48.9623 68.7373 49.4417 69.5519 50.2931C70.3666 51.1446 70.8248 52.2986 70.8263 53.5023V62.6272C69.979 63.0803 69.3023 63.818 68.905 64.7215C68.5077 65.6251 68.4131 66.642 68.6362 67.6085C68.8593 68.5751 69.3873 69.4352 70.1351 70.0503C70.8829 70.6655 71.8071 71 72.759 71C73.7109 71 74.6351 70.6655 75.383 70.0503C76.1308 69.4352 76.6587 68.5751 76.8819 67.6085C77.105 66.642 77.0103 65.6251 76.613 64.7215C76.2158 63.818 75.5391 63.0803 74.6918 62.6272V62.6243Z" fill="#092C80"></path>
+                                            <path style="mix-blend-mode:lighten" d="M9 90H99" stroke="url(#paint6_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <defs>
+                                                <linearGradient id="paint0_linear" x1="60.5" y1="23" x2="60.5" y2="90" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint1_linear" x1="28.0001" y1="7287.2" x2="60.5541" y2="20071.1" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint2_linear" x1="27.755" y1="56" x2="93.2792" y2="56" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                    <stop offset="0.08" stop-color="#C2D3FF" stop-opacity="0.15"></stop>
+                                                    <stop offset="0.28" stop-color="#C2D3FF" stop-opacity="0.54"></stop>
+                                                    <stop offset="0.411458" stop-color="#C2D3FF" stop-opacity="0.827956"></stop>
+                                                    <stop offset="0.49" stop-color="#C2D3FF"></stop>
+                                                    <stop offset="0.5" stop-color="#C2D3FF" stop-opacity="0.98"></stop>
+                                                    <stop offset="0.61" stop-color="#C2D3FF" stop-opacity="0.69"></stop>
+                                                    <stop offset="0.71" stop-color="#C2D3FF" stop-opacity="0.44"></stop>
+                                                    <stop offset="0.81" stop-color="#C2D3FF" stop-opacity="0.25"></stop>
+                                                    <stop offset="0.89" stop-color="#C2D3FF" stop-opacity="0.11"></stop>
+                                                    <stop offset="0.96" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint3_linear" x1="26048.7" y1="2469.44" x2="32906.9" y2="15623" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint4_linear" x1="26048.7" y1="2530.44" x2="32906.9" y2="15684" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint5_linear" x1="30972.8" y1="2944.18" x2="38884.8" y2="18415.6" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint6_linear" x1="-nan" y1="-nan" x2="-nan" y2="-nan" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#C8C2FD" stop-opacity="0"></stop>
+                                                    <stop offset="0.08" stop-color="#C8C2FD" stop-opacity="0.15"></stop>
+                                                    <stop offset="0.28" stop-color="#C8C2FD" stop-opacity="0.54"></stop>
+                                                    <stop offset="0.49" stop-color="#C8C2FD"></stop>
+                                                    <stop offset="0.5" stop-color="#C8C2FD" stop-opacity="0.98"></stop>
+                                                    <stop offset="0.61" stop-color="#C8C2FD" stop-opacity="0.69"></stop>
+                                                    <stop offset="0.71" stop-color="#C8C2FD" stop-opacity="0.44"></stop>
+                                                    <stop offset="0.81" stop-color="#C8C2FD" stop-opacity="0.25"></stop>
+                                                    <stop offset="0.89" stop-color="#C8C2FD" stop-opacity="0.11"></stop>
+                                                    <stop offset="0.96" stop-color="#C8C2FD" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C8C2FD" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                    <div class="card-section card-content">
+                                        <p class="h4">Contributing a new check</p>
+                                        <span class="home-contributing__link-text">Learn more <svg class="icon"><use xlink:href="#right-arrow"></use></svg></span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cell medium-4">
+                                <a href="https://www.checkov.io/6.Contribution/Contribute%20New%20Terraform%20Provider.html" class="card">
+                                    <div class="card-image" aria-hidden="true">
+                                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M46.4262 58.8505L51.6981 60.7011L54.1588 56.437L49.888 52.8741C50.5202 50.9334 50.782 48.8913 50.6599 46.8539L55.6959 44.4303L54.4217 39.6741L48.8768 40.1966C47.9535 38.3768 46.6956 36.7472 45.1689 35.3932L47.0161 30.1213L42.7521 27.6606L39.1925 31.9415C37.2567 31.3078 35.2193 31.0426 33.1858 31.1595L30.7622 26.1235L26.0094 27.3977L26.5183 32.9527C24.7011 33.87 23.0719 35.1196 21.715 36.637L16.4431 34.7898L13.9824 39.0539L18.2667 42.6168C17.6321 44.5536 17.3658 46.5921 17.4813 48.6269L12.4453 51.0471L13.7195 55.7999L19.2846 55.2808C20.1986 57.0992 21.4474 58.7288 22.9655 60.0842L21.1183 65.3595L25.379 67.8202L28.9453 63.5359C30.8809 64.1706 32.9183 64.437 34.9521 64.3213L37.3723 69.3572L42.1352 68.0898L41.6262 62.5348C43.4456 61.6195 45.0754 60.3683 46.4296 58.8471L46.4262 58.8505ZM28.9891 56.5685C27.2436 55.5622 25.8357 54.0608 24.9435 52.2543C24.0513 50.4478 23.7148 48.4173 23.9767 46.4195C24.2386 44.4218 25.087 42.5466 26.4146 41.0311C27.7423 39.5155 29.4896 38.4278 31.4355 37.9054C33.3814 37.3829 35.4386 37.4493 37.3468 38.0961C39.2549 38.7428 40.9285 39.941 42.1557 41.5389C43.3829 43.1369 44.1087 45.0629 44.2413 47.0733C44.3738 49.0838 43.9072 51.0884 42.9004 52.8336C41.5506 55.1734 39.3269 56.8812 36.7181 57.5816C34.1094 58.282 31.3292 57.9176 28.9891 56.5685Z" fill="#092C80"></path>
+                                            <path d="M103.312 70.4494L112.457 68.7236V60.5258L103.312 58.9517C102.613 55.6316 101.3 52.4715 99.4386 49.6348L104.69 41.9427L98.8926 36.1483L91.3083 41.5045C88.4693 39.6474 85.3083 38.3373 81.9881 37.6416L80.2656 28.5H72.0611L70.4903 37.6416C67.1705 38.3408 64.0106 39.6544 61.1735 41.5146L53.4847 36.2629L47.6869 42.0607L53.0465 49.6483C51.1906 52.4866 49.8805 55.6463 49.1836 58.9652L40.042 60.691V68.8888L49.1836 70.4629C49.8828 73.7838 51.1963 76.9448 53.0566 79.7831L47.8083 87.4685L53.606 93.2663L61.197 87.9034C64.0311 89.7628 67.1892 91.0732 70.5072 91.7663L72.2296 100.911H80.4274L82.0015 91.7663C85.3222 91.0682 88.4832 89.7558 91.3218 87.8966L99.0105 93.1449L104.808 87.3472L99.4386 79.7697C101.302 76.933 102.616 73.7714 103.312 70.4494ZM76.2476 81.6809C72.8908 81.6829 69.6089 80.6892 66.8169 78.8256C64.025 76.962 61.8485 74.3122 60.5629 71.2114C59.2772 68.1106 58.9401 64.6981 59.5943 61.4057C60.2484 58.1133 61.8644 55.0888 64.2377 52.715C66.6111 50.3411 69.6352 48.7246 72.9275 48.0698C76.2198 47.415 79.6323 47.7514 82.7334 49.0364C85.8345 50.3215 88.4847 52.4974 90.3489 55.289C92.2131 58.0806 93.2074 61.3623 93.206 64.7191C93.2043 69.2165 91.4171 73.5293 88.2373 76.7097C85.0574 79.8902 80.745 81.6782 76.2476 81.6809Z" fill="#092C80"></path>
+                                            <path style="mix-blend-mode:lighten" d="M28.6822 75.8865C21.2921 73.8205 15.0253 68.9034 11.2606 62.2169C7.49585 55.5304 6.54152 47.6222 8.60752 40.232C10.6735 32.8419 15.5906 26.5751 22.2772 22.8104C28.9637 19.0457 36.8719 18.0913 44.262 20.1573" stroke="url(#paint0_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <path style="mix-blend-mode:lighten" d="M73.1634 75.7314C70.9842 75.1228 69.0343 73.8818 67.5604 72.1652C66.0865 70.4486 65.1546 68.3334 64.8827 66.0873C64.6108 63.8411 65.0111 61.5647 66.0328 59.546C67.0546 57.5273 68.652 55.8568 70.6231 54.7459C72.5942 53.635 74.8504 53.1335 77.1065 53.3048C79.3625 53.4761 81.5172 54.3126 83.2979 55.7083C85.0787 57.1041 86.4055 58.9966 87.1108 61.1465C87.816 63.2963 87.8679 65.607 87.26 67.7864C86.8563 69.2338 86.1713 70.5874 85.2443 71.7701C84.3174 72.9527 83.1665 73.9411 81.8574 74.6789C80.5484 75.4167 79.1068 75.8894 77.6151 76.07C76.1233 76.2505 74.6106 76.1355 73.1634 75.7314V75.7314Z" stroke="url(#paint1_linear)" stroke-width="1.88" stroke-miterlimit="10"></path>
+                                            <path d="M46.4262 58.8505L51.6981 60.7011L54.1588 56.437L49.888 52.8741C50.5202 50.9334 50.782 48.8913 50.6599 46.8539L55.6959 44.4303L54.4217 39.6741L48.8768 40.1966C47.9535 38.3768 46.6956 36.7472 45.1689 35.3932L47.0161 30.1213L42.7521 27.6606L39.1925 31.9415C37.2567 31.3078 35.2193 31.0426 33.1858 31.1595L30.7622 26.1235L26.0094 27.3977L26.5183 32.9527C24.7011 33.87 23.0719 35.1196 21.715 36.637L16.4431 34.7898L13.9824 39.0539L18.2667 42.6168C17.6321 44.5536 17.3658 46.5921 17.4813 48.6269L12.4453 51.0471L13.7195 55.7999L19.2846 55.2808C20.1986 57.0992 21.4474 58.7288 22.9655 60.0842L21.1183 65.3595L25.379 67.8202L28.9453 63.5359C30.8809 64.1706 32.9183 64.437 34.9521 64.3213L37.3723 69.3572L42.1352 68.0898L41.6262 62.5348C43.4456 61.6195 45.0754 60.3683 46.4296 58.8471L46.4262 58.8505ZM28.9891 56.5685C27.2436 55.5622 25.8357 54.0608 24.9435 52.2543C24.0513 50.4478 23.7148 48.4173 23.9767 46.4195C24.2386 44.4218 25.087 42.5466 26.4146 41.0311C27.7423 39.5155 29.4896 38.4278 31.4355 37.9054C33.3814 37.3829 35.4386 37.4493 37.3468 38.0961C39.2549 38.7428 40.9285 39.941 42.1557 41.5389C43.3829 43.1369 44.1087 45.0629 44.2413 47.0733C44.3738 49.0838 43.9072 51.0884 42.9004 52.8336C41.5506 55.1734 39.3269 56.8812 36.7181 57.5816C34.1094 58.282 31.3292 57.9176 28.9891 56.5685Z" fill="url(#paint2_linear)"></path>
+                                            <path d="M103.312 70.4494L112.457 68.7236V60.5258L103.312 58.9517C102.613 55.6316 101.3 52.4715 99.4386 49.6348L104.69 41.9427L98.8926 36.1483L91.3083 41.5045C88.4693 39.6474 85.3083 38.3373 81.9881 37.6416L80.2656 28.5H72.0611L70.4903 37.6416C67.1705 38.3408 64.0106 39.6544 61.1735 41.5146L53.4847 36.2629L47.6869 42.0607L53.0465 49.6483C51.1906 52.4866 49.8805 55.6463 49.1836 58.9652L40.042 60.691V68.8888L49.1836 70.4629C49.8828 73.7838 51.1963 76.9448 53.0566 79.7831L47.8083 87.4685L53.606 93.2663L61.197 87.9034C64.0311 89.7628 67.1892 91.0732 70.5072 91.7663L72.2296 100.911H80.4274L82.0015 91.7663C85.3222 91.0682 88.4832 89.7558 91.3218 87.8966L99.0105 93.1449L104.808 87.3472L99.4386 79.7697C101.302 76.933 102.616 73.7714 103.312 70.4494ZM76.2476 81.6809C72.8908 81.6829 69.6089 80.6892 66.8169 78.8256C64.025 76.962 61.8485 74.3122 60.5629 71.2114C59.2772 68.1106 58.9401 64.6981 59.5943 61.4057C60.2484 58.1133 61.8644 55.0888 64.2377 52.715C66.6111 50.3411 69.6352 48.7246 72.9275 48.0698C76.2198 47.415 79.6323 47.7514 82.7334 49.0364C85.8345 50.3215 88.4847 52.4974 90.3489 55.289C92.2131 58.0806 93.2074 61.3623 93.206 64.7191C93.2043 69.2165 91.4171 73.5293 88.2373 76.7097C85.0574 79.8902 80.745 81.6782 76.2476 81.6809Z" fill="url(#paint3_linear)"></path>
+                                            <defs>
+                                                <linearGradient id="paint0_linear" x1="24.35" y1="19.8141" x2="24.2602" y2="77.0844" gradientUnits="userSpaceOnUse">
+                                                    <stop offset="0.11" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                    <stop offset="0.13" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="0.16" stop-color="#C2D3FF" stop-opacity="0.1"></stop>
+                                                    <stop offset="0.2" stop-color="#C2D3FF" stop-opacity="0.21"></stop>
+                                                    <stop offset="0.24" stop-color="#C2D3FF" stop-opacity="0.38"></stop>
+                                                    <stop offset="0.28" stop-color="#C2D3FF" stop-opacity="0.59"></stop>
+                                                    <stop offset="0.33" stop-color="#C2D3FF" stop-opacity="0.84"></stop>
+                                                    <stop offset="0.35" stop-color="#C2D3FF"></stop>
+                                                    <stop offset="0.49" stop-color="#C2D3FF" stop-opacity="0.72"></stop>
+                                                    <stop offset="0.63" stop-color="#C2D3FF" stop-opacity="0.46"></stop>
+                                                    <stop offset="0.75" stop-color="#C2D3FF" stop-opacity="0.26"></stop>
+                                                    <stop offset="0.86" stop-color="#C2D3FF" stop-opacity="0.12"></stop>
+                                                    <stop offset="0.94" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint1_linear" x1="71.7015" y1="54.352" x2="77.4928" y2="77.079" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                    <stop offset="0.08" stop-color="#C2D3FF" stop-opacity="0.15"></stop>
+                                                    <stop offset="0.28" stop-color="#C2D3FF" stop-opacity="0.54"></stop>
+                                                    <stop offset="0.49" stop-color="#C2D3FF"></stop>
+                                                    <stop offset="0.5" stop-color="#C2D3FF" stop-opacity="0.98"></stop>
+                                                    <stop offset="0.61" stop-color="#C2D3FF" stop-opacity="0.69"></stop>
+                                                    <stop offset="0.71" stop-color="#C2D3FF" stop-opacity="0.44"></stop>
+                                                    <stop offset="0.81" stop-color="#C2D3FF" stop-opacity="0.25"></stop>
+                                                    <stop offset="0.89" stop-color="#C2D3FF" stop-opacity="0.11"></stop>
+                                                    <stop offset="0.96" stop-color="#C2D3FF" stop-opacity="0.03"></stop>
+                                                    <stop offset="1" stop-color="#C2D3FF" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint2_linear" x1="12.4521" y1="47.7438" x2="55.6959" y2="47.7438" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                                <linearGradient id="paint3_linear" x1="19886" y1="29553.5" x2="43989.9" y2="32473.3" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1648CA"></stop>
+                                                    <stop offset="0.34" stop-color="#1648CA" stop-opacity="0.63"></stop>
+                                                    <stop offset="0.66" stop-color="#1648CA" stop-opacity="0.29"></stop>
+                                                    <stop offset="0.89" stop-color="#1648CA" stop-opacity="0.08"></stop>
+                                                    <stop offset="1" stop-color="#1648CA" stop-opacity="0"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                    <div class="card-section card-content">
+                                        <p class="h4">Contributing a new provider</p>
+                                        <span class="home-contributing__link-text">Learn more <svg class="icon"><use xlink:href="#right-arrow"></use></svg></span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <aside class="svg-bg" aria-hidden="true">
+                <svg width="1440" height="1581" viewBox="0 0 1440 1581" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="1434.5" cy="584.5" r="385.5" fill="#F0F2F8"></circle>
+                    <circle cx="155.5" cy="1428.5" r="377.5" fill="#F0F2F8"></circle>
+                    <circle cx="1152.5" cy="90.5" r="90.5" fill="#F0F2F8"></circle>
+                    <circle cx="1434.5" cy="584.5" r="282.5" fill="#E4E8F2"></circle>
+                    <circle cx="155.5" cy="1428.5" r="276.5" fill="#E4E8F2"></circle>
+                    <circle cx="796.5" cy="387.5" r="43.5" fill="#F0F2F8"></circle>
+                    <circle cx="640.5" cy="54.5" r="43.5" fill="#F0F2F8"></circle>
+                    <circle cx="640.5" cy="54.5" r="26.5" fill="#E4E8F2"></circle>
+                    <circle cx="896.5" cy="137.5" r="22.5" fill="#F0F2F8"></circle>
+                    <circle cx="1152.5" cy="90.5" r="53.5" fill="#E4E8F2"></circle>
+                    <circle cx="1434.5" cy="584.5" r="172.5" fill="#DBE1EE"></circle>
+                    <circle cx="155.5" cy="1428.5" r="168.5" fill="#DBE1EE"></circle>
+                </svg>
+            </aside>
+        </section>
+    </div>
+
+</div>
+
+<footer class="footer">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-y grid-padding-x align-center-middle">
+      <aside class="branding cell small-auto shrink">
+        <p class="powered-text">Powered By</p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="193" height="25" fill="none" viewBox="0 0 193 25">
+    <path fill="#ffffff" d="M75.174 9.635c-2.687-.399-3.272-.703-3.272-1.31 0-.608.759-1.119 2.546-1.119 1.405 0 2.86.352 4.14.879.333.128.633.272.934.416v-2.66c-.02-.01-.042-.018-.064-.025-1.408-.608-2.893-.926-4.855-.926-3.493 0-5.801 1.582-5.801 3.595 0 2.24 1.866 3.038 5.55 3.564 2.59.368 3.224.655 3.224 1.311 0 .736-.948 1.215-3.05 1.215-1.36 0-2.97-.378-4.349-.943-.342-.138-.79-.348-1.166-.551v2.66c.11.048.219.097.298.128 1.564.64 3.336 1.024 5.358 1.024 3.4 0 6.024-1.39 6.024-3.676 0-2.238-1.754-3.038-5.517-3.582zm-42.813-4.52c3.174 0 4.958 1.526 4.958 3.92 0 2.533-1.973 4.007-5.113 4.007h-3.448v3.625h-2.986V5.114h6.589zm-3.604 5.603h3.019c1.938 0 2.574-.624 2.574-1.63 0-.972-.704-1.63-2.437-1.63h-3.157v3.26zm16.556 5.95h-2.986V5.113h7.481c3.14 0 4.803 1.405 4.803 3.781 0 1.874-1.217 3.105-3.002 3.592l3.569 4.18h-3.414l-3.312-3.956h-3.14v3.956h.001zm0-6.193h3.775c1.664 0 2.504-.503 2.504-1.527 0-.972-.686-1.51-2.367-1.51h-3.913v3.037h.001zm18.102-5.36v11.552h-3.002V5.114h3.002zm26.354 0l3.998 7.857h.051l3.963-7.858h4.358v11.553h-2.951V8.046h-.035l-4.41 8.639h-2.126l-4.41-8.639h-.035v8.621H85.41V5.114h4.359zm27.561 9.489h-6.554l-1.012 2.064h-3.105l5.816-11.622h3.26l5.833 11.622h-3.225l-1.013-2.064zm-5.524-2.117h4.495L114.07 7.89h-.034l-2.23 4.597z"></path>
+    <path fill="#ffffff" d="M121.735 6.074V6.03c0-.246-.187-.419-.515-.419h-.571V6.94h.271v-.448h.303l.227.448h.299l-.278-.526c.169-.052.264-.18.264-.34zm-.815-.217h.3c.172 0 .243.057.243.188v.015c0 .116-.071.187-.243.187h-.3v-.39z"></path>
+    <path fill="#ffffff" d="M121.163 4.904c-.771 0-1.357.592-1.357 1.372 0 .78.586 1.372 1.357 1.372.772 0 1.358-.592 1.358-1.372 0-.78-.586-1.372-1.358-1.372zm0 2.556c-.671 0-1.157-.492-1.157-1.184 0-.694.486-1.184 1.157-1.184.672 0 1.158.492 1.158 1.184 0 .693-.486 1.184-1.158 1.184z"></path>
+    <path fill="#00BFE7" d="M12.362 16.667V5.093l5.981 11.574h-5.981zM12.362 5.093l-5.98 11.574h5.98V25L0 12.5l6.322-6.394 1.003-1.013L12.362 0v5.093z"></path>
+    <path fill="#ffffff" d="M25.839 21.525h1.95c.646 0 1.035.268 1.035.787 0 .35-.136.595-.521.72.398.16.588.371.588.742 0 .648-.49.88-1.172.88h-1.88v-3.13zm1.702 1.252c.257 0 .363-.081.363-.282 0-.188-.115-.268-.363-.268h-.787v.55h.787zm.045 1.168c.274 0 .38-.09.38-.296 0-.192-.106-.29-.38-.29h-.832v.59l.832-.004zm3.168-.291l-1.358-2.13h1.044l.765 1.248h.044l.774-1.247h1.017l-1.353 2.124v1.007h-.934v-1.002h.001zm4.708-2.13h1.828c.761 0 1.163.444 1.163 1.168 0 .819-.518 1.194-1.234 1.194h-.826v.77h-.93v-3.131zm1.664 1.625c.287 0 .41-.189.41-.434 0-.282-.136-.434-.42-.434h-.726v.868h.736zm2.833-1.624h1.495l1.075 3.13h-.974l-.217-.648H40.06l-.221.649h-.955l1.075-3.131zm.326 1.78h.832l-.332-.985h-.168l-.331.985zm3.06-1.78h.928v2.321h1.641l-.036.81h-2.534v-3.131zm3.177 1.565c0-1.019.686-1.659 1.77-1.659 1.083 0 1.769.64 1.769 1.66 0 1.018-.686 1.658-1.77 1.658s-1.769-.64-1.769-1.659zm2.615 0c0-.541-.31-.863-.845-.863-.536 0-.846.322-.846.863 0 .542.31.863.84.863.536 0 .85-.321.85-.863zm4.335-1.565h1.496l1.074 3.13h-.973l-.217-.648h-1.278l-.221.649h-.955l1.074-3.131zm.328 1.78h.831l-.332-.985h-.168l-.331.985zm3.058-1.78h.93v2.321h1.64l-.036.81h-2.534v-3.131zm3.868.804h-1.083l.036-.804h3.03l.036.804H61.66v2.325h-.932V22.33h-.003zm2.626.761c0-1.019.686-1.659 1.769-1.659 1.083 0 1.77.64 1.77 1.66 0 1.018-.687 1.658-1.77 1.658-1.085 0-1.77-.64-1.77-1.659zm2.614 0c0-.541-.31-.863-.845-.863-.535 0-.845.322-.845.863 0 .542.31.863.84.863.535 0 .85-.321.85-.863zm3.549-1.565h.964l1.332 1.775h.013v-1.775h.885v3.13h-.934l-1.362-1.82h-.014v1.82h-.884v-3.13zm4.297 0h2.707l.036.76h-1.819v.43h1.429v.693h-1.429v.488h1.872l-.036.761h-2.76v-3.132zm4.606.804h-1.084l.036-.804h3.03l.036.804h-1.083v2.325h-.933V22.33h-.002zm2.692-.804h.99l.505 2.174h.048l.656-2.174h.907l.641 2.174h.048l.496-2.174h.947l-.815 3.13h-1.216l-.567-1.887h-.027l-.575 1.888h-1.221l-.817-3.131zm5.845 1.565c0-1.019.686-1.659 1.769-1.659 1.083 0 1.77.64 1.77 1.66 0 1.018-.687 1.658-1.77 1.658s-1.77-.64-1.77-1.659zm2.614 0c0-.541-.31-.863-.845-.863-.536 0-.845.322-.845.863 0 .542.31.863.84.863.535 0 .85-.321.85-.863zm1.856-1.565h1.805c.823 0 1.225.394 1.225 1.122 0 .502-.204.841-.602 1.002l.734 1.007h-1.053l-.57-.824h-.61v.824h-.93v-3.131zm1.685 1.574c.31 0 .42-.175.42-.412s-.11-.406-.42-.406h-.756v.818h.756zm2.301-1.574h.93v1.154h.38l.906-1.154h1.044l.005.005-1.186 1.498 1.253 1.623-.005.005h-1.084l-.937-1.203h-.377v1.203h-.929v-3.131zm3.96 2.925v-.858h.006c.517.264 1.021.394 1.459.394.332 0 .5-.081.5-.237 0-.156-.111-.197-.774-.304-.725-.117-1.207-.336-1.207-.966 0-.586.508-1.038 1.503-1.038.399 0 .815.085 1.2.25v.85l-.005.005c-.368-.214-.863-.349-1.261-.349-.354 0-.496.085-.496.228 0 .184.217.201.761.296.726.125 1.208.33 1.208.993 0 .514-.38 1.03-1.473 1.03-.539-.003-.969-.116-1.42-.294zM128.241 10.913c0-3.233 2.191-6.165 6.509-6.165 1.895 0 3.412.716 4.252 1.383v2.6h-.016c-1.236-.833-2.455-1.65-4.285-1.65-2.471 0-3.856 1.634-3.856 3.817 0 2.082 1.286 3.715 3.84 3.715 1.796 0 3.098-.667 4.301-1.583h.016v2.6c-.807.615-2.406 1.315-4.498 1.315-4.435-.001-6.263-2.866-6.263-6.032zm13.758-5.898h2.538v9.297h6.575l-.083 2.366h-9.03V5.015zm10.249 5.832c0-3.7 2.456-6.098 6.345-6.098s6.344 2.399 6.344 6.098c0 3.698-2.455 6.097-6.344 6.097-3.889 0-6.345-2.399-6.345-6.097zm10.086 0c0-2.35-1.335-3.783-3.724-3.783-2.389 0-3.757 1.434-3.757 3.783 0 2.348 1.335 3.782 3.724 3.782 2.388 0 3.757-1.434 3.757-3.782zm5.222 1.332V5.015h2.538v7.048c0 1.9 1.434 2.516 2.982 2.516 1.549 0 2.983-.583 2.983-2.433V5.015h2.538v7.08c0 3.565-2.456 4.849-5.554 4.849-3.098 0-5.487-1.3-5.487-4.765zm13.991-7.164h5.652c3.625 0 5.8 2.165 5.8 5.814 0 3.633-2.175 5.848-5.8 5.848h-5.652V5.015zm5.636 9.347c2.043 0 3.213-1.083 3.213-3.5 0-2.398-1.17-3.53-3.213-3.53h-3.098v7.03h3.098z"></path>
+</svg>
+
+        <nav class="social-nav grid-x grid-padding-x grid-padding-y align-left">
+          <a href="https://twitter.com/prisma_cloud" target="_blank" class="cell small-3 social-nav__anchor">
+            <img src="/assets/img/twitter.png" class="social-nav__icon">
+          </a>
+          <a href="https://www.facebook.com/PaloAltoNetworks" target="_blank" class="cell small-3 social-nav__anchor">
+            <img src="/assets/img/facebook.png" class="social-nav__icon">
+          </a>
+          <a href="https://www.linkedin.com/products/palo-alto-networks-prisma-cloud" target="_blank" class="cell small-3 social-nav__anchor">
+            <img src="/assets/img/linkedin.png" class="social-nav__icon">
+          </a>
+          <a href="https://github.com/bridgecrewio/checkov" target="_blank" class="cell small-3 social-nav__anchor">
+            <img src="/assets/img/github.png" class="social-nav__icon">
+          </a>
+        </nav>
+      </aside>
+      <nav class="footer-nav cell small-shrink medium-8 align-center-middle">
+        <ul>
+          <li class="footer-li">
+            <a href="https://codifiedsecurity.slack.com/" class="footer-link">Slack Community</a>
+          </li>
+          <li class="footer-li">
+            <a href="https://www.paloaltonetworks.com/prisma/cloud" class="footer-link">Prisma Cloud</a>
+          </li>
+          <li class="footer-li">
+            <a href="https://www.paloaltonetworks.com/legal-notices/terms-of-use?utm_source=checkovio&amp;utm_medium=organic_oss&amp;utm_campaign=checkov" class="footer-link">Terms of use</a>
+          </li>
+          <li class="footer-li">
+            <a href="https://github.com/bridgecrewio/checkov" class="footer-link">GitHub</a>
+          </li>
+          <li class="footer-li">
+            <a href="https://www.checkov.io/1.Welcome/Quick%20Start.html" class="footer-link">Docs</a>
+          </li>
+          <li class="footer-li">
+            <a href="https://www.paloaltonetworks.com/legal-notices/trust-center/privacy?utm_source=checkovio&amp;utm_medium=organic_oss&amp;utm_campaign=checkov" class="footer-link">Privacy policy</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+
+<script>var base_url = '';</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script type="text/javascript" defer="">
+    hljs.initHighlightingOnLoad();
+</script>
+
+<!-- Build Date: 2024-06-13 23:01 -->
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+<script>
+    window.cookieconsent.initialise({
+            "palette": {
+                "popup": {
+                    "background": "#edeff5",
+                    "text": "#838391"
+                },
+                "button": {
+                    "background": "#4b81e8"
+                }
+            },
+            "type": "opt-in",
+            "content": {
+                "href": "https://www.paloaltonetworks.com/legal-notices/trust-center/privacy"
+            },
+            onInitialise: function (status) {
+                var type = this.options.type;
+                var didConsent = this.hasConsented();
+                if (type == 'opt-in' && didConsent) {
+                    // enable cookies
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'UA-156134275-1');
+                }
+            },
+
+            onStatusChange: function(status, chosenBefore) {
+                var type = this.options.type;
+                var didConsent = this.hasConsented();
+                if (type == 'opt-in' && didConsent) {
+                    // enable cookies
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'UA-156134275-1');
+                }
+            },
+
+            onRevokeChoice: function() {
+                var type = this.options.type;
+                if (type == 'opt-in') {
+                    // disable cookies
+                    clearCookie('_ga','.mysite.fr','/');
+                    clearCookie('_gat_gtag_UA-156134275-1','.mysite.fr','/');
+                    clearCookie('_gid','.mysite.fr','/');
+                    // Get an array of cookies
+                    var arrSplit = document.cookie.split(";");
+                    for(var i = 0; i < arrSplit.length; i++)
+                    {
+                        var cookie = arrSplit[i].trim();
+                        var cookieName = cookie.split("=")[0];
+                        // If the prefix of the cookie's name matches the one specified, remove it
+                        if(cookieName.indexOf("ssupp.") === 0) {
+                            // Remove the cookie
+                            document.cookie = cookieName + "=; Max-Age=-99999999;";
+                        }
+                    }
+                }
+            },
+        }
+    )
+    ;
+</script>
+
+
+</body></html>

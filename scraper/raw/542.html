@@ -1,0 +1,156 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us"><head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.82.0">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Anatomy of a Crypto Vulnerability · Alex Gaynor</title>
+  <meta name="description" content="">
+
+  
+  <link type="text/css" rel="stylesheet" href="https://alexgaynor.net/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="https://alexgaynor.net/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="https://alexgaynor.net/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="https://alexgaynor.net/css/hyde.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+<style type="text/css">
+    .sidebar {
+        overflow: auto;
+    }
+    .sidebar-sticky {
+        top: 1rem;
+    }
+</style>
+
+</head>
+
+  <body class="theme-base-0d ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://alexgaynor.net/"><h1>Alex Gaynor</h1></a>
+      <p class="lead">
+       Hi, I'm Alex. I'm a software resilience engineer. I care about building systems that work. I've worked for the government, in the private sector, and on open source. I'm based in Washington, DC. 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="https://alexgaynor.net/">Home</a> </li>
+        <li><a href="/about/"> About </a></li><li><a href="/quotes/"> Quotes </a></li><li><a href="/contact/"> Contact </a></li><li><a href="https://github.com/alex"> Github </a></li>
+      </ul>
+    </nav>
+
+    <p>© 2024. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Anatomy of a Crypto Vulnerability</h1>
+  
+    <time datetime="2016-03-14" class="post-date">Mon, Mar 14, 2016</time>
+  <p>Before I describe the vulnerability, I want to give huge thanks to <a href="https://github.com/bbangert">Ben
+Bangert</a> and <a href="https://github.com/amol-">Alessandro Molina</a> for quickly responding to my report, and to
+<a href="https://github.com/reaperhulk">Paul Kehrer</a> for reviewing and confirming my findings.</p>
+<p>Sessions are a core part of many web applications. Put an opaque identifier
+(e.g. a UUID) in a cookie, then in your web app find the session in a database
+of some sort. The session might contain data like the currently logged in user,
+whatever.</p>
+<p>For a variety of reasons, sometimes you don’t want to have the database on your
+backend. Instead you want to put the session data directly into a cookie. In
+those cases, generally you want to ensure your cookie has two properties:
+<em>integrity</em> and <em>confidentiality</em>. Integrity means a user should not be able to
+change the contents of their session (e.g. to change what <code>user_id</code> they’re
+logged in as), and confidentiality means they should not be able to see the
+contents of their session <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+<p><a href="https://pypi.python.org/pypi/Beaker">Beaker</a> is a popular Python library for managing sessions. I was looking at
+it for reasons that I’ve completely forgotten at this point. Specifically, I
+was looking at its crypto. Beaker offers encrypted sessions, and I wanted to
+see how they were implemented.</p>
+<p>Digging around a bit, I found an <code>aesEncrypt</code> function <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">aesEncrypt</span>(data, key):
+    cipher <span style="color:#f92672">=</span> AES<span style="color:#f92672">.</span>new(key, AES<span style="color:#f92672">.</span>MODE_CTR,
+                     counter<span style="color:#f92672">=</span>Counter<span style="color:#f92672">.</span>new(<span style="color:#ae81ff">128</span>, initial_value<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>))
+
+    <span style="color:#66d9ef">return</span> cipher<span style="color:#f92672">.</span>encrypt(data)
+</code></pre></div><p>Ok, <code>AES</code> in <code>CTR</code> mode. The first thing that jumped out to me is that the
+<code>nonce</code> (or <code>counter</code> here) is always
+<code>b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</code>.
+<code>CTR</code> mode for block ciphers has one requirement: you must <strong>never</strong> reuse a
+<code>(key, nonce)</code> pair. If you reuse a pair, then any data encrypted under that
+pair becomes decryptable by the attacker. Since our <code>nonce</code> is constant, that
+means we <strong>must</strong> have a unique key for every encryption, or <em>confidentiality</em>
+is totally broken.</p>
+<p>Let’s look to see where our key comes from.</p>
+<p>A quick grep for <code>aesEncrypt(</code> <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> turns up:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">nonce <span style="color:#f92672">=</span> b64encode(os<span style="color:#f92672">.</span>urandom(<span style="color:#ae81ff">6</span>))[:<span style="color:#ae81ff">8</span>]
+encrypt_key <span style="color:#f92672">=</span> crypto<span style="color:#f92672">.</span>generateCryptoKeys(self<span style="color:#f92672">.</span>encrypt_key,
+                                        self<span style="color:#f92672">.</span>validate_key <span style="color:#f92672">+</span> nonce, <span style="color:#ae81ff">1</span>)
+data <span style="color:#f92672">=</span> util<span style="color:#f92672">.</span>serialize(session_data, self<span style="color:#f92672">.</span>data_serializer)
+<span style="color:#66d9ef">return</span> nonce <span style="color:#f92672">+</span> b64encode(crypto<span style="color:#f92672">.</span>aesEncrypt(data, encrypt_key))
+</code></pre></div><p>What’s happening here? First we generate a 6-byte <code>nonce</code> from
+<code>/dev/urandom</code> and base64 encode it (note that this is <em>different</em> from the
+<code>nonce</code> in <code>aesEncrypt</code>).</p>
+<p>Then we call <code>generateCryptoKeys</code> <sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>. What does it do?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generateCryptoKeys</span>(master_key, salt, iterations):
+    <span style="color:#66d9ef">return</span> pbkdf2(master_key, salt, iterations<span style="color:#f92672">=</span>iterations, dklen<span style="color:#f92672">=</span>keyLength)
+</code></pre></div><p>Doing a little substitution, this means that <code>encrypt_key</code> is derived by:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pbkdf2(self<span style="color:#f92672">.</span>encrypt_key, self<span style="color:#f92672">.</span>validate_key <span style="color:#f92672">+</span> nonce, iterations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, dklen<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>)
+</code></pre></div><p><code>self.encrypt_key</code> and <code>self.validate_key</code> are constant in this context.
+This means that if our <code>nonce</code> repeats, then the result of
+<code>generateCryptoKeys</code> repeats, which is passed to <code>aesEncrypt</code> as <code>key</code>.</p>
+<p>If <code>nonce</code> here is 6 bytes, which are base64 encoded, how often does it
+repeat? We can ignore the base64 encoding since it doesn’t affect the entropy.
+6 bytes of random data means 48 bits. So <code>2 ** 48</code> possible values. The
+<a href="https://en.wikipedia.org/wiki/Birthday_problem">birthday paradox</a> means that we can, with 50% probability, expect a repeat after
+<code>sqrt(2 ** 48)</code> (or <code>2 ** 24</code>) values. <code>2 ** 24</code> is a little under 17
+million.</p>
+<p>In short, if we observe 17 million cookies, there’s a 50% chance we’ll be able
+to decrypt a pair of them. That may not sound like much, but it’s completely
+unnecessary: we know how to build more secure cryptographic systems. It’s
+particularly bad for a general purpose library, where we have no idea how
+important the data being protected is.</p>
+<p>The immediate-term solution is for Beaker to use a larger <code>nonce</code> size, which
+decreases the frequency of repeat values. A better long-term solution is to
+move away from custom cryptographic code and use safer, preprepared recipes,
+such as NaCL’s <code>secret_box</code> or <code>Fernet</code> (available for Python in <a href="https://pynacl.readthedocs.io/en/latest/secret/">PyNACL</a>
+and <a href="https://cryptography.io/en/latest/fernet/">pyca/cryptography</a>), which have received extensive review from
+cryptographers and offer safer APIs.</p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>For some applications confidentiality isn’t actually important. But if you’re going to offer it, you should do it correctly. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">↩︎</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p><a href="https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker%2Fcrypto%2Fpycrypto.py#L20-L24">https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker%2Fcrypto%2Fpycrypto.py#L20-L24</a> <a href="#fnref:2" class="footnote-backref" role="doc-backlink">↩︎</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p><a href="https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker/session.py#L259-L270">https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker/session.py#L259-L270</a> <a href="#fnref:3" class="footnote-backref" role="doc-backlink">↩︎</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p><a href="https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker%2Fcrypto%2F__init__.py#L39-L44">https://github.com/bbangert/beaker/blob/8cc7e316df2ac90ea3f75db4052212c192376dec/beaker%2Fcrypto%2F__init__.py#L39-L44</a> <a href="#fnref:4" class="footnote-backref" role="doc-backlink">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+</div>
+    </main>
+
+    
+      
+    
+  
+
+</body></html>

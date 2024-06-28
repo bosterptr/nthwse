@@ -1,0 +1,565 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Abusing Azure AD SSO with the Primary Refresh Token - dirkjanm.io</title>
+<meta name="description" content="Modern corporate environments often don’t solely exist of an on-prem Active Directory. A hybrid setup, where devices are joined to both on-prem AD and Azure AD, or a set-up where they are only joined to Azure AD is getting more common. These hybrid set-ups offer multiple advantages, one of which is the ability to use Single Sign On (SSO) against both on-prem and Azure AD connected resources. To enable this, devices possess a Primary Refresh Token which is a long-term token that is stored on the device, where possible using a TPM for extra security. This blog explains how SSO works with the Primary Refresh Tokens, and what some of the implicit risks are of using SSO. I’ll also demonstrate how attackers can abuse this if they have access to a device which is Azure AD joined or Hybrid joined, to obtain long-lived tokens which can be used independently of the device and which will in most cases comply with even the stricter Conditional Access policies. A tool to abuse this and the capabilities to use this with ROADtools are present towards the end of this blog, as well as considerations for defenders.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="dirkjanm.io">
+<meta property="og:title" content="Abusing Azure AD SSO with the Primary Refresh Token">
+<meta property="og:url" content="https://dirkjanm.io/abusing-azure-ad-sso-with-the-primary-refresh-token/">
+
+
+  <meta property="og:description" content="Modern corporate environments often don’t solely exist of an on-prem Active Directory. A hybrid setup, where devices are joined to both on-prem AD and Azure AD, or a set-up where they are only joined to Azure AD is getting more common. These hybrid set-ups offer multiple advantages, one of which is the ability to use Single Sign On (SSO) against both on-prem and Azure AD connected resources. To enable this, devices possess a Primary Refresh Token which is a long-term token that is stored on the device, where possible using a TPM for extra security. This blog explains how SSO works with the Primary Refresh Tokens, and what some of the implicit risks are of using SSO. I’ll also demonstrate how attackers can abuse this if they have access to a device which is Azure AD joined or Hybrid joined, to obtain long-lived tokens which can be used independently of the device and which will in most cases comply with even the stricter Conditional Access policies. A tool to abuse this and the capabilities to use this with ROADtools are present towards the end of this blog, as well as considerations for defenders.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-07-21T15:57:00+00:00">
+
+
+
+
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.33333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1em}.svg-inline--fa.fa-stack-2x{height:2em;width:2em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://dirkjanm.io/abusing-azure-ad-sso-with-the-primary-refresh-token/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="dirkjanm.io Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+  <body class="layout--single wide" style="margin-bottom: 229.767px;">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">dirkjanm.io</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/talks/">Presentations</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/thisisapicture.png" alt="Dirk-jan Mollema" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dirk-jan Mollema</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Hacker, red teamer, researcher. Likes to write infosec-focussed Python tools. This is my personal blog containing research on topics I find interesting, such as (Azure) Active Directory internals, protocols and vulnerabilities.<br><br>Looking for a security test or training? Business contact via <a href="https://outsidersecurity.nl">outsidersecurity.nl</a>
+
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="http://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Both sides of a security boundary</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/_dirkjan" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/dirkjanm" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        
+          <li>
+            <a href="https://www.youtube.com/c/dirkjanm" itemprop="sameAs">
+              <svg class="svg-inline--fa fa-youtube fa-w-18 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fab fa-fw fa-youtube" aria-hidden="true"></i> --> YouTube
+            </a>
+          </li>
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Abusing Azure AD SSO with the Primary Refresh Token">
+    <meta itemprop="description" content="Modern corporate environments often don’t solely exist of an on-prem Active Directory. A hybrid setup, where devices are joined to both on-prem AD and Azure AD, or a set-up where they are only joined to Azure AD is getting more common. These hybrid set-ups offer multiple advantages, one of which is the ability to use Single Sign On (SSO) against both on-prem and Azure AD connected resources. To enable this, devices possess a Primary Refresh Token which is a long-term token that is stored on the device, where possible using a TPM for extra security. This blog explains how SSO works with the Primary Refresh Tokens, and what some of the implicit risks are of using SSO. I’ll also demonstrate how attackers can abuse this if they have access to a device which is Azure AD joined or Hybrid joined, to obtain long-lived tokens which can be used independently of the device and which will in most cases comply with even the stricter Conditional Access policies. A tool to abuse this and the capabilities to use this with ROADtools are present towards the end of this blog, as well as considerations for defenders.">
+    <meta itemprop="datePublished" content="July 21, 2020">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Abusing Azure AD SSO with the Primary Refresh Token
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  21 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Modern corporate environments often don’t solely exist of an on-prem Active Directory. A hybrid setup, where devices are joined to both on-prem AD and Azure AD, or a set-up where they are only joined to Azure AD is getting more common. These hybrid set-ups offer multiple advantages, one of which is the ability to use Single Sign On (SSO) against both on-prem and Azure AD connected resources. To enable this, devices possess a Primary Refresh Token which is a long-term token that is stored on the device, where possible using a TPM for extra security. This blog explains how SSO works with the Primary Refresh Tokens, and what some of the implicit risks are of using SSO. I’ll also demonstrate how attackers can abuse this if they have access to a device which is Azure AD joined or Hybrid joined, to obtain long-lived tokens which can be used independently of the device and which will in most cases comply with even the stricter Conditional Access policies. A tool to abuse this and the capabilities to use this with <a href="https://github.com/dirkjanm/ROADtools">ROADtools</a> are present towards the end of this blog, as well as considerations for defenders.</p>
+
+<h1 id="hybrid-whut">Hybrid whut?</h1>
+<p>The attacks described in this blog only work on devices that are joined to Azure AD, or joined to both Azure AD and Windows Server Active Directory. In the last case it’s called a Hybrid Azure AD joined device, because it is joined to both directories. The concept of Azure AD joined devices is described pretty well in the <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/overview">Microsoft Device Identity documentation</a>. Hybrid environments come in <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/hybrid-azuread-join-plan">different flavours</a>, mostly depending on whether the company uses Federation for authentication (such as ADFS, where all authentication takes place on-premises) or uses a Managed Azure AD domain (where authentication takes place on Microsoft’s servers using Password Hash Synchronization or Pass-through Authentication). In this blog I’ll use the most common scenario, where the on-prem domain is synced to Azure AD with Password Hash Synchronization through Azure AD connect. To make things easier, both the on-prem domain and the Azure AD domain use the same publicly routable domain name. In this scenario, the hybrid join is established as follows:</p>
+
+<ul>
+  <li>The device is joined to on-prem AD and a computer account is created in the directory.</li>
+  <li>Azure AD connect detects the new account and syncs the computer account to Azure AD, where a device object is created.</li>
+  <li>The device detects that hybrid join is enabled via the <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/hybrid-azuread-join-manual">Service Connection Point</a> in LDAP, which contains the domain name and tenant ID.</li>
+  <li>The device uses it’s certificate, of which the public part is stored in AD and synced to Azure AD, to prove it’s identity to Azure AD and register itself.</li>
+  <li>Some private keys are generated and certificates are exchanged which establish a trust between the device and Azure AD.</li>
+</ul>
+
+<p>The device is now registered in both Azure AD and the on-prem AD, and can interact with both using the various cryptographic certificates and keys that were previously exchanged. To identify the state of a device, the <code class="language-plaintext highlighter-rouge">dsregcmd</code> utility can be used. A hybrid device will be joined to both Azure AD and to a domain:</p>
+
+<p><img src="/assets/img/prt/dsregstate.png" alt="dsregcmd.exe result" class="align-center"></p>
+
+<h1 id="primary-refresh-tokens-prt">Primary Refresh Tokens (PRT)</h1>
+<p>A Primary Refresh Token can be compared to a long-term persistent Ticket Granting Ticket (TGT) in Active Directory. It is a token that enables users to sign in once on their Azure AD connected device and then automatically sign in to Azure AD connected resources. To understand this PRT, let’s have a look first at what a PRT is and how it is secured. In OAuth2 terminology, a <em>refresh</em> token is a long lived token that can be used to request new <em>access</em> tokens, which are then sent to the service you want to authenticate to. A regular refresh token is issued when a user is signed in to an application, website or mobile app (which are all applications in Azure AD terminology). This refresh token is only valid for the user that requested it, only has access to what that application is granted access to and can only be used to request access tokens for that same application. The Primary Refresh Token however can be used to authenticate to <strong>any</strong> application, and is thus even more valuable. This is why Microsoft has applied extra protection to this token. The most important protection is that on devices with a TPM, the cryptographic keys are stored within that TPM, making it under most circumstances not possible to recover the actual keys from the OS itself. There is some quite extensive documentation about the Primary Refresh Token <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/concept-primary-refresh-token">available here</a>. I do suggest you read the whole article as it has quite some technical details, but for the purpose of this post, here are the most important points:</p>
+
+<ul>
+  <li>If a TPM is present, the keys required to request or use the PRT are protected by the TPM and can’t be extracted under normal circumstances.</li>
+  <li>A PRT can get updated with an MFA claim when MFA is used on the device, which enables SSO to resources requiring MFA afterwards.</li>
+  <li>The PRT contains the device ID and is thus tied to the device object in Azure AD, this can be used to match the tokens against Conditional Access policies requiring compliant devices.</li>
+  <li>The PRT is invalidated when the device is disabled in Azure AD and can’t be used any more to request new tokens at that point.</li>
+  <li>During SSO the PRT is used to request refresh and access tokens. The refresh tokens are kept by the CloudAP plug-in and encrypted with DPAPI, the access tokens are passed to the requesting application.</li>
+</ul>
+
+<p>Something to note on this is that quite a few of these protections use the TPM, which is optional in a Hybrid join. If there is no TPM the keys are stored in software. In this scenario it is possible to recover them from the OS with the right privileges, as described in <a href="https://dirkjanm.io/digging-further-into-the-primary-refresh-token/">my follow-up blog</a>. Another thing of note that warrants further research is the Session key which is mentioned several times throughout the <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/concept-primary-refresh-token">PRT documentation</a>, which is decrypted using the transport key and then stored into the TPM. Unless this is a single step taking place entirely within the TPM, this could provide a brief window in which the session key is unencrypted in memory, at which point it could be intercepted by an attacker already on the system. The number of opportunities to intercept this key could increase if the session key is renewed or changed at certain points in time.</p>
+
+<h1 id="single-sign-on">Single Sign On</h1>
+<p>As described in the PRT documentation, the PRT enables single sign-on to Azure AD resources. In Edge this is done natively (as expected), but Chrome does not do this natively, it uses a Chrome extension from Microsoft to enable this capability. At this point it’s probably good to note that Lee Christensen was researching this around the same time as I was and wrote <a href="https://posts.specterops.io/requesting-azure-ad-request-tokens-on-azure-ad-joined-machines-for-browser-sso-2b0409caad30">a blog about it</a> just a bit earlier. As my approach on this was slightly different than Lee’s, I figured there is still value in describing the process, but if you’re already familiar with Lee’s blog on this feel free to skip to the next section.</p>
+
+<h2 id="interaction-with-the-prt-from-chrome">Interaction with the PRT from Chrome</h2>
+<p>Let’s start with the <a href="https://chrome.google.com/webstore/detail/windows-10-accounts/ppnbnpeolgkicgegkbkbjmhlideopiji?hl=en">Chrome extension</a> that Microsoft provides for SSO on Windows 10. Once the extension is installed and you browse to an Azure AD connected application such as office.com, the sign-in process doesn’t prompt for anything but just continues straight to your account. Since Chrome extensions are written in JavaScript, you can just load the code in your favourite editor. For reference, the extensions are saved in <code class="language-plaintext highlighter-rouge">C:\Users\youruser\AppData\Local\Google\Chrome\User Data\Default\Extensions</code>. In its manifest, the permission <code class="language-plaintext highlighter-rouge">nativeMessaging</code> is declared, with the <code class="language-plaintext highlighter-rouge">background.js</code> script indeed using the <code class="language-plaintext highlighter-rouge">sendNativeMessage</code> function to the <code class="language-plaintext highlighter-rouge">com.microsoft.browsercore</code> namespace.</p>
+
+<p><img src="/assets/img/prt/nativemessage.png" alt="extension code calling nativemessage" class="align-center"></p>
+
+<p>According to the <a href="https://developer.chrome.com/extensions/nativeMessaging">documentation</a> this requires a registry key in <code class="language-plaintext highlighter-rouge">HKCU\Software\Google\Chrome\NativeMessagingHosts</code>, which is indeed present for the <code class="language-plaintext highlighter-rouge">com.microsoft.browsercore</code> name we saw in the extension. It points us to <code class="language-plaintext highlighter-rouge">C:\Windows\BrowserCore\manifest.json</code>, which contains a reference to which extensions are allowed to call the <code class="language-plaintext highlighter-rouge">BrowserCore.exe</code> binary. Note that <code class="language-plaintext highlighter-rouge">C:\Windows\BrowserCore</code> is the location in recent insider builds of Windows 10, in older versions it is located in <code class="language-plaintext highlighter-rouge">C:\Program Files\Windows Security\BrowserCore</code>.</p>
+
+<p><img src="/assets/img/prt/registry.png" alt="registry key" class="align-center"></p>
+
+<p>And the <code class="language-plaintext highlighter-rouge">manifest.json</code>:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.microsoft.browsercore"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BrowserCore"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BrowserCore.exe"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stdio"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"allowed_origins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"chrome-extension://ppnbnpeolgkicgegkbkbjmhlideopiji/"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"chrome-extension://ndjpnladcallmjemlbaebfadecfhkepb/"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To see what is sent to this process, I signed in a couple of times while Process Monitor from Sysinternals was running, which captured the process command line:</p>
+
+<p><img src="/assets/img/prt/procmon_browsercore.png" alt="procmon capturing browsercore" class="align-center"></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:\Windows\system32\cmd.exe /d /c "C:\Windows\BrowserCore\BrowserCore.exe" chrome-extension://ppnbnpeolgkicgegkbkbjmhlideopiji/ --parent-window=0 &lt; \\.\pipe\chrome.nativeMessaging.in.720bfd13d22dec77 &gt; \\.\pipe\chrome.nativeMessaging.out.720bfd13d22dec77
+</code></pre></div></div>
+
+<p>As we see Chrome is using named pipes to feed information to <code class="language-plaintext highlighter-rouge">stdin</code> and another pipe to read <code class="language-plaintext highlighter-rouge">stdout</code>. I figured the best way to see what is sent over these named pipes was to try and intercept or monitor the traffic. I couldn’t find an open source tool that easily allowed monitoring of named pipes, so I had to opt for the commercial Pipe Monitor from <a href="https://ioninja.com/plugins/pipe-monitor.html">IO Ninja</a> (they do offer an evaluation version which I used for this). This worked pretty well and after clearing the cookies and signing back in to Office.com I saw the named pipe communication show up:</p>
+
+<p><img src="/assets/img/prt/namedpipemon.png" alt="IO Ninja named pipe communication" class="align-center"></p>
+
+<p>As already mentioned in the <code class="language-plaintext highlighter-rouge">nativeMessaging</code> documentation, the first few bytes are the total length of the message and the rest is the data (in JSON) transferred to the native component. The JSON is as follows:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"method"</span><span class="p">:</span><span class="s2">"GetCookies"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"uri"</span><span class="p">:</span><span class="s2">"https://login.microsoftonline.com/common/oauth2/authorize?client_id=4345a7b9-9a63-4910-a426-35363201d503&amp;redirect_uri=https%3&lt;cut&gt;ANDARD2_0&amp;x-client-ver=6.6.0.0&amp;sso_nonce=AQABAAAAAAAGV_bv21oQQ4ROqh0_1-tAPrlbf_TrEVJRMW2Cr7cJvYKDh2XsByis2eCF9iBHNqJJVzYR_boX8VfBpZpeIV078IE4QY0pIBtCcr90eyah5yAA"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"sender"</span><span class="p">:</span><span class="s2">"https://login.microsoftonline.com/common/oauth2/authorize?client_id=4345a7b9-9a63-4910-a426-35363201d503&amp;redirect_uri=https%3&lt;cut&gt;oth8XvXy-663HzpYYNgNtUPkF0RwNtvu1WdojjxycLl-zbLOsM_T4s&amp;x-client-SKU=ID_NETSTANDARD2_0&amp;x-client-ver=6.6.0.0"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It then gets back a similar JSON response containing the refresh token cookie, which is (like other tokens in Azure AD) a JSON Web Token (JWT):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"response"</span><span class="p">:[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+         </span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"x-ms-RefreshTokenCredential"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"data"</span><span class="p">:</span><span class="s2">"eyJhbGciOiJIUzI1NiIsICJjdHgiOiJxSDBtSzc0VE92Z1Rz&lt;cut&gt;NjcjkwZXlhaDV5QUEifQ.Er2I_1unszMORwB5K0ZESc-HD1uZW9dQlJd8MulOQi0"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"p3pHeader"</span><span class="p">:</span><span class="s2">"CP=</span><span class="se">\"</span><span class="s2">CAO DSP COR ADMa DEV CONo TELo CUR PSA PSD TAI IVDo OUR SAMi BUS DEM NAV STA UNI COM INT PHY ONL FIN PUR LOCi CNT</span><span class="se">\"</span><span class="s2">"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"flags"</span><span class="p">:</span><span class="mi">8256</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+   </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>When we decode this JWT, we see it contains the PRT itself and a nonce, which ties the cookie to the current login that is being performed:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"refresh_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AQABAAAAAAAGV_bv21oQQ4ROqh0_1-tAZ18nQkT-eD6Hqt7sf5QY0iWPSssZOto]&lt;cut&gt;VhcDew7XCHAVmCutIod8bae4YFj8o2OOEl6JX-HIC9ofOG-1IOyJegQBPce1WS-ckcO1gIOpKy-m-JY8VN8xY93kmj8GBKiT8IAA"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"is_primary"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"request_nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AQABAAAAAAAGV_bv21oQQ4ROqh0_1-tAPrlbf_TrEVJRMW2Cr7cJvYKDh2XsByis2eCF9iBHNqJJVzYR_boX8VfBpZpeIV078IE4QY0pIBtCcr90eyah5yAA"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Whereas most JWTs in Azure are signed with a key that is managed by Azure AD, in this case the JWT containing the PRT is signed by the Session key that is in the devices TPM. The PRT itself is an encrypted blob and can’t be decrypted by any keys on the device, because this contains the identity claims that are managed by Azure AD.</p>
+
+<h2 id="the-login-process">The login process</h2>
+<p>The primary domain where all important authentication happens in Azure AD is <code class="language-plaintext highlighter-rouge">login.microsoftonline.com</code>. This is the domain where credentials are sent and tokens are requested and renewed. There is quite some complexity here, so it’s good to have a look how Chrome does SSO on this site. I’ve set up my Windows VM to proxy everything via Burp, which makes it easy to see the whole login process. After clearing the cookies so all my current sessions are invalidated, we see a request to the login page. This request does not yet contain the PRT cookie, but since it uses the Chrome user agent, we are greeted by a “Redirecting” page which contains JavaScript code to interact with the Chrome extension.</p>
+
+<p><img src="/assets/img/prt/login_sso_browserrequest.png" alt="login request in the browser" class="align-center"></p>
+
+<p>When we look at the URL which is sent from the extension to the native component, this URL consists of the URL we were visiting, plus the <code class="language-plaintext highlighter-rouge">sso_nonce</code> parameter (which is passed to the extension via JavaScript on the page). This nonce is then reflected back into the token, essentially binding the signed JWT with PRT to this specific login. I’m not sure how the login page handles state and where/if it stores this nonce, but it won’t accept a JWT with a different nonce.</p>
+
+<p><img src="/assets/img/prt/sso_nonce.png" alt="login request in the browser" class="align-center">
+<img src="/assets/img/prt/sso_javascript.png" alt="login request in the browser" class="align-center"></p>
+
+<h2 id="getting-rid-of-the-nonce">Getting rid of the nonce</h2>
+<p>Now that we figured out how we can interact with <code class="language-plaintext highlighter-rouge">BrowserCore.exe</code>, I wrote a small tool in Python which spawns the process and writes the JSON directly to it’s <code class="language-plaintext highlighter-rouge">stdin</code> and <code class="language-plaintext highlighter-rouge">stdout</code>. It then reads the reply and decodes that, allowing us to request PRT cookies for an arbitrary URL.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="p">.</span><span class="n">Popen</span><span class="p">([</span><span class="sa">r</span><span class="s">"C:\Windows\BrowserCore\browsercore.exe"</span><span class="p">],</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="p">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="p">.</span><span class="n">PIPE</span><span class="p">)</span>
+<span class="n">inv</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">inv</span><span class="p">[</span><span class="s">'method'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'GetCookies'</span>
+<span class="n">inv</span><span class="p">[</span><span class="s">'sender'</span><span class="p">]</span> <span class="o">=</span> <span class="s">"https://login.microsoftonline.com"</span>
+<span class="n">inv</span><span class="p">[</span><span class="s">'uri'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'https://login.microsoftonline.com/common/oauth2/authorize?client_id=4345a7b9-9a63-4910-a426-35363201d503&amp;response_mode=form_post&amp;response_type=code+id_token&amp;scope=openid+profile&amp;state=OpenIdConnect.AuthenticationProperties%3dhiUgyLP6LnqNTRRyNpT0W1WGjOO_9hNAUjayiM5WJb0wwdAK0fwF635Dw5XStDKDP9EV_AeGIuWqN_rtyrl8m9t6pUGiXHhG3GMSSpW-AWcpfxW9D6bmWECYrN36_9zw&amp;nonce=636957966885511040.YmI2MDIxNmItZDA0Yy00MjZlLThlYjAtYjNkNDM5NzkwMjVlYThhYTMyZGYtMGVlZi00Mjk4LWE2ODktY2Q2ZjllODU4ZjNk&amp;redirect_uri=https%3a%2f%2fwww.office.com%2f&amp;ui_locales=nl&amp;mkt=nl&amp;client-request-id=d738dfc8-db89-4f27-9522-eb70aa55c2b3&amp;sso_nonce=AQABAAAAAADCoMpjJXrxTq9VG9te-7FX2rBuuPsFpQIW4_wk_IAK5pG2t1EdXLfKDDJotUpwFvQKzd0U_I_IKLw4CEQ5d9uzoWgbWEsY6lt1Tm3Kpw9CfiAA'</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">inv</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+<span class="n">encoded_length</span> <span class="o">=</span> <span class="n">struct</span><span class="p">.</span><span class="n">pack</span><span class="p">(</span><span class="s">'=I'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">encoded_length</span> <span class="o">+</span> <span class="n">text</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Playing around with this a bit I noticed that most parameters in the URL are not required to get a valid PRT cookie. For example, a URL with <code class="language-plaintext highlighter-rouge">https://login.microsoftonline.com/?sso_nonce=aaaaa"</code> is enough to get a valid signed PRT cookie with the nonce <code class="language-plaintext highlighter-rouge">aaaaa</code>. If we leave the <code class="language-plaintext highlighter-rouge">sso_nonce</code> parameter out, the resulting JWT is slightly different. Instead of the JWT containing a nonce, the JWT now contains an <code class="language-plaintext highlighter-rouge">iat</code> parameter. This contains the Unix time stamp of when the JWT was issued:</p>
+
+<p><img src="/assets/img/prt/jwt_iat.png" alt="JWT with iat parameter" class="align-center"></p>
+
+<p>This suggests that this specific JWT is not valid forever. It doesn’t have an explicit expiry date set, so it is up to the Microsoft login page to either accept or reject the cookie after a certain time. Note that the JWT is now no longer tied to a specific login session, and can thus be used on other computers as well by intercepting and editing the request or simply adding the cookie to the <code class="language-plaintext highlighter-rouge">login.microsoftonline.com</code> domain in Chrome. This is useful but it is not something that remains valid for long. In my testing, the PRT cookie expired after about 35 minutes, after which it couldn’t be used any more to sign in. Most sites that do do their own session management will leave you signed in for a while since it can use the refresh token to extend the access, but sites that use the implicit OAuth2 flow only give out an access token. This access token expires after an hour, meaning that if you use the PRT cookie to sign in on such a site, you will be logged out again after an hour. This also means that if you lose your access to the device for whatever reason, the access to Azure AD will also be lost.</p>
+
+<p><strong>Update</strong>: Since somewhere around October 2020, it is no longer possible to use a PRT cookie without a nonce. ROADtools has been updated since to first request a nonce, which can then be used to request a PRT cookie.</p>
+
+<h2 id="using-the-prt-cookie-with-public-clients">Using the PRT cookie with public clients</h2>
+<p>I was curious if we could use SSO with other Azure AD applications, such as the Azure PowerShell module. When we run the <code class="language-plaintext highlighter-rouge">Connect-AzureAD</code> cmdlet, a pop-up box opens prompting us to log in, and no SSO takes place. <del>I’m not sure why this is, maybe it is not supported yet</del> As <a href="https://twitter.com/cnotin/status/1285734903389265922?s=20">pointed out by @cnotin</a> SSO does take place if the <code class="language-plaintext highlighter-rouge">-AccountId</code> parameter is specified, but even without it there is a PRT cookie included in the <code class="language-plaintext highlighter-rouge">x-ms-RefreshTokenCredential</code> HTTP header:</p>
+
+<p><img src="/assets/img/prt/refresh_header.png" alt="refresh token cookie in headers" class="align-center"></p>
+
+<p>Yet there is no SSO taking place, despite there being a PRT cookie. This is caused by the <code class="language-plaintext highlighter-rouge">prompt=login</code> parameter, which explicitly force the login prompt to appear instead of signing in the user directly. I’m not sure what framework the PowerShell modules use, but I assume it is related to the WAM framework mentioned in the documentation (the user agent points to Internet Explorer?). When we remove the <code class="language-plaintext highlighter-rouge">prompt</code> parameter in the HTTP request, we do get an authorization code:</p>
+
+<p><img src="/assets/img/prt/authcode.png" alt="auth code response" class="align-center"></p>
+
+<p>This code is used in the <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow">OAuth2 authorization code flow</a>, and we can use it to obtain an access token and refresh token. Because the Azure AD PowerShell module is a <em>public</em> application, there is no secret involved in requesting the access and refresh token using this authorization code. This is the case for all mobile and native apps, since there is no way to securely store such a secret as there is no backend in place and these clients talk directly to the various API’s. This is also <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token">documented</a> on the same page. In this example I’m using the Azure PowerShell module because it has quite some permissions by default, but there are others. I’ve described some of these in my <a href="https://dirkjanm.io/assets/raw/Im%20in%20your%20cloud%20bluehat-v1.0.pdf">BlueHat talk</a> on slide 24. You can also find public clients using ROADrecon. For first-party applications (applications that exist in the same tenant), this is shown as a column in the overview. For applications not in your tenant, but that do have a service principal (such as most of the Office 365 applications), you can find public clients in the database in the ApplicationRefs table:</p>
+
+<p><img src="/assets/img/prt/publicclients.png" alt="roadrecon applicationRefs table" class="align-center"></p>
+
+<p>By sending the obtained authorization code to the correct endpoint (<code class="language-plaintext highlighter-rouge">https://login.microsoftonline.com/Common/oauth2/token</code>) we obtain both an access token and a refresh token. Even though the refresh token is normally not sent to the app but protected by the WAM, by sending the request ourselves we can obtain both tokens without issue:</p>
+
+<p><img src="/assets/img/prt/gettokens_request.png" alt="auth code request" class="align-center"></p>
+
+<p>Resulting JSON response:</p>
+
+<p><img src="/assets/img/prt/gettokens_response.png" alt="tokens response" class="align-center"></p>
+
+<h1 id="token-claims-and-implications">Token claims and implications</h1>
+<p>The access tokens and refresh tokens issued by this process will have the same claims as the PRT had. So if MFA authentication was performed in an app that uses SSO, the PRT will contain the MFA claim <a href="https://docs.microsoft.com/en-us/azure/active-directory/devices/concept-primary-refresh-token#when-does-a-prt-get-an-mfa-claim">as per the documentation</a>. This means that in most cases, the refresh token obtained by this manner will include the MFA claim and thus will satisfy Conditional Access policies that require MFA. Furthermore, since the PRT is issued to an Azure AD joined device, the tokens that we get by using the PRT cookie also contain the device ID, making it satisfy policies that require a compliant or Hybrid device:</p>
+
+<p><img src="/assets/img/prt/token_claims.png" alt="JWT claims in token" class="align-center"></p>
+
+<p>So in short, no matter how strong the login protection, once an attacker gains code execution on a machine with SSO capabilities, they can profit from that SSO to acquire a token that satisfies even the strictest Conditional Access policies. In fact, the machine on which I’ve been testing this so far is using a YubiKey with FIDO2 to authenticate. Yet after the refresh token is obtained, an attacker can access the users data such as email or OneDrive files without being in possession of the hardware security token. This offers a way of persistence since the refresh token is no longer tied to anything cryptographicly on the device, and with the right application ID most of the Office 365 APIs can be accessed since there are several default applications that have full permissions on those APIs. The refresh token is valid for 90 days by default, but if you use it you are issued a new refresh token which has an extended validity. So once you have this token the access can be kept as long as you refresh the token every few weeks. There <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes">used to be</a> a configuration option in preview which could limit the lifetime of a refresh token issued to public clients but that is no longer supported. I’m not sure how setting the <a href="https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime">sign-in frequency</a> ties in with all this, but my assumption is that using such a policy would limit the validity of refresh tokens. A few more interesting observations:</p>
+
+<ul>
+  <li>The PRT will stop working when the device it belongs to is disabled in Azure AD.</li>
+  <li>The refresh token obtained using the PRT stays valid even if the device is disabled. The only exception is that when the device is disabled it will no longer pass Conditional Access policies that require a managed or compliant device.</li>
+  <li>Obtaining a refresh token counts as a sign-in and is logged in the sign-in log of Azure AD. Refreshing the refresh token and obtaining an access token with it however does not count as a sign-in and is not logged in the Sign-in log.</li>
+  <li>If there are policies that involve a specific IP as trusted location, and deny logins from outside these, this will still trigger when the refresh token is used to request a new access token.</li>
+</ul>
+
+<p><img src="/assets/img/prt/policy_results.png" alt="conditional access policies screenshot" class="align-center"></p>
+
+<p>It bears repeating that this can all be done from the context of the user, thus without requiring admin access. Access to non-Office 365 applications is often harder since there may not be any public applications with rights to access those.</p>
+
+<h1 id="tools">Tools</h1>
+<p>To demonstrate how this can be abused, I wrote a small tool in C# named <strong>ROADtoken</strong> that basically does the same as the Python PoC shown earlier. It will try to run <code class="language-plaintext highlighter-rouge">BrowserCore.exe</code> from the right directory and use it to obtain a PRT cookie. This cookie can then be used with ROADtools to authenticate and obtain a persistent refresh token. Since the change in using PRT cookies in October 2020, you will first have to initialize an SSO session to obtain a nonce, which you can do with <code class="language-plaintext highlighter-rouge">roadrecon</code> and <code class="language-plaintext highlighter-rouge">--prt-init</code>:</p>
+
+<p><img src="/assets/img/prt/roadrecon_prt_init.png" alt="ROADrecon requesting a nonce" class="align-center"></p>
+
+<p>With this nonce you can then request a PRT cookie:</p>
+
+<p><img src="/assets/img/prt/roadtoken_cookie_nonce.png" alt="ROADtoken requesting a PRT cookie with given nonce" class="align-center"></p>
+
+<p>You can see it used in ROADrecon below where the cookie is used in the <code class="language-plaintext highlighter-rouge">auth</code> phase with the <code class="language-plaintext highlighter-rouge">--prt-cookie</code> parameter.</p>
+
+<p><img src="/assets/img/prt/roadrecon_prtcookie_auth.png" alt="ROADrecon auth with PRT cookie" class="align-center"></p>
+
+<p>A small note on OPSEC: the ROADtoken tool is only a simple POC. It will spawn a process that is normally only called by Chrome. I also didn’t bother with communication over named pipes, so a defender paying attention to <code class="language-plaintext highlighter-rouge">BrowserCore.exe</code> being spawned using an odd command line may spot this in well-monitored environments. <a href="https://github.com/leechristensen/RequestAADRefreshToken/">Lee’s tool</a> uses a slightly different approach which avoids spawning a process, but essentially returns the same cookie which you can also use with ROADtools. Also note that the sign-in takes place in the <code class="language-plaintext highlighter-rouge">auth</code> phase of ROADrecon, so in order to get the expected IP in the sign-in logs (or comply with location based policies) you may want to proxy that via the original device.</p>
+
+<p>With the tokens obtained by ROADrecon it is possible to do the regular data gathering. But that is not all, these tokens can be used to access the Azure AD Graph or Microsoft Graph and access user information (OneDrive/SharePoint files, emails) or even make modifications to accounts and roles in Azure AD depending on the privileges of the user involved. For example, here I’m using the AzureAD PowerShell module on a completely different PC (not joined to the same AD or Azure AD) and authenticate using the access token requested by ROADrecon:</p>
+
+<p><img src="/assets/img/prt/ps_differentpc.png" alt="AzureAD PowerShell module with the access token"></p>
+
+<h1 id="defence">Defence</h1>
+<h2 id="general-account-protection">General account protection</h2>
+<p>If you are a defender or sysadmin reading this, first of all you should consider if defending against this should be your first priority. Most breaches via Azure AD nowadays are the result of using weak passwords without MFA externally. Once you have that covered and are using Conditional Access policies to secure how your users and admins can authenticate, then you can start thinking about these more advanced attacks. That being said, as long as there is Single Sign On, an attacker with code execution on the device will be able to use the SSO to sign in to things, no matter how well they are protected. If the user can access it from that device, so can an attacker. This means that especially for accounts that require extra security (such as Administrator acccounts in Azure AD), it is important to check which attack paths may exist that allow an attacker to execute code on the device. This is even more important with devices that are Hybrid joined and can thus be controlled from Active Directory, which would potentially offer an escalation path towards cloud resources. Using Privileged Identity Management (PIM) and Privileged Access Workstations (PAW) are important to reduce permissions and attack surface. There’s also <a href="https://docs.microsoft.com/en-us/azure/active-directory/users-groups-roles/directory-admin-roles-secure#stage-3-take-control-of-admin-activity">this document</a> from Microsoft describing best practices for Administrator accounts, though it doesn’t go in-depth into how to use PAWs with Azure AD only environments or which (Azure) AD you should join them to.</p>
+
+<h2 id="monitoring">Monitoring</h2>
+<p>In it’s current state, ROADtoken is not too difficult to detect if command line logging and alerting is in place. <code class="language-plaintext highlighter-rouge">BrowserCore.exe</code> not being executed by <code class="language-plaintext highlighter-rouge">cmd.exe</code> or <code class="language-plaintext highlighter-rouge">cmd.exe</code> being executed with <code class="language-plaintext highlighter-rouge">BrowserCore</code> in the command line but without named pipes are some examples where it’s behaviour differs from how Chrome calls it. <a href="https://posts.specterops.io/requesting-azure-ad-request-tokens-on-azure-ad-joined-machines-for-browser-sso-2b0409caad30">Lee’s blog</a> also contains further advice for monitoring for this behaviour. If you are monitoring the Azure AD sign-in logs, a non-technical user suddenly signing in using the PowerShell app id (and using SSO which as far as I know isn’t supported in the PowerShell module) may be suspicious.</p>
+
+<h2 id="response">Response</h2>
+<p>If a device is compromised, it is important to disable it in Azure AD and re-provision it. Aside from forcing the user to change their password, make sure to also update the <code class="language-plaintext highlighter-rouge">refreshTokensValidFromDateTime</code> property, which disables all current refresh tokens. You can for example do this with <a href="https://docs.microsoft.com/en-us/powershell/module/azuread/revoke-azureaduserallrefreshtoken?view=azureadps-2.0">PowerShell</a>. Doing this will make sure that any existing refresh tokens can no longer be used by an attacker.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+<p>As identity is getting more and more important in modern environments, organisations will hopefully implement security policies that prevents password spraying attacks from the internet from being successful. Attackers will then have to either phish credentials and MFA prompts together, but this also won’t get them past policies requiring a managed device or using password-less authentication. At that point it is back to attacking the endpoint, where SSO can be used to connect to apps requiring strict access policies, without knowing the user’s password or requiring administrative permissions. I hope this post illustrates the implicit risks of SSO and why it’s important to protect your endpoints. The ROADtoken tool is available on my <a href="https://github.com/dirkjanm/ROADtoken">GitHub</a> and so is of course the <a href="https://github.com/dirkjanm/ROADtools">ROADtools framework</a> itself. A new version of <em>roadlib</em> has been published which makes it possible to authenticate with a PRT cookie obtained by ROADtoken. For a more in-depth view into PRT crypto and abuse with Administrative privileges, see <a href="https://dirkjanm.io/digging-further-into-the-primary-refresh-token/">my next blog on this topic</a>.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M436 160H12c-6.6 0-12-5.4-12-12v-36c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48v36c0 6.6-5.4 12-12 12zM12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm116 204c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2020-07-21T15:57:00+00:00">July 21, 2020</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Abusing+Azure+AD+SSO+with+the+Primary+Refresh+Token%20https%3A%2F%2Fdirkjanm.io%2Fabusing-azure-ad-sso-with-the-primary-refresh-token%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdirkjanm.io%2Fabusing-azure-ad-sso-with-the-primary-refresh-token%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdirkjanm.io%2Fabusing-azure-ad-sso-with-the-primary-refresh-token%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><svg class="svg-inline--fa fa-google-plus fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="google-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm-70.7 372c-68.8 0-124-55.5-124-124s55.2-124 124-124c31.3 0 60.1 11 83 32.3l-33.6 32.6c-13.2-12.9-31.3-19.1-49.4-19.1-42.9 0-77.2 35.5-77.2 78.1s34.2 78.1 77.2 78.1c32.6 0 64.9-19.1 70.1-53.3h-70.1v-42.6h116.9c1.3 6.8 1.9 13.6 1.9 20.7 0 70.8-47.5 121.2-118.8 121.2zm230.2-106.2v35.5H372v-35.5h-35.5v-35.5H372v-35.5h35.5v35.5h35.2v35.5h-35.2z"></path></svg><!-- <i class="fab fa-fw fa-google-plus" aria-hidden="true"></i> --><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdirkjanm.io%2Fabusing-azure-ad-sso-with-the-primary-refresh-token%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/introducing-roadtools-and-roadrecon-azure-ad-exploration-framework/" class="pagination--pager" title="Introducing ROADtools - The Azure AD exploration framework
+">Previous</a>
+    
+    
+      <a href="/digging-further-into-the-primary-refresh-token/" class="pagination--pager" title="Digging further into the Primary Refresh Token
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+    
+    
+    
+      <li><a href="https://github.com/dirkjanm"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+    <li><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/img/cc-by.png"></a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">All blog content is available under the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0 License</a> unless stated otherwise.
+  <br>Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> and a modified version of the "Minimal Mistakes" theme.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-G3JYRDGZVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G3JYRDGZVR', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+  
+</body></html>

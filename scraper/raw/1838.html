@@ -1,0 +1,470 @@
+<html lang="en" class="dark-mode"><head>
+
+    <title>Evil QR - Phishing With QR Codes</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=5cb0155b50">
+
+    <meta name="description" content="Evil QR is a spin-off of a QRLJacking attack, demonstrating how attackers could take over accounts by convincing users to scan supplied QR codes, through phishing.">
+    <link rel="icon" href="https://breakdev.org/content/images/size/w256h256/2022/08/breakdev_logo_512.png" type="image/png">
+    <link rel="canonical" href="https://breakdev.org/evilqr-phishing/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="https://breakdev.org/evilqr-phishing/amp/">
+    
+    <meta property="og:site_name" content="BREAKDEV">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Evil QR - Phishing With QR Codes">
+    <meta property="og:description" content="Evil QR is a spin-off of a QRLJacking attack, demonstrating how attackers could take over accounts by convincing users to scan supplied QR codes, through phishing.">
+    <meta property="og:url" content="https://breakdev.org/evilqr-phishing/">
+    <meta property="og:image" content="https://breakdev.org/content/images/2023/07/evilqr-blog-cover2.png">
+    <meta property="article:published_time" content="2023-07-05T14:31:10.000Z">
+    <meta property="article:modified_time" content="2023-07-05T14:31:10.000Z">
+    <meta property="article:tag" content="phishing">
+    <meta property="article:tag" content="hacking">
+    <meta property="article:tag" content="tool">
+    <meta property="article:tag" content="research">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Evil QR - Phishing With QR Codes">
+    <meta name="twitter:description" content="Evil QR is a spin-off of a QRLJacking attack, demonstrating how attackers could take over accounts by convincing users to scan supplied QR codes, through phishing.">
+    <meta name="twitter:url" content="https://breakdev.org/evilqr-phishing/">
+    <meta name="twitter:image" content="https://breakdev.org/content/images/2023/07/evilqr-blog-cover2.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Kuba Gretzky">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="phishing, hacking, tool, research">
+    <meta name="twitter:site" content="@mrgretzky">
+    <meta name="twitter:creator" content="@mrgretzky">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "BREAKDEV",
+        "url": "https://breakdev.org/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://breakdev.org/content/images/2022/08/breakdev_logo_with_title.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Kuba Gretzky",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://breakdev.org/content/images/2022/08/avatar512.png",
+            "width": 512,
+            "height": 512
+        },
+        "url": "https://breakdev.org/author/kuba/",
+        "sameAs": [
+            "https://breakdev.org",
+            "https://twitter.com/mrgretzky"
+        ]
+    },
+    "headline": "Evil QR - Phishing With QR Codes",
+    "url": "https://breakdev.org/evilqr-phishing/",
+    "datePublished": "2023-07-05T14:31:10.000Z",
+    "dateModified": "2023-07-05T14:31:10.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://breakdev.org/content/images/2023/07/evilqr-blog-cover2.png",
+        "width": 1280,
+        "height": 720
+    },
+    "keywords": "phishing, hacking, tool, research",
+    "description": "Evil QR is a spin-off of a QRLJacking attack, demonstrating how attackers could take over accounts by convincing users to scan supplied QR codes, through phishing.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://breakdev.org/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.7">
+    <link rel="alternate" type="application/rss+xml" title="BREAKDEV" href="https://breakdev.org/rss/">
+    <script defer="" src="https://cdn.jsdelivr.net/npm/@tryghost/portal@~2.3/umd/portal.min.js" data-ghost="https://breakdev.org/" data-key="cbe8757390779c577a82afa6ee" data-api="https://breakdev.org/ghost/api/content/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer="" src="https://cdn.jsdelivr.net/npm/@tryghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="cbe8757390779c577a82afa6ee" data-styles="https://cdn.jsdelivr.net/npm/@tryghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://breakdev.org/" crossorigin="anonymous"></script>
+    <script defer="" src="/public/cards.min.js?v=5cb0155b50"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=5cb0155b50">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Questrial&amp;family=Source+Code+Pro&amp;display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+<style>
+.site-logo {
+	max-height: 480px;    
+}
+:root {
+    --font-sans: "Questrial", sans-serif;
+}
+.gh-content>blockquote:not([class]), .gh-content>dl, .gh-content>ol, .gh-content>p, .gh-content>ul {
+    font-family: "Questrial", sans-serif; /*var(--font-sans);*/
+}
+code, kbd, pre, samp {
+    font-family: 'Source Code Pro', monospace;
+}
+::selection {
+    background: var(--ghost-accent-color);
+}
+</style>
+
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-DKYFY5BSK5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DKYFY5BSK5');
+</script>
+<style>:root {--ghost-accent-color: #124559;}</style>
+
+<style>
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsInNvdXJjZVJvb3QiOiIifQ== */</style><style>
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsInNvdXJjZVJvb3QiOiIifQ== */</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style><style id="fit-vids-style">.fluid-width-video-container{flex-grow: 1;width:100%;}.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+<body class="post-template tag-phishing tag-hacking tag-tool tag-research has-sans-body has-cover">
+<div class="viewport">
+
+    <header id="gh-head" class="gh-head outer">
+        <nav class="gh-head-inner inner">
+
+            <div class="gh-head-brand">
+                <a class="gh-head-logo" href="https://breakdev.org">
+                        <img src="https://breakdev.org/content/images/2022/08/breakdev_logo_with_title.png" alt="BREAKDEV">
+                </a>
+                <div class="gh-head-brand-wrapper">
+                    <button class="gh-search" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                    <a class="gh-burger" role="button">
+                        <div class="gh-burger-box">
+                            <div class="gh-burger-inner"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="gh-head-menu">
+                <ul class="nav">
+    <li class="nav-home"><a href="https://breakdev.org/">Home</a></li>
+    <li class="nav-tools"><a href="https://github.com/kgretzky">Tools</a></li>
+    <li class="nav-contact"><a href="https://breakdev.org/contact/">Contact</a></li>
+</ul>
+
+            </div>
+            <div class="gh-head-actions">
+                <button class="gh-search" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <div class="gh-social">
+                        <a class="gh-social-link gh-social-twitter" href="https://twitter.com/mrgretzky" title="Twitter" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"></path></svg></a>
+                </div>
+                        <a class="gh-head-button gh-portal-close" href="#/portal/signup" data-portal="signup">Subscribe</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="site-content">
+        
+
+
+
+<main id="site-main" class="site-main">
+<article class="article post tag-phishing tag-hacking tag-tool tag-research ">
+
+    <header class="article-header gh-canvas">
+
+        <div class="article-tag post-card-tags">
+                <span class="post-card-primary-tag">
+                    <a href="/tag/phishing/">phishing</a>
+                </span>
+        </div>
+
+        <h1 class="article-title">Evil QR - Phishing With QR Codes</h1>
+
+            <p class="article-excerpt">Evil QR is a spin-off of a QRLJacking attack, demonstrating how attackers could take over accounts by convincing users to scan supplied QR codes, through phishing.</p>
+
+        <div class="article-byline">
+        <section class="article-byline-content">
+
+            <ul class="author-list">
+                <li class="author-list-item">
+                    <a href="/author/kuba/" class="author-avatar">
+                        <img class="author-profile-image" src="/content/images/size/w100/2022/08/avatar512.png" alt="Kuba Gretzky">
+                    </a>
+                </li>
+            </ul>
+
+            <div class="article-byline-meta">
+                <h4 class="author-name"><a href="/author/kuba/">Kuba Gretzky</a></h4>
+                <div class="byline-meta-content">
+                    <time class="byline-meta-date" datetime="2023-07-05">Jul 5, 2023</time>
+                        <span class="byline-reading-time"><span class="bull">•</span> 7 min read</span>
+                </div>
+            </div>
+
+        </section>
+        </div>
+
+            <figure class="article-image">
+                <img srcset="/content/images/size/w300/2023/07/evilqr-blog-cover2.png 300w,
+                            /content/images/size/w600/2023/07/evilqr-blog-cover2.png 600w,
+                            /content/images/size/w1000/2023/07/evilqr-blog-cover2.png 1000w,
+                            /content/images/size/w2000/2023/07/evilqr-blog-cover2.png 2000w" sizes="(min-width: 1400px) 1400px, 92vw" src="/content/images/size/w2000/2023/07/evilqr-blog-cover2.png" alt="Evil QR - Phishing With QR Codes">
+            </figure>
+
+    </header>
+
+    <section class="gh-content gh-canvas">
+        <p>Today I'm publishing the research I started to work on last year, but I was too busy with the <a href="https://academy.breakdev.org/evilginx-mastery">Evilginx Mastery</a> course, to publish it, at the time.</p><p>If you want a quick TL;DR rundown of what this blog post is about, check out the demo video I prepared:</p><figure class="kg-card kg-embed-card"><div class="fluid-width-video-container"><div class="fluid-width-video-wrapper" style="padding-top: 56.5%;"><iframe src="https://www.youtube.com/embed/8pfodWzqMcU?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" title="Evil QR - Phishing With QR Codes" name="fitvid0"></iframe></div></div></figure><h1 id="background">Background</h1><p>In recent years, I've noticed that more and more web applications begin to offer a new way to sign in - through QR code scanning. This method is especially convenient if you have a mobile app, on your phone, corresponding to the web application you are trying to sign into, in your web browser.</p><p>Here are the most popular websites, you can sign into, in any web browser, by scanning a QR code within the mobile application.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_MjsPYYQP9L.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_MjsPYYQP9L.png 600w, https://breakdev.org/content/images/2023/07/chrome_MjsPYYQP9L.png 885w" sizes="(min-width: 720px) 720px"><figcaption>Discord</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_KNrCzWXZJY.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_KNrCzWXZJY.png 600w, https://breakdev.org/content/images/2023/07/chrome_KNrCzWXZJY.png 885w" sizes="(min-width: 720px) 720px"><figcaption>Telegram</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_oT6hs4i5n9.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_oT6hs4i5n9.png 600w, https://breakdev.org/content/images/2023/07/chrome_oT6hs4i5n9.png 885w" sizes="(min-width: 720px) 720px"><figcaption>Whatsapp</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_jaxSIkFFVQ.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_jaxSIkFFVQ.png 600w, https://breakdev.org/content/images/2023/07/chrome_jaxSIkFFVQ.png 885w" sizes="(min-width: 720px) 720px"><figcaption>Steam</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_XeZrh4q1a8.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_XeZrh4q1a8.png 600w, https://breakdev.org/content/images/2023/07/chrome_XeZrh4q1a8.png 885w" sizes="(min-width: 720px) 720px"><figcaption>TikTok</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_jt9fNtReWm.png" class="kg-image" alt="" loading="lazy" width="885" height="717" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_jt9fNtReWm.png 600w, https://breakdev.org/content/images/2023/07/chrome_jt9fNtReWm.png 885w" sizes="(min-width: 720px) 720px"><figcaption>Binance</figcaption></figure><p>To sign in, you open the mobile application, navigate to "Scan QR code", usually residing somewhere within your profile settings, in the mobile application, and scan the QR with your phone camera.</p><p>The QR code, displayed on every sign-in page, is nothing more than a dynamically generated session token, which you can authorize with your mobile application, to pair it with your account.</p><p>Try to scan any of these QR codes with your phone's camera and you'll see the code translates into a unique string, usually presented in URL format. Here are several examples:</p><p>Discord:</p><pre><code>https://discord.com/ra/GLt61XsN_fuakToqeSMV25pd3G-uwSbdScI1Zc9iwT8</code></pre><p>Whatsapp:</p><pre><code>2@o7Ugs+XwUVXgG2f8stGluhiItwCxbZJNLkpkeKEhz65GmPh6+/N1lp3fXpaSjxeARrE2JGXi3ikIFA==,it98cjNOA3qvp4i/TidKTeWZTrGkFUTnqsOzPPxFEzI=,AMV+jQ0gSnoFFKbuYzKdrDSPT7BVZ4R5iFxIGEbCqQI=,nVAlyqnDJiYfW/S1LzZoaVNsDm+pNaB1mGm8pGC0+/E=,1</code></pre><p>Steam:</p><pre><code>https://s.team/q/1/1711614348354244891</code></pre><p>TikTok:</p><pre><code>https://www.tiktok.com/t/ZGJXCraU8/</code></pre><p>Binance:</p><pre><code>https://www.binance.com/en/qr/93bd2ead7e504488bda81bf50deab7e8</code></pre><p>Now let's imagine if there is any potential way, attackers could convince users to scan the QR code with the session token they control.</p><h1 id="meet-evil-qr-phishing-aka-qrljacking">Meet Evil QR Phishing aka QRLJacking</h1><p>One day you receive an email, telling you that you've been granted exclusive access to a private Discord server, where highly valuable information will be shared, among the participants. All you need to do is open the attached link and scan the QR code with your Discord application.</p><p>You click the link and the following website shows up in your web browser:</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://breakdev.org/content/images/2023/07/chrome_ZDBusl819X.png" class="kg-image" alt="" loading="lazy" width="937" height="625" srcset="https://breakdev.org/content/images/size/w600/2023/07/chrome_ZDBusl819X.png 600w, https://breakdev.org/content/images/2023/07/chrome_ZDBusl819X.png 937w" sizes="(min-width: 720px) 720px"><figcaption>Phishing page deployed and hosted by the attacker</figcaption></figure><p>Since you are pretty excited to join, you open your Discord application and scan the QR code, showing up on the screen of your PC. Discord asks you to confirm if you want to sign in, using the scanned QR code. You think that it makes sense that you need to be signed in to join the Discord server, so you agree without hesitation.</p><p>Once you approve the login attempt, the website redirects you to the Discord server page. You lose interest and go back to your other activities. All this without realizing, you've just given the attacker full access to your account.</p><h2 id="what-happened">What happened?</h2><p>Here is the step-by-step process of what the attacker did to pull off this phishing attack, using the <a href="https://github.com/kgretzky/evilqr">Evil QR</a> toolkit.</p><ol><li>The attacker opens the official <a href="https://discord.com/login">Discord login page</a> within their web browser to generate the sign-in QR code.</li><li>Using the <a href="https://github.com/kgretzky/evilqr">Evil QR</a> browser extension, the attacker is able to extract the sign-in QR code from the login page and upload it to the <a href="https://github.com/kgretzky/evilqr">Evil QR</a> server, where the phishing page is hosted.</li><li>The phishing page, hosted by the attacker, dynamically displays the most recent sign-in QR code controlled by the attacker.</li></ol><p>Once the target successfully scans the QR code, the attacker takes over the phished account.</p><p>The concept of phishing users with sign-in QR codes is not new and it has been <a href="https://seekurity.com/blog/2016/11/04/admin/phishing-analysis/qrljacking-your-qr-based-session-belongs-to-us">broadly documented</a> by <a href="https://twitter.com/SymbianSyMoh">Mohamed Abdelbasset Elnouby (@SymbianSyMoh)</a> from <a href="https://seekurity.com/">Seekurity</a> in 2016! I highly recommend you read this post as it covers a lot of information about the potential attack vectors, which could be used to pull off such attacks.</p><p>The technique was later officially recognized as <a href="https://owasp.org/www-community/attacks/Qrljacking">QRLJacking</a> and <a href="https://twitter.com/SymbianSyMoh/status/1675895436870139904">@SymbianSyMoh</a> also released a <a href="https://github.com/OWASP/QRLJacking">QRLJacker</a> tool in 2020 to demonstrate how such attacks can be executed. Evil QR idea is just a spin-off of the same idea.</p><h1 id="evil-qr-toolkit">Evil QR Toolkit</h1><p>To demonstrate this interesting phishing technique, I've developed a set of proof-of-concept tools for demonstration purposes.</p><p>You can find the open-sourced <a href="https://github.com/kgretzky/evilqr">Evil QR</a> toolkit on my <a href="https://github.com/kgretzky/evilqr">GitHub</a> if you're interested in trying it out yourself.</p><p>As you can see below, the Evil QR attack can be customized using personalized phishing pre-text, with dynamic updates, for every website separately. Evil QR browser extension can detect and extract QR codes, within websites, no matter how they are rendered.</p><p>The extension supports extracting QR codes rendered as <code>CANVAS</code>, <code>IMG</code>, <code>SVG</code> or even <code>DIV</code> (by taking a screenshot with <a href="https://html2canvas.hertzen.com/">html2canvas</a> library).</p><figure class="kg-card kg-image-card kg-width-wide"><img src="https://breakdev.org/content/images/2023/07/evilqr-phishing.gif" class="kg-image" alt="" loading="lazy" width="1921" height="1079" srcset="https://breakdev.org/content/images/size/w600/2023/07/evilqr-phishing.gif 600w, https://breakdev.org/content/images/size/w1000/2023/07/evilqr-phishing.gif 1000w, https://breakdev.org/content/images/size/w1600/2023/07/evilqr-phishing.gif 1600w, https://breakdev.org/content/images/2023/07/evilqr-phishing.gif 1921w" sizes="(min-width: 1200px) 1200px"></figure><h3 id="evil-qr-server">Evil QR Server</h3><p>The server is developed in GO and its main purpose is to expose REST API for the browser extension and run an HTTP server to host the phishing page.</p><p>It awaits authenticated communication from the browser extension including QR code image with metadata in JSON format on <code>/qrcode/[qr_uuid]</code> endpoint:</p><pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"11111111-1111-1111-1111-111111111111"</span><span class="token punctuation">,</span>
+    <span class="token property">"source"</span><span class="token operator">:</span> <span class="token string">"data:image/png;base64,iVBORw0K..."</span><span class="token punctuation">,</span>
+    <span class="token property">"host"</span><span class="token operator">:</span> <span class="token string">"discord.com"</span>
+<span class="token punctuation">}</span></code></pre><p>The retrieved QR code is then stored and is available for retrieval by the JavaScript, running on the phishing page. The phishing page is using <a href="https://www.pubnub.com/blog/http-long-polling/">HTTP Long Polling</a> to be able to retrieve QR code updates with minimal delays, without having to use Websockets.</p><p>The phishing page automatically detects which hostname the QR code was retrieved from and can dynamically adjust its CSS and text content to change the phishing pre-text, for social engineering purposes.</p><h3 id="evil-qr-browser-extension">Evil QR Browser Extension</h3><figure class="kg-card kg-image-card"><img src="https://breakdev.org/content/images/2023/07/image.png" class="kg-image" alt="" loading="lazy" width="412" height="222"></figure><p>The extension is used solely by the attacker and it needs to be enabled on the sign-in page of the web application, the target is phished for. It will automatically find the QR code image and detect if it changes. Once it changes, it will upload the updated image to the Evil QR server.</p><p>One of the most important characteristics of session tokens represented by sign-in QR codes, is that the tokens are short-lived by design. Every token is made to expire approximately after 30 seconds, which drastically shortens the time frame of the token's validity. Once the token expires, the website regenerates it and updates the displayed QR code, on the sign-in page.</p><p>If the sign-in session tokens did not expire, the attackers would hypothetically be able to print out the QR codes on a physical piece of paper and send them as phishing leaflets to potential victims, since the tokens would never expire.</p><p>Some websites will stop updating QR codes, after a certain period of inactivity, to save bandwidth. When this happens, they will usually display a "Retry" button of some sort, which the extension can automatically detect and click on, to not interrupt the process of updating QR codes.</p><p>The extension can also detect the presence of a specific DOM object, which will show up only when the attacker is signed in after the phishing attempt is successful. It will then send an update to the Evil QR server with <code>authorized: "true"</code> parameter, allowing the phishing page to decide on how to proceed.</p><h1 id="how-serious-is-this">How serious is this?</h1><p>In my personal opinion - not that serious. For the QRLJacking phishing attack to be successful, it requires a lot of prerequisites to be met prior to the attack taking place. Nevertheless, it was a very fun project to work on.</p><p>The classic phishing attacks, focused on capturing credentials and session tokens to <a href="https://breakdev.org/evilginx-3-0-evilginx-mastery/">bypass multi-factor authentication</a>, are still much more dangerous than this one and they can be executed on a much larger scale using a tool like <a href="https://github.com/kgretzky/evilginx2">Evilginx</a> for example.</p><p>I think the most realistic scenario of how QRLJacking phishing could be pulled off, would be to set up a phishing page with a QR code on display using an external device, deployed in public, like a <a href="https://youtu.be/8pfodWzqMcU">tablet or TV screen</a>. Once one person successfully signs in, by scanning a QR code, the attacker's Evil QR setup would save the captured session for later and reload the new sign-in page to generate a new QR code to phish another user.</p><p>That could in theory make it possible to phish a larger number of users, one at a time. I don't think QRLJacking phishing is a viable technique when sending phishing links via e-mail or other mediums. These days most people read incoming messages on their mobile phones and once the phishing page with a QR code shows up on their phone's screen, it is impossible to use the same phone's camera to scan it.</p><p>To summarize, here is a list of all pros and cons of executing this phishing attack technique, I could think of:</p><p><strong>Pros:</strong></p><ul><li>No need for the target to enter their username and password.</li><li>Could be potentially pulled off in public areas, having an external device displaying a phishing QR code, on display.</li></ul><p><strong>Cons:</strong></p><ul><li>Target needs to have the mobile app pre-installed for the given service.</li><li>Attacks are hard to pull off, on a wider scale, since there has to be a separate QR code generated for every target.</li><li>Usually pretty hard to find the setting to scan QR codes within mobile applications, involving multiple clicks, with every click lowering the chance of a successful social engineering attempt.</li><li>If a phishing page is opened on a mobile phone, there is no way for the target to scan the QR code with the same mobile phone.</li></ul><h1 id="closing-thoughts">Closing thoughts</h1><p>I decided not to implement this attack vector into <a href="https://github.com/kgretzky/evilginx2">Evilginx</a> phishing framework, since Evilginx is already powerful on its own.</p><p>While sign-in QR codes displayed on phishing pages, reverse proxied by Evilginx, will not let you sign in by scanning them, due to hostname mismatch, it is still possible to patch the JavaScript code, which generates them, to make them work on phishing pages.</p><p>If you're interested in learning more about reverse proxy phishing to bypass MFA, check out my <a href="https://academy.breakdev.org/evilginx-mastery">Evilginx Mastery</a> video course, which will teach you everything you need to know to perform successful red team phishing engagements.</p><p>Till next time!</p>
+    </section>
+
+
+</article>
+</main>
+
+    <section class="footer-cta outer">
+        <div class="inner">
+            <h2 class="footer-cta-title">Sign up for more like this.</h2>
+            <a class="footer-cta-button gh-portal-close" href="#/portal" data-portal="">
+                <div class="footer-cta-input">Enter your email</div>
+                <span>Subscribe</span>
+            </a>
+        </div>
+    </section>
+
+
+
+            <aside class="read-more-wrap outer">
+                <div class="read-more inner">
+                        
+<article class="post-card post featured">
+
+    <a class="post-card-image-link" href="/evilginx-3-3-go-phish/">
+
+        <img class="post-card-image" srcset="/content/images/size/w300/2024/04/evilginx33.png 300w,
+                    /content/images/size/w600/2024/04/evilginx33.png 600w,
+                    /content/images/size/w1000/2024/04/evilginx33.png 1000w,
+                    /content/images/size/w2000/2024/04/evilginx33.png 2000w" sizes="(max-width: 1000px) 400px, 800px" src="/content/images/size/w600/2024/04/evilginx33.png" alt="Evilginx 3.3 - Go &amp; Phish" loading="lazy">
+
+
+    </a>
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/evilginx-3-3-go-phish/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                        <span class="post-card-featured"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4.49365 4.58752C3.53115 6.03752 2.74365 7.70002 2.74365 9.25002C2.74365 10.6424 3.29678 11.9778 4.28134 12.9623C5.26591 13.9469 6.60127 14.5 7.99365 14.5C9.38604 14.5 10.7214 13.9469 11.706 12.9623C12.6905 11.9778 13.2437 10.6424 13.2437 9.25002C13.2437 6.00002 10.9937 3.50002 9.16865 1.68127L6.99365 6.25002L4.49365 4.58752Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg> Featured</span>
+                </div>
+                <h2 class="post-card-title">
+                    Evilginx 3.3 - Go &amp; Phish
+                </h2>
+            </header>
+                <div class="post-card-excerpt">Evilginx 3.3 update is here and it comes packing with the special feature everyone has been waiting for.</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2024-04-02">Apr 2, 2024</time>
+                <span class="sep">—</span>
+                <span class="post-card-meta-length">9 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                        
+<article class="post-card post">
+
+    <a class="post-card-image-link" href="/evilginx-pro-reveal/">
+
+        <img class="post-card-image" srcset="/content/images/size/w300/2023/09/evilginx-pro-reveal.png 300w,
+                    /content/images/size/w600/2023/09/evilginx-pro-reveal.png 600w,
+                    /content/images/size/w1000/2023/09/evilginx-pro-reveal.png 1000w,
+                    /content/images/size/w2000/2023/09/evilginx-pro-reveal.png 2000w" sizes="(max-width: 1000px) 400px, 800px" src="/content/images/size/w600/2023/09/evilginx-pro-reveal.png" alt="Evilginx Pro - The Future of Phishing" loading="lazy">
+
+
+    </a>
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/evilginx-pro-reveal/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                </div>
+                <h2 class="post-card-title">
+                    Evilginx Pro - The Future of Phishing
+                </h2>
+            </header>
+                <div class="post-card-excerpt">I've teased the idea of Evilginx Pro long enough and I think it is finally time to make a proper reveal of what it exactly is.
+
+Evilginx Pro will be a paid professional version of Evilginx, with extra features and added advanced reverse proxy anti-detection techniques, available only to BREAKDEV</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2023-09-27">Sep 27, 2023</time>
+                <span class="sep">—</span>
+                <span class="post-card-meta-length">11 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                        
+<article class="post-card post">
+
+    <a class="post-card-image-link" href="/breakdev-red/">
+
+        <img class="post-card-image" srcset="/content/images/size/w300/2023/08/breakdev_red.png 300w,
+                    /content/images/size/w600/2023/08/breakdev_red.png 600w,
+                    /content/images/size/w1000/2023/08/breakdev_red.png 1000w,
+                    /content/images/size/w2000/2023/08/breakdev_red.png 2000w" sizes="(max-width: 1000px) 400px, 800px" src="/content/images/size/w600/2023/08/breakdev_red.png" alt="BREAKDEV RED - Red Team Community" loading="lazy">
+
+
+    </a>
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/breakdev-red/">
+            <header class="post-card-header">
+                <div class="post-card-tags">
+                </div>
+                <h2 class="post-card-title">
+                    BREAKDEV RED - Red Team Community
+                </h2>
+            </header>
+                <div class="post-card-excerpt">Join the vetted Discord community, oriented around using Evilginx and ethical phishing, where everyone can safely share their phishing tips and tricks without worrying about them being misused by unknown parties.</div>
+        </a>
+
+        <footer class="post-card-meta">
+            <time class="post-card-meta-date" datetime="2023-08-30">Aug 30, 2023</time>
+                <span class="sep">—</span>
+                <span class="post-card-meta-length">3 min read</span>
+        </footer>
+
+    </div>
+
+</article>
+                </div>
+            </aside>
+
+
+
+    </div>
+
+    <footer class="site-footer outer">
+        <div class="inner">
+            <section class="copyright"><a href="https://breakdev.org">BREAKDEV</a> © 2024</section>
+            <nav class="site-footer-nav">
+                <ul class="nav">
+    <li class="nav-e-mail"><a href="mailto:kuba@breakdev.org">E-mail</a></li>
+    <li class="nav-github"><a href="https://github.com/kgretzky">GitHub</a></li>
+    <li class="nav-twitter"><a href="https://twitter.com/mrgretzky">Twitter</a></li>
+    <li class="nav-linkedin"><a href="https://www.linkedin.com/in/kubagretzky">LinkedIn</a></li>
+</ul>
+
+            </nav>
+            <div><a href="https://ghost.org/" target="_blank" rel="noopener">Powered by Ghost</a></div>
+        </div>
+    </footer>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous">
+</script>
+<script src="/assets/built/casper.js?v=5cb0155b50"></script>
+<script>
+$(document).ready(function () {
+    // Mobile Menu Trigger
+    $('.gh-burger').click(function () {
+        $('body').toggleClass('gh-head-open');
+    });
+    // FitVids - Makes video embeds responsive
+    $(".gh-content").fitVids();
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-fTl/qcO1VgvKtOMApX2PdZzkziyr2stM65GYPLGuYMnuMm1z2JLJG6XVU7C/mR+E7xBUqCivykuhlzfqxXBXbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+<div id="ghost-portal-root"><iframe srcdoc="<!DOCTYPE html>" class="gh-portal-triggerbtn-iframe" title="portal-trigger" style="z-index: 3999998; position: fixed; bottom: 0px; right: 0px; width: 183px; max-width: 500px; height: 98px; animation: 250ms animation-bhegco; transition: opacity 0.3s; overflow: hidden;" frameborder="0"></iframe></div><div id="sodo-search-root"></div></body></html>

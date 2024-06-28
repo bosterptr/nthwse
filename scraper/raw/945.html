@@ -1,0 +1,1934 @@
+<html lang="pl"><head>
+<meta charset="utf-8">
+
+<title>Asembler Arm64 dla Windows. Podstawowa wiedza w kapsułce</title>
+<meta name="description" content="Spreading knowledge like a virus.">
+<meta name="author" content="Dawid Farbaniec">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://ethical.blue/assets/bootstrap.min.css" rel="stylesheet">
+<link href="https://ethical.blue/assets/ethicalblue.css" rel="stylesheet">
+</head>
+<body>
+<header class="container">
+<h1>
+<span style="white-space: nowrap;"><img alt="" src="https://ethical.blue/img/bio.svg" style="height: 2.0rem; vertical-align: middle;" class="me-1">ethical<span class="text-blue">.blue</span></span> <span class="text-silver">Magazine</span>
+</h1>
+<span class="slogan small"> <span class="text-secondary">//</span> <span class="text-blue">Cybersecurity</span> <span class="text-light-blue">clarified.</span></span>
+</header>
+<nav class="navbar navbar-expand-md">
+<div class="container">
+<button class="navbar-toggler m-1 text-blue" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+Pages »
+</button>
+<div class="collapse navbar-collapse" id="navbarNavDropdown">
+<ul class="navbar-nav">
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" href="https://ethical.blue/">Textz <img alt="" src="https://ethical.blue/img/pen.svg" style="height: 1.25rem; vertical-align: text-bottom;"></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://ethical.blue/page/ethics">Ethics <img alt="" src="https://ethical.blue/img/aureola.svg" style="height: 1.25rem; vertical-align: text-bottom;"></a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main class="container">
+<article>
+<h2 class="text-eroded">
+<img alt="" src="https://ethical.blue/img/pen.svg" style="height: 1.40em; vertical-align: text-bottom;">
+
+Asembler Arm64 dla Windows. Podstawowa wiedza w kapsułce
+</h2>
+
+<img loading="lazy" src="https://ethical.blue/cover/5.png" class="img-fluid" alt="...">
+<div class="text-end mb-2">
+
+Assembly Language
+<span class="text-secondary">//</span>
+
+<span class="text-biolinum"><time datetime="2024">MMXXIV</time></span>
+<span class="text-secondary">//</span> <a style="white-space: nowrap;" href="https://ethical.blue/page/dawid-farbaniec" rel="canonical" title="Dawid Farbaniec">Dawid Farbaniec</a>
+</div>
+<div class="text-end mb-2">
+<span class="small">Ostatnia modyfikacja:</span>
+<br>
+
+<time datetime="2024-02-21 00:00">2024-02-21</time>
+</div>
+
+<h3 class="text-eroded">Spis treści</h3>
+<ul style="list-style-type: square;">
+<li>
+<a href="#r1">Niejawny program testów Windows Insider</a>
+</li>
+<li>
+<a href="#r2">Platforma chmurowa Azure</a>
+</li>
+<li>
+<a href="#r3">Podstawy architektury Arm64 (AArch64)</a>
+<ul style="list-style-type: square;">
+<li>
+<a href="#r3_1">Typy danych</a>
+</li>
+<li>
+<a href="#r3_2">Stos programu</a>
+</li>
+<li>
+<a href="#r3_3">Format przykładowego rozkazu</a>
+</li>
+<li>
+<a href="#r3_4">Rejestry R0...R30</a>
+</li>
+<li>
+<a href="#r3_5">Rejestry V0...V31 oraz FPSR i FPCR</a>
+</li>
+<li>
+<a href="#r3_6">Rejestry Z0...Z31</a>
+</li>
+<li>
+<a href="#r3_7">Rejestr Program Counter</a>
+</li>
+<li>
+<a href="#r3_8">Rejestr Stack Pointer</a>
+</li>
+<li>
+<a href="#r3_9">Flagi NZCV</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#r4">Podstawy składni Microsoft Arm Assembler</a>
+<ul style="list-style-type: square;">
+<li>
+<a href="#r4_1">Stałe (EQU)</a>
+</li>
+<li>
+<a href="#r4_2">Dane o rozmiarze bajta (DCB)</a>
+</li>
+<li>
+<a href="#r4_3">Dane o rozmiarze pół słowa maszynowego (DCW, DCWU)</a>
+</li>
+<li>
+<a href="#r4_4">Dane o rozmiarze słowa (DCD, DCDU)</a>
+</li>
+<li>
+<a href="#r4_5">Dane o rozmiarze podwójnego słowa (DCQ, DCQU)</a>
+</li>
+<li>
+<a href="#r4_6">Dane o rozmiarze wielu bajtów</a>
+</li>
+<li>
+<a href="#r4_7">Etykiety (ang. labels)</a>
+</li>
+<li>
+<a href="#r4_8">Proste operacje arytmetyczne</a>
+</li>
+<li>
+<a href="#r4_9">Proste operacje logiczne</a>
+</li>
+<li>
+<a href="#r4_10">Procedury (ang. procedures)</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#r5">Podstawowe instrukcje (A64)</a>
+<ul style="list-style-type: square;">
+<li>
+<a href="#r5_1">Instrukcje transferu danych</a>
+</li>
+<li>
+<a href="#r5_2">Instrukcje arytmetyczne</a>
+</li>
+<li>
+<a href="#r5_3">Instrukcje logiczne</a>
+</li>
+<li>
+<a href="#r5_4">Rozgałęzienia (ang. branch)</a>
+</li>
+<li>
+<a href="#r5_5">Inne (ang. misc)</a>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="r1" class="text-eroded">Niejawny program testów Windows Insider</h3>
+<p>
+Program o nazwie Windows Insider pozwala na dostęp do przyszłych wersji systemu Windows, które można używać do celów testowych.
+Uczestnicy zapisani do niejawnego programu testów Windows Insider mogą bezpłatnie uzyskać pliki obrazu systemu Windows dla architektury Arm.
+Niestety próba instalacji systemu Windows dla Arm w oprogramowaniu typu emulator na sprzęcie x64 ze względu na niską wydajność takiego rozwiązania prawdopodobnie uniemożliwi normalne korzystanie z systemu.
+</p>
+<h3 id="r2" class="text-eroded">Platforma chmurowa Azure</h3>
+<p>
+Wygodnym sposobem na uzyskanie dostępu do systemu Windows dla procesorów Arm (bez kupowania sprzętu) wydaje się być platforma chmurowa Azure.
+Należy jednak zaznaczyć, że jest to rozwiązanie płatne (nie licząc darmowych bonusowych śródków na start czy promocji).
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="arm64azure.png">
+<figcaption>Systemy operacyjne Windows dla procesorów Arm dostępne na platformie Azure</figcaption>
+</figure>
+<p>
+Platformę sprzętową na której zainstalowano system Windows można odczytać np. za pomocą PowerShell.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+Get-WmiObject <span class="text-silver">-Class</span> <span class="electric-white">Win32_ComputerSystem</span> <span class="text-silver">|</span> Select-Object <span class="text-silver">-Property</span> <span class="electric-white">SystemType</span>
+</code>
+</div>
+</div>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="system_architecture.png">
+<figcaption>Odczytanie platformy sprzętowej oraz wersji systemu Windows za pomocą PowerShell</figcaption>
+</figure>
+<p>Informacje o architekturze procesora można też znaleźć w oknie informacji o systemie (System &gt; About).</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="arm_based_processor.png">
+<figcaption>Połączenie przez zdalny pulpit z maszyną wirtualną na platformie Azure</figcaption>
+</figure>
+<h3 id="r3" class="text-eroded">Podstawy architektury Arm64 (AArch64)</h3>
+<p>
+Architektura sprzętowa Arm cały czas się rozwija, dlatego jej kolejne generacje nazywane są z użyciem numeru wersji np. Armv7, Armv8 czy Armv9.
+Procesory Arm obsługują kolejność bajtów <abbr title="Little Endian">LE</abbr> oraz <abbr title="Big Endian">BE</abbr>.
+System operacyjny Windows dla architektury Arm działa na kolejności bajtów <abbr title="Little Endian">LE</abbr>.
+Warto wspomnieć, że nazwy AArch64 i AArch32 dotyczą stanu w jakim jest procesor (ang. execution state).
+Stan AArch64 (nazywany też Arm64) oznacza możliwość korzystania z 64-bitowych rejestrów oraz zestawu rozkazów A64.
+Natomiast stan AArch32 (nazywany Arm32) używa 32-bitowych rejestrów oraz zestawu rozkazów A32 oraz T32.
+</p>
+<p>
+Dodatkowo architektura Arm definiuje następujące profile:
+</p>
+<ul style="list-style-type: square;">
+<li>Application (aplikacje),</li>
+<li>Real-time (czasu rzeczywistego),</li>
+<li>Microcontroller (mikrokontroler).</li>
+</ul>
+<p>
+Dlatego często można spotkać zapis np. Armv9-A, który oznacza architekturę Arm dziewiątej generacji i profil Application.
+</p>
+<h4 id="r3_1" class="text-eroded">Typy danych</h4>
+<ul style="list-style-type: square;">
+<li>Bajt (8 bitów)</li>
+<li>Pół słowa maszynowego (16 bitów)</li>
+<li>Słowo maszynowe (32 bity)</li>
+<li>Podwójne słowo maszynowe (64 bity)</li>
+</ul>
+<h4 id="r3_2" class="text-eroded">Stos programu</h4>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="stack.png">
+<figcaption>Kierunek rośnięcia stosu programu (AArch64)</figcaption>
+</figure>
+<h4 id="r3_3" class="text-eroded">Format przykładowego rozkazu</h4>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="instruction_format.png">
+<figcaption>Przykładowy rozkaz w języku Asembler dla Arm64 (AArch64)</figcaption>
+</figure>
+<h4 id="r3_4" class="text-eroded">Rejestry R0...R30</h4>
+<ul style="list-style-type: square;">
+<li>Rejestr <code>X30</code> to <em>Link Register</em> (<code>LR</code>), który przechowuje adres powrotny wymagany do powrotu z wywołania procedury.</li>
+<li>Rejestr <code>X18</code> (<code>XPR</code>) w trybie użytkownika (ang. user mode, ring 3) umożliwia dostęp do struktur <abbr title="Thread Environment Block">TEB</abbr> i <abbr title="Process Environment Block">PEB</abbr></li>
+<li>Parametry wywoływanej procedury lub funkcji są przekazywane przez rejestry od <code>X0</code> do <code>X7</code>. Jeśli parametrów jest więcej niż osiem, to pozostałe przekazywane są przez stos.</li>
+<li>Wartości w postaci liczb całkowitych są zwracane w rejestrze <code>X0</code>.</li>
+<li>Rejestry od <code>X19</code> do <code>X28</code> oraz rejestr <code><abbr title="Frame Pointer">FP</abbr></code> są nieulotne (ang. nonvolatile), czyli jeśli są modyfikowane (używane), to ich wartości powinny zostać zachowane na początku funkcji i przywrócone przed wyjściem z funkcji.</li>
+<li>Rejestry <code>X8</code> do <code>X15</code> są ulotne (ang. volatile) — nie ma potrzeby zachowania ich wartości.</li>
+</ul>
+<p>Rejestry od <code>R0</code> do <code>R30</code> są udostępniane w postaci:</p>
+<ul style="list-style-type: square;">
+<li><code>W0...W30</code> (32 bitowe)</li>
+<li><code>X0...X30</code> (64 bitowe)</li>
+</ul>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="r0_r30.png">
+<figcaption>Rejestry ogólnego przeznaczenia (AArch64)</figcaption>
+</figure>
+<h4 id="r3_5" class="text-eroded">Rejestry V0...V31 oraz FPSR i FPCR</h4>
+<ul style="list-style-type: square;">
+<li>Parametry wywoływanej procedury lub funkcji są przekazywane przez rejestry od <code>V0</code> do <code>V7</code>. Jeśli parametrów jest więcej niż osiem, to pozostałe przekazywane są przez stos.</li>
+<li>Wartości w postaci liczb zmiennoprzecinkowych są zwracane w rejestrze <code>V0</code>.</li>
+<li>Młodsze 64-bity rejestrów od <code>V8</code> do <code>V15</code> są nieulotne (ang. nonvolatile), czyli jeśli są modyfikowane (używane), to ich wartości powinny zostać zachowane na początku funkcji i przywrócone przed wyjściem z funkcji.</li>
+<li>Rejestry <code>V16</code> do <code>V31</code> są ulotne (ang. volatile) — nie ma potrzeby zachowania ich wartości.</li>
+</ul>
+<p>Rejestry od <code>V0</code> do <code>V31</code> są udostępniane w postaci:</p>
+<ul style="list-style-type: square;">
+<li><code>B0...B31</code> (8 bitowe)</li>
+<li><code>H0...H31</code> (16 bitowe)</li>
+<li><code>S0...S31</code> (32 bitowe)</li>
+<li><code>D0...D31</code> (64 bitowe)</li>
+<li><code>Q0...Q31</code> (128 bitowe)</li>
+</ul>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="v0_v31.png">
+<figcaption>Rejestry przeznaczone do operacji zmiennoprzecinkowych i SIMD (AArch64)</figcaption>
+</figure>
+<h4 id="r3_6" class="text-eroded">Rejestry Z0...Z31</h4>
+<p>Rejestry od <code>Z0</code> do <code>Z31</code> są używane w rozkazach <abbr title="Scalable Vector Extension">SVE</abbr>.</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="z0_z31.png">
+<figcaption>Rejestry przeznaczone dla rozkazów Scalable Vector Extension (AArch64)</figcaption>
+</figure>
+<h4 id="r3_7" class="text-eroded">Rejestr Program Counter</h4>
+<p>Rejestr <code><abbr title="Program Counter">PC</abbr></code> pozwala określić, która instrukcja jest następna do wykonania. Nie jest to rejestr ogólnego przeznaczenia. Rejestr <code><abbr title="Program Counter">PC</abbr></code> jest rejestrem specjalnym.</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="pc.png">
+<figcaption>Rejestr PC (AArch64)</figcaption>
+</figure>
+<h4 id="r3_8" class="text-eroded">Rejestr Stack Pointer</h4>
+<p>Rejestr wskaźnika stosu. Nie jest to rejestr ogólnego przeznaczenia. Rejestr <code><abbr title="Stack Pointer">SP</abbr></code> jest rejestrem specjalnym.</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="sp.png">
+<figcaption>Rejestr SP (AArch64)</figcaption>
+</figure>
+<h4 id="r3_9" class="text-eroded">Flagi NZCV</h4>
+<p>
+Flagi procesora nazywane też znacznikami to pola o rozmiarze jednego bitu, które mogą przyjmować wartość zero (flaga nieustawiona) lub jeden (flaga
+ustawiona).
+</p>
+<ul style="list-style-type: square;">
+<li>
+<code>N</code> (Negative) — Rezultat operacji jest wartością ujemną. Flaga ta jest
+ustawiana zgodnie z bitem znaku rezultatu (najstarszy bit).
+</li>
+<li>
+<code>Z</code> (Zero) — Rezultat operacji jest równy zero. Flaga jest ustawiana np. gdy
+porównujemy dwie wartości i są one równe. Gdyż porównanie dwóch
+wartości to wykonanie odejmowania. Inny przykład to dekrementacja, czyli
+zmniejszanie wartości o jeden. Jeśli osiągniemy zero, to flaga jest ustawiana.
+</li>
+<li>
+<code>C</code> (Carry) — Rezultat operacji spowodował przeniesienie (ang. carry). Przy
+użyciu rejestrów <code>X0...X30</code> oznacza to, że rezultat nie mieści się w rejestrze
+(ma więcej niż 64 bity).
+</li>
+<li>
+<code>V</code> (Overflow) — Rezultat operacji spowodował przepełnienie. Oznacza to, że
+rezultat nie mieści się w rejestrze oraz zmienił się najstarszy bit (nazywany
+bitem znaku).
+</li>
+</ul>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="nzcv.png">
+<figcaption>Rejestr z flagami NZCV (AArch64)</figcaption>
+</figure>
+<h3 id="r4" class="text-eroded">Podstawy składni Microsoft Arm Assembler</h3>
+<h4 id="r4_1" class="text-eroded">Stałe (EQU)</h4>
+<p>
+Dyrektywa <code>EQU</code>, której synonimem jest znak gwiazdki (<code>*</code>) pozwala nadać wartości numerycznej przyjazną nazwę symboliczną.
+Pozwala to uniknąć tzw. magic numbers, czyli wartości liczbowych, których znaczenie nie jest zrozumiałe bez zagłębienia się w dokumentację.
+Prosty przykład: Wyświetlenie okna dialogowego przez funkcję <code>MessageBox</code>. Jeśli jako rodzaj komunikatu poda się <code>0x00000002</code>,
+to bez znajomości dokumentacji Windows API ciężko będzie się domyślić znaczenia tej wartości.
+Natomiast utworzenie stałej nazwanej <code>MB_ABORTRETRYIGNORE</code> pozwoli zwiększyć przejrzystość kodu.
+</p>
+<p>
+Przykładowe stałe:
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+NULL EQU 0 <span class="code-comment">;stała NULL o wartości zero</span><br>
+TRUE EQU 1 <span class="code-comment">;stała TRUE o wartości jeden</span><br>
+FALSE EQU 0 <span class="code-comment">;stała FALSE o wartości zero</span><br>
+FALSE EQU 0 <span class="code-comment">;stała FALSE o wartości zero</span><br>
+LETTER_A EQU 'A' <span class="code-comment">;stała LETTER_A o wartości 0x41 (kod ASCII litery A)</span>
+</code>
+</div>
+</div>
+<h4 id="r4_2" class="text-eroded">Dane o rozmiarze bajta (DCB)</h4>
+<p>
+Dyrektywa <code>DCB</code>, której synonimem jest znak równości (<code>=</code>) pozwala zarezerwować jeden lub więcej bajtów z nadaną wartością początkową.
+Za pomocą tego rodzaju dyrektywy możliwe jest również definiowanie napisów zakończonych zerem — nazywanych C string.
+Jednak o kończący znak <code>NULL</code> należy zadbać samemu.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+format DCB "%#08x",0x00 <span class="code-comment">;przykładowy ciąg formatujący dla funkcji StringCChPrintf</span><br>
+var1 DCB 255 <span class="code-comment">;przykładowy bajt (8 bitów) o wartości 255 (0xFF)</span><br>
+var2 DCB 0xFF <span class="code-comment">;przykładowy bajt (8 bitów) o wartości 0xFF (255)</span><br>
+hello DCB "ethical.blue", 0xD, 0xA, "Magazine", 0x00 <span class="code-comment">;przykładowy napis ze znakiem nowej linii w środku</span>
+</code>
+</div>
+</div>
+<h4 id="r4_3" class="text-eroded">Dane o rozmiarze pół słowa maszynowego (DCW, DCWU)</h4>
+<p>
+Dyrektywa <code>DCW</code> pozwala zarezerwować pół słowa maszynowego (16 bitów) lub więcej takich pół słów z nadaną wartością początkową.
+Jeśli nie jest wymagane wyrównanie danych do 2 bajtów, to można zastosować dyrektywę <code>DCWU</code>.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+<span class="code-comment">;pół słowa komputerowego (16 bitów, 2 bajty)</span><br>
+var1 DCW 0xBAD <span class="code-comment">;16 bitów (pół słowa komputerowego)</span><br>
+var2 DCWU 0xBAD <span class="code-comment">;16 bitów (pół słowa, bez wyrównania)</span>
+</code>
+</div>
+</div>
+<h4 id="r4_4" class="text-eroded">Dane o rozmiarze słowa (DCD, DCDU)</h4>
+<p>
+Dyrektywa <code>DCD</code> pozwala zarezerwować słowo maszynowe (32 bity) lub więcej takich słów z nadaną wartością początkową.
+Jeśli nie jest wymagane wyrównanie danych do 4 bajtów, to można zastosować dyrektywę <code>DCDU</code>.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+<span class="code-comment">;Słowo (ang. word) na platformie Arm64 ma 32 bity (4 bajty).</span><br>
+<span class="code-comment">;Natomiast słowo na platformie x64 ma 16 bitów (2 bajty).</span><br>
+var1 DCD 0xC0FFEE <span class="code-comment">;32 bity (słowo komputerowe)</span><br>
+var2 DCD 1,2,3,4 <span class="code-comment">;cztery słowa komputerowe (cztery razy 32-bity)</span>
+</code>
+</div>
+</div>
+<h4 id="r4_5" class="text-eroded">Dane o rozmiarze podwójnego słowa (DCQ, DCQU)</h4>
+<p>
+Dyrektywa <code>DCQ</code> pozwala zarezerwować podwójne słowo maszynowe (64 bity) lub więcej takich podwójnych słów z nadaną wartością początkową.
+Jeśli nie jest wymagane wyrównanie danych do 8 bajtów, to można zastosować dyrektywę <code>DCQU</code>.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+var1 DCQ 13 <span class="code-comment">;dane o rozmiarze 8 bajtów (64-bity)</span>
+</code>
+</div>
+</div>
+<h4 id="r4_6" class="text-eroded">Dane o rozmiarze wielu bajtów</h4>
+<p>
+Dyrektywy <code>SPACE</code> oraz <code>FILL</code> pozwalają zarezerwować wielobajtową przestrzeń z nadaną wartością początkową.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+var1 SPACE 255 <span class="code-comment">;dane o rozmiarze 255 bajtów (wypełnione zerami)</span><br>
+var2 FILL 50,0xCC,1 <span class="code-comment">;dane o rozmiarze 50 bajtów wypełnione wartością 0xCC (1 to rozmiar wartości)</span>
+</code>
+</div>
+</div>
+<h4 id="r4_7" class="text-eroded">Etykiety (ang. labels)</h4>
+<p>
+Etykietami można oznaczać miejsca w kodzie programu, do których później można się odwoływać za pomocą określonych rozkazów.
+Pozwala to m.in. na zapętlanie fragmentów kodu czy przekazanie wykonania do fragmentu kodu i powrót za miejsce rozgałęzienia po wykonaniu.
+</p>
+<p class="red">
+W przypadku błędów budowania stosując Microsoft Arm Assembler (marmasm), należy pamiętać, że etykiety nie mają mieć wcięcia,
+natomiast mnemoniki powinny mieć wcięcie w postaci tabulatora lub znaków spacji.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+&nbsp;&nbsp;AREA .drectve, DRECTVE<br><br>
+&nbsp;&nbsp;AREA .rdata, DATA, READONLY<br><br>
+&nbsp;&nbsp;EXPORT Main<br>
+&nbsp;&nbsp;IMPORT |__imp_ExitProcess|<br><br>
+&nbsp;&nbsp;AREA .text, CODE, ARM64<br><br>
+Main PROC<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;odłożenie wartości rejestrów FR i LR na stosie programu</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;stp fp,lr,[sp,#-0x10]!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;zapisanie nowej wartości wskaźnika stosu (SP) w rejestrze FP</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov fp,sp<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;wyzerowanie rejestru X0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;tst x0,x0 <span class="code-comment">;sprawdzenie czy w rejestrze X0 jest wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;beq |FAIL| <span class="code-comment">;jeśli tak, to przejście do etykiety |FAIL|</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;b |EXIT| <span class="code-comment">;w przeciwnym wypadku bezwarunkowe przejście do |EXIT|</span><br>
+|FAIL|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w0,#-1 <span class="code-comment">;rejestr W0 przyjmuje wartość minus jeden</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;będzie to kod powrotu funkcji ExitProcess</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;zwracany do systemu Windows</span><br>
+|EXIT|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;wczytanie adresu funkcji ExitProcess do rejestru X8</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;(adres jest względem wartości rejestru Program Counter)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,__imp_ExitProcess<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;rozkaz LDR lub ADD jest tutaj wymagany do utworzenia</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;kompletnego adresu funkcji ExitProcess</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldr x8,[x8,__imp_ExitProcess]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;wywołanie funkcji ExitProcess, której adres jest w rejestrze X8</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;adres powrotny jest zachowywany w rejestrze X30 (LR)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;blr x8<br><br>
+ENDP<br><br>
+END
+</code>
+</div>
+<span class="text-eroded text-silver">Download:</span>
+<div class="ms-md-2">
+<a class="electric-white small" href="Labels.txt">
+Labels.txt
+</a>
+</div>
+</div>
+<h4 id="r4_8" class="text-eroded">Proste operacje arytmetyczne</h4>
+<p>
+Proste operacje arytmetyczne można przeprowadzić za pomocą rozkazów:
+</p>
+<ul style="list-style-type: square;">
+<li><code>ADD</code> (dodawanie),</li>
+<li><code>SUB</code> (odejmowanie),</li>
+<li><code>SUBS</code> (odejmowanie z ustawieniem flag),</li>
+<li><code>NEG</code> (zero odjąć wartość),</li>
+<li><code>MUL</code> (mnożenie),</li>
+<li><code>UDIV</code> (dzielenie bez znaku),</li>
+<li><code>SDIV</code> (dzielenie ze znakiem)</li>
+<li>(...)</li>
+</ul>
+<p>
+Przykładowy program prezentuje się następująco:
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+&nbsp;&nbsp;AREA .drectve, DRECTVE<br><br>
+&nbsp;&nbsp;AREA .rdata, DATA, READONLY<br><br>
+&nbsp;&nbsp;EXPORT Main<br>
+&nbsp;&nbsp;IMPORT |__imp_ExitProcess|<br><br>
+&nbsp;&nbsp;AREA .text, CODE, ARM64<br><br>
+Main PROC<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;stp fp,lr,[sp,#-0x10]!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov fp,sp<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x7,#1 <span class="code-comment">;rejestr X7 przyjmuje wartość jeden</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;add x0,x7,#1 <span class="code-comment">;rejestr X0 przyjmuje wartość X7 dodać jeden, czyli dwa</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x7,#255 <span class="code-comment">;rejestr X7 przyjmuje wartość 255 (0xFF)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;sub x0,x7,#1 <span class="code-comment">;rejestr X0 przyjmuje wartość X7 odjąć jeden, czyli 254</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x7,#128 <span class="code-comment">;rejestr X7 przyjmuje wartość 128</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;subs x0,x7,#1 <span class="code-comment">;rejestr X0 przyjmuje wartość X7 odjąć jeden, czyli 127</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;(rozkaz SUBS ustawia flagi procesora)</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;x0 = 0 - x7</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x7,#1 <span class="code-comment">;rejestr X7 przyjmuje wartość jeden</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;neg x0,x7 <span class="code-comment">;rejestr X0 przyjmuje wartość zero odjąć wartość rejestru X7</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;x0 = x1 * x2</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x1,#4 <span class="code-comment">;rejestr X1 przyjmuje wartość cztery</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x2,#4 <span class="code-comment">;rejestr X2 przyjmuje wartość cztery</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mul x0,x1,x2 <span class="code-comment">;rejestr X0 przyjmuje wartość X1 pomnożone przez X2, czyli 4*4=16</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;mnożenie z dodawaniem</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;x0 = x1 * x2 + x3</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;madd x0,x1,x2,x3</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;x0 = x1 / x2 (bez znaku)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x1,#10 <span class="code-comment">;rejestr X1 przyjmuje wartość dziesięć</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x2,#2 <span class="code-comment">;rejestr X2 przyjmuje wartość dwa</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;udiv x0,x1,x2 <span class="code-comment">;rejestr X0 przyjmuje wartość X1 podzielone przez X2</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;x0 = x1 / x2 (ze znakiem)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0 <span class="code-comment">;rejestr X0 przyjmuje wartość zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x1,#32 <span class="code-comment">;rejestr X1 przyjmuje wartość trzydzieści dwa</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x2,#2 <span class="code-comment">;rejestr X2 przyjmuje wartość dwa</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;sdiv x0,x1,x2 <span class="code-comment">;rejestr X0 przyjmuje wartość X1 podzielone przez X2</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;wyjście z programu do systemu Windows</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w0,#0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,__imp_ExitProcess<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldr x8,[x8,__imp_ExitProcess]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;blr x8<br><br>
+ENDP<br><br>
+END
+</code>
+</div>
+<span class="text-eroded text-silver">Download:</span>
+<div class="ms-md-2">
+<a class="electric-white small" href="SimpleMath.txt">
+SimpleMath.txt
+</a>
+</div>
+</div>
+<h4 id="r4_9" class="text-eroded">Proste operacje logiczne</h4>
+<p>
+Proste operacje logiczne można przeprowadzić za pomocą rozkazów:
+</p>
+<ul style="list-style-type: square;">
+<li><code>AND</code> (koniunkcja — Logical AND),</li>
+<li><code>ANDS</code> (koniunkcja z ustawieniem flag),</li>
+<li><code>ORR</code> (alternatywa — Logical OR),</li>
+<li><code>ORN</code> (alternatywa z zaprzeczonym trzecim operandem — Logical OR NOT),</li>
+<li><code>EON</code> (alternatywa wykluczająca z zaprzeczonym trzecim operandem — Logical Exclusive OR NOT),</li>
+<li><code>MVN</code> (negacja, zaprzeczenie — Logical NOT),</li>
+<li><code>EOR</code> (alternatywa wykluczająca — Logical XOR)</li>
+<li>(...)</li>
+</ul>
+<p>
+Przykładowy program prezentuje się następująco:
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+&nbsp;&nbsp;AREA .drectve, DRECTVE<br><br>
+&nbsp;&nbsp;AREA .rdata, DATA, READONLY<br><br>
+&nbsp;&nbsp;EXPORT Main<br>
+&nbsp;&nbsp;IMPORT |__imp_ExitProcess|<br><br>
+&nbsp;&nbsp;AREA .text, CODE, ARM64<br><br>
+Main PROC<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;stp fp,lr,[sp,#-0x10]!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov fp,sp<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;koniunkcja logiczna</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w1,#0xFF0000FF <span class="code-comment">;rejestr W1 przyjmuje wartość 0xFF0000FF</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;and w0,w1,#0xFF00FF00 <span class="code-comment">;rejestr W0 przyjmuje wartość W1 and #0xFF00FF00</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;koniunkcja logiczna</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w1,#0xFF0000FF <span class="code-comment">;rejestr W1 przyjmuje wartość 0xFF0000FF</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;ands w0,w1,#0xFF00FF00 <span class="code-comment">;rejestr W0 przyjmuje wartość W1 and #0xFF00FF00</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;(rozkaz ANDS ustawia flagi procesora)</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;alternatywa logiczna</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w1,#0xFF0000FF <span class="code-comment">;rejestr W1 przyjmuje wartość 0xFF0000FF</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;orr w0,w1,#0xFF00FF00 <span class="code-comment">;rejestr W0 przyjmuje wartość W1 or #0xFF00FF00</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;alternatywa wykluczająca</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w1,#0xFF0000FF <span class="code-comment">;rejestr W1 przyjmuje wartość 0xFF0000FF</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;eor w0,w1,#0xFF00FF00 <span class="code-comment">;rejestr W0 przyjmuje wartość W1 xor #0xFF00FF00</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w0,#0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,__imp_ExitProcess<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldr x8,[x8,__imp_ExitProcess]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;blr x8<br><br>
+ENDP<br>
+END
+</code>
+</div>
+<span class="text-eroded text-silver">Download:</span>
+<div class="ms-md-2">
+<a class="electric-white small" href="SimpleLogic.txt">
+SimpleLogic.txt
+</a>
+</div>
+</div>
+<h4 id="r4_10" class="text-eroded">Procedury (ang. procedures)</h4>
+<p>
+Tworzenie procedur ma głównie na celu podzielenie kodu źródłowego na mniejsze fragmenty,
+które mogą być później wielokrotnie wywoływane, zamiast wklejania ich w miejsca gdzie są potrzebne.
+Przykładowy program prezentuje wydzieloną procedurę <code>ProcedureExample</code>, która wyświetla okno dialogowe za pomocą funkcji <code>MessageBoxA</code>.
+</p>
+<p>
+Wywołanie procedury za pomocą rozkazu <code>BL</code> (ang. branch with link) zachowuje w rejestrze <code>X30</code> (<code><abbr title="Link Register">LR</abbr></code>)
+adres powrotny, aby po wykonaniu fragmentu kodu zawartego w procedurze wrócić za miejsce rozgałęzienia.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+&nbsp;&nbsp;AREA .drectve, DRECTVE<br><br>
+&nbsp;&nbsp;AREA .rdata, DATA, READONLY<br>
+szText DCB "Windows Arm64 Assembly Language", 0x00<br><br>
+&nbsp;&nbsp;EXPORT Main<br>
+&nbsp;&nbsp;IMPORT |__imp_ExitProcess|<br>
+&nbsp;&nbsp;IMPORT |__imp_MessageBoxA|<br><br>
+&nbsp;&nbsp;AREA .text, CODE, ARM64<br><br>
+Main PROC<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;stp fp,lr,[sp,#-0x10]!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov fp,sp<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">;bezwarunkowe wywołanie procedury</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;bl ProcedureExample<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w0,#0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,__imp_ExitProcess<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldr x8,[x8,__imp_ExitProcess]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;blr x8<br><br>
+ENDP<br><br>
+&nbsp;&nbsp;AREA .text, CODE, ARM64<br><br>
+ProcedureExample PROC<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;stp fp,lr,[sp,#-0x20]!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov fp,sp<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov w3,#0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,szText<br>
+&nbsp;&nbsp;&nbsp;&nbsp;add x2,x8, szText<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,szText<br>
+&nbsp;&nbsp;&nbsp;&nbsp;add x1,x8, szText<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mov x0,#0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;adrp x8,__imp_MessageBoxA<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldr x8,[x8,__imp_MessageBoxA]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;blr x8<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;ldp fp,lr,[sp],#0x20<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ret<br><br>
+ENDP<br><br>
+END
+</code>
+</div>
+<span class="text-eroded text-silver">Download:</span>
+<div class="ms-md-2">
+<a class="electric-white small" href="Proc.txt">
+Proc.txt
+</a>
+</div>
+</div>
+<h3 id="r5" class="text-eroded">Podstawowe instrukcje (A64)</h3>
+<h4 id="r5_1" class="text-eroded">Instrukcje transferu danych</h4>
+<h5 class="text-eroded">LDR (Wczytanie danych z pamięci do rejestru)</h5>
+<p>
+Dostęp do wartości w pamięci wykonywany jest na podstawie adresu liniowego (nazywanego też efektywnym).
+Najprostszy sposób adresowania to odczytanie wartości spod adresu zawartego w rejestrze.
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="addr_base.png">
+<figcaption>Adresowanie pośrednie przez rejestr (AArch64)</figcaption>
+</figure>
+<p>
+Możliwe jest także uzyskanie dostępu do wartości w pamięci poprzez umieszczenie adresu bazowego w rejestrze i dodanie do tego adresu wartości przesunięcia (ang. offset).
+Przykładem zastosowania tego rodzaju adresowania może być uzyskiwanie dostępu do określonego pola struktury, gdzie adres bazowy struktury jest w rejestrze, a przesunięcia
+to adresy poszczególnych pól struktury względem adresu bazowego (początku).
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="addr_base_offset.png">
+<figcaption>Adresowanie pośrednie przez rejestr z przesunięciem (AArch64)</figcaption>
+</figure>
+<p>
+Przykładowe adresowanie z preindeksowaniem można spotkać w prologu procedury, gdzie tworzona jest ramka stosu.
+</p>
+<div class="mb-4">
+<span class="text-eroded text-silver">Code:</span>
+<div class="ms-md-2">
+<code>
+<span class="code-comment">;(...)</span><br>
+stp fp,lr,[sp,#-0x40]!<br>
+mov fp,sp<br>
+<span class="code-comment">;(...)</span>
+</code>
+</div>
+</div>
+<p>
+Za pomocą rozkazu <code>STP</code> (ang. store pair) od wartości rejestru wskaźnika stosu <code>SP</code> jest odejmowana wartość <code>0x40</code> (ponieważ jest to adresowanie z preindeksowaniem),
+a na zarezerwowanym miejscu na stosie zachowywane są wartości rejestrów <code>LR</code> (Link Register) oraz <code>FP</code> (Frame Pointer).
+Tego rodzaju operacja nazywana jest w prostych słowach odkładaniem wartości na stos programu. Dodatkowy rozkaz <code>mov fp, sp</code> zachowuje w rejestrze <code>FP</code> adres wskazujący na nową ramkę stosu.
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="addr_preindexed.png">
+<figcaption>Adresowanie pośrednie przez rejestr z preindeksowaniem (AArch64)</figcaption>
+</figure>
+<p>
+W przypadku adresowania z postindeksowaniem wartość rejestru zawierającego adres bazowy jest modyfikowana po wykonaniu rozkazu odczytu lub zapisu.
+Z tego powodu tego rodzaju adresowania używa się np. przy zdejmowaniu wartości ze stosu — najpierw dane są odczytywane spod adresu w rejestrze, a dopiero później następuje modyfikacja aktualnej wartości adresu.
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="addr_postindexed.png">
+<figcaption>Adresowanie pośrednie przez rejestr z postindeksowaniem (AArch64)</figcaption>
+</figure>
+<p>
+Za pomocą etykiet możliwe jest oznaczanie miejsc w kodzie do których można przekazywać sterowanie (przepływ wykonania programu).
+Nic jednak nie stoi na przeszkodzie, aby etykietą oznaczyć np. zdefiniowany ciąg bajtów i uzyskać dostęp do tego ładunku (ang. payload) używając nazwy etykiety czy też nazwy etykiety z przesunięciem.
+</p>
+<figure>
+<img alt="..." class="img-fluid img-smaller" src="addr_pc.png">
+<figcaption>Adresowanie względem rejestru Program Counter (AArch64)</figcaption>
+</figure>
+<h5 class="text-eroded">Informacja</h5>
+<p>
+Adresowanie względem <code><abbr title="Program Counter">PC</abbr></code> pozwala utworzyć
+kod niezależny od miejsca w pamięci (ang. position-independent code).
+</p>
+<h5 class="text-eroded">ADR (Adresowanie względem rejestru Program Counter)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">expression</span></code>
+</p>
+<p>
+Rozkaz <code>ADR</code> pozwala uformować adres względem wartości rejestru <code><abbr title="Program Counter">PC</abbr></code>
+poprzez dodanie odpowiedniego przesunięcia w zakresie ±1 <abbr title="Megabyte">MB</abbr> do aktualnej
+wartości <code><abbr title="Program Counter">PC</abbr></code> i zapisanie uzyskanego adresu w 64-bitowym rejestrze ogólnego przeznaczenia.
+</p>
+<h5 class="text-eroded">ADRL (pseudoinstrukcja)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADRL <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">expression</span></code><br>
+<code class="lead">ADRL <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">expression</span></code>
+</p>
+<p>
+Pseudorozkaz <code>ADRL</code> pozwala uformować adres względem wartości rejestru <code><abbr title="Program Counter">PC</abbr></code>
+podobnie jak instrukcja <code>ADR</code>. Jednak pozwala sięgnąć dalej niż ±1<abbr title="Megabyte">MB</abbr>,
+ponieważ mnemonik <code>ADRL</code> w kodzie maszynowym jest przeważnie tłumaczony na dwa rozkazy:
+instrukcja <code>ADR</code>, a po niej rozkaz <code>ADD</code>. Dzięki temu zasięg formowanych adresów jest większy.
+</p>
+<h5 class="text-eroded">ADRP (Adresowanie względem rejestru PC do 4KB obszaru pamięci)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADRP <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">expression</span></code>
+</p>
+<p>
+Rozkaz <code>ADRP</code> pozwala uformować adres względem wartości rejestru <code><abbr title="Program Counter">PC</abbr></code>
+poprzez dodanie odpowiedniego przesunięcia w zakresie ±4<abbr title="Gigabyte">GB</abbr> do aktualnej
+wartości <code><abbr title="Program Counter">PC</abbr></code> i zapisanie uzyskanego adresu w 64-bitowym rejestrze ogólnego przeznaczenia.
+</p>
+<h5 class="text-eroded">MOV (Kopiowanie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MOV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>m</sub></span></code><br>
+<code class="lead">MOV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>m</sub></span></code><br>
+<code class="lead">MOV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">MOV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">MOV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">SP</span></code><br>
+<code class="lead">MOV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">WSP</span></code><br>
+<code class="lead">MOV <span class="text-silver">SP</span>, <span class="text-silver">X<sub>m</sub></span></code><br>
+<code class="lead">MOV <span class="text-silver">WSP</span>, <span class="text-silver">W<sub>m</sub></span></code><br>
+</p>
+<p>
+Rozkaz <code>MOV</code> zawiera wiele wersji składniowych, a niektóre są nawet aliasami dla innych rozkazów.
+Podstawowe możliwości tej instrukcji to:
+</p>
+<ul style="list-style-type: square;">
+<li>kopiowanie pomiędzy rejestrami ogólnego przeznaczenia (<abbr title="General Purpose Registers">GPRs</abbr>),</li>
+<li>kopiowanie pomiędzy rejestrem ogólnego przeznaczenia (<abbr title="General Purpose Register">GPR</abbr>) a rejestrem wskaźnika stosu (<code><abbr title="Stack Pointer">SP</abbr></code>),</li>
+<li>kopiowanie wartości natychmiastowej (ang. immediate) do rejestru ogólnego przeznaczenia (<abbr title="General Purpose Register">GPR</abbr>),</li>
+<li>(...)</li>
+</ul>
+<h5 class="text-eroded">LDP (Wczytanie danych z pamięci do pary rejestrów)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>LDP</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby z pamięci o tym adresie załadować
+dwa 32-bitowe słowa lub dwa 64-bitowe podwójne słowa do podanej pary rejestrów
+<code>W<sub>a</sub></code>/<code>W<sub>b</sub></code>
+albo <code>X<sub>a</sub></code>/<code>X<sub>b</sub></code>.
+Wartość przesunięcia (ang. offset) dla składni 32-bitowej to wielokrotność czwórki o maksymalnym zakresie od -256 do 252,
+a dla składni 64-bitowej wielokrotność ósemki o maksymalnym zakresie od -512 do 504.
+</p>
+<h5 class="text-eroded">LDPSW (Wczytanie słów ze znakiem z pamięci do pary rejestrów)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDPSW <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>LDPSW</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby z pamięci o tym adresie załadować
+dwa 32-bitowe słowa i rozszerzyć je z zachowaniem znaku (ang. sign extension),
+a następnie wpisać do podanej pary rejestrów
+<code>W<sub>a</sub></code>/<code>W<sub>b</sub></code>
+albo <code>X<sub>a</sub></code>/<code>X<sub>b</sub></code>.
+Wartość przesunięcia (ang. offset) to wielokrotność czwórki o maksymalnym zakresie od -256 do 252.
+</p>
+<h5 class="text-eroded">LDRSB (Wczytanie bajta z pamięci do rejestru)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSB <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>LDRSB</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby z pamięci o tym adresie załadować
+bajt i rozszerzyć go z zachowaniem znaku (ang. sign extension),
+a następnie wpisać do podanego rejestru
+<code>W<sub>t</sub></code>
+albo <code>X<sub>t</sub></code>.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie o maksymalnym zakresie od 0 do 4095.
+</p>
+<h5 class="text-eroded">LDRSH (Wczytanie połowy słowa z pamięci do rejestru)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSH <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>LDRSH</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby z pamięci o tym adresie załadować
+pół słowa maszynowego i rozszerzyć je z zachowaniem znaku (ang. sign extension),
+a następnie wpisać do podanego rejestru
+<code>W<sub>t</sub></code>
+albo <code>X<sub>t</sub></code>.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie, które jest wielokrotnością dwójki o maksymalnym zakresie od 0 do 8190.
+</p>
+<h5 class="text-eroded">LDRSW (Wczytanie słowa ze znakiem z pamięci do rejestru)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">LDRSW <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>LDRSW</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby z pamięci o tym adresie załadować
+słowo maszynowe i rozszerzyć je z zachowaniem znaku (ang. sign extension),
+a następnie wpisać do podanego rejestru
+<code>W<sub>t</sub></code>
+albo <code>X<sub>t</sub></code>.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie, które jest wielokrotnością czwórki o maksymalnym zakresie od 0 do 16380.
+</p>
+<h5 class="text-eroded">STP (Zapisanie wartości pary rejestrów do pamięci)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]</code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>STP</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby do pamięci o tym adresie zapisać
+dwa 32-bitowe słowa lub dwa 64-bitowe podwójne podanej pary rejestrów
+<code>W<sub>a</sub></code>/<code>W<sub>b</sub></code>
+albo <code>X<sub>a</sub></code>/<code>X<sub>b</sub></code>.
+Wartość przesunięcia (ang. offset) dla składni 32-bitowej to wielokrotność czwórki o maksymalnym zakresie od -256 do 252,
+a dla składni 64-bitowej wielokrotność ósemki o maksymalnym zakresie od -512 do 504.
+</p>
+<h5 class="text-eroded">STR (Zapisanie wartości rejestru do pamięci)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STR <span class="text-silver">X<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STR <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>STR</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby do pamięci o tym adresie zapisać
+słowo maszynowe lub podwójne słowo.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie, które dla składni 32-bitowej to
+wielokrotność czwórki o maksymalnym zakresie od 0 do 16380,
+a dla składni 64-bitowej wielokrotność ósemki o maksymalnym zakresie od 0 do 32760.
+</p>
+<h5 class="text-eroded">STRB (Zapisanie najmłodszego bajta z rejestru do pamięci)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STRB <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>STRB</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby do pamięci o tym adresie zapisać
+najmłodszy bajt rejestru <code>W<sub>t</sub></code>.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie o maksymalnym zakresie od 0 do 4095.
+</p>
+<h5 class="text-eroded">STRH (Zapisanie połowy słowa maszynowego z rejestru do pamięci)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset_2</span>]</code><br>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset_2</span>]</code>
+</p>
+<p>
+Składnia (adresowanie z preindeksowaniem):
+</p>
+<p>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>, <span class="text-silver">#offset</span>]!</code><br>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>, <span class="text-silver">#offset</span>]!</code>
+</p>
+<p>
+Składnia (adresowanie z postindeksowaniem):
+</p>
+<p>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">X<sub>n</sub></span>], <span class="text-silver">#offset</span></code><br>
+<code class="lead">STRH <span class="text-silver">W<sub>t</sub></span>, [<span class="text-silver">SP</span>], <span class="text-silver">#offset</span></code>
+</p>
+<p>
+Rozkaz <code>STRH</code> oblicza adres bazowy na podstawie wartości
+rejestru <code>X<sub>n</sub></code>/<code><abbr title="Stack Pointer">SP</abbr></code>
+oraz wartości przesunięcia (ang. offset), aby do pamięci o tym adresie zapisać
+młodszą połowę słowa maszynowego rejestru <code>W<sub>t</sub></code>.
+Wartość <code>#offset</code> to przesunięcie o maksymalnym zakresie od -256 do 255.
+Natomiast wartość <code>#offset_2</code> to przesunięcie, które jest wielokrotnością dwójki o maksymalnym zakresie od 0 do 8190.
+</p>
+<h4 id="r5_2" class="text-eroded">Instrukcje arytmetyczne</h4>
+<h5 class="text-eroded">ADC (Dodawanie z przeniesieniem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADC <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">ADC <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>ADC</code> dodaje wartości rejestrów <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+oraz wartość flagi przeniesienia (<code><abbr title="Carry">C</abbr></code>) i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">ADCS (Dodawanie z przeniesieniem, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADCS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">ADCS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>ADCS</code> dodaje wartości rejestrów <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+oraz wartość flagi przeniesienia (<code><abbr title="Carry">C</abbr></code>) i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+</p>
+<h5 class="text-eroded">ADD (Dodawanie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADD <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ADD <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ADD <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ADD <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ADD</code> dodaje wartości rejestrów <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni umożliwia dodanie wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) oraz wartości natychmiastowej (ang. immediate)
+i zapisanie wyniku w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">ADDS (Dodawanie, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ADDS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ADDS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ADDS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ADDS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ADDS</code> dodaje wartości rejestrów <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni umożliwia dodanie wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) oraz wartości natychmiastowej (ang. immediate)
+i zapisanie wyniku w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+</p>
+<h5 class="text-eroded">CLS (Zliczenie wiodących bitów znaku)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">CLS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">CLS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>CLS</code> zlicza wiodące bity znaku w rejestrze <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisuje rezultat operacji do rejestru docelowego <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">CLZ (Zliczenie wiodących bitów zerowych)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">CLZ <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">CLZ <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>CLZ</code> zlicza wiodące bity zerowe w rejestrze <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisuje rezultat operacji do rejestru docelowego <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">MADD (Mnożenie z dodawaniem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MADD <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, <span class="text-silver">X<sub>c</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">MADD <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, <span class="text-silver">W<sub>c</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>MADD</code> mnoży wartość rejestru <code>X<sub>a</sub></code> przez <code>X<sub>b</sub></code> i dodaje do rezultatu wartość rejestru <code>X<sub>c</sub></code>
+zapisując wynik całej operacji w rejestrze docelowym <code>X<sub>d</sub></code>.
+Inna wersja składni (32-bitowa) pozwala użyć rejestrów <code>W<sub>n</sub></code>.<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> * <span class="text-silver">X<sub>b</sub></span> + <span class="text-silver">X<sub>c</sub></span></code>
+</p>
+<h5 class="text-eroded">MNEG (Mnożenie z negacją)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MNEG <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">MNEG <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>MNEG</code> mnoży wartość rejestru <code>X<sub>a</sub></code> przez <code>X<sub>b</sub></code>, neguje rezultat
+i zapisuje wynik całej operacji w rejestrze docelowym <code>X<sub>d</sub></code>.
+Inna wersja składni (32-bitowa) pozwala użyć rejestrów <code>W<sub>n</sub></code>.<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = -(<span class="text-silver">X<sub>a</sub></span> * <span class="text-silver">X<sub>b</sub></span>)</code>
+</p>
+<h5 class="text-eroded">MSUB (Mnożenie z odejmowaniem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MSUB <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span>, <span class="text-silver">X<sub>c</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">MSUB <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span>, <span class="text-silver">W<sub>c</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>MSUB</code> mnoży wartość rejestru <code>X<sub>a</sub></code> przez <code>X<sub>b</sub></code> i odejmuje rezultat od wartości rejestru <code>X<sub>c</sub></code>.
+Inna wersja składni (32-bitowa) pozwala użyć rejestrów <code>W<sub>n</sub></code>.<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>c</sub></span> - (<span class="text-silver">X<sub>a</sub></span> * <span class="text-silver">X<sub>b</sub></span>)</code>
+</p>
+<h5 class="text-eroded">MUL (Mnożenie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MUL <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">MUL <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>MUL</code> mnoży wartość rejestru <code>X<sub>a</sub></code> przez <code>X<sub>b</sub></code> i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code>
+Inna wersja składni (32-bitowa) pozwala użyć rejestrów <code>W<sub>n</sub></code>.<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> * <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h5 class="text-eroded">SBC (Odejmowanie z przeniesieniem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">SBC <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">SBC <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>SBC</code> odejmuje wartość rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>) od wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+oraz wartość zanegowanej flagi przeniesienia (<code><abbr title="Carry">C</abbr></code>) i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">X<sub>b</sub></span> - 1 + <span class="text-silver">C</span></code>
+</p>
+<h5 class="text-eroded">SBCS (Odejmowanie z przeniesieniem, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">SBCS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">SBCS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>SBCS</code> odejmuje wartość rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>) od wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+oraz wartość zanegowanej flagi przeniesienia (<code><abbr title="Carry">C</abbr></code>) i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">X<sub>b</sub></span> - 1 + <span class="text-silver">C</span></code>
+</p>
+<h5 class="text-eroded">SDIV (Dzielenie ze znakiem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">SDIV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">SDIV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>SDIV</code> dzieli wartość całkowitą z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) przez <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>). Instrukcja ta nie ma wpływu na flagi warunkowe procesora.
+<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> / <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h5 class="text-eroded">SUB (Odejmowanie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">SUB <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">SUB <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">SUB <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">SUB <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>SUB</code> odejmuje wartość rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) od <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni umożliwia odjęcie wartości natychmiastowej (ang. immediate) od wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisanie wyniku w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">SUBS (Odejmowanie, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">SUBS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">SUBS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">SUBS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">SUBS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>SUBS</code> odejmuje wartość rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) od <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni umożliwia odjęcie wartości natychmiastowej (ang. immediate) od wartości rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisanie wyniku w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> - <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">UDIV (Dzielenie bez znaku)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">UDIV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span> <span class="code-comment">;64-bit</span></code><br>
+<code class="lead">UDIV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span> <span class="code-comment">;32-bit</span></code>
+</p>
+<p>
+Rozkaz <code>UDIV</code> dzieli wartość całkowitą z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) przez <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>). Instrukcja ta nie ma wpływu na flagi warunkowe procesora.
+<br>
+Pseudokod: <code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> / <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h4 id="r5_3" class="text-eroded">Instrukcje logiczne</h4>
+<h5 class="text-eroded">AND (Koniunkcja logiczna)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">AND <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">AND <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">AND <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">AND <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>AND</code> wykonuje koniunkcję logiczną wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni pozwala na wykonanie koniunkcji logicznej wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) oraz wartości natychmiastowej (ang. immediate).
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> AND <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> AND <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">ANDS (Koniunkcja logiczna, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ANDS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ANDS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ANDS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ANDS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ANDS</code> wykonuje koniunkcję logiczną wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) i <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni pozwala na wykonanie koniunkcji logicznej wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>) oraz wartości natychmiastowej (ang. immediate).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> AND <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> AND <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">ASR (Arytmetyczne przesunięcie w prawo)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ASR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ASR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ASR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ASR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ASR</code> wykonuje arytmetyczne przesunięcie w prawo wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+o liczbę bitów zakodowaną na sześciu najmłodszych bitach rejestru <code>X<sub>b</sub></code> o zakresie od 0 do 63
+(lub na pięciu najmłodszych bitach rejestru <code>W<sub>b</sub></code> o zakresie od 0 do 31).
+Inna wersja składni pozwala wykonać arytmetyczne przesunięcie w prawo o liczbę bitów podaną jako wartość natychmiastowa (ang. immediate)
+o zakresie od 0 do 63 (składnia 64-bitowa) lub od 0 do 31 (składnia 32-bitowa).
+<br>
+Informacja: Przesunięcie arytmetyczne w prawo zachowuje bit znaku.
+</p>
+<h5 class="text-eroded">BIC (Koniunkcja logiczna z zanegowanym operandem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BIC <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">BIC <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code>
+</p>
+<p>
+Rozkaz <code>BIC</code> wykonuje koniunkcję logiczną wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zanegowanej wartości z rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> AND NOT <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h5 class="text-eroded">EON (Alternatywa wykluczająca z zanegowanym operandem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">EON <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">EON <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code>
+</p>
+<p>
+Rozkaz <code>EON</code> wykonuje alternatywę wykluczającą wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zanegowanej wartości z rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> EOR NOT <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h5 class="text-eroded">EOR (Alternatywa wykluczająca)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">EOR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">EOR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">EOR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">SP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">EOR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">WSP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">EOR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">EOR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>EOR</code> wykonuje alternatywę wykluczającą wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i wartości z rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni pozwala na wykonanie tej samej operacji z użyciem wartości natychmiastowej (ang. immediate).
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> EOR <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> EOR <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">LSL (Logiczne przesunięcie w lewo)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LSL <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">LSL <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">LSL <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">LSL <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>LSL</code> wykonuje logiczne przesunięcie w lewo wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+o liczbę bitów zakodowaną na sześciu najmłodszych bitach rejestru <code>X<sub>b</sub></code> o zakresie od 0 do 63
+(lub na pięciu najmłodszych bitach rejestru <code>W<sub>b</sub></code> o zakresie od 0 do 31).
+Inna wersja składni pozwala wykonać logiczne przesunięcie w lewo o liczbę bitów podaną jako wartość natychmiastowa (ang. immediate)
+o zakresie od 0 do 63 (składnia 64-bitowa) lub od 0 do 31 (składnia 32-bitowa).
+Informacja: Na miejsce przesuniętych w lewo bitów wpisywane są zera.
+</p>
+<h5 class="text-eroded">LSR (Logiczne przesunięcie w prawo)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">LSR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">LSR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">LSR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">LSR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>LSR</code> wykonuje logiczne przesunięcie w prawo wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+o liczbę bitów zakodowaną na sześciu najmłodszych bitach rejestru <code>X<sub>b</sub></code> o zakresie od 0 do 63
+(lub na pięciu najmłodszych bitach rejestru <code>W<sub>b</sub></code> o zakresie od 0 do 31).
+Inna wersja składni pozwala wykonać logiczne przesunięcie w prawo o liczbę bitów podaną jako wartość natychmiastowa (ang. immediate)
+o zakresie od 0 do 63 (składnia 64-bitowa) lub od 0 do 31 (składnia 32-bitowa).
+</p>
+<h5 class="text-eroded">MVN (Zaprzeczenie logiczne)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">MVN <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">MVN <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span></code>
+</p>
+<p>
+Rozkaz <code>MVN</code> wykonuje logiczne zaprzeczenie wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+zapisując rezultat do rejestru docelowego <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = NOT <span class="text-silver">X<sub>a</sub></span></code>
+</p>
+<h5 class="text-eroded">NEG (Negacja z uzupełnieniem do dwóch)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">NEG <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">NEG <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span></code>
+</p>
+<p>
+Rozkaz <code>NEG</code> odejmuje wartość z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+od zera zapisując rezultat do rejestru docelowego <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = 0 - <span class="text-silver">X<sub>a</sub></span></code>
+</p>
+<h5 class="text-eroded">NEGS (Negacja z uzupełnieniem do dwóch, ustawia flagi)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">NEGS <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">NEGS <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span></code>
+</p>
+<p>
+Rozkaz <code>NEGS</code> odejmuje wartość z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+od zera zapisując rezultat do rejestru docelowego <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Ustawia flagi procesora zgodnie z rezultatem operacji.
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = 0 - <span class="text-silver">X<sub>a</sub></span></code>
+</p>
+<h5 class="text-eroded">ORN (Alternatywa z zanegowanym operandem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ORN <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ORN <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code>
+</p>
+<p>
+Rozkaz <code>ORN</code> wykonuje alternatywę wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zanegowanej wartości z rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+<br>
+Pseudokod:
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> OR NOT <span class="text-silver">X<sub>b</sub></span></code>
+</p>
+<h5 class="text-eroded">ORR (Alternatywa logiczna)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ORR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ORR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ORR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">SP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ORR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">WSP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ORR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ORR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ORR</code> wykonuje alternatywę logiczną wartości z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i wartości z rejestru <code>X<sub>b</sub></code> (lub <code>W<sub>b</sub></code>)
+zapisując wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+Inna wersja składni pozwala na wykonanie tej samej operacji z użyciem wartości natychmiastowej (ang. immediate).
+<br>
+Pseudokod:<br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> OR <span class="text-silver">X<sub>b</sub></span></code><br>
+<code><span class="text-silver">X<sub>d</sub></span> = <span class="text-silver">X<sub>a</sub></span> OR <span class="text-silver">immediate</span></code>
+</p>
+<h5 class="text-eroded">RBIT (Odwrócenie kolejności bitów w rejestrze)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">RBIT <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">RBIT <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span></code>
+</p>
+<p>
+Rozkaz <code>RBIT</code> odwraca kolejność bitów w rejestrze <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">ROR (Obrót bitów w prawo)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">ROR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">ROR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">ROR <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">ROR <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>ROR</code> wykonuje obrót w prawo bitów z rejestru <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+o liczbę bitów zakodowaną na sześciu najmłodszych bitach rejestru <code>X<sub>b</sub></code> o zakresie od 0 do 63
+(lub na pięciu najmłodszych bitach rejestru <code>W<sub>b</sub></code> o zakresie od 0 do 31).
+Inna wersja składni pozwala wykonać logiczne przesunięcie w lewo o liczbę bitów podaną jako wartość natychmiastowa (ang. immediate)
+o zakresie od 0 do 63 (składnia 64-bitowa) lub od 0 do 31 (składnia 32-bitowa).
+Informacja: Bity wyrzucone z prawej strony podczas obrotu wchodzą z lewej strony z powrotem do rejestru.
+</p>
+<h4 id="r5_4" class="text-eroded">Rozgałęzienia (ang. branch)</h4>
+<h5 class="text-eroded">B (Rozgałęzienie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">B <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>B</code> (ang. branch) wykonuje przejście do określonego miejsca w kodzie
+oznaczonego etykietą.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±128 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BL (Rozgałęzienie z adresem powrotnym)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BL <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BL</code> (ang. branch with link) wykonuje przejście do określonego miejsca w kodzie
+oznaczonego etykietą
+i ustawia wartość rejestru <code>X30</code> (<code><abbr title="Link Register">LR</abbr></code>)
+na <code><abbr title="Program Counter">PC</abbr> + 4</code>.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±128 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BLR (Rozgałęzienie z użyciem rejestru z adresem powrotnym)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BLR <span class="text-silver">X<sub>n</sub></span></code>
+</p>
+<p>
+Rozkaz <code>BLR</code> (ang. branch with link to register) wykonuje przejście do określonego miejsca w kodzie,
+którego adres jest w rejestrze ogólnego przeznaczenia <code>X<sub>n</sub></code>
+i ustawia wartość rejestru <code>X30</code> (<code><abbr title="Link Register">LR</abbr></code>)
+na <code><abbr title="Program Counter">PC</abbr> + 4</code>.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±128 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BR (Rozgałęzienie z użyciem rejestru)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BR <span class="text-silver">X<sub>n</sub></span></code>
+</p>
+<p>
+Rozkaz <code>BR</code> (ang. branch to register) wykonuje przejście do określonego miejsca w kodzie,
+którego adres jest w rejestrze ogólnego przeznaczenia <code>X<sub>n</sub></code>.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±128 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BEQ (Rozgałęzienie warunkowe, jeśli równe)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BEQ <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BEQ</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy ustawiona jest flaga zerowa (<code><abbr title="Zero">Z</abbr></code>).
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BNE (Rozgałęzienie warunkowe, jeśli różne)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BNE <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BNE</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga zerowa (<code><abbr title="Zero">Z</abbr></code>) nie jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BCS/BHS (Rozgałęzienie warunkowe, jeśli przeniesienie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BCS <span class="text-silver">label</span></code><br>
+<code class="lead">BHS <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkazy <code>BCS</code> i <code>BHS</code> wykonują warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy ustawiona jest flaga przeniesienia (<code><abbr title="Carry">C</abbr></code>),
+co można rozumieć jako większe bądź równe bez znaku.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BCC/BLO (Rozgałęzienie warunkowe, jeśli brak przeniesienia)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BCC <span class="text-silver">label</span></code><br>
+<code class="lead">BLO <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkazy <code>BCC</code> i <code>BLO</code> wykonują warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga przeniesienia (<code><abbr title="Carry">C</abbr></code>) nie jest ustawiona,
+co można rozumieć jako mniejsze bez znaku.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BMI (Rozgałęzienie warunkowe, jeśli ujemny)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BMI <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BMI</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy ustawiona jest flaga ujemna (<code><abbr title="Negative">N</abbr></code>).
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BPL (Rozgałęzienie warunkowe, jeśli dodatni lub zero)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BPL <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BPL</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga ujemna (<code><abbr title="Negative">N</abbr></code>) nie jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BVS (Rozgałęzienie warunkowe, jeśli przepełnienie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BVS <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BVS</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy ustawiona jest flaga przepełnienia (<code><abbr title="Overflow">V</abbr></code>).
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BVC (Rozgałęzienie warunkowe, jeśli brak przepełnienia)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BVC <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BVC</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga przepełnienia (<code><abbr title="Overflow">V</abbr></code>) nie jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BHI (Rozgałęzienie warunkowe, jeśli większe bez znaku)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BHI <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BHI</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga przeniesienia (<code><abbr title="Carry">C</abbr></code>)
+jest ustawiona, a flaga zerowa (<code><abbr title="Zero">Z</abbr></code>) nie jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BLS (Rozgałęzienie warunkowe, jeśli mniejsze bądź równe bez znaku)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BLS <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BLS</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flaga przeniesienia (<code><abbr title="Carry">C</abbr></code>)
+nie jest ustawiona, a flaga zerowa (<code><abbr title="Zero">Z</abbr></code>) jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BGE (Rozgałęzienie warunkowe, jeśli większe bądź równe ze znakiem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BGE <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BGE</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flagi <code><abbr title="Negative">N</abbr></code> i <code><abbr title="Overflow">V</abbr></code>
+mają taką samą wartość.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BLT (Rozgałęzienie warunkowe, jeśli mniejsze ze znakiem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BLT <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BLT</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flagi <code><abbr title="Negative">N</abbr></code> i <code><abbr title="Overflow">V</abbr></code>
+mają różne od siebie wartości.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BGT (Rozgałęzienie warunkowe, jeśli większe ze znakiem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BGT <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BGT</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flagi <code><abbr title="Negative">N</abbr></code> i <code><abbr title="Overflow">V</abbr></code>
+mają taką samą wartość, a flaga <code><abbr title="Zero">Z</abbr></code> nie jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BLE (Rozgałęzienie warunkowe, jeśli mniejsze ze znakiem)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BLE <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BLE</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą, gdy flagi <code><abbr title="Negative">N</abbr></code> i <code><abbr title="Overflow">V</abbr></code>
+mają różne od siebie wartości oraz flaga <code><abbr title="Zero">Z</abbr></code> jest ustawiona.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">BAL (Rozgałęzienie warunkowe, Zawsze)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">BAL <span class="text-silver">label</span></code>
+</p>
+<p>
+Rozkaz <code>BAL</code> wykonuje warunkowe przejście do określonego miejsca w kodzie
+oznaczonego etykietą. Przyrostek (kod warunkowy <code>AL</code>, ang. always) jest przeważnie pomijany
+i stosuje się instrukcję rozgałęzienia bezwarunkowego <code>B</code>.
+Możliwe jest przejście wstecz lub do przodu o zakresie ±1 <abbr title="Megabyte">MB</abbr>
+licząc od adresu bieżącej instrukcji.
+</p>
+<h5 class="text-eroded">RET (Powrót z rozgałęzienia)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">RET <span class="text-silver">X<sub>n</sub></span></code>
+</p>
+<p>
+Rozkaz <code>RET</code> wykonuje powrót do określonego miejsca w kodzie,
+którego adres jest w rejestrze ogólnego przeznaczenia <code>X<sub>n</sub></code>.
+Domyślnie adres instrukcji do której ma nastąpić powrót jest pobierany z rejestru <code>X30</code> (<code><abbr title="Link Register">LR</abbr></code>),
+wtedy rozkaz jest wywoływany bez operandu.
+</p>
+<h4 id="r5_5" class="text-eroded">Inne (ang. misc)</h4>
+<h5 class="text-eroded">REV (Odwrócenie kolejności bajtów w rejestrze)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">REV64 <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">REV <span class="text-silver">X<sub>d</sub></span>, <span class="text-silver">X<sub>a</sub></span></code><br>
+<code class="lead">REV <span class="text-silver">W<sub>d</sub></span>, <span class="text-silver">W<sub>a</sub></span></code>
+</p>
+<p>
+Rozkaz <code>REV</code> odwraca kolejność bajtów w rejestrze <code>X<sub>a</sub></code> (lub <code>W<sub>a</sub></code>)
+i zapisuje wynik w rejestrze docelowym <code>X<sub>d</sub></code> (lub <code>W<sub>d</sub></code>).
+</p>
+<h5 class="text-eroded">CMP (Porównanie)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">CMP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">CMP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">CMP <span class="text-silver">SP</span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">CMP <span class="text-silver">WSP</span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">CMP <span class="text-silver">SP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">CMP <span class="text-silver">WSP</span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">CMP <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">CMP <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>CMP</code> wykonuje porównanie wartości dwóch operandów poprzez wykonanie odejmowania (<code>SUB</code>)
+z ustawieniem flag, ale bez zapisywania wyniku. Po tej instrukcji przeważnie występują rozkazy warunkowe.
+</p>
+<h5 class="text-eroded">TST (Test)</h5>
+<p>
+Składnia:
+</p>
+<p>
+<code class="lead">TST <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">X<sub>b</sub></span></code><br>
+<code class="lead">TST <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">W<sub>b</sub></span></code><br>
+<code class="lead">TST <span class="text-silver">X<sub>a</sub></span>, <span class="text-silver">#immediate</span></code><br>
+<code class="lead">TST <span class="text-silver">W<sub>a</sub></span>, <span class="text-silver">#immediate</span></code>
+</p>
+<p>
+Rozkaz <code>TST</code> wykonuje porównanie wartości dwóch operandów poprzez wykonanie koniunkcji logicznej (<code>AND</code>)
+z ustawieniem flag, ale bez zapisywania wyniku. Po tej instrukcji przeważnie występują rozkazy warunkowe.
+Wskazówka: <code>TST X<sub>n</sub>, X<sub>n</sub></code> pozwala łatwo sprawdzić czy wartość rejestru to zero.
+</p>
+<h2 class="text-eroded">Wykaz literatury</h2>
+<ol class="no-bullets">
+<li>[1] <a rel="nofollow" target="_blank" href="https://developer.arm.com/documentation/">https://developer.arm.com/documentation/</a> <span class="text-secondary">[dostęp: 2024-02-21]</span></li>
+<li>[2] <a rel="nofollow" target="_blank" href="https://learn.microsoft.com/en-us/cpp/assembler/arm/arm-assembler-reference">https://learn.microsoft.com/en-us/cpp/assembler/arm/arm-assembler-reference</a> <span class="text-secondary">[dostęp: 2024-02-21]</span></li>
+<li>[3] Arm ® Architecture Reference Manual for A-profile architecture by Arm Limited</li>
+</ol>
+
+</article>
+</main>
+<footer class="small">
+<div class="container clearfix">
+<div class="float-start">© ethical<span class="text-blue">.blue</span> Magazine. All rights reserved.</div>
+<div class="float-end"><a href="https://ethical.blue/page/legal">Legal</a></div>
+</div>
+</footer>
+<script src="https://ethical.blue/assets/bootstrap.bundle.min.js"></script>
+
+</body></html>

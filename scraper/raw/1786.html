@@ -1,0 +1,1457 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SSH Tunneling Explained  | Source Open</title>
+<link rel="pingback" href="https://chamibuddhika.wordpress.com/xmlrpc.php">
+<meta name="robots" content="max-image-preview:large">
+<meta name="msvalidate.01" content="C2D7A21AA1B62EB09B42705FABDD6905">
+<link rel="dns-prefetch" href="//s0.wp.com">
+<link rel="dns-prefetch" href="//widgets.wp.com">
+<link rel="alternate" type="application/rss+xml" title="Source Open » Feed" href="https://chamibuddhika.wordpress.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Source Open » Comments Feed" href="https://chamibuddhika.wordpress.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Source Open » SSH Tunneling Explained Comments Feed" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/feed/">
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s0.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1710334132i&ver=6.6-beta2-58393"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-1" href="https://s0.wp.com/_static/??-eJx9jNEKwjAMRX/Img0KfRK/ZXZRs7ZJMCmyv9eJIIj4cuHAPQfuGrKwIzu0HrT2C7HBgq5TLm+GJrLN3Csa3LBOjnNQMf+ifTbbwe9kpYKf8Iv+3YnPxOQr+BXbU9R+gkbmaxUpm3hshzGNKQ5xSHF5AAk7StI=&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-emoji-styles-inline-css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-2-1" href="https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/block-library/style.css?m=1716578158i&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-block-library-inline-css">
+.has-text-align-justify {
+	text-align:justify;
+}
+.wp-block-cover__image-background.has-parallax {
+	background-size: cover;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-4-1" href="https://s0.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&amp;cssminify=yes" type="text/css" media="all">
+<style id="jetpack-sharing-buttons-style-inline-css">
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-6-1" href="https://s0.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&amp;cssminify=yes" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-8-1" href="https://s0.wp.com/_static/??-eJx9jcEKg0AMRH+oaVhorR7Eb9E16IpZg8min2889FZ6GYbhPQYPgbhlo2zIBWQtU8qKcdvJd5be0AmmMfW0Ejv2jKoP/K0daZzIXNdvB6PzvyJ+A8MgO6mCJ6fCYLN/6e113IZXU9WfUL/DcgHSTkDo&amp;cssminify=yes" type="text/css" media="all">
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-10-1" href="https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/moon/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.css?m=1709200696i&amp;cssminify=yes" type="text/css" media="all">
+<link rel="stylesheet" id="verbum-gutenberg-css-css" href="https://widgets.wp.com/verbum-block-editor/block-editor.css?ver=1717067639" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-12-1" href="https://s0.wp.com/_static/??-eJx9i0EKhDAMRS9kDULFcSGeRUvsdEybYlLE26s73czq/wfvwZ6N46SYFPSLEQVymSEG0YOYV7gXaydSwUONxWQqPiQBj2yI3aSB0wvMQlPY/qUbzsT+uh4u64F3NMahsW1v7adr7O8EFu0+MA==&amp;cssminify=yes" type="text/css" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="print-css-13-1" href="https://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&amp;cssminify=yes" type="text/css" media="print">
+<style id="jetpack-global-styles-frontend-style-inline-css">
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-16-1" href="https://s0.wp.com/_static/??-eJyNjcEKwjAQRH/IuA1aehI/ReImJKmb3eAmFP9eW3oRL16GeTC8gaUaFG6BG5RuKvWYWWEOrTp87AxFZA3fKShocs/gnfevrWaOR1Q9wP+mW2YEFcyODEkU/YIfW0uhfH7TGSLJ3dE6uJaLneww2mkYT/MbUOlJHA==&amp;cssminify=yes" type="text/css" media="all">
+<script type="text/javascript" id="jetpack_related-posts-js-extra">
+/* <![CDATA[ */
+var related_posts_js_options = {"post_heading":"h4"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="media-video-jwt-bridge-js-extra">
+/* <![CDATA[ */
+var videopressAjax = {"ajaxUrl":"https:\/\/chamibuddhika.wordpress.com\/wp-admin\/admin-ajax.php","bridgeUrl":"\/wp-content\/mu-plugins\/jetpack-plugin\/moon\/jetpack_vendor\/automattic\/jetpack-videopress\/build\/lib\/token-bridge.js","post_id":"517"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"11192597","postID":"517","siteURL":"http:\/\/chamibuddhika.wordpress.com","xhrURL":"https:\/\/chamibuddhika.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"35657116c9","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/pKXHL-8l","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/read\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar"}};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJyVjj0OwjAMhS9EcDqgigFxlCptTOU2saPEKXB7MlQI2Bi/p/cH92QmYUVWWApEGSmgqQWzm5tmiG9yXMoBPnyxmhTqTFxgQU1uWnducWEYiCcYKwUPGYNT9CZJ0fJNx0j8W9wO5KAmZXk8/xzdtWFD9pLBVZXoVGl6uzfyKCljKfu5QCOorMhmzORnbIvXeOl6a23fnc52eQHwqWpF"></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	window.addEventListener( 'DOMContentLoaded', function() {
+		rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+	} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://chamibuddhika.wordpress.com/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress.com">
+<link rel="canonical" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/">
+<link rel="shortlink" href="https://wp.me/pKXHL-8l">
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F&amp;for=wpcom-auto-discovery"><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F&amp;for=wpcom-auto-discovery">
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH Tunneling Explained">
+<meta property="og:url" content="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/">
+<meta property="og:description" content="Recently I wanted to set up a remote desktop sharing session from home pc to my laptop. While going through the set up guide I came across ssh tunneling. Even though there are many articles on the …">
+<meta property="article:published_time" content="2012-03-21T16:28:04+00:00">
+<meta property="article:modified_time" content="2012-11-11T14:24:04+00:00">
+<meta property="og:site_name" content="Source Open">
+<meta property="og:image" content="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg">
+<meta property="og:image:width" content="650">
+<meta property="og:image:height" content="187">
+<meta property="og:image:alt" content="">
+<meta property="og:locale" content="en_US">
+<meta property="fb:app_id" content="249643311490">
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom">
+<meta name="twitter:text:title" content="SSH Tunneling Explained">
+<meta name="twitter:image" content="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=640">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://s0.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48">
+<link rel="icon" type="image/x-icon" href="https://s0.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48">
+<link rel="apple-touch-icon" href="https://s0.wp.com/i/webclip.png">
+<link rel="openid.server" href="https://chamibuddhika.wordpress.com/?openidserver=1">
+<link rel="openid.delegate" href="https://chamibuddhika.wordpress.com/">
+<link rel="search" type="application/opensearchdescription+xml" href="https://chamibuddhika.wordpress.com/osd.xml" title="Source Open">
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com">
+		<style id="wpcom-hotfix-masterbar-style">
+			@media screen and (min-width: 783px) {
+				#wpadminbar .quicklinks li#wp-admin-bar-my-account.with-avatar > a img {
+					margin-top: 5px;
+				}
+			}
+		</style>
+		<meta name="application-name" content="Source Open"><meta name="msapplication-window" content="width=device-width;height=device-height"><meta name="msapplication-tooltip" content="About Technology and Life With A Touch Of My Own"><meta name="description" content="Recently I wanted to set up a remote desktop sharing session from home pc to my laptop. While going through the set up guide I came across ssh tunneling. Even though there are many articles on the subject still it took me a&nbsp;considerable amount of googling, some experimenting and couple of Wireshark sessions&nbsp;to grasp what's…">
+<style type="text/css">
+			#header h1 a,
+		#header h2 {
+			color: #265E15 !important;
+		}
+				#headerimage {
+			background: url('https://s0.wp.com/wp-content/themes/pub/mistylook/img/misty.jpg') no-repeat;
+			height: 200px;
+		}
+	</style>
+<link rel="stylesheet" type="text/css" href="https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b"><link rel="stylesheet" type="text/css" href="https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414i&amp;amp;ver=3.0.9b"><link rel="stylesheet" id="gravatar-card-css" href="https://0.gravatar.com/js/hovercards/hovercards.min.css?ver=2024244cee4591fae4bea45ee2571078613ea2fab8a404a7b5ceb1cf2b511ebc67fadd"><link href="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115" type="text/css" rel="stylesheet"></head>
+<body id="section-index" class="post-template-default single single-post postid-517 single-format-standard customizer-styles-applied jetpack-reblog-enabled">
+
+
+<div id="navigation" class="clearfix">
+		<div class="menu">
+		<ul>
+			<li><a href="https://chamibuddhika.wordpress.com/" title="Home">Home</a></li>
+			<li class="page_item page-item-69"><a href="https://chamibuddhika.wordpress.com/about-2/">About</a></li>
+									<li class="search"><form method="get" id="searchform" action="https://chamibuddhika.wordpress.com"><input type="text" class="textbox" value="" name="s" id="s"><input type="submit" id="searchsubmit" value="Search"></form></li>
+					</ul>
+	</div>
+</div><!-- end id:navigation -->
+
+<div id="container">
+
+<div id="header">
+<h1><a href="https://chamibuddhika.wordpress.com/" title="Source Open">Source Open</a></h1>
+<h2>About Technology and Life With A Touch Of My Own</h2>
+</div><!-- end id:header -->
+
+
+	
+		<div id="feedarea">
+	<dl>
+		<dt><strong>Feeds:</strong></dt>
+
+			<dd><a href="https://chamibuddhika.wordpress.com/feed/">Posts</a></dd>
+	
+			<dd><a href="https://chamibuddhika.wordpress.com/comments/feed/">Comments</a></dd>
+		</dl>
+	</div><!-- end id:feedarea -->
+	
+	<div id="headerimage">
+</div><!-- end id:headerimage -->
+
+<div id="content">
+<div id="content-main">
+
+		
+						
+			<div class="post-517 post type-post status-publish format-standard hentry category-concepts category-security tag-port-forwarding tag-ssh tag-tunnelling" id="post-517">
+				<div class="posttitle">
+					<h2>SSH Tunneling Explained</h2>
+					<p class="post-info">March 21, 2012 by <a href="https://chamibuddhika.wordpress.com/author/chamibuddhika/" title="Posts by Buddhika Chamith">Buddhika Chamith</a>  </p>
+				</div>
+
+				<div class="entry">
+					<p>Recently I wanted to set up a remote desktop sharing session from home pc to my laptop. While going through the set up guide I came across ssh tunneling. Even though there are many articles on the subject still it took me a&nbsp;considerable amount of googling, some experimenting and couple of Wireshark sessions&nbsp;to grasp what’s going under the hood. Most of the guides were incomplete in terms of&nbsp;explaining the concept which left me desiring for a good article on the subject&nbsp;with some explanatory illustrations. So I decided to write it my self. So here goes…</p>
+<h3 style="text-align:justify;">Introduction</h3>
+<p style="text-align:justify;">A SSH tunnel consists of an encrypted tunnel created through a SSH protocol<br>
+connection. A SSH tunnel can be used to transfer unencrypted traffic over a<br>
+network through an encrypted channel. For example we can use a ssh tunnel to<br>
+securely transfer files between a FTP server and a client even though the FTP<br>
+protocol itself is not encrypted. SSH tunnels also provide a means to bypass firewalls that prohibits or filter&nbsp;certain internet services. For example an organization will block certain sites&nbsp;using their proxy filter. But users may not wish to have their web traffic<br>
+monitored or blocked by the organization proxy filter. If users can connect to<br>
+an external SSH server, they can create a SSH tunnel to forward a given port on<br>
+their local machine to port 80 on remote web-server via the external SSH<br>
+server. I will describe this scenario in detail in a little while.</p>
+<p style="text-align:justify;">To set up a SSH tunnel a given port of one machine needs to be forwarded (of<br>
+which I am going to talk about in a little while) to a port in the other<br>
+machine which will be the other end of the tunnel. Once the SSH tunnel has been<br>
+established, the user can connect to earlier specified port at first machine to<br>
+access the network service.</p>
+<h3 style="text-align:justify;">Port Forwarding</h3>
+<p style="text-align:justify;">SSH tunnels can be created in several ways using different kinds of port forwarding<br>
+mechanisms. Ports can be forwarded in three ways.</p>
+<ol style="text-align:justify;">
+<li>Local port forwarding</li>
+<li>Remote port forwarding</li>
+<li>Dynamic port forwarding</li>
+</ol>
+<p style="text-align:justify;">I didn’t explain what port forwarding is. I found Wikipedia’s definition more explanatory.</p>
+<blockquote><p>Port forwarding or port mapping is a name given to the combined technique of</p>
+<ol>
+<li>translating the address and/or port number of a packet to a new destination</li>
+<li>possibly accepting such packet(s) in a packet filter(firewall)</li>
+<li>forwarding the packet according to the routing table.</li>
+</ol>
+</blockquote>
+<p style="text-align:justify;">Here the first technique will be used in creating an SSH tunnel. When a client application&nbsp;connects to the local port (local endpoint) of the SSH tunnel and transfer data these&nbsp;data will be forwarded to the remote end by translating the host and port values to that of&nbsp;the remote end of the channel.</p>
+<p style="text-align:justify;">So with that let’s see how SSH tunnels can be created using forwarded ports with an examples.</p>
+<h3 style="text-align:justify;">Tunnelling with Local port forwarding</h3>
+<p style="text-align:justify;">Let’s say that yahoo.com is being blocked using a proxy filter in the University.<br>
+(For the sake of this example. :). Cannot think any valid reason why yahoo would be blocked).&nbsp;A SSH tunnel can be used to bypass this restriction. Let’s name my machine at the&nbsp;university as ‘work’ and my home machine as ‘home’. ‘home’ needs to have a public IP for this&nbsp;to work. And I am running a SSH server on my home machine. Following diagram illustrates the scenario.</p>
+<p style="text-align:center;"><a href="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg"><img data-attachment-id="543" data-permalink="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/scenario/" data-orig-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg" data-orig-size="1073,310" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="Scenario" data-image-description="" data-image-caption="" data-medium-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=300" data-large-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=500" class=" wp-image-543 aligncenter" title="Scenario" alt="" src="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=650&amp;h=187" height="187" width="650" srcset="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=647&amp;h=187 647w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=150&amp;h=43 150w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=300&amp;h=87 300w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=768&amp;h=222 768w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg?w=1024&amp;h=296 1024w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/scenario.jpg 1073w" sizes="(max-width: 650px) 100vw, 650px"></a></p>
+<p style="text-align:justify;">To create the SSH tunnel execute following from ‘work’ machine.</p>
+<div><div id="highlighter_205714" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -L 9001:yahoo.com:80 home</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">The ‘L’ switch indicates that a local port forward is need to be created. The switch syntax is as follows.</p>
+<div><div id="highlighter_870030" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">-L &lt;</code><code class="xml keyword">local-port-to-listen</code><code class="xml plain">&gt;:&lt;</code><code class="xml keyword">remote-host</code><code class="xml plain">&gt;:&lt;</code><code class="xml keyword">remote-port</code><code class="xml plain">&gt;</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">Now the SSH client at ‘work’ will connect to SSH server running at ‘home’ (usually running at port 22)&nbsp;binding port 9001 of ‘work’ to listen for local requests thus creating a SSH tunnel between ‘home’ and&nbsp;‘work’. At the ‘home’ end it will create a connection to ‘yahoo.com’ at port 80. So ‘work’ doesn’t need&nbsp;to know how to connect to yahoo.com. Only ‘home’ needs to worry about that. The channel between ‘work’&nbsp;and ‘home’ will be encrypted while the connection between ‘home’ and ‘yahoo.com’ will be unencrypted.</p>
+<p style="text-align:justify;">Now it is possible to browse yahoo.com by visiting <a href="http://localhost:9001" rel="nofollow">http://localhost:9001</a> in the web browser at ‘work’&nbsp;computer. The ‘home’ computer will act as a gateway which would accept requests from ‘work’ machine and&nbsp;fetch data and tunnelling it back. So the syntax of the full command would be as follows.</p>
+<div><div id="highlighter_427522" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -L &lt;</code><code class="xml keyword">local-port-to-listen</code><code class="xml plain">&gt;:&lt;</code><code class="xml keyword">remote-host</code><code class="xml plain">&gt;:&lt;</code><code class="xml keyword">remote-port</code><code class="xml plain">&gt; &lt;</code><code class="xml keyword">gateway</code><code class="xml plain">&gt;</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">The image below describes the scenario.</p>
+<p style="text-align:justify;"><a href="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg"><img data-attachment-id="545" data-permalink="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/localportforwarding/" data-orig-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg" data-orig-size="703,336" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="LocalPortForwarding" data-image-description="" data-image-caption="" data-medium-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=300" data-large-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=500" class="aligncenter size-full wp-image-545" title="LocalPortForwarding" alt="" src="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=500&amp;h=238" height="238" width="500" srcset="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=498&amp;h=238 498w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=150&amp;h=72 150w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg?w=300&amp;h=143 300w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/localportforwarding.jpg 703w" sizes="(max-width: 500px) 100vw, 500px"></a></p>
+<p style="text-align:justify;">Here the ‘host’ to ‘yahoo.com’ connection is only made when browser makes the<br>
+request not at the tunnel setup time.</p>
+<p style="text-align:justify;">It is also possible to specify a port in the ‘home’ computer itself instead of<br>
+connecting to an external host. This is useful if I were to set up a VNC session<br>
+between ‘work’ and ‘home’. Then the command line would be as follows.</p>
+<div><div id="highlighter_501395" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -L 5900:localhost:5900 home (Executed from 'work')</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">So here what does localhost refer to? Is it the ‘work’ since the command line is executed from ‘work’?&nbsp;Turns out that it is not. As explained earlier is relative to the gateway (‘home’ in this case) , not the machine&nbsp;from where the tunnel is initiated. So this will make a connection to port 5900 of the ‘home’ computer&nbsp;where the VNC client would be listening in.</p>
+<p style="text-align:justify;">The created tunnel can be used to transfer all kinds of data not limited to web browsing sessions.&nbsp;We can also tunnel SSH sessions from this as well.&nbsp;Let’s assume there is another computer (‘banned’) to which we need to SSH from within University but the SSH&nbsp;access is being blocked. It is possible to tunnel a SSH session to this host using a local port forward. The setup&nbsp;would look like this.</p>
+<p style="text-align:justify;"><a href="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg"><img data-attachment-id="542" data-permalink="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/sshsessionforwarding/" data-orig-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg" data-orig-size="799,327" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="SSHSessionForwarding" data-image-description="" data-image-caption="" data-medium-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=300" data-large-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=500" class="aligncenter size-full wp-image-542" title="SSHSessionForwarding" alt="" src="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=500&amp;h=204" height="204" width="500" srcset="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=498&amp;h=204 498w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=150&amp;h=61 150w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=300&amp;h=123 300w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg?w=768&amp;h=314 768w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/sshsessionforwarding.jpg 799w" sizes="(max-width: 500px) 100vw, 500px"></a></p>
+<p style="text-align:justify;">As can be seen now the transferred data between ‘work’ and ‘banned’ are encrypted end to end. For this we need to&nbsp;create a local port forward as follows.</p>
+<div><div id="highlighter_593437" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -L 9001:banned:22 home</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">Now we need to create a SSH session to local port 9001 from where the session<br>
+will get tunneled to ‘banned’ via ‘home’ computer.</p>
+<div><div id="highlighter_806280" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -p 9001 localhost</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">With that let’s move on to next type of SSH tunnelling method, reverse tunnelling.</p>
+<h3 style="text-align:justify;">Reverse Tunnelling with remote port forwarding</h3>
+<p style="text-align:justify;">Let’s say it is required to connect to an internal university website from home.<br>
+The university firewall is blocking all incoming traffic. How can we connect from ‘home’ to internal&nbsp;network so that we can browse the internal site? A VPN setup is a good candidate here. However for this example&nbsp;let’s assume we don’t have this facility. Enter SSH reverse tunnelling..</p>
+<p style="text-align:justify;">As in the earlier case we will initiate the tunnel from ‘work’ computer behind the firewall. This is possible&nbsp;since only incoming traffic is blocking and outgoing traffic is allowed. However instead of the earlier case&nbsp;the client will now be at the ‘home’ computer. Instead of -L option we now define -R which specifies<br>
+a reverse tunnel need to be created.</p>
+<div><div id="highlighter_765556" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -R 9001:intra-site.com:80 home (Executed from 'work')</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">Once executed the SSH client at ‘work’ will connect to SSH server running at home creating a SSH channel. Then the server will bind port 9001 on ‘home’ machine to listen for incoming requests which would subsequently be&nbsp;routed through the created SSH channel between ‘home’ and ‘work’. Now it’s possible to browse the internal site<br>
+by visiting <a href="http://localhost:9001" rel="nofollow">http://localhost:9001</a> in ‘home’ web browser. The ‘work’ will then create a connection to intra-site&nbsp;and relay back the response to ‘home’ via the created SSH channel.</p>
+<p style="text-align:justify;"><a href="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg"><img data-attachment-id="544" data-permalink="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/remoteportforwarding/" data-orig-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg" data-orig-size="655,343" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="RemotePortForwarding" data-image-description="" data-image-caption="" data-medium-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=300" data-large-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=500" loading="lazy" class="aligncenter size-full wp-image-544" title="RemotePortForwarding" alt="" src="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=500&amp;h=261" height="261" width="500" srcset="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=498&amp;h=261 498w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=150&amp;h=79 150w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg?w=300&amp;h=157 300w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/remoteportforwarding.jpg 655w" sizes="(max-width: 500px) 100vw, 500px"></a></p>
+<p style="text-align:justify;">As nice all of these would be still you need to create another tunnel if you need to connect to another site&nbsp;in both cases. Wouldn’t it be nice if it is possible to proxy traffic to any site using the SSH channel created?&nbsp;That’s what dynamic port forwarding is all about.</p>
+<h3 style="text-align:justify;">Dynamic Port Forwarding</h3>
+<p style="text-align:justify;">Dynamic port forwarding allows to configure one local port for tunnelling data to all remote destinations.&nbsp;However to utilize this the client application connecting to local port should send their traffic using the&nbsp;SOCKS protocol. At the client side of the tunnel a SOCKS proxy would be created and the application (eg. browser)&nbsp;uses the SOCKS protocol to specify where the traffic should be sent when it leaves the other end of the ssh tunnel.</p>
+<div><div id="highlighter_772248" class="syntaxhighlighter  xml"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="xml plain">ssh -D 9001 home (Executed from 'work')</code></div></div></td></tr></tbody></table></div></div>
+<p style="text-align:justify;">Here SSH will create a SOCKS proxy listening in for connections at local port<br>
+9001 and upon receiving a request would route the traffic via SSH channel<br>
+created between ‘work’ and ‘home’. For this it is required to configure the<br>
+browser to point to the SOCKS proxy at port 9001 at localhost.</p>
+<p style="text-align:justify;"><a href="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg"><img data-attachment-id="546" data-permalink="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/dynamicportforwarding/" data-orig-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg" data-orig-size="877,329" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="DynamicPortForwarding" data-image-description="" data-image-caption="" data-medium-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=300" data-large-file="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=500" loading="lazy" class="aligncenter size-full wp-image-546" title="DynamicPortForwarding" alt="" src="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=500&amp;h=187" height="187" width="500" srcset="https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=498&amp;h=187 498w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=150&amp;h=56 150w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=300&amp;h=113 300w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg?w=768&amp;h=288 768w, https://chamibuddhika.wordpress.com/wp-content/uploads/2012/03/dynamicportforwarding.jpg 877w" sizes="(max-width: 500px) 100vw, 500px"></a></p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul data-sharing-events-added="true"><li class="share-email share-service-visible"><a rel="nofollow noopener noreferrer" data-shared="" class="share-email sd-button share-icon no-text" href="mailto:?subject=%5BShared%20Post%5D%20SSH%20Tunneling%20Explained%20&amp;body=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F&amp;share=email&amp;nb=1" target="_blank" title="Click to email a link to a friend" data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you're having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="dce75fd6a7" data-email-share-track-url="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?share=email" jetpack-share-click-count="0"><span></span><span class="sharing-screen-reader-text">Click to email a link to a friend (Opens in new window)</span></a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer" data-shared="sharing-facebook-517" class="share-facebook sd-button share-icon no-text" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?share=facebook&amp;nb=1" target="_blank" title="Click to share on Facebook"><span></span><span class="sharing-screen-reader-text">Click to share on Facebook (Opens in new window)</span></a></li><li class="share-twitter"><a rel="nofollow noopener noreferrer" data-shared="sharing-twitter-517" class="share-twitter sd-button share-icon no-text" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?share=twitter&amp;nb=1" target="_blank" title="Click to share on Twitter"><span></span><span class="sharing-screen-reader-text">Click to share on Twitter (Opens in new window)</span></a></li><li class="share-reddit"><a rel="nofollow noopener noreferrer" data-shared="" class="share-reddit sd-button share-icon no-text" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?share=reddit&amp;nb=1" target="_blank" title="Click to share on Reddit"><span></span><span class="sharing-screen-reader-text">Click to share on Reddit (Opens in new window)</span></a></li><li class="share-end"></li></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-11192597-517-6669fa8ef051a" data-src="//widgets.wp.com/likes/index.html?ver=20240612#blog_id=11192597&amp;post_id=517&amp;origin=chamibuddhika.wordpress.com&amp;obj_id=11192597-517-6669fa8ef051a" data-name="like-post-frame-11192597-517-6669fa8ef051a" data-title="Like or Reblog"><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div>
+<div id="jp-relatedposts" class="jp-relatedposts" style="display: block;">
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+<div class="jp-relatedposts-items jp-relatedposts-items-minimal jp-relatedposts-grid "><p class="jp-relatedposts-post jp-relatedposts-post0" data-post-id="62" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://chamibuddhika.wordpress.com/2009/09/17/soa-workshop/" title="SOA Workshop" data-origin="517" data-position="0">SOA Workshop</a></span><time class="jp-relatedposts-post-date" datetime="September 17, 2009" style="display: block;">September 17, 2009</time><span class="jp-relatedposts-post-context">In "SOA"</span></p><p class="jp-relatedposts-post jp-relatedposts-post1" data-post-id="100" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://chamibuddhika.wordpress.com/2010/03/05/a-thing-or-two-about-apache-rampart-part-ii/" title="A Thing or Two About Apache Rampart &amp;#8211; Part&amp;nbsp;II" data-origin="517" data-position="1">A Thing or Two About Apache Rampart – Part&nbsp;II</a></span><time class="jp-relatedposts-post-date" datetime="March 5, 2010" style="display: block;">March 5, 2010</time><span class="jp-relatedposts-post-context">In "Security"</span></p><p class="jp-relatedposts-post jp-relatedposts-post2" data-post-id="75" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://chamibuddhika.wordpress.com/2009/10/03/iso27001-its-business-value/" title="ISO27001 &amp;amp; its Business&amp;nbsp;Value" data-origin="517" data-position="2">ISO27001 &amp; its Business&nbsp;Value</a></span><time class="jp-relatedposts-post-date" datetime="October 3, 2009" style="display: block;">October 3, 2009</time><span class="jp-relatedposts-post-context">In "Security"</span></p></div></div></div>									</div>
+
+				<p class="postmetadata">
+					Posted in <a href="https://chamibuddhika.wordpress.com/category/concepts/" rel="category tag">Concepts</a>, <a href="https://chamibuddhika.wordpress.com/category/security/" rel="category tag">Security</a> | Tagged <a href="https://chamibuddhika.wordpress.com/tag/port-forwarding/" rel="tag">Port forwarding</a>, <a href="https://chamibuddhika.wordpress.com/tag/ssh/" rel="tag">SSH</a>, <a href="https://chamibuddhika.wordpress.com/tag/tunnelling/" rel="tag">tunnelling</a> | 											37 Comments									</p>
+				
+<!-- You can start editing here. -->
+
+<h3 id="comments">37 Responses</h3>
+
+	<ol class="commentlist">
+			<li class="pingback even thread-even depth-1" id="comment-73">
+		<div id="div-comment-73">
+		<div class="cmtinfo"><em> on <a href="#comment-73" title="">March 23, 2012 at 12:21 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=73#respond" data-commentid="73" data-postid="517" data-belowelement="div-comment-73" data-respondelement="respond" data-replyto="Reply to Tunneling SSH – transfert de ports — Bruno ARLIGUY" aria-label="Reply to Tunneling SSH – transfert de ports — Bruno ARLIGUY">Reply</a></em>  <cite><a href="http://arliguy.net/2004/05/06/tunneling-ssh/" class="url" rel="ugc external nofollow">Tunneling SSH – transfert de ports — Bruno ARLIGUY</a></cite></div>
+						<p>[…] Le but de ce document est d’expliquer les tunnels SSH. C’est à dire comment utiliser SSH pour faire passer différents protocoles, ce qui permet de sécuriser la communication (une sorte de VPN software). Si vous souhaitez plus de détails sur les différentes possibilités, cet article de&nbsp;Buddhika Chamith vous éclairera : SSH Tunneling Explained. […]</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="pingback odd alt thread-odd thread-alt depth-1" id="comment-84">
+		<div id="div-comment-84">
+		<div class="cmtinfo"><em> on <a href="#comment-84" title="">April 9, 2012 at 12:40 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=84#respond" data-commentid="84" data-postid="517" data-belowelement="div-comment-84" data-respondelement="respond" data-replyto="Reply to Dica: Acessando ssh através de um proxy autenticado « O Futuro é a Liberdade" aria-label="Reply to Dica: Acessando ssh através de um proxy autenticado « O Futuro é a Liberdade">Reply</a></em> <img alt="" src="https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=48" srcset="https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=48 1x, https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=72 1.5x, https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=96 2x, https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=144 3x, https://secure.gravatar.com/blavatar/abce2c01f5002cf47b567a1ed3d097e2a9eeb0e63ef23bacdf0d9b4a0a0972ad?s=192 4x" class="avatar avatar-48" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://almalivre.wordpress.com/?p=2926" class="url" rel="ugc external nofollow">Dica: Acessando ssh através de um proxy autenticado « O Futuro é a Liberdade</a></cite></div>
+						<p>[…] SSH Tunnelling Explained (chamibuddhika.wordpress.com) […]</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-92">
+		<div id="div-comment-92">
+		<div class="cmtinfo"><em> on <a href="#comment-92" title="">May 28, 2012 at 3:09 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=92#respond" data-commentid="92" data-postid="517" data-belowelement="div-comment-92" data-respondelement="respond" data-replyto="Reply to raghavan" aria-label="Reply to raghavan">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/bedfec4915f09c2353f93607799f0349535c9d99c2766ef2ea5d5ba129736e90?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>raghavan</cite></div>
+						<p>very well explained. well done.</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor odd alt depth-2" id="comment-93">
+		<div id="div-comment-93">
+		<div class="cmtinfo"><em> on <a href="#comment-93" title="">May 28, 2012 at 11:41 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=93#respond" data-commentid="93" data-postid="517" data-belowelement="div-comment-93" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Thanks. Glad that you found it useful. :).</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-97">
+		<div id="div-comment-97">
+		<div class="cmtinfo"><em> on <a href="#comment-97" title="">June 8, 2012 at 4:29 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=97#respond" data-commentid="97" data-postid="517" data-belowelement="div-comment-97" data-respondelement="respond" data-replyto="Reply to Emmanuel" aria-label="Reply to Emmanuel">Reply</a></em> <img alt="" src="https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=48&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=48&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=72&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=96&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=144&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/94a9d2da4d52845bf16729b7eafdeb97c99de183c0ee1d5faa175a4045cdeba5?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Emmanuel</cite></div>
+						<p>Excellent article on port forwarding</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor odd alt depth-2" id="comment-98">
+		<div id="div-comment-98">
+		<div class="cmtinfo"><em> on <a href="#comment-98" title="">June 8, 2012 at 9:05 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=98#respond" data-commentid="98" data-postid="517" data-belowelement="div-comment-98" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Thanks.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-109">
+		<div id="div-comment-109">
+		<div class="cmtinfo"><em> on <a href="#comment-109" title="">July 21, 2012 at 12:07 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=109#respond" data-commentid="109" data-postid="517" data-belowelement="div-comment-109" data-respondelement="respond" data-replyto="Reply to Nick" aria-label="Reply to Nick">Reply</a></em> <img alt="" src="https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=48&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=48&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=72&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=96&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=144&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/05682e90bed7be1c8260f8b59ca4394d2bf73c7bcab83823a00ae9420cd5a4ff?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://www.gmail.com" class="url" rel="ugc external nofollow">Nick</a></cite></div>
+						<p>This is a very detailed document.. Since I am new to this technology.can anyone please explain me where are the commands (ssh -L 5900:localhost:5900 home (Executed from ‘work’)<br>
+) executed.Is there a software in which the commands are executed..????</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor odd alt depth-2" id="comment-112">
+		<div id="div-comment-112">
+		<div class="cmtinfo"><em> on <a href="#comment-112" title="">July 26, 2012 at 11:24 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=112#respond" data-commentid="112" data-postid="517" data-belowelement="div-comment-112" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>You need to install SSH server and client in order to follow this tutorial. Specially in this case SSH client at ‘work’ and SSH server in ‘home’. <a href="http://www.cyberciti.biz/faq/ubuntu-linux-openssh-server-installation-and-configuration/" rel="nofollow ugc">http://www.cyberciti.biz/faq/ubuntu-linux-openssh-server-installation-and-configuration/</a> may be of help to you if you are on an Ubuntu distribution. Or else you can try installing Putty. HTH.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-111">
+		<div id="div-comment-111">
+		<div class="cmtinfo"><em> on <a href="#comment-111" title="">July 25, 2012 at 4:03 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=111#respond" data-commentid="111" data-postid="517" data-belowelement="div-comment-111" data-respondelement="respond" data-replyto="Reply to root_taker" aria-label="Reply to root_taker">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56b5d8f3ac23f7238b0d5bcc62db25c39410e1cee28f0805c62d9fc7ab8c1dd3?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://technologyordie.com/" class="url" rel="ugc external nofollow">root_taker</a></cite></div>
+						<p>Great tutorial! I have a similar tutorial on my blog that explains things similarly for windows users who would be using putty: <a href="http://technologyordie.com/ssh-tunneling-and-proxying" rel="nofollow ugc">http://technologyordie.com/ssh-tunneling-and-proxying</a></p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor odd alt depth-2" id="comment-116">
+		<div id="div-comment-116">
+		<div class="cmtinfo"><em> on <a href="#comment-116" title="">August 2, 2012 at 2:02 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=116#respond" data-commentid="116" data-postid="517" data-belowelement="div-comment-116" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Thanks. Nice work on your part too. :).</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-114">
+		<div id="div-comment-114">
+		<div class="cmtinfo"><em> on <a href="#comment-114" title="">August 2, 2012 at 1:03 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=114#respond" data-commentid="114" data-postid="517" data-belowelement="div-comment-114" data-respondelement="respond" data-replyto="Reply to Bjarne Valle" aria-label="Reply to Bjarne Valle">Reply</a></em> <img alt="" src="https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd" srcset="https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd 1x, https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd 1.5x, https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd 2x, https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd 3x, https://graph.facebook.com/100003795281045/picture?type=large&amp;_md5=9e5f827892523ff7a319a1687be4b4dd 4x" class="avatar avatar-48" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://www.facebook.com/bjarne.valle.5" class="url" rel="ugc external nofollow">Bjarne Valle</a></cite></div>
+						<p>One of the best, and easy understandable article about ssh Tunneling I have come across.</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor odd alt depth-2" id="comment-115">
+		<div id="div-comment-115">
+		<div class="cmtinfo"><em> on <a href="#comment-115" title="">August 2, 2012 at 1:58 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=115#respond" data-commentid="115" data-postid="517" data-belowelement="div-comment-115" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Thanks Bjarne!! Glad you found it useful.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-124">
+		<div id="div-comment-124">
+		<div class="cmtinfo"><em> on <a href="#comment-124" title="">August 22, 2012 at 7:45 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=124#respond" data-commentid="124" data-postid="517" data-belowelement="div-comment-124" data-respondelement="respond" data-replyto="Reply to David AMAR" aria-label="Reply to David AMAR">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/82034e8546301d8f1e1103e04a4ff67276c81ceaeee348882201e9c6194766f0?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>David AMAR</cite></div>
+						<p>Very clear and useful! Thanks a lot</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-even depth-1" id="comment-128">
+		<div id="div-comment-128">
+		<div class="cmtinfo"><em> on <a href="#comment-128" title="">September 2, 2012 at 12:57 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=128#respond" data-commentid="128" data-postid="517" data-belowelement="div-comment-128" data-respondelement="respond" data-replyto="Reply to Umapathi Anand" aria-label="Reply to Umapathi Anand">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d74465038ea1ea8295adee828e4fe9f61dca0d5fc3f9b665d3a8cd183d2895c5?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Umapathi Anand</cite></div>
+						<p>Very Good Stuff and Style.  The World Expects more contribution from You.</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor even depth-2" id="comment-129">
+		<div id="div-comment-129">
+		<div class="cmtinfo"><em> on <a href="#comment-129" title="">September 2, 2012 at 3:10 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=129#respond" data-commentid="129" data-postid="517" data-belowelement="div-comment-129" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Thanks Anand.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-132">
+		<div id="div-comment-132">
+		<div class="cmtinfo"><em> on <a href="#comment-132" title="">September 20, 2012 at 8:06 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=132#respond" data-commentid="132" data-postid="517" data-belowelement="div-comment-132" data-respondelement="respond" data-replyto="Reply to simpleissweet" aria-label="Reply to simpleissweet">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/bd31b66fcc1d5f984aa7c0f9bc3b7d9829a3bfcae3923cdcf5f2a6c4ca33e15c?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>simpleissweet</cite></div>
+						<p>This is a fantastic article… saved me tons of time from googling for answers and worked like a charm!</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-135">
+		<div id="div-comment-135">
+		<div class="cmtinfo"><em> on <a href="#comment-135" title="">October 13, 2012 at 8:34 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=135#respond" data-commentid="135" data-postid="517" data-belowelement="div-comment-135" data-respondelement="respond" data-replyto="Reply to nodmonkey" aria-label="Reply to nodmonkey">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/8a19db1cbd709bddef8fb3b480a23e1c2c35bd9ac83e2f6cf87e79406c095e2f?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://gravatar.com/nodmonkey" class="url" rel="ugc external nofollow">nodmonkey</a></cite></div>
+						<p>Clearly explained, good examples, well illustrated. The Internet was missing this resource and now we have it. Great!</p>
+<p>One thing I would suggest adding is the syntax of reverse and dynamic tunnelling using angle brackets, as you did for the first local tunnelling example.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-136">
+		<div id="div-comment-136">
+		<div class="cmtinfo"><em> on <a href="#comment-136" title="">November 6, 2012 at 9:15 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=136#respond" data-commentid="136" data-postid="517" data-belowelement="div-comment-136" data-respondelement="respond" data-replyto="Reply to Ricardo Murillo" aria-label="Reply to Ricardo Murillo">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Ricardo Murillo</cite></div>
+						<p>Excelente explanation, this is the first time I read about SSH tunnelling but I know understand it clearly.</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment even depth-2" id="comment-137">
+		<div id="div-comment-137">
+		<div class="cmtinfo"><em> on <a href="#comment-137" title="">November 6, 2012 at 9:16 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=137#respond" data-commentid="137" data-postid="517" data-belowelement="div-comment-137" data-respondelement="respond" data-replyto="Reply to Ricardo Murillo" aria-label="Reply to Ricardo Murillo">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/40ab5a1ba3018ae83dafe574b4e3d1f3fe9843f7e14809f175f129d9daba72a0?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Ricardo Murillo</cite></div>
+						<p>(Correcting previous post) Excellent explanation, this is the first time I read about SSH tunnelling but now I understand it clearly.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-even depth-1" id="comment-141">
+		<div id="div-comment-141">
+		<div class="cmtinfo"><em> on <a href="#comment-141" title="">November 11, 2012 at 8:28 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=141#respond" data-commentid="141" data-postid="517" data-belowelement="div-comment-141" data-respondelement="respond" data-replyto="Reply to Johannes" aria-label="Reply to Johannes">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/2f39658c1088ff7628af67ae95195438b9e9c1c736f090cf1651fb5df1924e2e?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Johannes</cite></div>
+						<p>Hey,<br>
+Thx for your effort! Really helpful. Just on thing:<br>
+You do describe the following example:<br>
+ssh -L 5900:localhost:5900 home (Executed from ‘work’)</p>
+<p>There is the sentence:<br>
+“As explained earlier is relative to the , not the machine from where the tunnel is initiated” You seem to have forgotten a word or sentence after “relative to the…”?!</p>
+<p>Could you tell to which it is relative to?</p>
+<p>Thanks,<br>
+Johannes</p>
+			<br style="clear: both">
+		</div>
+<ul class="children">
+		<li class="comment byuser comment-author-chamibuddhika bypostauthor even depth-2" id="comment-142">
+		<div id="div-comment-142">
+		<div class="cmtinfo"><em> on <a href="#comment-142" title="">November 11, 2012 at 8:58 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=142#respond" data-commentid="142" data-postid="517" data-belowelement="div-comment-142" data-respondelement="respond" data-replyto="Reply to Buddhika Chamith" aria-label="Reply to Buddhika Chamith">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/56ad0ace6e8172bb56967000184ef178264b9cef186ef771f2e056512a85f401?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Buddhika Chamith</cite></div>
+						<p>Hi Johannes,</p>
+<p>Yes there is a slight omission. Thanks for pointing it out. It has been fixed now. It should be the gateway computer. (‘home’ in that particular case).</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-177">
+		<div id="div-comment-177">
+		<div class="cmtinfo"><em> on <a href="#comment-177" title="">November 30, 2012 at 7:55 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=177#respond" data-commentid="177" data-postid="517" data-belowelement="div-comment-177" data-respondelement="respond" data-replyto="Reply to RichardB" aria-label="Reply to RichardB">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>RichardB</cite></div>
+						<p>A really well explained topic. Thanks<br>
+I aim to play with a socks proxy to really get my understanding with this nailed.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-178">
+		<div id="div-comment-178">
+		<div class="cmtinfo"><em> on <a href="#comment-178" title="">November 30, 2012 at 8:01 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=178#respond" data-commentid="178" data-postid="517" data-belowelement="div-comment-178" data-respondelement="respond" data-replyto="Reply to RichardB" aria-label="Reply to RichardB">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>RichardB</cite></div>
+						<p>BTW, I note the tunnel remains and accepts new connections when I used the -L option even if I kill the original command that created the tunnel. netstat says the local port is now being owned by my sshd daemon. Is that normal behavior?<br>
+my ssh command was for mysql client forwarding to a remote server which had a local access only mysql server…</p>
+<p>ssh <a href="mailto:root@192.168.0.36">root@192.168.0.36</a> -L 3306:127.0.0.1:3306 -N</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-179">
+		<div id="div-comment-179">
+		<div class="cmtinfo"><em> on <a href="#comment-179" title="">November 30, 2012 at 8:05 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=179#respond" data-commentid="179" data-postid="517" data-belowelement="div-comment-179" data-respondelement="respond" data-replyto="Reply to RichardB" aria-label="Reply to RichardB">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d4228328d438c2b1388e9761fd363c7c8189dc32e3372c5711e28b3a8cdaf947?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>RichardB</cite></div>
+						<p>Ahh, my bad I had also tried the -R example from the remote server – which of course had connected and created a tunnel to my local ssh daemon – sorry for the confusion.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-237">
+		<div id="div-comment-237">
+		<div class="cmtinfo"><em> on <a href="#comment-237" title="">December 11, 2012 at 12:31 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=237#respond" data-commentid="237" data-postid="517" data-belowelement="div-comment-237" data-respondelement="respond" data-replyto="Reply to Mohammad Adnan" aria-label="Reply to Mohammad Adnan">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/5d588ede626e154cef077d12e741d8b191c1e825befdae36fa625dbc545776b7?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Mohammad Adnan</cite></div>
+						<p>Great Explanation</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-244">
+		<div id="div-comment-244">
+		<div class="cmtinfo"><em> on <a href="#comment-244" title="">January 16, 2013 at 4:55 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=244#respond" data-commentid="244" data-postid="517" data-belowelement="div-comment-244" data-respondelement="respond" data-replyto="Reply to pushparajxap" aria-label="Reply to pushparajxap">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d3a069cad0b0cb59270dffc0aa1a5c027e06d91282f7db76a7aee5067f59f336?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://gravatar.com/pushparajxa" class="url" rel="ugc external nofollow">pushparajxap</a></cite></div>
+						<p>Very will explained…It cleared all my doubts..in fact it made me to realize to write blogs on concepts which I know well, so that it will be useful for others….Just like what you posted here is useful for me..</p>
+<p>Thanx a lot..</p>
+<p>Pushparaj</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-245">
+		<div id="div-comment-245">
+		<div class="cmtinfo"><em> on <a href="#comment-245" title="">January 25, 2013 at 3:26 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=245#respond" data-commentid="245" data-postid="517" data-belowelement="div-comment-245" data-respondelement="respond" data-replyto="Reply to kentgrav" aria-label="Reply to kentgrav">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/e820576b3b3f610f32c0c0eec10fca64348bc31cde1ddfffbeb30617fa1444cf?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://gravatar.com/kentgrav" class="url" rel="ugc external nofollow">kentgrav</a></cite></div>
+						<p>I have been trying to do this for about 8 days now and have looked at virtually every single article there is that explains this process.  And this is by far the best I have found, thanks for posting it and contributing back to the community.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-248">
+		<div id="div-comment-248">
+		<div class="cmtinfo"><em> on <a href="#comment-248" title="">February 2, 2013 at 6:39 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=248#respond" data-commentid="248" data-postid="517" data-belowelement="div-comment-248" data-respondelement="respond" data-replyto="Reply to Ruud" aria-label="Reply to Ruud">Reply</a></em> <img alt="" src="https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=48&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=48&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=72&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=96&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=144&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/63e457a9b7eec94265dee4791b50cf66c6e8a84ee712fd1157afddf12cb950db?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Ruud</cite></div>
+						<p>Nice, clear and compact article. Thanks !</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-249">
+		<div id="div-comment-249">
+		<div class="cmtinfo"><em> on <a href="#comment-249" title="">February 6, 2013 at 1:14 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=249#respond" data-commentid="249" data-postid="517" data-belowelement="div-comment-249" data-respondelement="respond" data-replyto="Reply to Nitin" aria-label="Reply to Nitin">Reply</a></em> <img alt="" src="https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=48&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=48&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=72&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=96&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=144&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/03fdf0d2d560ff8503d00f7f28165c8e1fae92f4bfe797bb199eee51b26b3e55?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Nitin</cite></div>
+						<p>Crisp and clear.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="pingback odd alt thread-odd thread-alt depth-1" id="comment-284">
+		<div id="div-comment-284">
+		<div class="cmtinfo"><em> on <a href="#comment-284" title="">July 12, 2013 at 4:56 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=284#respond" data-commentid="284" data-postid="517" data-belowelement="div-comment-284" data-respondelement="respond" data-replyto="Reply to Simple Quick SSH Tunneling to expose your web app | Sid__" aria-label="Reply to Simple Quick SSH Tunneling to expose your web app | Sid__">Reply</a></em>  <cite><a href="http://siddharth-ravichandran.com/2013/07/12/simple-quick-ssh-tunneling-to-expose-your-web-app/" class="url" rel="ugc external nofollow">Simple Quick SSH Tunneling to expose your web app | Sid__</a></cite></div>
+						<p>[…] Before we move to the “how to” here is a quick intro to ssh tunneling […]</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="pingback even thread-even depth-1" id="comment-378">
+		<div id="div-comment-378">
+		<div class="cmtinfo"><em> on <a href="#comment-378" title="">March 1, 2014 at 8:58 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=378#respond" data-commentid="378" data-postid="517" data-belowelement="div-comment-378" data-respondelement="respond" data-replyto="Reply to Secure Two-Machine Maya commandPort, with SSH Tunneling | CG Tech by Jonathan Rice" aria-label="Reply to Secure Two-Machine Maya commandPort, with SSH Tunneling | CG Tech by Jonathan Rice">Reply</a></em>  <cite><a href="http://jricecg.wordpress.com/2014/03/02/secure-two-machine-maya-commandport-with-ssh-tunneling/" class="url" rel="ugc external nofollow">Secure Two-Machine Maya commandPort, with SSH Tunneling | CG Tech by Jonathan Rice</a></cite></div>
+						<p>[…] a port like this, however, we can set up a more secure two-machine connection by making use of ssh tunneling. To be specific, we will use local port forwarding, so that Maya and the remote application each […]</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-384">
+		<div id="div-comment-384">
+		<div class="cmtinfo"><em> on <a href="#comment-384" title="">March 5, 2014 at 9:04 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=384#respond" data-commentid="384" data-postid="517" data-belowelement="div-comment-384" data-respondelement="respond" data-replyto="Reply to Harro" aria-label="Reply to Harro">Reply</a></em> <img alt="" src="https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=48&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=48&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=72&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=96&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=144&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/d4816cb8a152d8b46a9295624a55f604966edcd08fd09aaeb36ed2eb0cc6fa37?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="http://harro.com" class="url" rel="ugc external nofollow">Harro</a></cite></div>
+						<p>Thanks for covering all the scenarios. More here….<br>
+<a href="http://wiki.glitchdata.com/index.php?title=SSH:_Port_Tunnelling" rel="nofollow ugc">http://wiki.glitchdata.com/index.php?title=SSH:_Port_Tunnelling</a></p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-387">
+		<div id="div-comment-387">
+		<div class="cmtinfo"><em> on <a href="#comment-387" title="">March 8, 2014 at 5:37 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=387#respond" data-commentid="387" data-postid="517" data-belowelement="div-comment-387" data-respondelement="respond" data-replyto="Reply to Andy Crofts" aria-label="Reply to Andy Crofts">Reply</a></em> <img alt="" src="https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41" srcset="https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41 1x, https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41 1.5x, https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41 2x, https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41 3x, https://graph.facebook.com/669509714/picture?type=large&amp;_md5=e9092705e20dfaa7614f1e1f9dcb3d41 4x" class="avatar avatar-48" height="48" width="48" loading="lazy" decoding="async"> <cite><a href="https://www.facebook.com/oululife" class="url" rel="ugc external nofollow">Andy Crofts</a></cite></div>
+						<p>Best, clearest desciption ever. Thanks – exactly what I was searching for.</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="pingback odd alt thread-odd thread-alt depth-1" id="comment-398">
+		<div id="div-comment-398">
+		<div class="cmtinfo"><em> on <a href="#comment-398" title="">March 21, 2014 at 3:37 pm</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=398#respond" data-commentid="398" data-postid="517" data-belowelement="div-comment-398" data-respondelement="respond" data-replyto="Reply to SSH Tunneling | Derek Provance" aria-label="Reply to SSH Tunneling | Derek Provance">Reply</a></em>  <cite><a href="http://derekprovance.com/?p=252" class="url" rel="ugc external nofollow">SSH Tunneling | Derek Provance</a></cite></div>
+						<p>[…] that I have found have proven to only confuse and frustrate me more. Fortunately, I stumbled upon <a href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/" rel="ugc">https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/</a> which explained the how in setting up an SSH […]</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-559">
+		<div id="div-comment-559">
+		<div class="cmtinfo"><em> on <a href="#comment-559" title="">October 1, 2014 at 10:48 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=559#respond" data-commentid="559" data-postid="517" data-belowelement="div-comment-559" data-respondelement="respond" data-replyto="Reply to Mr. Moderate Misbehaviour" aria-label="Reply to Mr. Moderate Misbehaviour">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/5f037773fd70adbc001725c316615b1aa8ecc23e3be0029688a9a6a9f1199064?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Mr. Moderate Misbehaviour</cite></div>
+						<p>Dude thank you so much, was driving me nuts trying to wrap my head around this but your explanation was perfect!</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-2164">
+		<div id="div-comment-2164">
+		<div class="cmtinfo"><em> on <a href="#comment-2164" title="">June 20, 2017 at 9:18 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=2164#respond" data-commentid="2164" data-postid="517" data-belowelement="div-comment-2164" data-respondelement="respond" data-replyto="Reply to Yarik" aria-label="Reply to Yarik">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/24447daf290705ecb520f11d33bc914297634d84b50fb01367bb2c5d700129e6?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Yarik</cite></div>
+						<p>Perfect! Thank you so much for ideal explanation</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+		<li class="comment even thread-even depth-1" id="comment-2971">
+		<div id="div-comment-2971">
+		<div class="cmtinfo"><em> on <a href="#comment-2971" title="">September 4, 2018 at 11:14 am</a> | <a rel="nofollow" class="comment-reply-link" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/?replytocom=2971#respond" data-commentid="2971" data-postid="517" data-belowelement="div-comment-2971" data-respondelement="respond" data-replyto="Reply to Joel Stevick" aria-label="Reply to Joel Stevick">Reply</a></em> <img alt="" src="https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=48&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=48&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=72&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=96&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=144&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/8f09324c45fda611ec6a3fdddcc2bdfb2c361ab69cf2db16ab49dc54be527c51?s=192&amp;d=identicon&amp;r=G 4x" class="avatar avatar-48 wp-hovercard-attachment grav-hashed grav-hijack" height="48" width="48" loading="lazy" decoding="async"> <cite>Joel Stevick</cite></div>
+						<p>Well done, thank you for you explanation.  The vital piece of information that really nailed-it for me was that the host is “relative to the gateway”</p>
+			<br style="clear: both">
+		</div>
+</li><!-- #comment-## -->
+	</ol>
+
+	<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+	<br>
+
+  <div class="post-content">
+<p>
+	<span class="commentsfeed"><a href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/feed/">Comments RSS</a></span>
+</p>
+</div>
+
+
+	<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a comment <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2012/03/21/ssh-tunnelling-explained/#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://chamibuddhika.wordpress.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+
+
+<div id="comment-form__verbum" class="transparent"></div><div class="verbum-form-meta"><input type="hidden" name="comment_post_ID" value="517" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+
+			<input type="hidden" name="highlander_comment_nonce" id="highlander_comment_nonce" value="d9b586bcea">
+			<input type="hidden" name="verbum_show_subscription_modal" value=""></div><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="09a25a6942"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="1718453633259"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+			</div>
+
+		
+		<p align="center"></p>
+
+	</div><!-- end id:content-main -->
+<div id="sidebar">
+<ul>
+<li class="sidebox"><h2>jkj</h2>			<div class="textwidget">
+</div>
+		</li><li class="sidebox"><style>.widget.widget_media_image { overflow: hidden; }.widget.widget_media_image img { height: auto; max-width: 100%; }</style><a href="http://www.dzone.com/user/412776"><img class="image alignnone" src="http://www.dzone.com/sites/all/files/big-mvbbutton.png" alt="" width="181" height="91"></a></li><li class="sidebox"><style>.widget.widget_media_image { overflow: hidden; }.widget.widget_media_image img { height: auto; max-width: 100%; }</style><a href="http://www.javacodegeeks.com/"><img class="image alignnone" src="http://4.bp.blogspot.com/_tWwHCKnIbjs/TPIBwpd71cI/AAAAAAAAAEw/3zbNwgbGYDM/s1600/logo_jcg_115x100.png" alt="Java Code Geeks Logo" width="181" height="91"></a></li><li class="sidebox"><form role="search" method="get" id="searchform" class="searchform" action="https://chamibuddhika.wordpress.com/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s">
+					<input type="submit" id="searchsubmit" value="Search">
+				</div>
+			</form></li><li class="sidebox"><h2>Archives</h2>
+			<ul>
+					<li><a href="https://chamibuddhika.wordpress.com/2012/08/">August 2012</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2012/07/">July 2012</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2012/06/">June 2012</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2012/05/">May 2012</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2012/03/">March 2012</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2012/02/">February 2012</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/12/">December 2011</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/11/">November 2011</a>&nbsp;(3)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/10/">October 2011</a>&nbsp;(3)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/09/">September 2011</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/08/">August 2011</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/07/">July 2011</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/06/">June 2011</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2011/05/">May 2011</a>&nbsp;(6)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2010/11/">November 2010</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2010/10/">October 2010</a>&nbsp;(4)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2010/05/">May 2010</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2010/04/">April 2010</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2010/03/">March 2010</a>&nbsp;(4)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2009/10/">October 2009</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2009/09/">September 2009</a>&nbsp;(1)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2009/08/">August 2009</a>&nbsp;(2)</li>
+	<li><a href="https://chamibuddhika.wordpress.com/2009/07/">July 2009</a>&nbsp;(4)</li>
+			</ul>
+
+			</li><li class="sidebox"><h2>Categories</h2>
+			<ul>
+					<li class="cat-item cat-item-40471"><a href="https://chamibuddhika.wordpress.com/category/concepts/">Concepts</a> (10)
+</li>
+	<li class="cat-item cat-item-1587"><a href="https://chamibuddhika.wordpress.com/category/foss/">FOSS</a> (1)
+</li>
+	<li class="cat-item cat-item-320"><a href="https://chamibuddhika.wordpress.com/category/guides/">Guides</a> (1)
+</li>
+	<li class="cat-item cat-item-3251196"><a href="https://chamibuddhika.wordpress.com/category/hadoop/">Hadoop</a> (2)
+</li>
+	<li class="cat-item cat-item-779"><a href="https://chamibuddhika.wordpress.com/category/how-tos/">How To's</a> (7)
+</li>
+	<li class="cat-item cat-item-875"><a href="https://chamibuddhika.wordpress.com/category/miscellaneous/">miscellaneous</a> (5)
+</li>
+	<li class="cat-item cat-item-2008"><a href="https://chamibuddhika.wordpress.com/category/projects/">Projects</a> (4)
+</li>
+	<li class="cat-item cat-item-47"><a href="https://chamibuddhika.wordpress.com/category/rants/">rants</a> (3)
+</li>
+	<li class="cat-item cat-item-309"><a href="https://chamibuddhika.wordpress.com/category/reviews/">Reviews</a> (1)
+</li>
+	<li class="cat-item cat-item-801"><a href="https://chamibuddhika.wordpress.com/category/security/">Security</a> (4)
+</li>
+	<li class="cat-item cat-item-11271"><a href="https://chamibuddhika.wordpress.com/category/soa/">SOA</a> (4)
+</li>
+	<li class="cat-item cat-item-1788"><a href="https://chamibuddhika.wordpress.com/category/tips/">Tips</a> (19)
+</li>
+	<li class="cat-item cat-item-1"><a href="https://chamibuddhika.wordpress.com/category/uncategorized/">Uncategorized</a> (2)
+</li>
+			</ul>
+
+			</li><li class="sidebox"><h2></h2><a href="https://chamibuddhika.wordpress.com/tag/apache-cassandra/" class="tag-cloud-link tag-link-33222905 tag-link-position-1" style="font-size: 15.636363636364pt;" aria-label="Apache Cassandra (3 items)">Apache Cassandra</a>
+<a href="https://chamibuddhika.wordpress.com/tag/apache-hadoop/" class="tag-cloud-link tag-link-5665468 tag-link-position-2" style="font-size: 15.636363636364pt;" aria-label="Apache Hadoop (3 items)">Apache Hadoop</a>
+<a href="https://chamibuddhika.wordpress.com/tag/apache-hive/" class="tag-cloud-link tag-link-44775221 tag-link-position-3" style="font-size: 8pt;" aria-label="Apache Hive (1 item)">Apache Hive</a>
+<a href="https://chamibuddhika.wordpress.com/tag/apache-ode/" class="tag-cloud-link tag-link-24514108 tag-link-position-4" style="font-size: 8pt;" aria-label="Apache ODE (1 item)">Apache ODE</a>
+<a href="https://chamibuddhika.wordpress.com/tag/apache-thrift/" class="tag-cloud-link tag-link-33748987 tag-link-position-5" style="font-size: 15.636363636364pt;" aria-label="Apache Thrift (3 items)">Apache Thrift</a>
+<a href="https://chamibuddhika.wordpress.com/tag/api/" class="tag-cloud-link tag-link-4276 tag-link-position-6" style="font-size: 8pt;" aria-label="API (1 item)">API</a>
+<a href="https://chamibuddhika.wordpress.com/tag/asynchronous-io/" class="tag-cloud-link tag-link-601936 tag-link-position-7" style="font-size: 8pt;" aria-label="Asynchronous I/O (1 item)">Asynchronous I/O</a>
+<a href="https://chamibuddhika.wordpress.com/tag/axis2/" class="tag-cloud-link tag-link-431179 tag-link-position-8" style="font-size: 8pt;" aria-label="Axis2 (1 item)">Axis2</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bam/" class="tag-cloud-link tag-link-180827 tag-link-position-9" style="font-size: 8pt;" aria-label="BAM (1 item)">BAM</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bash/" class="tag-cloud-link tag-link-2674 tag-link-position-10" style="font-size: 8pt;" aria-label="BASH (1 item)">BASH</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bindings/" class="tag-cloud-link tag-link-24044 tag-link-position-11" style="font-size: 8pt;" aria-label="Bindings (1 item)">Bindings</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bloom-filter/" class="tag-cloud-link tag-link-23736872 tag-link-position-12" style="font-size: 8pt;" aria-label="Bloom filter (1 item)">Bloom filter</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bnd/" class="tag-cloud-link tag-link-337877 tag-link-position-13" style="font-size: 12.581818181818pt;" aria-label="BND (2 items)">BND</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bpel/" class="tag-cloud-link tag-link-172842 tag-link-position-14" style="font-size: 8pt;" aria-label="BPEL (1 item)">BPEL</a>
+<a href="https://chamibuddhika.wordpress.com/tag/bpm/" class="tag-cloud-link tag-link-51757 tag-link-position-15" style="font-size: 8pt;" aria-label="BPM (1 item)">BPM</a>
+<a href="https://chamibuddhika.wordpress.com/tag/builds/" class="tag-cloud-link tag-link-116492 tag-link-position-16" style="font-size: 8pt;" aria-label="Builds (1 item)">Builds</a>
+<a href="https://chamibuddhika.wordpress.com/tag/business-activity-monitor/" class="tag-cloud-link tag-link-27522952 tag-link-position-17" style="font-size: 8pt;" aria-label="Business Activity Monitor (1 item)">Business Activity Monitor</a>
+<a href="https://chamibuddhika.wordpress.com/tag/cassandra/" class="tag-cloud-link tag-link-566348 tag-link-position-18" style="font-size: 15.636363636364pt;" aria-label="Cassandra (3 items)">Cassandra</a>
+<a href="https://chamibuddhika.wordpress.com/tag/cassandra-cli/" class="tag-cloud-link tag-link-63494176 tag-link-position-19" style="font-size: 8pt;" aria-label="cassandra-cli (1 item)">cassandra-cli</a>
+<a href="https://chamibuddhika.wordpress.com/tag/cep/" class="tag-cloud-link tag-link-343867 tag-link-position-20" style="font-size: 8pt;" aria-label="CEP (1 item)">CEP</a>
+<a href="https://chamibuddhika.wordpress.com/tag/command-line/" class="tag-cloud-link tag-link-33927 tag-link-position-21" style="font-size: 8pt;" aria-label="command line (1 item)">command line</a>
+<a href="https://chamibuddhika.wordpress.com/tag/debut/" class="tag-cloud-link tag-link-180724 tag-link-position-22" style="font-size: 8pt;" aria-label="Debut (1 item)">Debut</a>
+<a href="https://chamibuddhika.wordpress.com/tag/distributed/" class="tag-cloud-link tag-link-131459 tag-link-position-23" style="font-size: 8pt;" aria-label="distributed (1 item)">distributed</a>
+<a href="https://chamibuddhika.wordpress.com/tag/equinox/" class="tag-cloud-link tag-link-227712 tag-link-position-24" style="font-size: 12.581818181818pt;" aria-label="Equinox (2 items)">Equinox</a>
+<a href="https://chamibuddhika.wordpress.com/tag/extra-mile/" class="tag-cloud-link tag-link-835016 tag-link-position-25" style="font-size: 8pt;" aria-label="extra mile (1 item)">extra mile</a>
+<a href="https://chamibuddhika.wordpress.com/tag/felix/" class="tag-cloud-link tag-link-173349 tag-link-position-26" style="font-size: 12.581818181818pt;" aria-label="Felix (2 items)">Felix</a>
+<a href="https://chamibuddhika.wordpress.com/tag/hadoop/" class="tag-cloud-link tag-link-3251196 tag-link-position-27" style="font-size: 15.636363636364pt;" aria-label="Hadoop (3 items)">Hadoop</a>
+<a href="https://chamibuddhika.wordpress.com/tag/hector/" class="tag-cloud-link tag-link-563969 tag-link-position-28" style="font-size: 8pt;" aria-label="Hector (1 item)">Hector</a>
+<a href="https://chamibuddhika.wordpress.com/tag/introduction/" class="tag-cloud-link tag-link-885 tag-link-position-29" style="font-size: 8pt;" aria-label="Introduction (1 item)">Introduction</a>
+<a href="https://chamibuddhika.wordpress.com/tag/java/" class="tag-cloud-link tag-link-1017 tag-link-position-30" style="font-size: 8pt;" aria-label="Java (1 item)">Java</a>
+<a href="https://chamibuddhika.wordpress.com/tag/jms/" class="tag-cloud-link tag-link-254692 tag-link-position-31" style="font-size: 8pt;" aria-label="JMS (1 item)">JMS</a>
+<a href="https://chamibuddhika.wordpress.com/tag/jmx/" class="tag-cloud-link tag-link-373297 tag-link-position-32" style="font-size: 8pt;" aria-label="JMX (1 item)">JMX</a>
+<a href="https://chamibuddhika.wordpress.com/tag/kpi/" class="tag-cloud-link tag-link-359326 tag-link-position-33" style="font-size: 8pt;" aria-label="KPI (1 item)">KPI</a>
+<a href="https://chamibuddhika.wordpress.com/tag/map-reduce/" class="tag-cloud-link tag-link-2536815 tag-link-position-34" style="font-size: 8pt;" aria-label="map-reduce (1 item)">map-reduce</a>
+<a href="https://chamibuddhika.wordpress.com/tag/mapreduce/" class="tag-cloud-link tag-link-3859232 tag-link-position-35" style="font-size: 8pt;" aria-label="MapReduce (1 item)">MapReduce</a>
+<a href="https://chamibuddhika.wordpress.com/tag/maven/" class="tag-cloud-link tag-link-47862 tag-link-position-36" style="font-size: 12.581818181818pt;" aria-label="Maven (2 items)">Maven</a>
+<a href="https://chamibuddhika.wordpress.com/tag/nio/" class="tag-cloud-link tag-link-2090294 tag-link-position-37" style="font-size: 8pt;" aria-label="nio (1 item)">nio</a>
+<a href="https://chamibuddhika.wordpress.com/tag/non-blocking/" class="tag-cloud-link tag-link-11372355 tag-link-position-38" style="font-size: 8pt;" aria-label="non blocking (1 item)">non blocking</a>
+<a href="https://chamibuddhika.wordpress.com/tag/nosql/" class="tag-cloud-link tag-link-22319505 tag-link-position-39" style="font-size: 8pt;" aria-label="NoSQL (1 item)">NoSQL</a>
+<a href="https://chamibuddhika.wordpress.com/tag/operational-intelligence/" class="tag-cloud-link tag-link-4607629 tag-link-position-40" style="font-size: 8pt;" aria-label="Operational Intelligence (1 item)">Operational Intelligence</a>
+<a href="https://chamibuddhika.wordpress.com/tag/osgi/" class="tag-cloud-link tag-link-5165 tag-link-position-41" style="font-size: 22pt;" aria-label="OSGi (6 items)">OSGi</a>
+<a href="https://chamibuddhika.wordpress.com/tag/p2/" class="tag-cloud-link tag-link-338207 tag-link-position-42" style="font-size: 15.636363636364pt;" aria-label="p2 (3 items)">p2</a>
+<a href="https://chamibuddhika.wordpress.com/tag/port-forwarding/" class="tag-cloud-link tag-link-855164 tag-link-position-43" style="font-size: 8pt;" aria-label="Port forwarding (1 item)">Port forwarding</a>
+<a href="https://chamibuddhika.wordpress.com/tag/programming/" class="tag-cloud-link tag-link-196 tag-link-position-44" style="font-size: 8pt;" aria-label="Programming (1 item)">Programming</a>
+<a href="https://chamibuddhika.wordpress.com/tag/proper-documentation/" class="tag-cloud-link tag-link-23074566 tag-link-position-45" style="font-size: 8pt;" aria-label="proper documentation (1 item)">proper documentation</a>
+<a href="https://chamibuddhika.wordpress.com/tag/rampart/" class="tag-cloud-link tag-link-1085238 tag-link-position-46" style="font-size: 8pt;" aria-label="Rampart (1 item)">Rampart</a>
+<a href="https://chamibuddhika.wordpress.com/tag/review/" class="tag-cloud-link tag-link-1745 tag-link-position-47" style="font-size: 8pt;" aria-label="Review (1 item)">Review</a>
+<a href="https://chamibuddhika.wordpress.com/tag/rpc/" class="tag-cloud-link tag-link-148989 tag-link-position-48" style="font-size: 8pt;" aria-label="RPC (1 item)">RPC</a>
+<a href="https://chamibuddhika.wordpress.com/tag/security/" class="tag-cloud-link tag-link-801 tag-link-position-49" style="font-size: 8pt;" aria-label="Security (1 item)">Security</a>
+<a href="https://chamibuddhika.wordpress.com/tag/servlet/" class="tag-cloud-link tag-link-68800 tag-link-position-50" style="font-size: 8pt;" aria-label="Servlet (1 item)">Servlet</a>
+<a href="https://chamibuddhika.wordpress.com/tag/soa/" class="tag-cloud-link tag-link-11271 tag-link-position-51" style="font-size: 12.581818181818pt;" aria-label="SOA (2 items)">SOA</a>
+<a href="https://chamibuddhika.wordpress.com/tag/ssh/" class="tag-cloud-link tag-link-49320 tag-link-position-52" style="font-size: 8pt;" aria-label="SSH (1 item)">SSH</a>
+<a href="https://chamibuddhika.wordpress.com/tag/ssl/" class="tag-cloud-link tag-link-58302 tag-link-position-53" style="font-size: 8pt;" aria-label="SSL (1 item)">SSL</a>
+<a href="https://chamibuddhika.wordpress.com/tag/svn/" class="tag-cloud-link tag-link-164684 tag-link-position-54" style="font-size: 20.218181818182pt;" aria-label="SVN (5 items)">SVN</a>
+<a href="https://chamibuddhika.wordpress.com/tag/synchronization/" class="tag-cloud-link tag-link-141950 tag-link-position-55" style="font-size: 8pt;" aria-label="synchronization (1 item)">synchronization</a>
+<a href="https://chamibuddhika.wordpress.com/tag/tips/" class="tag-cloud-link tag-link-1788 tag-link-position-56" style="font-size: 20.218181818182pt;" aria-label="Tips (5 items)">Tips</a>
+<a href="https://chamibuddhika.wordpress.com/tag/tomcat/" class="tag-cloud-link tag-link-7585 tag-link-position-57" style="font-size: 8pt;" aria-label="Tomcat (1 item)">Tomcat</a>
+<a href="https://chamibuddhika.wordpress.com/tag/tunnelling/" class="tag-cloud-link tag-link-2214000 tag-link-position-58" style="font-size: 8pt;" aria-label="tunnelling (1 item)">tunnelling</a>
+<a href="https://chamibuddhika.wordpress.com/tag/work/" class="tag-cloud-link tag-link-131 tag-link-position-59" style="font-size: 8pt;" aria-label="work (1 item)">work</a>
+<a href="https://chamibuddhika.wordpress.com/tag/workrave/" class="tag-cloud-link tag-link-716432 tag-link-position-60" style="font-size: 8pt;" aria-label="workrave (1 item)">workrave</a>
+<a href="https://chamibuddhika.wordpress.com/tag/wsdl/" class="tag-cloud-link tag-link-12954 tag-link-position-61" style="font-size: 8pt;" aria-label="WSDL (1 item)">WSDL</a>
+<a href="https://chamibuddhika.wordpress.com/tag/zookeeper/" class="tag-cloud-link tag-link-425781 tag-link-position-62" style="font-size: 8pt;" aria-label="Zookeeper (1 item)">Zookeeper</a></li><li class="sidebox">			<div class="textwidget"><!-- Site Meter -->
+<a href="http://s51.sitemeter.com/stats.asp?site=s51chami" target="_top" rel="noopener">
+<img src="https://i0.wp.com/s51.sitemeter.com/meter.asp" alt="Site Meter" border="0"></a>
+<!-- Copyright (c)2009 Site Meter -->
+
+</div>
+		</li></ul>
+</div><!-- end id:sidebar -->
+</div><!-- end id:content -->
+</div><!-- end id:container -->
+<div id="footer">
+	<div id="colophon">
+		<p></p>
+		<p>WPThemes.</p>
+		<br class="clear">
+	</div><!-- end #colophon-->
+</div><!-- end #footer-->
+<!--  -->
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=2024244cee4591fae4bea45ee2571078613ea2fab8a404a7b5ceb1cf2b511ebc67fadd" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i"></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile': 'Edit your profile',
+							'View profile': 'View profile',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.': 'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-cbb88e52abd8060e7659bcc78cb5b779">
+	</div>
+	<div class="grofile-hash-map-c545780442a6d104ced0f1a3bd4a425c">
+	</div>
+	<div class="grofile-hash-map-b011ce8d06af37494297df445af49766">
+	</div>
+	<div class="grofile-hash-map-db4fe100dde17c67afb85968b218e002">
+	</div>
+	<div class="grofile-hash-map-84f163a93fac7269eef7c5c0aac13923">
+	</div>
+	<div class="grofile-hash-map-6d0dd3eb364c25a6f257372de43ecca6">
+	</div>
+	<div class="grofile-hash-map-dd4455cbc334a6b5564c561bfba69b86">
+	</div>
+	<div class="grofile-hash-map-0191ee7db4816a1eca3584e098e0556d">
+	</div>
+	<div class="grofile-hash-map-dc17dbee627186cf0acd2dce3b4a69fe">
+	</div>
+	<div class="grofile-hash-map-7acd0f1d0b4d32aecfd322076cdd0080">
+	</div>
+	<div class="grofile-hash-map-efaefb5c173b01fd8c7af6246f5202c7">
+	</div>
+	<div class="grofile-hash-map-6ab9b02c46853a404cf40168c5a6af69">
+	</div>
+	<div class="grofile-hash-map-0d206661083d31b80da71ee2b9078064">
+	</div>
+	<div class="grofile-hash-map-889fad55e7caa287ec6426d465eeca23">
+	</div>
+	<div class="grofile-hash-map-d0468d83bba5eff38b3bd3ce6c1c572f">
+	</div>
+	<div class="grofile-hash-map-89a3497548725edccb5a99884297e415">
+	</div>
+	<div class="grofile-hash-map-af1df65f785e8f4f9a6ea927fe4484d8">
+	</div>
+	<div class="grofile-hash-map-dce9c8f8a5185e8163921aa5ba3b7640">
+	</div>
+	<div class="grofile-hash-map-a5272bf15230d3c29c4cfe8626dbaeed">
+	</div>
+	<div class="grofile-hash-map-bd403ced595fa2261d50201fac297d36">
+	</div>
+	<div class="grofile-hash-map-7832bf4210a680b6a981afca4aba1a2b">
+	</div>
+	<div class="grofile-hash-map-4cbb06a82caf39f4344fd0ae4c1c4402">
+	</div>
+	<div class="grofile-hash-map-fdfb1d0072e0eecdd89d108a929dbaa3">
+	</div>
+	</div>
+	<div id="actionbar" class="actnbr-pub-mistylook actnbr-has-follow">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-comment" href="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/#comments">
+							<svg class="gridicon gridicons-comment" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M12 16l-5 5v-5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2h-7z"></path></g></svg>							<span>Comment						</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-reblog" href="">
+							<svg class="gridicon gridicons-reblog" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.086 9.914L20 7.828V18c0 1.105-.895 2-2 2h-7v-2h7V7.828l-2.086 2.086L14.5 8.5 19 4l4.5 4.5-1.414 1.414zM6 16.172V6h7V4H6c-1.105 0-2 .895-2 2v10.172l-2.086-2.086L.5 15.5 5 20l4.5-4.5-1.414-1.414L6 16.172z"></path></g></svg><span>Reblog</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://chamibuddhika.wordpress.com">
+				<img alt="" src="https://s0.wp.com/i/logo/wpcom-gray-white.png" srcset="https://s0.wp.com/i/logo/wpcom-gray-white.png 1x" class="avatar avatar-50" height="50" width="50">				Source Open			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 25 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address">
+										</div>
+										<input type="hidden" name="action" value="subscribe">
+										<input type="hidden" name="blog_id" value="11192597">
+										<input type="hidden" name="source" value="https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/">
+										<input type="hidden" name="sub-type" value="actionbar-follow">
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="dfa2cf225c">										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F&amp;signup_flow=account">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+									<li class="actnbr-btn actnbr-hidden no-display" onclick="javascript:__tcfapi( 'showUi' );">
+						<a class="actnbr-action actnbr-actn-privacy" href="#">
+							<svg class="gridicon gridicons-info-outline" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M13 9h-2V7h2v2zm0 2h-2v6h2v-6zm-1-7c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8m0-2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path></g></svg>							<span>Privacy						</span>
+						</a>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"></path></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+									<li class="actnbr-sitename">
+			<a href="https://chamibuddhika.wordpress.com">
+				<img alt="" src="https://s0.wp.com/i/logo/wpcom-gray-white.png" srcset="https://s0.wp.com/i/logo/wpcom-gray-white.png 1x" class="avatar avatar-50" height="50" width="50">				Source Open			</a>
+		</li>
+								<li class="actnbr-folded-customize">
+								<a href="https://chamibuddhika.wordpress.com/wp-admin/customize.php?url=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F">
+									<svg class="gridicon gridicons-customize" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M2 6c0-1.505.78-3.08 2-4 0 .845.69 2 2 2 1.657 0 3 1.343 3 3 0 .386-.08.752-.212 1.09.74.594 1.476 1.19 2.19 1.81L8.9 11.98c-.62-.716-1.214-1.454-1.807-2.192C6.753 9.92 6.387 10 6 10c-2.21 0-4-1.79-4-4zm12.152 6.848l1.34-1.34c.607.304 1.283.492 2.008.492 2.485 0 4.5-2.015 4.5-4.5 0-.725-.188-1.4-.493-2.007L18 9l-2-2 3.507-3.507C18.9 3.188 18.225 3 17.5 3 15.015 3 13 5.015 13 7.5c0 .725.188 1.4.493 2.007L3 20l2 2 6.848-6.848c1.885 1.928 3.874 3.753 5.977 5.45l1.425 1.148 1.5-1.5-1.15-1.425c-1.695-2.103-3.52-4.092-5.448-5.977z"></path></g></svg>									<span>Customize</span>
+								</a>
+							</li>
+																<li class="actnbr-folded-follow">
+												<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+										</li>
+																	<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+									<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F&amp;signup_flow=account">Log in</a></li>
+																	<li class="actnbr-shortlink"><a href="https://wp.me/pKXHL-8l">Copy shortlink</a></li>
+																	<li class="flb-report">
+										<a href="https://wordpress.com/abuse/?report_url=https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/" target="_blank" rel="noopener noreferrer">
+											Report this content										</a>
+									</li>
+																	<li class="actnbr-reader">
+										<a href="https://wordpress.com/read/blogs/11192597/posts/517">
+											View post in Reader										</a>
+									</li>
+																	<li class="actnbr-subs">
+										<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+									</li>
+																		<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+															</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+			<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading">&nbsp;</span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div class="jp-carousel-wrap swiper-container jp-carousel-swiper-container jp-carousel-transitions" itemscope="" itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"></path>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Loading Comments...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner">&nbsp;</span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Write a Comment...</label>
+												<textarea name="comment" class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea" id="jp-carousel-comment-form-comment-field" placeholder="Write a Comment..."></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Email (Required)</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Name (Required)</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Website</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field">
+															</fieldset>
+																											</div>
+													<input type="submit" name="submit" class="jp-carousel-comment-form-button" id="jp-carousel-comment-form-button-submit" value="Post Comment">
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"></path>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+		
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/chamibuddhika.wordpress.com\/2012\/03\/21\/ssh-tunnelling-explained\/":517};
+	</script>
+				<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJzTLy/QTc7PK0nNK9EvyClNz8wr1i+uzCtJrMjITM/IAeKS1CJMEWP94uSizIISoOIM5/yiVL2sYh19yo1yKiotzojIzQEaZ59ra2hmamZqZGphapEFAJBuP8E="></script>
+<script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.head.appendChild( corecss );
+		var themecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414i&amp;ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		document.head.appendChild( themecss );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+
+	// Infinite scroll support
+	document.addEventListener( 'is.post-load', function () {
+		SyntaxHighlighter.highlight();
+	} );
+</script>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-2" href="https://s0.wp.com/_static/??-eJyljEsKgDAMBS9kDUUquhDPom0Qaz/BNHh9KdgTuBl4w2PgIWVzKpgKRFEU5DgTg8dCm72+DTHnCicBGex2Z2EMwM9JeKtdkgvYW+YOftTaqYkaXOOix8noQU+z8S9MR0BZ&amp;cssminify=yes" type="text/css" media="all">
+<script type="text/javascript" id="jetpack-carousel-js-extra">
+/* <![CDATA[ */
+var jetpackSwiperLibraryPath = {"url":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-plugin\/moon\/_inc\/build\/carousel\/swiper-bundle.min.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https:\/\/chamibuddhika.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"78b441f116","display_exif":"1","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","download_original":"View full size <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","copyright":"Copyright","comment_registration":"0","require_name_email":"1","login_url":"https:\/\/chamibuddhika.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fchamibuddhika.wordpress.com%2F2012%2F03%2F21%2Fssh-tunnelling-explained%2F","blog_id":"11192597","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"],"stats_query_args":"blog=11192597&v=wpcom&tz=-5&user_id=0&subd=chamibuddhika","is_public":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="verbum-settings-js-before">
+/* <![CDATA[ */
+window.VerbumComments = {"Log in or provide your name and email to leave a reply.":"Log in or provide your name and email to leave a reply.","Log in or provide your name and email to leave a comment.":"Log in or provide your name and email to leave a comment.","Receive web and mobile notifications for posts on this site.":"Receive web and mobile notifications for posts on this site.","Name":"Name","Email (address never made public)":"Email (address never made public)","Website (optional)":"Website (optional)","Leave a reply. (log in optional)":"Leave a reply. (log in optional)","Leave a comment. (log in optional)":"Leave a comment. (log in optional)","Log in to leave a reply.":"Log in to leave a reply.","Log in to leave a comment.":"Log in to leave a comment.","Logged in via %s":"Logged in via %s","Log out":"Log out","Email":"Email","(Address never made public)":"(Address never made public)","Instantly":"Instantly","Daily":"Daily","Reply":"Reply","Comment":"Comment","WordPress":"WordPress","Weekly":"Weekly","Notify me of new posts":"Notify me of new posts","Email me new posts":"Email me new posts","Email me new comments":"Email me new comments","Cancel":"Cancel","Write a comment...":"Write a comment...","Write a reply...":"Write a reply...","Website":"Website","Optional":"Optional","We'll keep you in the loop!":"We'll keep you in the loop!","Loading your comment...":"Loading your comment...","Discover more from":"Discover more from Source Open","Subscribe now to keep reading and get access to the full archive.":"Subscribe now to keep reading and get access to the full archive.","Continue reading":"Continue reading","Never miss a beat!":"Never miss a beat!","Interested in getting blog post updates? Simply click the button below to stay in the loop!":"Interested in getting blog post updates? Simply click the button below to stay in the loop!","Enter your email address":"Enter your email address","Subscribe":"Subscribe","Comment sent successfully":"Comment sent successfully","Save my name, email, and website in this browser for the next time I comment.":"Save my name, email, and website in this browser for the next time I comment.","siteId":11192597,"postId":517,"mustLogIn":false,"requireNameEmail":true,"commentRegistration":false,"connectURL":"https:\/\/chamibuddhika.wordpress.com\/public.api\/connect\/?action=request","logoutURL":"https:\/\/chamibuddhika.wordpress.com\/wp-login.php?action=logout&_wpnonce=2278a86270","homeURL":"https:\/\/chamibuddhika.wordpress.com\/","subscribeToBlog":true,"subscribeToComment":true,"isJetpackCommentsLoggedIn":false,"jetpackUsername":"","jetpackUserId":0,"jetpackSignature":"","jetpackAvatar":"https:\/\/0.gravatar.com\/avatar\/?s=96&amp;d=identicon&amp;r=G","enableBlocks":true,"enableSubscriptionModal":true,"currentLocale":"en","isJetpackComments":false,"allowedBlocks":["core\/paragraph","core\/list","core\/code","core\/list-item","core\/quote","core\/image","core\/embed","core\/quote","core\/code"],"embedNonce":"91e5299d3d","verbumBundleUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/moon\/vendor\/automattic\/jetpack-mu-wpcom\/src\/features\/verbum-comments\/dist\/index.js","isRTL":false,"vbeCacheBuster":1717067639}
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJydUFtOxDAMvBCpu6JSvxBHQd7Y7KaNkxAnrHp7oiXlIRAgvuKMxzNjwyUZG0PhUECqSb6eXFDwbmWFp8qVzxjIcx4WvYHvyQuXhHY1DbokG6U3QGIM8MyBYgasJQqW4uwXOmi2cKzOUyPnY5XmIdI8FFCV20NbQHHW+Ij0nsQF6yu1mItCnzCZk98GceEPcT+mfGhiPYPFHKuyf+PtwC+yuDoVLuZ2GF/lduAxX8n0w+xu0Q/y+fv/VfSMmQmJtmvpwqnvcC93h/kwT+M0ztPyAiQjwdU="></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<iframe src="https://widgets.wp.com/likes/master.html?ver=20240612#ver=20240612&amp;origin=https://chamibuddhika.wordpress.com" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars" class="wpl-new-layout" role="dialog" aria-hidden="true" tabindex="-1">
+		<div class="likes-text">
+			<span>%d</span>		</div>
+		<ul class="wpl-avatars sd-like-gravatars"></ul>
+	</div>
+
+		<script src="//stats.wp.com/w.js?67" defer=""></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'11192597','blog_tz':'-5','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'11192597','v':'wpcom','tz':'-5','user_id':'0','post':'517','subd':'chamibuddhika'}]);
+		_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1oMUpKVjdLUHY1WldoajE/MT9jXTVxa1MyMC4wRSx6c0k0VD0zQmxBSm1WZjJIPW1LRXdBR0tVOS13ekNmUz0wS0JqeW9KZWlpMHosQW9hL2otX2w4fmoveDJtbHZpL3pvVlV4fC1mRy15RT9FXVNnW2Y4M11LcHgmWFd4aTVMVkRoUl1mOUwva0hlZVl2ZmFFRWdGRE8wa0tadkc9aXxuUXhQSTlbUiZjbmxNd1ZVYjFjUkgtRE9zUWt6ckxdak5aTTRxUU9JZ0VEK3QlcnVIcUItRHksdW1DS29iZVZdJVJbNDklY2JQM0NUPWFDc1FZVS9iRnFudmosV35aOGt2eFNWVz10ck1hZHE3YnA/OXZwenI='}]);
+_stq.push([ 'clickTrackerInit', '11192597', '517' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+<script type="disabled" id="wp-enqueue-dynamic-script:wp-i18n:after:1">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+</script>
+
+<script>
+(function() {
+	'use strict';
+
+	const fetches = {};
+	const promises = {};
+	const urls = {
+		'wp-polyfill': 'https://s0.wp.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?m=1710866488i&ver=3.15.0',
+		'wp-hooks': 'https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/hooks/index.min.js?m=1716578158i&ver=3aee234ea7807d8d70bc',
+		'wp-i18n': 'https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/i18n/index.min.js?m=1716578158i&ver=5baa98e4345eccc97e24',
+		'verbum': 'https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/moon/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.js?m=1718212087i&minify=false&ver=f722f8e738413ba13e41'
+	};
+	const loaders = {
+		'verbum': () => {
+			fetchExternalScript('wp-polyfill');
+			fetchExternalScript('wp-hooks');
+			fetchExternalScript('wp-i18n');
+			fetchExternalScript('verbum');
+			promises['wp-polyfill'] = promises['wp-polyfill'] || loadWPScript('wp-polyfill');
+			promises['wp-hooks'] = promises['wp-hooks'] || promises['wp-polyfill'].then( () => loadWPScript('wp-hooks') );
+			promises['wp-i18n'] = promises['wp-i18n'] || Promise.all( [ promises['wp-hooks'], promises['wp-polyfill'],  ] ).then( () => loadWPScript('wp-i18n') );
+			promises['verbum'] = promises['verbum'] || promises['wp-i18n'].then( () => loadWPScript('verbum') );
+			return promises['verbum'];
+		},
+		
+	};
+	const scriptExtras = {
+		'wp-i18n': { translations: 0, before: 0, after: 1 },
+		
+	};
+
+	window.WP_Enqueue_Dynamic_Script = {
+		loadScript: (handle) => {
+			if (!loaders[handle]) {
+				console.error('WP_Enqueue_Dynamic_Script: unregistered script `' + handle + '`.');
+			}
+			return loaders[handle]();
+		}
+	};
+
+	function fetchExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		fetches[handle] = fetches[handle] || fetch(urls[handle], { mode: 'no-cors' });
+		return fetches[handle];
+	}
+
+	function runExtraScript(handle, type, index) {
+		const id = 'wp-enqueue-dynamic-script:' + handle + ':' + type + ':' + (index + 1);
+		const template = document.getElementById(id);
+		if (!template) {
+			return Promise.reject();
+		}
+
+		const script = document.createElement( 'script' );
+		script.innerHTML = template.innerHTML;
+		document.body.appendChild( script );
+		return Promise.resolve();
+	}
+
+	function loadExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		return fetches[handle].then(() => {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.onload = () => resolve();
+				script.onerror = (e) => reject(e);
+				script.src = urls[handle];
+				document.body.appendChild(script);
+			});
+		});
+	}
+
+	function loadExtra(handle, pos) {
+		const count = (scriptExtras[handle] && scriptExtras[handle][pos]) || 0;
+		let promise = Promise.resolve();
+
+		for (let i = 0; i < count; i++) {
+			promise = promise.then(() => runExtraScript(handle, pos, i));
+		}
+
+		return promise;
+	}
+
+	function loadWPScript(handle) {
+		// Core loads scripts in this order. See: https://github.com/WordPress/WordPress/blob/a59eb9d39c4fcba834b70c9e8dfd64feeec10ba6/wp-includes/class-wp-scripts.php#L428.
+		return loadExtra(handle, 'translations')
+			.then(() => loadExtra(handle, 'before'))
+			.then(() => loadExternalScript(handle))
+			.then(() => loadExtra(handle, 'after'));
+	}
+} )();
+</script>
+
+<script src="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122" defer=""></script></body></html>

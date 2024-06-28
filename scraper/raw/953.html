@@ -1,0 +1,108 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+    <title>The Yasm Modular Assembler Project</title>
+    <link href="/stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+  </head>
+
+  <body>
+    <div id="header">
+      <a id="logo" href="/"><img src="/banner.png" alt="Yasm" height="93" width="244"></a>
+
+    </div>
+
+    <div id="left">
+      <div id="menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/Download.html">Download</a></li>
+          <li><a href="/Guide.html">Documentation</a></li>
+          <li><a href="/HowToContribute.html">Participate</a></li>
+	  <li><a href="/MailingList.html">Mailing lists</a></li>
+      	</ul>
+      	<ul>
+          <li><a href="http://github.com/yasm/yasm">GitHub</a></li>
+          <li><a href="http://tortall.lighthouseapp.com/projects/78676-yasm">Bug Tracker</a></li>
+          <li><a href="http://github.com/yasm/yasm/wiki">Wiki</a></li>
+          <li><a href="http://github.com/yasm/yasm/wiki/Faq">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="content">
+        <h1 id="the-yasm-modular-assembler-project">The Yasm Modular Assembler Project</h1>
+
+<p><strong>Yasm</strong> is a complete rewrite of the <a href="http://nasm.sf.net/">NASM assembler</a> under the <a href="http://github.com/yasm/yasm/blob/master/BSD.txt">“new” BSD License</a> (some portions are under other licenses, see <a href="http://github.com/yasm/yasm/blob/master/COPYING">COPYING</a> for details).</p>
+
+<p>Yasm currently supports the x86 and AMD64 instruction sets, accepts NASM and GAS assembler syntaxes, outputs binary, ELF32, ELF64, 32 and 64-bit Mach-O, RDOFF2, COFF, Win32, and Win64 object formats, and generates source debugging information in STABS, DWARF 2, and CodeView 8 formats.</p>
+
+<p>Yasm can be easily integrated into Visual Studio <a href="http://github.com/yasm/yasm/wiki/VisualStudio2005">2005/2008</a> and <a href="http://www.tortall.net/projects/yasm/manual/html/vsyasm.html">2010</a> for assembly of NASM or GAS syntax code into Win32 or Win64 object files.</p>
+
+<h1 id="key-current-user-visible-features">Key Current User-Visible Features</h1>
+
+<ul>
+  <li>Nearly feature-complete lexing and parsing of <a href="http://github.com/yasm/yasm/wiki/NasmSyntax">NASM syntax</a>.</li>
+  <li>Basic support for <a href="http://github.com/yasm/yasm/wiki/TasmSyntax">TASM syntax</a>.</li>
+  <li>Nearly feature-complete lexing and parsing of <a href="http://github.com/yasm/yasm/wiki/GasSyntax">GAS (GNU assembler) syntax</a>.</li>
+  <li><a href="http://github.com/yasm/yasm/wiki/AMD64">AMD64</a> support (enabled using “BITS 64”, “-m amd64”, or selecting an explicitly 64-bit object format output such as “-f win64” or “-f elf64”)</li>
+  <li>64-bit (and larger) integer constants allowed (including math operations).</li>
+  <li>A fast jump size optimizer equivalent to or better than other assemblers’ multi-pass optimizers.</li>
+  <li>Support for multiple object formats:
+    <ul>
+      <li><a href="http://github.com/yasm/yasm/wiki/BinaryObject">Binary object file</a> output (NASM style).</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/CoffObject">COFF object file</a> output, for use with DJGPP.</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/Win32Object">Win32 object file</a> output.</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/Win64Object">Win64/AMD64 aka “x64” object file</a> output
+(supports <a href="http://www.tortall.net/projects/yasm/manual/html/objfmt-win64-exception.html">structured exception handling</a>).</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/RdfObject">RDOFF2 object file</a> output.</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/ElfObject">ELF32 and ELF64 object file</a> output.</li>
+      <li><a href="http://github.com/yasm/yasm/wiki/MachObject">32 and 64-bit Mach-O object file</a> output.</li>
+    </ul>
+  </li>
+  <li><a href="http://github.com/yasm/yasm/wiki/StabsDebug">STABS</a>, <a href="http://github.com/yasm/yasm/wiki/DwarfDebug">DWARF2</a>, and <a href="http://github.com/yasm/yasm/wiki/CodeViewDebug">CodeView</a> debug formats.</li>
+  <li>Portability; currently compilable on:
+    <ul>
+      <li>UNIX and compatibles (32-bit and 64-bit FreeBSD and Linux tested, GNU configure based autoconfiguration)</li>
+      <li>DOS (using <a href="http://www.delorie.com/djgpp/">DJGPP</a>)</li>
+      <li>Windows (using <a href="http://msdn.microsoft.com/vstudio/">Visual C++</a> or <a href="http://www.cygwin.com/">CygWin</a>).</li>
+    </ul>
+  </li>
+  <li>Internationalization support via <a href="http://www.gnu.org/software/gettext/gettext.html">GNU gettext</a>.</li>
+</ul>
+
+<h1 id="key-internal-features">Key Internal Features</h1>
+
+<p>The core focus of <strong>Yasm</strong> is not the <em>yasm</em> commandline frontend; rather, it is the <a href="http://github.com/yasm/yasm/wiki/Libyasm">Libyasm</a> library and associated <a href="http://github.com/yasm/yasm/wiki/LoadableModules">loadable modules</a> (see the <a href="http://github.com/yasm/yasm/wiki/ProgrammerReferences">programmer references</a> for documentation).  Libyasm and the modules are intended for reuse in other sorts of programs dealing with code at the assembly level (compilers, debuggers, etc). Someday, libyasm may be packaged separately from the rest of <strong>Yasm</strong>.</p>
+
+<ul>
+  <li>
+    <p>A NASM syntax and GAS syntax recursive-descent parser.</p>
+  </li>
+  <li>
+    <p>Architecture-specific instruction parsers hand-written for simplicity and size, as well as to make it easy to add additional architectures while retaining the same front-end syntax. The blend of recursive descent for syntax and a hand-written parser for instructions strikes a great balance between the strengths and weaknesses of each approach.</p>
+  </li>
+  <li>
+    <p>A <a href="http://github.com/yasm/yasm/wiki/NasmSyntax">NASM syntax</a> lexer written in re2c. A highly efficient scanner generator (almost always faster than lex/flex), it’s also very embeddable due to its code generation methodology, allowing a number of re2c scanners to be used in various places in yasm without any worries about naming conflicts.</p>
+  </li>
+  <li>
+    <p>A <a href="http://github.com/yasm/yasm/wiki/GasSyntax">GAS syntax</a> lexer written in re2c.</p>
+  </li>
+  <li>
+    <p>Many of the modular interfaces at least superficially finished. This is still an area that needs a lot of work.</p>
+  </li>
+  <li>
+    <p>A small set of portable equivalents of useful functions that are standard on some systems (detected via configure), such as the <a href="http://www.freebsd.org/cgi/man.cgi?query=queue&amp;sektion=3">queue(3)</a> set of functions, strdup, <a href="http://www.freebsd.org/cgi/man.cgi?query=strcasecmp&amp;sektion=3">strcasecmp</a>, and <a href="http://www.freebsd.org/cgi/man.cgi?query=mergesort&amp;sektion=3">mergesort</a>.</p>
+  </li>
+  <li>
+    <p>A decent (and growing) set of assembler test input files to test the entire assembler as well as specific modules. </p>
+  </li>
+</ul>
+
+
+      </div>
+    </div>
+  
+
+</body></html>

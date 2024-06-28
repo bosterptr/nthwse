@@ -1,0 +1,328 @@
+<html lang="en"><head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>
+				Hunting With YARA
+		</title>
+		<link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i&amp;display=swap" rel="stylesheet">
+		<link href="https://support.unpac.me/assets/css/screen.min.css?v=a4a89a484c" rel="stylesheet">
+		<link rel="icon" href="https://support.unpac.me/content/images/size/w256h256/2023/11/favicon.png" type="image/png">
+    <link rel="canonical" href="https://support.unpac.me/howto/hunting-with-yara/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="UnpacMe Support">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Hunting With YARA">
+    <meta property="og:description" content="The following are a series of mini-tutorials that can help you get the most out of your YARA rules!
+
+
+Introduction
+
+YARA is an open-source tool used for identifying and classifying malware samples. It's essentially a pattern matching tool that allows researchers to create descriptions of malware families (rules) based on">
+    <meta property="og:url" content="https://support.unpac.me/howto/hunting-with-yara/">
+    <meta property="og:image" content="https://support.unpac.me/content/images/size/w1200/2023/11/unpacme_banner-1.png">
+    <meta property="article:published_time" content="2024-04-02T05:07:00.000Z">
+    <meta property="article:modified_time" content="2024-04-02T05:07:23.000Z">
+    <meta property="article:tag" content="howto">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Hunting With YARA">
+    <meta name="twitter:description" content="The following are a series of mini-tutorials that can help you get the most out of your YARA rules!
+
+
+Introduction
+
+YARA is an open-source tool used for identifying and classifying malware samples. It's essentially a pattern matching tool that allows researchers to create descriptions of malware families (rules) based on">
+    <meta name="twitter:url" content="https://support.unpac.me/howto/hunting-with-yara/">
+    <meta name="twitter:image" content="https://support.unpac.me/content/images/size/w1200/2023/11/unpacme_banner-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Sergei Frankoff">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="howto">
+    <meta name="twitter:site" content="@unpacme">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="675">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "UnpacMe Support",
+        "url": "https://support.unpac.me/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://support.unpac.me/content/images/2023/11/unpacme_name_clean.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Sergei Frankoff",
+        "url": "https://support.unpac.me/author/sergei/",
+        "sameAs": []
+    },
+    "headline": "Hunting With YARA",
+    "url": "https://support.unpac.me/howto/hunting-with-yara/",
+    "datePublished": "2024-04-02T05:07:00.000Z",
+    "dateModified": "2024-04-02T05:07:23.000Z",
+    "keywords": "howto",
+    "description": "The following are a series of mini-tutorials that can help you get the most out of your YARA rules!\n\n\nIntroduction\n\nYARA is an open-source tool used for identifying and classifying malware samples. It&#x27;s essentially a pattern matching tool that allows researchers to create descriptions of malware families (rules) based on strings or binary patterns. These rules can then be used with the YARA engine to scan files for matches.\n\nIn addition to the open source YARA tool, YARA has been integrated into",
+    "mainEntityOfPage": "https://support.unpac.me/howto/hunting-with-yara/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.85">
+    <link rel="alternate" type="application/rss+xml" title="UnpacMe Support" href="https://support.unpac.me/rss/">
+    
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="8fe0db70376bb6f6ad217c43c3" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://unpacme.ghost.io/" crossorigin="anonymous"></script>
+    
+    <link href="https://support.unpac.me/webmentions/receive/" rel="webmention">
+    <script defer="" src="/public/cards.min.js?v=a4a89a484c"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=a4a89a484c">
+    
+<style>
+  .kg-image-card {
+    text-align: center;
+    display: grid;
+    justify-content: center;
+  }
+  .hero-title {
+    font-weight: 100;
+  }
+  #js-show-all-topic{
+    display: none;
+  }
+  .section-topic .js-cards {
+        max-width: 19rem;
+  }
+  .dark-faq {
+      background-color: #151425;
+  }
+  .dark-title {
+    color: white;
+    padding-top: 25px;
+  }
+  .dark-wrap {
+        background: white;
+  }
+  .dark-foot {
+        padding-bottom: 25px;
+  }
+  .dark-button {
+    background: white;
+    color: black;
+  }
+  .dark-button:hover {
+    color: black;
+  }
+</style><style>:root {--ghost-accent-color: #151425;}</style>
+	<style type="text/css">.medium-zoom-overlay{bottom:0;left:0;opacity:0;position:fixed;right:0;top:0;transition:opacity .3s;will-change:opacity}.medium-zoom--opened .medium-zoom-overlay{cursor:pointer;cursor:zoom-out;opacity:1}.medium-zoom-image{cursor:pointer;cursor:zoom-in;transition:transform .3s cubic-bezier(.2,0,.2,1)}.medium-zoom-image--hidden{visibility:hidden}.medium-zoom-image--opened{cursor:pointer;cursor:zoom-out;position:relative;will-change:transform}</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style></head>
+	<body class="post-template tag-howto">
+		<div class="site-wrap">
+		<header class="site-header">
+    <div class="container flex header-inner">
+        <div class="logo">
+            <a href="https://www.unpac.me/"><img class="logo-image" src="https://support.unpac.me/content/images/2023/11/unpacme_name_clean.png" alt="UnpacMe Support"></a>
+        </div>
+        <div class="header-right flex">
+            <nav class="nav-wrap">
+    <ul class="nav-list">
+        <li class="nav-item "><a href="https://support.unpac.me">Home</a></li>
+<li class="nav-item "><a href="https://api.unpac.me">API</a></li>
+
+    </ul>
+</nav>        </div>
+        <div class="menu-icon" id="menu-toggle">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+    </div>
+    <div class="mobile-nav-wrap" id="mobile-nav">
+        <nav class="nav-wrap">
+    <ul class="nav-list">
+        <li class="nav-item "><a href="https://support.unpac.me">Home</a></li>
+<li class="nav-item "><a href="https://api.unpac.me">API</a></li>
+
+    </ul>
+</nav>    </div>
+    <div class="backdrop" id="backdrop"></div>
+    <div class="secondary-header-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="breadcrumb">
+                        <a href="https://support.unpac.me">Home</a>
+                                <a href="https://support.unpac.me/howto/">Quickstart Guides</a>
+                        <span class="current post-title">Hunting With YARA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>        <div class="main">
+    <div class="container js-main-content-area" style="position: relative;">
+        <div class="row">
+                    <div class="col-lg-3">
+    <aside class="js-sidebar">
+        <div class="js-sidebar-inner" style="position: relative;">
+            <div class="form-wrap sidebar-form-wrap">
+    <form class="sidebar-search-form js-search-form">
+        <div class="input-wrap">
+            <input type="text" name="search" class="search-input js-search-input small" id="search-bar" placeholder="Type to search">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 19.29l-3.4-3.39A7.92 7.92 0 0 0 19 11a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69l3.39 3.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM5 11a6 6 0 1 1 6 6 6 6 0 0 1-6-6z"></path></svg>        </div>
+    </form>
+    <div class="search-result" id="search-results"></div>
+    <div class="no-result-message" id="no-result">No result found</div>
+</div>            <div class="sidebar-navigation faq-sidebar">
+                <ul>
+                    <li class="open"><a href="https://support.unpac.me/howto/">All Guides</a>
+                        <ul>
+                                <li id="657cc5fa862ffc000127f9b3" class="post-link"><a href="/howto/unpacking-and-malware-id/">Unpacking and Malware Identification</a></li>
+                                <li id="660b91bebb82eb0001fda405" class="post-link"><a href="/howto/yara-rule-editor/">YARA Rule Editor</a></li>
+                                <li id="659463f98949e0000128d4cb" class="post-link current"><a href="/howto/hunting-with-yara/">Hunting With YARA</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        <div dir="ltr" class="resize-sensor" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div class="resize-sensor-expand" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div style="position: absolute; left: 0px; top: 0px; transition: all; width: 286px; height: 210px;"></div></div><div class="resize-sensor-shrink" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div style="position: absolute; left: 0px; top: 0px; transition: all; width: 200%; height: 200%;"></div></div></div></div>
+    </aside>
+</div>
+<script>
+    document.getElementById("659463f98949e0000128d4cb").classList.add('current');
+    document.getElementById("659463f98949e0000128d4cb").parentElement.parentElement.classList.add('open');
+</script>            <div class="col-lg-9">
+                <div class="single-post-wrap" id="single-post-wrap">
+                    <h1 class="post-title">Hunting With YARA</h1>
+                    <div class="toc-wrap visible" id="toc-wrap">
+                        <div class="toc-title h4">Table of contents</div>
+                    <ul class="toc"><li class="toc-h2"><a href="#introduction">Introduction</a></li><li class="toc-h2"><a href="#your-first-yara-rule">Your First YARA Rule</a></li><li class="toc-h2"><a href="#sharing-rules">Sharing Rules</a></li><li class="toc-h2"><a href="#yara-use-cases">YARA Use Cases </a></li><li class="toc-h3"><a href="#identifying-specific-malware-families-unpacked">Identifying specific malware families (unpacked)</a></li><li class="toc-h3"><a href="#identifying-malware-on-disk-or-in-network-traffic-packed">Identifying malware on disk or in network traffic (packed)</a></li><li class="toc-h3"><a href="#hunting-malware-characteristics">Hunting (malware characteristics)</a></li><li class="toc-h2"><a href="#writing-efficient-rules">Writing Efficient Rules</a></li><li class="toc-h3"><a href="#string-choice">String Choice </a></li><li class="toc-h3"><a href="#module-use">Module Use</a></li><li class="toc-h3"><a href="#condition-order-short-circuit">Condition Order Short-Circuit </a></li><li class="toc-h3"><a href="#unpacme-specific-considerations">UnpacMe Specific Considerations</a></li></ul></div>
+                    <div class="post-content" id="post-content">
+                        <p>The following are a series of mini-tutorials that can help you get the most out of your YARA rules!</p><h2 id="introduction">Introduction<a href="#introduction" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h2><p>YARA is an open-source tool used for identifying and classifying malware samples. It's essentially a pattern matching tool that allows researchers to create descriptions of malware families (rules) based on strings or binary patterns. These rules can then be used with the YARA engine to scan files for matches. </p><p>In addition to the open source <a href="https://github.com/VirusTotal/yara">YARA tool</a>, YARA has been integrated into many anti-virus and EDR products providing a way to scan endpoints in an enterprise using YARA rules. </p><p>If you are new to YARA we recommend starting with the official&nbsp;<a href="https://yara.readthedocs.io/en/stable/" rel="noreferrer">YARA documentation</a>.</p><h2 id="your-first-yara-rule">Your First YARA Rule<a href="#your-first-yara-rule" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h2>
+<!--kg-card-begin: html-->
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/901976082?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="first rule" data-ready="true"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+<!--kg-card-end: html-->
+<h2 id="sharing-rules">Sharing Rules<a href="#sharing-rules" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h2><p>One of the key advantages of YARA is the portability of the rules. YARA rules that are developed and shared with the community can be used by any tool that supports YARA to scan for malware. In essence YARA rules are a form of portable, actionable, threat intelligence. The following are some open source YARA rule repositories used for sharing rules with the community.</p><ul><li><a href="https://github.com/VirusTotal/yara" rel="noreferrer">VirusTotal YARA</a></li><li><a href="https://github.com/Yara-Rules/rules" rel="noreferrer">YaraRules YARA GitHub</a></li><li><a href="https://github.com/Neo23x0/signature-base" rel="noreferrer">Nextron Systems LOKI&nbsp;and&nbsp;THOR Lite Rules</a></li><li><a href="https://github.com/elastic/protections-artifacts" rel="noreferrer">Elastic YARA Rules</a></li><li><a href="https://github.com/bartblaze/Yara-rules" rel="noreferrer">BartBlaze YARA Rules</a></li><li><a href="https://github.com/embee-research/Yara-detection-rules" rel="noreferrer">Embee Research Rules</a></li></ul><h2 id="yara-use-cases">YARA Use Cases <a href="#yara-use-cases" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h2><p>At UnpacMe we roughly divide rules into three use cases, each one with its own unique set of advantages and constraints.</p><h3 id="identifying-specific-malware-families-unpacked">Identifying specific malware families (unpacked)<a href="#identifying-specific-malware-families-unpacked" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3>
+<!--kg-card-begin: html-->
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/901751035?h=d083c1c51c&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Malware Family Tracking with YARA" data-ready="true"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+<!--kg-card-end: html-->
+<p>These rules are used to identify specific malware families and are often used in malware processing platforms such as sandboxes to identify malware in-memory. They are often distributed via threat intelligence feeds or individual researchers who are tracking specific malware families.</p><p><strong>Advantages</strong> </p><ul><li>Identify specific malware families with high fidelity </li><li>Used with sandboxes and other malware processing platforms to categorize malware</li></ul><p><strong>Constraints</strong> </p><ul><li>Malware must be unpacked, or the rule must be run on process memory that contains the unpacked malware</li><li>Often not useful for enterprise scanning with EDR/AV unless the tools support in-memory scanning</li><li>False positives in rules have significant impact – a false positive can lead to a misclassification of malware</li></ul><h3 id="identifying-malware-on-disk-or-in-network-traffic-packed">Identifying malware on disk or in network traffic (packed)<a href="#identifying-malware-on-disk-or-in-network-traffic-packed" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3>
+<!--kg-card-begin: html-->
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/901746184?h=202599b5e4&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Identifying Packed Malware on Disk" data-ready="true"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+<!--kg-card-end: html-->
+<p>In general these rules will be used with AV or EDR products to identify badness in an enterprise. They can be thought of as typical malware <em>signatures</em> and are generally developed to identify packed samples. </p><p><strong>Advantages</strong></p><ul><li>Identify packed malware on disk</li><li>Often used to identify scripts and other early stage delivery artifacts </li><li>Used with EDR/AV to scan enterprise for malware</li></ul><p><strong>Constraints</strong></p><ul><li>Short life span – malware developers continuously change their packers to prevent detection meaning that rules matching on the packers quickly become outdated</li><li>Often incapable of identifying specific malware families with high fidelity </li><li>False positives in rules have significant impact – often these rules are used to trigger alerts in SIEM/SOC platforms and require analyst attention</li></ul><h3 id="hunting-malware-characteristics">Hunting (malware characteristics)<a href="#hunting-malware-characteristics" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3>
+<!--kg-card-begin: html-->
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/901761671?h=d69b06364c&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="hunting" data-ready="true"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+<!--kg-card-end: html-->
+<p>These rules are used for hunting potentially malicious files and can tolerate a high false positive rate. Often the rules will focus on a specific characteristic that may indicate maliciousness such as embedded bitcoin addresses. There characteristics are not exclusive to malware but they are useful for hunting. </p><p><strong>Advantages</strong></p><ul><li>Used to hunt for potential malware</li><li>Can be loose and developed quickly </li><li>False positives are <em>ok</em></li></ul><p><strong>Constraints</strong> </p><ul><li>Results must be triaged by an analyst</li><li>Low fidelity means they cannot be used for blocking or quarantine processes </li></ul><h2 id="writing-efficient-rules">Writing Efficient Rules<a href="#writing-efficient-rules" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h2><p>YARA rule efficiency generally refers to the amount of compute required to process a file with a given YARA rule. This often translates into scan time, or how <em>slow</em> a specific YARA scan will be. Obviously this depends on the file being scanned but rules can be crafted to give them the <em>best possible chance</em> at efficiency when scanning unknown files. </p><p>Though always important to consider, efficiency must sometimes take a back seat to fidelity. For example, when developing a rule to identify a specific malware family which has constantly changing binary sizes it may be less efficient but necessary to not include a size restriction in the rule.</p><p>When discussing efficiency it is important to consider how the YARA engine works under the hood. In the words of noted YARA contributor <a href="https://github.com/wxsBSD"></a><a href="https://github.com/VirusTotal/yara/issues/1820#issuecomment-1311826969">Westley Shields</a></p><blockquote>I encourage people to think of YARA as a two-step process. <br><br><strong>Step 1</strong> is just searching for all the patterns listed in the rules, regardless of where they are in the file (with a couple of small exceptions). <br><br><strong>Step 2</strong> is to evaluate the conditions in each rule. In most cases the string you are searching for is independent of the condition in which it is used. </blockquote><p>When this two step process is considered it becomes clear that attention must be payed to both the types of strings included in a rule and the conditions in the rule as both can independently effect the efficiency of the rule. It is also clear that <strong>conditions cannot be used to short-circuit poorly chosen strings</strong> except in some cases unique to the UnpacMe service which we will detail later in this post.</p><p>Though there are many small adjustments to a rule that can be used to make it more efficient the following key factors maximally influence efficiency; string choice, module use, condition order.  </p><p>We also recommend the following reading for a more in-depth understanding of YARA efficiency.</p><ul><li><a href="https://github.com/Neo23x0/YARA-Performance-Guidelines/" rel="noreferrer">YARA Performance Guidelines (Florian Roth)</a></li><li><a href="https://engineering.avast.io/tag/performance/">Avast Engineering YARA performance series</a></li><li><a href="https://github.com/VirusTotal/yara/issues/1415">YARA GitHub issue #1415</a></li><li><a href="https://github.com/VirusTotal/yara/issues/1665">YARA GitHub issue: YARA Scan Performance for Large Files is poor</a></li></ul><h3 id="string-choice">String Choice <a href="#string-choice" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3><p>Because YARA will scan an entire file for all string patterns before applying conditions string choice can significantly influence the efficiency of a rule. To better understand what makes a <em>good</em> string choice it will help to understand how YARA scans for strings. </p><p>Before scanning a file YARA breaks all strings in the rule into <a href="https://github.com/Neo23x0/YARA-Performance-Guidelines/#atoms"><em>atoms</em></a><strong> </strong>of up to four bytes in length. These atoms are chosen using an algorithm that attempts to select for the longest and most unique pattern of bytes. Once the atoms are extracted from the rule YARA scans the file using the <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasic</a> algorithm, locating all occurrences of the atoms. For each atom that has been located YARA will then determine if the full string matches in the file where the atom was detected. It is important to note that this process occurs for all string types in a rule including hexadecimal strings, and regular expressions. </p><p>With this process in mind the following may be considered when selecting strings for a YARA rule.</p><ul><li><strong>Avoid short strings</strong>. The shorter the string the more likely it is to occur in multiple locations and slow down scanning. Strings shorter than an atom (4-bytes) should be avoided at all costs.</li><li><strong>Avoid breaking hexadecimal strings into sections smaller than an atom</strong> (4-bytes). Binary strings allow a lot of flexibility with wildcards and jumps but only the bytes between these operators can be used to extract atoms.</li><li><strong>Do not use leading or trailing wildcards in hexadecimal strings</strong>.</li><li><strong>Avoid regular expressions</strong>. If a regular expression is required the efficiency can be improved by adding anchor text to the expression which can be used to generate an atom. Regular expressions with no fixed substrings will not generate any atoms and are the least efficient type of string.</li><li><strong>Avoid strings with a single repeating byte</strong>. A string that only contains a single repeated byte will not generate efficient atoms regardless of its length.</li><li><strong>Use the <em>nocase </em>string modifier sparingly</strong>. The <em>nocase</em> string modifier creates <code>n!</code> duplicates of the string where <code>n</code> is the length of the string. This can generate a lot of atoms depending on the string length. </li></ul><h3 id="module-use">Module Use<a href="#module-use" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3><p>YARA has many powerful <a href="https://yara.readthedocs.io/en/stable/writingrules.html#using-modules-1">modules</a> that can be used to augment rules, however modules can come at a cost. The general rule for using modules is <strong>only use a module if you are using multiple features from the module in your rule</strong>. Modules included in a rule will parse the entire file prior to applying conditions so including a module when a simple condition would suffice can be very inefficient.</p><p>A good example is the <a href="https://yara.readthedocs.io/en/stable/modules/pe.html#pe-module">PE module</a> <code>pe.is_pe</code> feature. Importing the module to check if a file is a PE is very inefficient when a simple magic byte check  <code>uint16(0) == 0x5A4D</code> would be sufficient in most cases.  </p><h3 id="condition-order-short-circuit">Condition Order Short-Circuit <a href="#condition-order-short-circuit" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3><p>The order of conditions matters. Conditions are evaluated from left to right and the first failed condition short-circuits the evaluation and terminates the scan. <strong>Rules can be made more efficient by placing filter conditions and conditions that are simple to evaluate first</strong>.</p><p>For example, when developing a rule to match on PE files it is efficient to start the condition logic with a simple PE magic byte check <code>uint16(0) == 0x5A4D</code> to filter all non-PE files prior to adding the rest of the condition logic for the rule.</p><h3 id="unpacme-specific-considerations">UnpacMe Specific Considerations<a href="#unpacme-specific-considerations" class="js-anchor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.29 9.29l-4 4a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4-4a1 1 0 0 0-1.42-1.42z"></path><path d="M12.28 17.4L11 18.67a4.2 4.2 0 0 1-5.58.4 4 4 0 0 1-.27-5.93l1.42-1.43a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0l-1.27 1.28a6.15 6.15 0 0 0-.67 8.07 6.06 6.06 0 0 0 9.07.6l1.42-1.42a1 1 0 0 0-1.42-1.42z"></path><path d="M19.66 3.22a6.18 6.18 0 0 0-8.13.68L10.45 5a1.09 1.09 0 0 0-.17 1.61 1 1 0 0 0 1.42 0L13 5.3a4.17 4.17 0 0 1 5.57-.4 4 4 0 0 1 .27 5.95l-1.42 1.43a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l1.42-1.42a6.06 6.06 0 0 0-.6-9.06z"></path></svg></a></h3><p>Though compatible with the standard <a href="https://github.com/VirusTotal/yara/releases">YARA engine</a> the UnpacMe YARA scanner has some enhancements that allow for more control of the scanning process. These can be used to drive efficiency in rules where it would normally not be possible.</p><p>Unlike standard YARA, <strong>UnpacMe does evaluate file size prior to scanning</strong> files. This means that file sizes including in the YARA rule can be used to pre-filter files prior to scanning. Including file size limits in a rule can dramatically improve the efficiency.</p><p>UnpacMe also offers a <a href="https://support.unpac.me/custom-scan-options/#scan-assist">Scan Assist</a> setting that will <strong>dynamically tailor the scan parameters based on realtime feedback during the scan</strong>. For example, if the scan engine observes that the only EXE files are matching on a rule the engine will dynamically filter out all non-EXE files for the remainder of the scan even if the rule does not include a condition to explicitly filter non-EXE files. Scan Assist can be used to automatically improve rule efficiency. </p>
+                    </div>
+                    <div class="post-footer">
+                        <div class="dates">
+                            <time class="date-publish" datetime="2024-04-02"><strong>Published:</strong> April 02, 2024</time>
+                            <time class="date-update" datetime="2024-04-02"><strong>Last updated:</strong> April 02, 2024</time>
+                        </div>
+                    </div>
+                </div>
+                <div class="prev-next-wrap flex">
+    <div class="prev visible" id="prev-post">
+        <a href="/howto/yara-rule-editor/">
+            <div class="label"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 11H7.14l3.63-4.36a1 1 0 1 0-1.54-1.28l-5 6a1.19 1.19 0 0 0-.09.15c0 .05 0 .08-.07.13A1 1 0 0 0 4 12a1 1 0 0 0 .07.36c0 .05 0 .08.07.13a1.19 1.19 0 0 0 .09.15l5 6A1 1 0 0 0 10 19a1 1 0 0 0 .64-.23 1 1 0 0 0 .13-1.41L7.14 13H19a1 1 0 0 0 0-2z"></path></svg> Previous</div>
+            <h4 class="title">YARA Rule Editor</h4>
+        </a>
+    </div>
+    <div class="next" id="next-post">
+        <a href="#">
+            <div class="label">Next <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 13h11.86l-3.63 4.36a1 1 0 0 0 1.54 1.28l5-6a1.19 1.19 0 0 0 .09-.15c0-.05.05-.08.07-.13A1 1 0 0 0 20 12a1 1 0 0 0-.07-.36c0-.05-.05-.08-.07-.13a1.19 1.19 0 0 0-.09-.15l-5-6A1 1 0 0 0 14 5a1 1 0 0 0-.64.23 1 1 0 0 0-.13 1.41L16.86 11H5a1 1 0 0 0 0 2z"></path></svg></div>
+            <h4 class="title"></h4>
+        </a>
+    </div>
+</div>            </div>
+        </div>
+    <div dir="ltr" class="resize-sensor" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div class="resize-sensor-expand" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div style="position: absolute; left: 0px; top: 0px; transition: all; width: 1242px; height: 8284px;"></div></div><div class="resize-sensor-shrink" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;"><div style="position: absolute; left: 0px; top: 0px; transition: all; width: 200%; height: 200%;"></div></div></div></div>
+    <section class="contact-cta">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="contact-cta-wrap flex">
+                    <div class="content">
+                        <h2 class="title">Need help?</h2>
+                        <p class="description">Have you any question which is not answered in this knowledge base? Contact us. We are here to help you.</p>
+                    </div>
+                    <div class="">
+                        <a href="mailto:unpacme@openanalysis.net" class="btn btn-primary">Contact us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section></div>
+        <footer class="footer">
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="secondary-nav text-center">
+    <ul>
+        <li class="nav-item "><a href="https://support.unpac.me/unpacme-service/">How It Works</a></li>
+<li class="nav-item "><a href="https://support.unpac.me/tos/"> Terms of Service</a></li>
+<li class="nav-item "><a href="https://support.unpac.me/privacy/"> Privacy Policy</a></li>
+
+    </ul>
+</nav>                </div>
+                <div class="col-12">
+                    <div class="social-links text-center">
+    <a href="https://twitter.com/unpacme" title="Twitter" rel="noopener" class="tooltip"><svg width="1200" height="1227" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" fill="white"></path>
+</svg></a>
+
+    
+</div>                </div>
+                <div class="col-12">
+                    <div class="copyright text-center">
+                            © 2024 UnpacMe - Powered by <a href="https://www.openanalysis.net/"><b>OpenAnalysis Inc</b></a> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<a href="#" id="back-to-top" class="flex back-top-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.23 10.64a1 1 0 0 0 1.41.13L11 7.14V19a1 1 0 0 0 2 0V7.14l4.36 3.63a1 1 0 1 0 1.28-1.54l-6-5-.15-.09-.13-.07a1 1 0 0 0-.72 0l-.13.07-.15.09-6 5a1 1 0 0 0-.13 1.41z"></path></svg></a>
+<div class="notification notification-copy-link">
+    Link copied to clipboard.
+</div>
+<div class="notification notification-subscribe text-center">
+    You've successfully subscribed to UnpacMe Support
+</div>
+<div class="notification notification-signup text-center">
+    Great! Next, complete checkout for full access to UnpacMe Support
+</div>
+<div class="notification notification-signin text-center">
+    Welcome back! You've successfully signed in.
+</div>
+<div class="notification notification-signin-failure error text-center">
+    Unable to sign you in. Please try again.
+</div>
+<div class="notification notification-checkout text-center">
+    Success! Your account is fully activated, you now have access to all content.
+</div>
+<div class="notification notification-billing-success text-center">
+    Success! Your billing info is updated.
+</div>
+<div class="notification notification-billing-cancel error text-center">
+    Billing info update failed.
+</div>		</div>
+		
+        <script>
+			var apiKey = 'f5fd889a39f280d2d77d05a9cf';
+            var nextPage = '';
+            var totalPages = '';
+			var loadingText ='Loading...';
+        </script>
+		
+		<script src="https://support.unpac.me/assets/js/app.bundle.min.js?v=a4a89a484c"></script>
+        
+	
+<div id="sodo-search-root"></div></body></html>

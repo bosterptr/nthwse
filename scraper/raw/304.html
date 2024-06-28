@@ -1,0 +1,799 @@
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml"><head>
+    <title>Deobfuscation: recovering an OLLVM-protected program - Quarkslab's blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="./extras/favicon.png" rel="icon">
+
+<link rel="canonical" href="./deobfuscation-recovering-an-ollvm-protected-program.html">
+
+        <meta name="author" content="Francis Gabriel">
+        <meta name="keywords" content="OLLVM,obfuscation,Miasm,symbolic execution,reverse-engineering,2014">
+        <meta name="description" content="We recently looked at the Obfuscator-LLVM project in order to test its different protections. Here are our results, and explanations on how we deal with obfuscation.">
+
+        <meta property="og:site_name" content="Quarkslab's blog">
+        <meta property="og:type" content="article">
+        <meta property="og:title" content="Deobfuscation: recovering an OLLVM-protected program">
+        <meta property="og:url" content="./deobfuscation-recovering-an-ollvm-protected-program.html">
+        <meta property="og:description" content="We recently looked at the Obfuscator-LLVM project in order to test its different protections. Here are our results, and explanations on how we deal with obfuscation.">
+        <meta property="article:published_time" content="2014-12-04">
+            <meta property="article:section" content="Reverse-Engineering">
+            <meta property="article:tag" content="OLLVM">
+            <meta property="article:tag" content="obfuscation">
+            <meta property="article:tag" content="Miasm">
+            <meta property="article:tag" content="symbolic execution">
+            <meta property="article:tag" content="reverse-engineering">
+            <meta property="article:tag" content="2014">
+            <meta property="article:author" content="Francis Gabriel">
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="./theme/css/bootstrap.min.css" type="text/css">
+    <link href="./theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./theme/css/font-awesome-brands.min.css" rel="stylesheet">
+    <link href="./theme/css/font-awesome-solid.min.css" rel="stylesheet">
+
+    <link href="./theme/css/pygments/default.css" rel="stylesheet">
+    <link rel="stylesheet" href="./theme/css/style.css" type="text/css">
+        <link href="./static/css/custom.css" rel="stylesheet">
+
+        <link href="./feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Quarkslab's blog ATOM Feed">
+
+        <link href="./feeds/reverse-engineering.atom.xml" type="application/atom+xml" rel="alternate" title="Quarkslab's blog Reverse-Engineering ATOM Feed">
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="./" class="navbar-brand">
+Quarkslab's blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="./archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+<!-- Content Container -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-7 col-sm-push-3">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="./deobfuscation-recovering-an-ollvm-protected-program.html" rel="bookmark" title="Permalink to Deobfuscation: recovering an OLLVM-protected program">
+                        Deobfuscation: recovering an OLLVM-protected program
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2014-12-04T00:00:00+01:00"> Thu 04 December 2014</time>
+    </span>
+
+
+            <span class="label label-default">By</span>
+                <a href="./author/francis-gabriel.html"><i class="fa fa-user"></i> Francis Gabriel</a>
+
+        <span class="label label-default">Category</span>
+        <a href="./category/reverse-engineering.html">Reverse-Engineering</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="./tag/ollvm.html"><i class="fa fa-solid fa-tag"></i>OLLVM</a>
+	<a href="./tag/obfuscation.html"><i class="fa fa-solid fa-tag"></i>obfuscation</a>
+	<a href="./tag/miasm.html"><i class="fa fa-solid fa-tag"></i>Miasm</a>
+	<a href="./tag/symbolic-execution.html"><i class="fa fa-solid fa-tag"></i>symbolic execution</a>
+	<a href="./tag/reverse-engineering.html"><i class="fa fa-solid fa-tag"></i>reverse-engineering</a>
+	<a href="./tag/2014.html"><i class="fa fa-solid fa-tag"></i>2014</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="summary"><p class="first last">We recently looked at the Obfuscator-LLVM project in order to test its different protections. Here are our results, and explanations on how we deal with obfuscation.</p>
+</div>
+                <div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>As we sometimes have to deal with heavily obfuscated code, we wanted to have a look at the <a class="reference external" href="http://o-llvm.org">Obfuscator-LLVM</a> project to check the strengths and weaknesses of the generated obfuscated code.
+We looked at the latest version available (based on <a class="reference external" href="http://llvm.org">LLVM</a> 3.5). We will show how it is possible to break all the protections using the <a class="reference external" href="https://github.com/cea-sec/miasm">Miasm</a>
+reverse engineering framework.</p>
+<p>Warning: this article only shows a method among others to break the <em>OLLVM</em> obfuscation passes. Although it contains many code samples, it is not a <em>Miasm</em>
+tutorial and there is no all-in-one <em>Python</em> script to download at the end. Of course, we could make a huge article, where we would analyze a
+complex program obfuscated by <em>OLLVM</em>, on an unsupported <em>Miasm</em> architecture... but no. We keep things simple and show how we manage to cleanup the code.</p>
+<p>First, we present all the tools we used and then, how it is possible on a simple example application we made, to break all <em>OLLVM</em> layers one by one
+(then all together).</p>
+<p><strong>Disclaimer</strong>: Quarkslab also works on obfuscation using LLVM. We work on that topic on both part, attacking obfuscation or designing some. These results are not yet public, and not ready to be made public. So, we looked at <strong>OLLVM</strong> because we know the challenges faced here. <strong>OLLVM</strong> is a useful project in the obfuscation world where everything is about (misplaced) secrets.</p>
+</div>
+<div class="section" id="quickly-what-is-obfuscation">
+<h2>Quickly: What is obfuscation?</h2>
+<p>Code obfuscation means code <strong>protection</strong>. A piece of code which is obfuscated is modified in order to be <strong>harder</strong> to
+understand. As example, it is often used in DRM (<em>Digital Rights Management</em>) software to protect multimedia content by hiding secrets informations like algorithms and encryption keys.</p>
+<p>When you need obfuscation, it means <strong>everybody</strong> can access your code or binary program but you don't want some to
+<strong>understand</strong> how it works. It is <em>security through obscurity</em> and a matter of time before someone can break it.
+So the security of an obfuscation tool depends on the time an attacker must spend in order to break it.</p>
+</div>
+<div class="section" id="used-tools">
+<h2>Used Tools</h2>
+<div class="section" id="test-case">
+<h3>Test Case</h3>
+<p>Our target is a single function which does some computations on the input value. There are 4 conditions which also depend on the input parameter. The application
+is compiled for <strong>x86 32-bit</strong> architecture:</p>
+<div class="highlight"><pre><span></span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">target_function</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">mod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mod</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mh">0xBAAAD0BF</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mod</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xBAAAD0BF</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mod</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mh">0xBAAAD0BF</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0xBAAAD0BF</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>Here is the <em>IDA Pro</em> <strong>Control Flow Graph</strong> representation:</p>
+<a href="resources/2014-12-04_ollvm/images/0_normal.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/0_normal.png" alt="Click to enlarge" width="50%">
+</a><p>We can see there are <strong>3 conditions</strong> and <strong>4 paths</strong> which make a specific computation using boolean and arithmetic instructions. We made it this way so that
+all <em>OLLVM</em> passes can obfuscate something in the test program.</p>
+<p>This function is very simple because it is the best way to learn. Our goal is not to obtain a 100% generic deobfuscation tool but to study <em>OLLVM</em> behaviour.</p>
+</div>
+<div class="section" id="miasm-framework">
+<h3>Miasm Framework</h3>
+<p><em>Miasm</em> is a <em>Python</em> open source reverse engineering framework. The latest version is available here: <a class="reference external" href="https://github.com/cea-sec/miasm">https://github.com/cea-sec/miasm</a>.
+As we said earlier, this article is not a <em>Miasm</em> tutorial although we'll show some pieces of code. Other tools can be used to do what we did,
+but this article is a good opportunity to show that this framework is evolving day by day and can be used to make powerful deobfuscation tools.</p>
+<p><strong>Warning!</strong> As the <em>Miasm API</em> can change in future commits, it is important to note the examples we give here are valid with the latest
+<em>Miasm</em> version available at the release date of this article (commit a5397cee9bacc81224f786f9a62adf3de5c99c87).</p>
+</div>
+<div class="section" id="graph-representation">
+<h3>Graph Representation</h3>
+<p>Before we can start to analyze the obfuscated code, it is important to decide the deobfuscated output representation we want.
+It is not an easy problem because deobfuscation work can take some time and we want to have an understandable output.</p>
+<p>We could translate basic blocks content into <em>LLVM Intermediate Representation</em> in order to recompile them, and apply optimisation passes
+to clean the useless parts of code and obtain a new binary, but it is time consuming and it could be done
+as a future improvement. Instead, we choose to build our deobfuscated output in an <em>IDAPython</em> graph, using <strong>GraphViewer</strong> class.
+This way we can build nodes and edges easily and fill the basic blocks with the <em>Miasm</em> intermediate representation.</p>
+<p>As an example, here is the graph our script produces on our un-obfuscated test case we presented earlier:</p>
+<a href="resources/2014-12-04_ollvm/images/1_normal_ok.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/1_normal_ok.png" alt="Click to enlarge" width="50%">
+</a><p>Sure, there are still some efforts to make for the output to be more understandable, but that's enough for this article.
+On the above screenshot, we can see the <strong>3 conditions</strong> and the <strong>4 paths</strong> with their respective computation. The graph could not
+be <em>valid</em> in terms of execution but it leaves enough information for the analyst to understand the function properly. And that's all deobfuscation is about.</p>
+<p>Our script used to produce the graph is ugly, there is no colors/cosmetics in the basic blocks. Also this is not 100% <em>Miasm</em>
+IR code because it is not easy to read. We choose to convert the IR to some (near <em>Python</em>) <strong>pseudo-code</strong> instead.</p>
+<p>So, when we do some deobfuscation work and want to display the result, we can generate the output using this representation and compare
+it to the above screenshot, as it is the original one.</p>
+</div>
+</div>
+<div class="section" id="breaking-ollvm">
+<h2>Breaking OLLVM</h2>
+<div class="section" id="quick-presentation">
+<h3>Quick Presentation</h3>
+<p>We will not explain in details how <em>OLLVM</em> works because it is already very well explained from the project website (<a class="reference external" href="http://o-llvm.org">http://o-llvm.org</a>).
+But quickly, we can say it is composed of <strong>3 distinct protections</strong>: <em>Control Flow Flattening, Bogus Control Flow</em> and <em>Instructions
+Substitution</em>, which can be cumulated in order to make the code very complicated to statically understand.
+In this part, we show how we managed to remove each protection, one by one and then all together.</p>
+</div>
+<div class="section" id="control-flow-flattening">
+<h3>Control Flow Flattening</h3>
+<p>This pass is explained here: <a class="reference external" href="https://github.com/obfuscator-llvm/obfuscator/wiki/Control-Flow-Flattening">https://github.com/obfuscator-llvm/obfuscator/wiki/Control-Flow-Flattening</a></p>
+<p>We applied this pass using the following command line on our test case application:</p>
+<div class="highlight"><pre><span></span><span class="p">..</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">clang</span><span class="w"> </span><span class="o">-</span><span class="n">m32</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">target_flat</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">fla</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">perFLA</span><span class="o">=</span><span class="mi">100</span>
+</pre></div>
+<p>This command enables the <em>Control Flow Flattening</em> protection on all the functions of our binary so that
+we are sure our test function is targeted.</p>
+<div class="section" id="protected-function">
+<h4>Protected Function</h4>
+<p>By looking at the <strong>control flow graph</strong> of our target function in <em>IDA</em>, one can see:</p>
+<a href="resources/2014-12-04_ollvm/images/2_code_flat.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/2_code_flat.png" alt="Click to enlarge" width="50%">
+</a><p>The behaviour of the obfuscated code is quite simple. On the prologue, a <strong>state variable</strong> is affected with
+a numeric constant which indicates to the <strong>main dispatcher</strong> (and to <strong>sub-dispatchers</strong>) the path to take to reach the target <strong>relevant</strong>
+basic block. The <strong>relevant</strong> blocks are the ones of the original un-obfuscated function. At the end of each relevant basic block, the <strong>state variable</strong>
+is affected with another numeric constant to indicate the next relevant block, and so on.</p>
+<p>The original conditions are transformed to  <strong>CMOV</strong> conditional instructions, and according to the result of the comparison they will set the
+next relevant block in the state variable.</p>
+<p>This pass doesn't add any protection at the instruction level, so the code still remains readable. Only the control flow graph is <strong>destroyed</strong>.
+Our goal here is to recover the original CFG of the function. We need to recover all possible paths, meaning we need to know all the links (parent -&gt; child)
+between relevants basic blocks in order to rebuild the flow.</p>
+<p>Here we require a symbolic execution tool which will browse the code and try to compute each basic block destination. If a condition occurs,
+it will give us the test and the possible destinations list. The <strong>Miasm framework</strong> has a symbolic execution engine (for <strong>x86 32-bit</strong> architecture and some others)
+based on its own IR and a disassembler to convert binary code to it.</p>
+<p>Below is documented <em>Miasm Python</em> code which enables us to do <strong>symbolic execution</strong> on a basic block in order to compute its <strong>destination address</strong>:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Imports from Miasm framework</span>
+<span class="kn">from</span> <span class="nn">miasm2.core.bin_stream</span>                 <span class="kn">import</span> <span class="n">bin_stream_str</span>
+<span class="kn">from</span> <span class="nn">miasm2.arch.x86.disasm</span>                 <span class="kn">import</span> <span class="n">dis_x86_32</span>
+<span class="kn">from</span> <span class="nn">miasm2.arch.x86.ira</span>                    <span class="kn">import</span> <span class="n">ir_a_x86_32</span>
+<span class="kn">from</span> <span class="nn">miasm2.arch.x86.regs</span>                   <span class="kn">import</span> <span class="n">all_regs_ids</span><span class="p">,</span> <span class="n">all_regs_ids_init</span>
+<span class="kn">from</span> <span class="nn">miasm2.ir.symbexec</span>                     <span class="kn">import</span> <span class="n">symbexec</span>
+<span class="kn">from</span> <span class="nn">miasm2.expression.simplifications</span>      <span class="kn">import</span> <span class="n">expr_simp</span>
+
+<span class="c1"># Binary path and offset of the target function</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="mh">0x3e0</span>
+<span class="n">fname</span> <span class="o">=</span> <span class="s2">"../src/target"</span>
+
+<span class="c1"># Get Miasm's binary stream</span>
+<span class="n">bin_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">bin_stream</span> <span class="o">=</span> <span class="n">bin_stream_str</span><span class="p">(</span><span class="n">bin_file</span><span class="p">)</span>
+
+<span class="c1"># Disassemble blocks of the function at 'offset'</span>
+<span class="n">mdis</span> <span class="o">=</span> <span class="n">dis_x86_32</span><span class="p">(</span><span class="n">bin_stream</span><span class="p">)</span>
+<span class="n">disasm</span> <span class="o">=</span> <span class="n">mdis</span><span class="o">.</span><span class="n">dis_multibloc</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+
+<span class="c1"># Create target IR object and add all basic blocks to it</span>
+<span class="n">ir</span> <span class="o">=</span> <span class="n">ir_a_x86_32</span><span class="p">(</span><span class="n">mdis</span><span class="o">.</span><span class="n">symbol_pool</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bbl</span> <span class="ow">in</span> <span class="n">disasm</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">add_bloc</span><span class="p">(</span><span class="n">bbl</span><span class="p">)</span>
+
+<span class="c1"># Init our symbols with all architecture known registers</span>
+<span class="n">symbols_init</span> <span class="o">=</span>  <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_regs_ids</span><span class="p">):</span>
+    <span class="n">symbols_init</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_regs_ids_init</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="c1"># Create symbolic execution engine</span>
+<span class="n">symb</span> <span class="o">=</span> <span class="n">symbexec</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span> <span class="n">symbols_init</span><span class="p">)</span>
+
+<span class="c1"># Get the block we want and emulate it</span>
+<span class="c1"># We obtain the address of the next block to execute</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">get_bloc</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+<span class="n">nxt_addr</span> <span class="o">=</span> <span class="n">symb</span><span class="o">.</span><span class="n">emulbloc</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+
+<span class="c1"># Run the Miasm's simplification engine on the next</span>
+<span class="c1"># address to be sure to have the simplest expression</span>
+<span class="n">simp_addr</span> <span class="o">=</span> <span class="n">expr_simp</span><span class="p">(</span><span class="n">nxt_addr</span><span class="p">)</span>
+
+<span class="c1"># The simp_addr variable is an integer expression (next basic block offset)</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simp_addr</span><span class="p">,</span> <span class="n">ExprInt</span><span class="p">):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">"Jump on next basic block: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">simp_addr</span><span class="p">)</span>
+
+<span class="c1"># The simp_addr variable is a condition expression</span>
+<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simp_addr</span><span class="p">,</span> <span class="n">ExprCond</span><span class="p">):</span>
+  <span class="n">branch1</span> <span class="o">=</span> <span class="n">simp_addr</span><span class="o">.</span><span class="n">src1</span>
+  <span class="n">branch2</span> <span class="o">=</span> <span class="n">simp_addr</span><span class="o">.</span><span class="n">src2</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">"Condition: </span><span class="si">%s</span><span class="s2"> or </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">branch1</span><span class="p">,</span><span class="n">branch2</span><span class="p">))</span>
+</pre></div>
+<p>The code above is an example of just one basic block symbolic execution. In order to cover all the function's basic blocks, we
+can use it by starting at the prologue of the target function and follow
+the execution flow. If we encounter a condition we must <strong>explore all branches</strong>, one by one, until we cover the function entirely.</p>
+<p>So we must have a <em>branches stack</em> to process the next available one when we reach the return of the function. For each branch we have
+to save the <strong>state</strong> in order to restore all the symbolic execution <em>context</em> (the registers for instance) when we want to process it.</p>
+</div>
+<div class="section" id="intermediate-function">
+<h4>Intermediate Function</h4>
+<p>By applying the previously explained method, we are able to rebuild an intermediate CFG. Let's display it with our graph
+representation script:</p>
+<a href="resources/2014-12-04_ollvm/images/2_code_flat_tmp.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/2_code_flat_tmp.png" alt="Click to enlarge" width="50%">
+</a><p>In this intermediate function, all the <strong>useful</strong> basic blocks and the conditions are now visible. Although the main dispatcher and
+its sub-dispatchers are <em>useful</em> for the execution of the code, they are <strong>useless</strong> for us because we just want to recover the original
+CFG. So we need to remove them, which is equivalent to <strong>keep only relevants blocks</strong>.</p>
+<p>In order to do that, we can use the constant <strong>"shape"</strong> of <em>OLLVM</em> control flow flattening. Indeed, most of the relevants blocks (excepted
+the prologue and <strong>return</strong> basic block),
+are located at a very precise place we can detect. We have to start from the original protected function and make some coding to build a generic
+algorithm which will find the relevants blocks:</p>
+<ul>
+<li><p class="first">Start from the function prologue (which is relevant)</p>
+</li>
+<li><p class="first">We are on the <em>main dispatcher</em>. Get its parent (different of prologue): it is the <strong>pre-dispatcher</strong></p>
+</li>
+<li><p class="first">Mark as relevant all pre-dispatcher parents</p>
+</li>
+<li><p class="first">Mark as relevant the only block which has no child(ren): the return block</p>
+</li>
+</ul>
+<p>This algorithm can easily be realized statically, by using the <strong>Miasm disassembler</strong> which gives us, as we seen earlier, the list
+of all disassembled basic blocks of the target function. Once we get the relevant blocks list, we are able to rebuild the original control flow
+by following the rules of this algorithm during the symbolic execution:</p>
+<ul>
+<li><p class="first">Define a variable which contains parent block (prologue at start) (<strong>only relevant blocks can be affected to this variable</strong>)</p>
+</li>
+<li><p class="first">On each new block we encounter, if it is in relevant list we can do the link between it and the parent block. Set this new block as parent.</p>
+</li>
+<li><p class="first">On each condition, each path will have its own relevant parent block variable</p>
+</li>
+<li><p class="first">And so on.</p>
+</li>
+</ul>
+<p>In order to illustrate this algorithm, below is a documented example:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Here we disassemble target function and collect relevants blocks</span>
+<span class="c1"># Collapsed for clarity but nothing complicated here, and the algorithm is given above</span>
+<span class="n">relevants</span> <span class="o">=</span> <span class="n">get_relevants_blocks</span><span class="p">()</span>
+
+<span class="c1"># Control flow dictionnary {parent: set(childs)}</span>
+<span class="n">flow</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Init flow dictionnary with empty sets of childs</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">relevants</span><span class="p">:</span> <span class="n">flow</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<span class="c1"># Start loop of symbolic execution</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+    <span class="n">block_state</span> <span class="o">=</span> <span class="c1"># Get next block state to emulate</span>
+
+    <span class="c1"># Get current branch parameters</span>
+    <span class="c1"># "parent_addr" is the parent block variable se seen earlier</span>
+    <span class="c1"># "symb" is the context (symbols) of the current branch</span>
+    <span class="n">parent_addr</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">symb</span> <span class="o">=</span> <span class="n">block_state</span>
+
+    <span class="c1"># If it is a relevant block</span>
+    <span class="k">if</span> <span class="n">block_addr</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">:</span>
+
+        <span class="c1"># We avoid the prologue's parent, as it doesn't exist</span>
+        <span class="k">if</span> <span class="n">parent_addr</span> <span class="o">!=</span> <span class="n">ExprInt32</span><span class="p">(</span><span class="n">prologue_parent</span><span class="p">):</span>
+
+            <span class="c1"># Do the link between the block and its relevant parent</span>
+            <span class="n">flow</span><span class="p">[</span><span class="n">parent_addr</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
+
+        <span class="c1"># Then we set the block as the new relevant parent</span>
+        <span class="n">parent_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
+
+    <span class="c1"># Finally, we can emulate the next block and so on.</span>
+</pre></div>
+</div>
+<div class="section" id="recovered-function">
+<h4>Recovered Function</h4>
+<p>By using the algorithm above, we are able to obtain this CFG:</p>
+<a href="resources/2014-12-04_ollvm/images/3_code_flat_ok.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/3_code_flat_ok.png" alt="Click to enlarge" width="50%">
+</a><p>The original code is completely recovered. We can see the <strong>3 conditions</strong> and the <strong>4 equations</strong> that are used to compute the output value.</p>
+</div>
+</div>
+<div class="section" id="bogus-control-flow">
+<h3>Bogus Control Flow</h3>
+<p>This pass is explained here: <a class="reference external" href="https://github.com/obfuscator-llvm/obfuscator/wiki/Bogus-Control-Flow">https://github.com/obfuscator-llvm/obfuscator/wiki/Bogus-Control-Flow</a></p>
+<p>We applied this pass using the following command line, on our test case application:</p>
+<div class="highlight"><pre><span></span><span class="p">..</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">clang</span><span class="w"> </span><span class="o">-</span><span class="n">m32</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">target_flat</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">bcf</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">boguscf</span><span class="o">-</span><span class="n">prob</span><span class="o">=</span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">boguscf</span><span class="o">-</span><span class="n">loop</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+<p>This command enables the <em>Bogus Control Flow</em> protection on all the functions of our test binary.
+We set only one pass on the <strong>"-boguscf-loop"</strong> parameter because it does not change the problem,
+the generation and the recovery are just much slower, and more RAM is needed when the pass is applied.</p>
+<div class="section" id="protected-function-1">
+<h4>Protected Function</h4>
+<p>Here is the control flow graph <em>IDA Pro</em> gives us when we load our target binary:</p>
+<a href="resources/2014-12-04_ollvm/images/4_bogus.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/4_bogus.png" alt="Click to enlarge" width="50%">
+</a><p>The poor resolution is not important here as this picture is enough to see the function is complex to understand.
+This pass, for each basic block to obfuscate,
+creates a new one containing an <strong>opaque predicate</strong> which makes a conditional jump: it can lead to the real basic block or another one containing junk code.</p>
+<p>We could use the <strong>symbolic execution</strong> method we seen in the previous part. By applying this method we'll find all useful basic block and rebuild
+the flow. But there is a problem: the opaque predicate. The basic block containing junk code <strong>returns to it's parent</strong>, so if we follow this path during
+symbolic execution, we'll get stuck in an infinite loop. So, we need to solve the opaque predicate in order to directly find the right path and avoid
+the useless block.</p>
+<p>Here is a graphical explanation of the problem, which is available in the <strong>source code</strong> of <em>OLLVM</em>:</p>
+<div class="highlight"><pre><span></span><span class="c1">// Before :</span>
+<span class="c1">//                       entry</span>
+<span class="c1">//                         |</span>
+<span class="c1">//                   ______v______</span>
+<span class="c1">//                  |   Original  |</span>
+<span class="c1">//                  |_____________|</span>
+<span class="c1">//                         |</span>
+<span class="c1">//                         v</span>
+<span class="c1">//                       return</span>
+<span class="c1">//</span>
+<span class="c1">// After :</span>
+<span class="c1">//                       entry</span>
+<span class="c1">//                         |</span>
+<span class="c1">//                     ____v_____</span>
+<span class="c1">//                    |condition*| (false)</span>
+<span class="c1">//                    |__________|----+</span>
+<span class="c1">//                   (true)|          |</span>
+<span class="c1">//                         |          |</span>
+<span class="c1">//                   ______v______    |</span>
+<span class="c1">//              +--&gt;|   Original* |   |</span>
+<span class="c1">//              |   |_____________| (true)</span>
+<span class="c1">//              |   (false)|    !-----------&gt; return</span>
+<span class="c1">//              |    ______v______    |</span>
+<span class="c1">//              |   |   Altered   |&lt;--!</span>
+<span class="c1">//              |   |_____________|</span>
+<span class="c1">//              |__________|</span>
+<span class="c1">//</span>
+<span class="c1">//  * The results of these terminator's branch's conditions are always true, but these predicates are</span>
+<span class="c1">//    opacificated. For this, we declare two global values: x and y, and replace the FCMP_TRUE</span>
+<span class="c1">//    predicate with (y &lt; 10 || x * (x + 1) % 2 == 0) (this could be improved, as the global</span>
+<span class="c1">//    values give a hint on where are the opaque predicates)</span>
+</pre></div>
+<p>During our symbolic execution, we need to <strong>simplify</strong> the following opaque predicate: <em>(y &lt; 10 || x * (x + 1) % 2 == 0)</em>.
+<em>Miasm</em> can still help us to do that because it contains an <strong>expression simplification engine</strong> which operates on its own IR.
+We have to add the knowledge of the opaque predicate. As we have an <strong>"or"</strong> (||) between two equations and as the result has to
+be <strong>True</strong> it is enough to only simplify one.</p>
+<p>The goal here is to do <strong>pattern matching</strong> using <em>Miasm</em> and replace the expression: <em>x * (x + 1) % 2</em> by zero. So, the right term of
+the opaque predicate is <strong>True</strong> and we solve it easily.</p>
+<p>It seems the ollvm developers made a little mistake in the code comments above: the announced opaque predicate
+is not valid. At first, we didn't managed to match it using the <em>Miasm</em> simplification engine. By looking at the equations given by <em>Miasm</em> we
+saw that the opaque predicate equation was: <strong>(x * (x - 1) % 2 == 0)</strong> (minus one instead of plus one).</p>
+<p>This problem can be verified by looking at the <em>OLLVM</em> source code:</p>
+<p><em>BogusControlFlow.cpp:620</em></p>
+<div class="highlight"><pre><span></span><span class="c1">//if y &lt; 10 || x*(x+1) % 2 == 0</span>
+<span class="n">opX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">LoadInst</span><span class="w"> </span><span class="p">((</span><span class="n">Value</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">));</span>
+<span class="n">opY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">LoadInst</span><span class="w"> </span><span class="p">((</span><span class="n">Value</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">));</span>
+
+<span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryOperator</span><span class="o">::</span><span class="n">Create</span><span class="p">(</span><span class="n">Instruction</span><span class="o">::</span><span class="n">Sub</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">Value</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">opX</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ConstantInt</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">Type</span><span class="o">::</span><span class="n">getInt32Ty</span><span class="p">(</span><span class="n">M</span><span class="p">.</span><span class="n">getContext</span><span class="p">()),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="nb">false</span><span class="p">),</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">));</span>
+</pre></div>
+<p>This piece of code shows the problem. The comment indicates (x+1) but the code is using <strong>Instruction::Sub</strong> directive which
+means: (x-1). As we work modulo 2, it is not a real problem because the result of the equation is the same, but working with pattern matching make this information important.</p>
+<p>Since we know precisely what we have to match, here is a code example to do it using <em>Miasm</em>:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Imports from Miasm framework</span>
+<span class="kn">from</span> <span class="nn">miasm2.expression.expression</span>           <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">miasm2.expression.simplifications</span>      <span class="kn">import</span> <span class="n">expr_simp</span>
+
+<span class="c1"># We define our jokers to match expressions</span>
+<span class="n">jok1</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok1"</span><span class="p">)</span>
+<span class="n">jok2</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok2"</span><span class="p">)</span>
+
+<span class="c1"># Our custom expression simplification callback</span>
+<span class="c1"># We are searching: (x * (x - 1) % 2)</span>
+<span class="k">def</span> <span class="nf">simp_opaque_bcf</span><span class="p">(</span><span class="n">e_s</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+    <span class="c1"># Trying to match (a * b) % 2</span>
+    <span class="n">to_match</span> <span class="o">=</span> <span class="p">((</span><span class="n">jok1</span> <span class="o">*</span> <span class="n">jok2</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">ExprInt32</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">MatchExpr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">to_match</span><span class="p">,[</span><span class="n">jok1</span><span class="p">,</span><span class="n">jok2</span><span class="p">,</span><span class="n">jok3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="p">{}):</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="c1"># Doesn't match. Return unmodified expression</span>
+
+    <span class="c1"># Interesting candidate, try to be more precise</span>
+    <span class="c1"># Verifies that b == (a - 1)</span>
+    <span class="n">mult_term1</span> <span class="o">=</span> <span class="n">expr_simp</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">jok1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">32</span><span class="p">])</span>
+    <span class="n">mult_term2</span> <span class="o">=</span> <span class="n">expr_simp</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">jok2</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">32</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">mult_term2</span> <span class="o">!=</span> <span class="p">(</span><span class="n">mult_term1</span> <span class="o">+</span> <span class="n">ExprInt</span><span class="p">(</span><span class="n">uint32</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))):</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="c1"># Doesn't match. Return unmodified expression</span>
+
+    <span class="c1"># Matched the opaque predicate, return 0</span>
+    <span class="k">return</span> <span class="n">ExprInt32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># We add our custom callback to Miasm default simplification engine</span>
+<span class="c1"># The expr_simp object is an instance of ExpressionSimplifier class</span>
+<span class="n">simplifications</span> <span class="o">=</span> <span class="p">{</span><span class="n">ExprOp</span> <span class="p">:</span> <span class="p">[</span><span class="n">simp_opaque_bcf</span><span class="p">]}</span>
+<span class="n">expr_simp</span><span class="o">.</span><span class="n">enable_passes</span><span class="p">(</span><span class="n">simplifications</span><span class="p">)</span>
+</pre></div>
+<p>Then, every time we call: <strong>expr_simp(e)</strong> (with "e" a lambda <em>Miasm</em> IR expression), if the opaque predicate is contained in it,
+it will be simplified. Since <em>Miasm</em> IR classes sometimes call <em>expr_simp()</em> method, it is possible that the callback is executed during IR manupulations.</p>
+</div>
+<div class="section" id="intermediate-function-1">
+<h4>Intermediate Function</h4>
+<p>Now, we have to apply the same symbolic execution algorithm than before, without dealing with <strong>relevants</strong> blocks. Indeed, useless
+blocks will automatically be removed since they are not executed. We obtain the follow CFG:</p>
+<a href="resources/2014-12-04_ollvm/images/4_bogus_tmp.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/4_bogus_tmp.png" alt="Click to enlarge" width="50%">
+</a><p>To get this graph, we just added the opaque predicate knowledge to our algorithm, and <em>Miasm</em> simplified it. The symbolic execution
+finds all possible paths and ignore impossible ones. We can see the "<strong>shape</strong>" of the function is correct but the result is kind of ugly
+because of the remaining instructions added by <em>OLLVM</em> and some empty basic blocks.</p>
+</div>
+<div class="section" id="recovered-function-1">
+<h4>Recovered Function</h4>
+<p>We can now apply the same <strong>heuristics</strong> than before (<em>Control Flow Flattening</em>) in order to clean the remains. Ok, it is an ugly method
+but we have to find something which works since we cannot use compiler simplification passes. We obtain the following CFG, which is <strong>pretty much the same</strong>
+as the original one:</p>
+<a href="resources/2014-12-04_ollvm/images/4_bogus_ok.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/4_bogus_ok.png" alt="Click to enlarge" width="50%">
+</a><p>Original code is recovered. We can see the <strong>3 conditions</strong> and the <strong>4 equations</strong> that are used to compute the output value.</p>
+</div>
+</div>
+<div class="section" id="instructions-substitution">
+<h3>Instructions Substitution</h3>
+<p>This pass is explained here: <a class="reference external" href="https://github.com/obfuscator-llvm/obfuscator/wiki/Instructions-Substitution">https://github.com/obfuscator-llvm/obfuscator/wiki/Instructions-Substitution</a></p>
+<p>We applied this pass using the following command line, on our test case application:</p>
+<div class="highlight"><pre><span></span><span class="p">..</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">clang</span><span class="w"> </span><span class="o">-</span><span class="n">m32</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">target_flat</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">sub</span>
+</pre></div>
+<p>This command enables the <em>Instructions Substitution</em> protection on all the functions of our test binary.</p>
+<div class="section" id="protected-function-2">
+<h4>Protected Function</h4>
+<p>Since this protection doesn't modify the original CFG, it is interesting to display it directly in our graph representation, using <em>Miasm</em> IR:</p>
+<a href="resources/2014-12-04_ollvm/images/5_sub.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/5_sub.png" alt="Click to enlarge" width="50%">
+</a><p>As expected, the function "<strong>shape</strong>" hasn't changed, we can still see conditions but the <strong>relevants</strong> blocks, which are supposed to do computations
+on input value seems <strong>bigger</strong> and more complex. Of course, in this example they are not very impressive since it is a simple one but it can be very ugly
+on a longer original code.</p>
+<p><em>OLLVM</em> pass replaced arithmetic and boolean operations by more complex ones. But since it is nothing more than a list of <strong>equivalent</strong> expressions, we can still attack
+them by using <em>Miasm</em> pattern matching technique.</p>
+<p>As we can see on the <em>OLLVM</em> website, there are several possible substitutions depending on the operator: <strong>+</strong> , <strong>-</strong> , <strong>^</strong> , <strong>|</strong> , <strong>&amp;</strong></p>
+<p>Here is the code that enables us to simplify the <em>OLLVM</em> <strong>XOR</strong> substitution:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Imports from Miasm framework</span>
+<span class="kn">from</span> <span class="nn">miasm2.expression.expression</span>           <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">miasm2.expression.simplifications</span>      <span class="kn">import</span> <span class="n">expr_simp</span>
+
+<span class="c1"># We define our jokers to match expressions</span>
+<span class="n">jok1</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok1"</span><span class="p">)</span>
+<span class="n">jok2</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok2"</span><span class="p">)</span>
+<span class="n">jok3</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok3"</span><span class="p">)</span>
+<span class="n">jok4</span> <span class="o">=</span> <span class="n">ExprId</span><span class="p">(</span><span class="s2">"jok4"</span><span class="p">)</span>
+
+<span class="c1"># Our custom expression simplification callback</span>
+<span class="c1"># We are searching: (~a &amp; b) | (a &amp; ~b)</span>
+<span class="k">def</span> <span class="nf">simp_ollvm_XOR</span><span class="p">(</span><span class="n">e_s</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+    <span class="c1"># First we try to match (a &amp; b) | (c &amp; d)</span>
+    <span class="n">to_match</span> <span class="o">=</span> <span class="p">(</span><span class="n">jok1</span> <span class="o">&amp;</span> <span class="n">jok2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">jok3</span> <span class="o">&amp;</span> <span class="n">jok4</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">MatchExpr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">to_match</span><span class="p">,[</span><span class="n">jok1</span><span class="p">,</span><span class="n">jok2</span><span class="p">,</span><span class="n">jok3</span><span class="p">,</span><span class="n">jok4</span><span class="p">])</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="p">{}):</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="c1"># Doesn't match. Return unmodified expression</span>
+
+    <span class="c1"># Check that ~a == c</span>
+    <span class="k">if</span> <span class="n">expr_simp</span><span class="p">(</span><span class="o">~</span><span class="n">result</span><span class="p">[</span><span class="n">jok1</span><span class="p">])</span> <span class="o">!=</span> <span class="n">result</span><span class="p">[</span><span class="n">jok3</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="c1"># Doesn't match. Return unmodified expression</span>
+
+    <span class="c1"># Check that b == ~d</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="n">jok2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">expr_simp</span><span class="p">(</span><span class="o">~</span><span class="n">result</span><span class="p">[</span><span class="n">jok4</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="c1"># Doesn't match. Return unmodified expression</span>
+
+    <span class="c1"># Expression matched. Return a ^ d</span>
+    <span class="k">return</span> <span class="n">expr_simp</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">jok1</span><span class="p">]</span><span class="o">^</span><span class="n">result</span><span class="p">[</span><span class="n">jok4</span><span class="p">])</span>
+
+<span class="c1"># We add our custom callback to Miasm default simplification engine</span>
+<span class="c1"># The expr_simp object is an instance of ExpressionSimplifier</span>
+<span class="n">simplifications</span> <span class="o">=</span> <span class="p">{</span><span class="n">ExprOp</span> <span class="p">:</span> <span class="p">[</span><span class="n">simp_ollvm_XOR</span><span class="p">]}</span>
+<span class="n">expr_simp</span><span class="o">.</span><span class="n">enable_passes</span><span class="p">(</span><span class="n">simplifications</span><span class="p">)</span>
+</pre></div>
+<p>The method is exactly the same for <strong>all substitutions</strong>. We just have to check if <em>Miasm</em> is matching it correctly. It could be a little <strong>tricky</strong> or time consuming
+because <em>Miasm</em> may suffer of some matching problems sometimes and we have to match specifically some equations. But when it's done... it's done.</p>
+<p>Also, it is important to say we have an advantage here because the obfuscator we are analyzing is <strong>open-source</strong> and we just have to look at the source in order to know
+precisely the substitutions. In a close source obfuscator, we have to find them manually and it can be very <strong>time consuming</strong>.</p>
+</div>
+<div class="section" id="recovered-function-2">
+<h4>Recovered Function</h4>
+<p>Once the knowledge of all <em>OLLVM</em> substitutions is added to the <em>Miasm</em> simplification engine, we can regenerate the CFG:</p>
+<a href="resources/2014-12-04_ollvm/images/5_sub_ok.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/5_sub_ok.png" alt="Click to enlarge" width="50%">
+</a><p>We can see on the screenshot above the <strong>relevants</strong> basic blocks are smaller and cleaned from ugly equations. Instead, we have the <strong>original</strong>
+equations back, and it is understandable for an analyst.</p>
+</div>
+</div>
+<div class="section" id="full-protection">
+<h3>Full Protection</h3>
+<p>It is a good point to break all protections <strong>one by one</strong> but often, the power of an obfuscator is to be able to <strong>cumulate passes</strong>, which makes
+the code very hard to understand without manipulation. Also, in real life, people may want to enable the <strong>maximum protection</strong> level in order
+to obfuscate their software. So, it is important to be able to handle <strong>all the protections</strong> at the same time.</p>
+<p>We enabled the maximum <em>OLLVM</em> protection level on our test case function using this command:</p>
+<div class="highlight"><pre><span></span><span class="p">..</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">clang</span><span class="w"> </span><span class="o">-</span><span class="n">m32</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">target_flat</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">bcf</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">boguscf</span><span class="o">-</span><span class="n">prob</span><span class="o">=</span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">boguscf</span><span class="o">-</span><span class="n">loop</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">sub</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">fla</span><span class="w"> </span><span class="o">-</span><span class="n">mllvm</span><span class="w"> </span><span class="o">-</span><span class="n">perFLA</span><span class="o">=</span><span class="mi">100</span>
+</pre></div>
+<div class="section" id="protected-function-3">
+<h4>Protected Function</h4>
+<p>By looking at the protected function in <em>IDA</em>, one can see the following control flow graph:</p>
+<a href="resources/2014-12-04_ollvm/images/6_full.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/6_full.png" alt="Click to enlarge" width="50%">
+</a><p>It is important to say that passes cumulation <strong>seems to</strong> significantly improve the protection level of the code because opaque predicates can be transformed by instructions
+substitution and the control flow flattening is applied on a bogus control flow protected code. On the screenshot above, we can see <strong>more and longer</strong> relevant blocks.</p>
+</div>
+<div class="section" id="recovered-function-3">
+<h4>Recovered Function</h4>
+<p>But we <strong>just run</strong> our script containing all methods described in this article, without any modification. The function is <strong>completely recovered</strong> and although the protected
+function above seems very impressive, we can say here the cumulation of all the passes <strong>doesn't make any difference</strong>, at the protection level.</p>
+<a href="resources/2014-12-04_ollvm/images/6_full_ok.png">
+    <img class="align-center" src="resources/2014-12-04_ollvm/images/6_full_ok.png" alt="Click to enlarge" width="50%">
+</a><p>We can see some <strong>useless lines</strong> our heuristic cleanup script didn't remove but it is negligeable as we recovered the original "<strong>shape</strong>", conditions and equations of the
+original function.</p>
+</div>
+</div>
+<div class="section" id="bonus">
+<h3>Bonus</h3>
+<p>As we have seen, it is possible to attack directly the control flow graph in order to rebuild it and fill it with understandable pseudo code. On our test case we can understand
+the code differently, using only <em>Miasm</em> symbolic execution engine.</p>
+<p>We know that our function take one input parameter and produce an output value, which depends on the input. What we can do is,  during symbolic execution, each time we
+reach the bottom (return) of a branch, to display <strong>EAX equation</strong> (which is the return value register for x86 32-bit architecture). For this example, we activated the
+full <em>OLLVM</em> protections options as we've seen in the previous part of this article.</p>
+<div class="highlight"><pre><span></span><span class="c1"># .. Here we have to do basic blocks symbolic execution, as we seen earlier ..</span>
+
+<span class="c1"># Jump to next basic block</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simp_addr</span><span class="p">,</span> <span class="n">ExprInt</span><span class="p">):</span>
+  <span class="c1"># Useless code removed here...</span>
+
+<span class="c1"># Condition</span>
+<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simp_addr</span><span class="p">,</span> <span class="n">ExprCond</span><span class="p">):</span>
+  <span class="c1"># Useless code removed here...</span>
+
+<span class="c1"># Next basic block address is in memory</span>
+<span class="c1"># Ugly way: Our function only do that on return, by reading return value on the stack</span>
+<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">simp_addr</span><span class="p">,</span> <span class="n">ExprMem</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Reached return ! Result equation is:"</span><span class="p">)</span>
+
+    <span class="c1"># Get the equation of EAX in symbols</span>
+    <span class="c1"># "my_sanitize" is our function used to display Miasm IR "properly"</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">my_sanitize</span><span class="p">(</span><span class="n">symb</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">ExprId</span><span class="p">(</span><span class="s2">"EAX"</span><span class="p">,</span><span class="mi">32</span><span class="p">)]))</span>
+
+    <span class="c1"># Replace input argument memory deref by "x" to be more understandable</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"@32[(ESP_init+0x4)]"</span><span class="p">,</span><span class="s2">"x"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Equation = </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">eq</span><span class="p">)</span>
+</pre></div>
+<p>By using the code above and running the symbolic execution, we get the following output:</p>
+<div class="highlight"><pre><span></span><span class="n">starting</span> <span class="n">symbolic</span> <span class="n">execution</span><span class="o">...</span>
+<span class="o">------------------------------</span>
+<span class="n">Reached</span> <span class="k">return</span> <span class="err">!</span> <span class="n">Result</span> <span class="n">equation</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">Equation</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span><span class="o">^</span><span class="mh">0x2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">|</span><span class="mh">0xBAAAD0BF</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+<span class="o">------------------------------</span>
+<span class="n">Reached</span> <span class="k">return</span> <span class="err">!</span> <span class="n">Result</span> <span class="n">equation</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">Equation</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span><span class="o">&amp;</span><span class="mh">0xBAAAD0BF</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mh">0x3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+<span class="o">------------------------------</span>
+<span class="n">Reached</span> <span class="k">return</span> <span class="err">!</span> <span class="n">Result</span> <span class="n">equation</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">Equation</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span><span class="o">^</span><span class="mh">0xBAAAD0BF</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">|</span><span class="mh">0x4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+<span class="o">------------------------------</span>
+<span class="n">Reached</span> <span class="k">return</span> <span class="err">!</span> <span class="n">Result</span> <span class="n">equation</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">Equation</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span><span class="o">&amp;</span><span class="mh">0x5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mh">0xBAAAD0BF</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+<span class="o">------------------------------</span>
+<span class="n">symbolic</span> <span class="n">execution</span> <span class="ow">is</span> <span class="n">done</span><span class="o">.</span>
+</pre></div>
+<p>Great, the result is exactly what we can find in the source code of our test case application!</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Although our script is a good start, it doesn't and will <strong>never break</strong> all functions protected by <em>OLLVM</em>, because on one hand there are always
+particular cases depending on the target binary and the scripts have to be patched/hacked/improved accordingly. Also it relies on <em>Miasm</em> which can
+have some <strong>unsupported</strong> features we have to implement or report.</p>
+<p>We tested this script on more complex functions, with <strong>loops</strong> for instance and it is working pretty well. But it does not handle <strong>particular cases</strong>, for example
+when a loop stop condition depends on an input parameter. It is <strong>difficult</strong> to handle because we have to deal with already encountered branches and quickly enter an
+<strong>infinite</strong> symbolic execution loop. In order to detect them, we have to do branches states differences to deduce the stop condition and continue symbolic execution normally.</p>
+<p>The <em>OLLVM</em> project is really <strong>interesting</strong> and <strong>useful</strong> because it shows by the example
+how to manipulate <em>LLVM</em> in order to build your own obfuscator, which can support <strong>several</strong> CPU architectures. Compared to commercial closed-source protections, we have seen having access to the source code helps to break protections. But it also shows how strongly obfuscation relies on secrets: how the transformations are applied, on  what rely transformations, how they are combined and so on. So, really, congrats to <em>OLLVM</em> team for exposing that.</p>
+<p>Conversely to what many people believe, code obfuscation is <strong>REALLY</strong> difficult. It is not about forbidding access to the code and data, it is about buying time and thinking ahead of how one will break your layers of protection.</p>
+</div>
+<div class="section" id="thanks">
+<h2>Thanks</h2>
+<ul>
+<li><p class="first"><em>OLLVM</em> authors for their useful project</p>
+</li>
+<li><p class="first">Fabrice Desclaux for the awesome <em>Miasm</em> framework</p>
+</li>
+<li><p class="first">Camille Mougey for his contribution and help on <em>Miasm</em></p>
+</li>
+<li><p class="first">Ninon Eyrolles for her help and corrections</p>
+</li>
+</ul>
+</div>
+
+            </div>
+            <hr>
+            <p>If you would like to learn more about our security audits and explore how we can help you, <a href="https://content.quarkslab.com/talk-to-our-experts-blog">get in touch with us</a>!</p>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3 col-sm-pull-7" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+<!-- Sidebar/Quarkslab -->
+<li class="list-group-item">
+    <h4>
+        <i class="fa-solid fa-earth-europe fa-lg"></i>
+        <a href="https://quarkslab.com">
+            Quarkslab's Website
+        </a>
+    </h4>
+</li>
+<!-- End Sidebar/Quarklab -->
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4>SOCIAL</h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a class="text-capitalize" href="https://twitter.com/quarkslab"><i class="fa-brands fa-twitter fa-lg"></i> twitter</a></li>
+    <li class="list-group-item"><a class="text-capitalize" href="https://infosec.exchange/@quarkslab"><i class="fa-brands fa-mastodon fa-lg"></i> mastodon</a></li>
+    <li class="list-group-item"><a class="text-capitalize" href="https://github.com/quarkslab"><i class="fa-brands fa-github fa-lg"></i> github</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Categories -->
+<li class="list-group-item">
+  <h4>CATEGORIES</h4>
+  <ul class="list-group" id="categories">
+    <li class="list-group-item">
+      <a href="./category/android.html"><i>•</i>Android</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/automotive.html"><i>•</i>Automotive</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/blockchain.html"><i>•</i>Blockchain</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/challenge.html"><i>•</i>Challenge</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/containers.html"><i>•</i>Containers</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/cryptography.html"><i>•</i>Cryptography</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/exploitation.html"><i>•</i>Exploitation</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/file-formats.html"><i>•</i>File Formats</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/fuzzing.html"><i>•</i>Fuzzing</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/hardware.html"><i>•</i>Hardware</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/kernel-debugging.html"><i>•</i>Kernel Debugging</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/life-at-quarkslab.html"><i>•</i>Life at Quarkslab</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/math.html"><i>•</i>Math</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/pentest.html"><i>•</i>Pentest</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/program-analysis.html"><i>•</i>Program Analysis</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/programming.html"><i>•</i>Programming</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/reverse-engineering.html"><i>•</i>Reverse-Engineering</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/software.html"><i>•</i>Software</a>
+    </li>
+    <li class="list-group-item">
+      <a href="./category/vulnerability.html"><i>•</i>Vulnerability</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Categories -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">© 2024 Quarkslab
+            · Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="./theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="./theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="./theme/js/respond.min.js"></script>
+
+    <script src="./static/js/misc.js"></script>
+
+
+
+
+</body></html>

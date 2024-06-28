@@ -1,0 +1,646 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    
+    <title>Intro to SDR and RF Signal Analysis</title>
+    
+    
+    <meta name="description" content="elttam is an independent security company providing research-driven security assessment services. We combine pragmatism and deep technical insight to help our customers secure their most important assets.">
+    
+    <meta name="keywords" content="Security Auditing, Adversary Simulations, White-box Penetration Testing, Scenario-driven Penetration Testing, Web Applications, Mobile Applications, Cloud Infrastructure, Embedded Devices">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- CSS -->
+    <link href="/css/all.css" rel="stylesheet" type="text/css">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/css/animate.css" rel="stylesheet" type="text/css">
+    <link href="/css/syntax.css" rel="stylesheet" type="text/css">
+    <link href="/css/elttam.css" rel="stylesheet" type="text/css">
+    <link href="/css/blog.css" rel="stylesheet" type="text/css">
+<style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+<body>
+
+    <!-- Page Wrapper -->
+    <div id="page-wrapper">
+        <div class="wrapper">
+            <!--Header-->
+            <div id="header" class="header">
+                <div class="header-inner">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <a href="/#intro"><img src="/img/elttam_logo_full_orange_white.png"></a>
+                    </div>
+                    <!-- End Logo -->
+
+                    <!--Navigation Icon-->
+                    <div class="nav-menu-icon">
+                        <a><i class="fa fa-bars"></i></a>
+                    </div>
+                    <!--End Navigation Icon-->
+
+                    <!-- Navigation Menu -->
+                    <div class="nav-menu" style="max-height: 628px;">
+                        <ul class="nav-menu-inner">
+                            <li><a href="/#services">Services</a></li>
+                            <li><a href="/#about">About</a></li>
+                            <li><a href="/#research">R&amp;D</a></li>
+                            <li><a href="/#careers">Careers</a></li>
+                            <li><a href="/#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <!-- End Navigation Menu -->
+                </div>
+            </div>
+            <!--End Header-->
+
+            <!--Intro Section-->
+            <section id="intro" class="intro-fullscreen" style="height: 693px; min-height: 500px;">
+                <div class="intro-media dark-bg bg-image overlay-dark" data-background-img="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/baudline_spectrum.gif" style="background-image: url(&quot;/img/blog/2017-06-13-brief-sdr-and-rf-analysis/baudline_spectrum.gif&quot;);"></div>
+                <div class="intro-caption-waper">
+                    <div class="intro-full-height container" style="height: 693px; min-height: 500px;">
+                        <div class="intro-content">
+                            <div class="intro-content-inner text-center">
+				<h2 class="page-title-alt mb-30 color"><span class="text-light">Intro to SDR and RF Signal Analysis</span></h2>
+                                <p class="lead max-width-800">Visual analysis of signal characteristics using software-defined radio</p>
+                                <br>
+                                <div>
+                                    <a href="../" class="btn btn-md btn-white-line xs-hidden">Back</a>
+                                    <a href="#content" class="btn btn-md btn-white">Continue</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- End Intro Section-->
+
+            <!-- Blog Post Section -->
+
+<section id="content" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 blog-post-hr">
+                <div class="blog-post mb-30">
+                    <div class="post-meta">
+                        <span><a href="/#about">Mykel Pritchard</a>, June 15, 2017</span>
+                    </div>
+                    <br>
+                    <div class="post-entry">
+                        <h2 id="introduction">Introduction</h2>
+<p>The increasing popularity of Internet of Things (IoT) and other devices becoming wireless is very much apparent in today’s society.  With availability of modern Software Defined Radio (SDR) hardware, it has become more accessible, cheaper, and easier than ever to examine the Radio Frequency (RF) signals that are used by these devices to communicate.  The following discussion attempts to understand how this communication information is transmitted through RF, and how SDR may be used to analyse and possibly reverse engineer this signal back to understandable data.  To achieve this, the RF signals of a number of simple household RF devices will be examined visually in an effort to identify the characteristics of the transmitted signal, along with the data that was transmitted.</p>
+
+<hr>
+
+<h2 id="some-basic-rf-theory-and-terminology">Some Basic RF Theory and Terminology</h2>
+
+<h3 id="what-is-radio-frequency-rf">What is Radio Frequency (RF)</h3>
+<p>To talk about RF, we first have to have some understanding of electromagnetic radiation (EMR).  When a charged particle is accelerated through space, such as being emitted by an antenna, it produces two oscillating fields that occur perpendicular to each other, an electric field, and a magnetic field.  These oscillating fields are called an EM wave, and can be visualised as shown in the following image, where <em>x</em> is time, <em>E</em> the electric field, and <em>B</em> the magnetic field.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/EM-Wave.gif">
+  <figcaption>Image Ref: https://commons.wikimedia.org/wiki/File:EM-Wave.gif</figcaption>
+</figure>
+
+<p>You already know EM waves because we deal with them on a daily basis.  Radio waves, microwaves, infrared radiation, visible light, ultraviolet light, x-rays, and gamma-rays, are all EMR.  The difference between these types of EMR is the frequency range in which the EM waves oscillate.</p>
+
+<p>RF is generally thought of as EMR with EM wave frequencies in the range of <em>3kHz</em> to <em>300GHz</em>, and is mostly used for RADAR and wireless communications.  An easy example of RF communication is <em>WiFi</em>, which operates in the <em>2.4GHz</em> and <em>5GHz</em> frequency ranges.</p>
+
+<p>For our purposes, we will need to identify a few basic characteristics of EM waves in order to analyse a given signal.  These are <strong>frequency and wavelength</strong>, <strong>amplitude</strong>, and <strong>phase</strong>.</p>
+
+<h3 id="frequency-and-wavelength">Frequency and Wavelength</h3>
+<p>As previously discussed, the frequency of a wave is the rate at which it’s EM fields are oscillating.  Generally, the electric field is measured, in which a <strong>wave cycle</strong> is the oscillating pattern of the wave before that pattern repeats.  <strong>Frequency (<em>f</em>)</strong> is therefore the number of EM wave cycles that occur within a given unit of time.  This is generally measured in <em>Hertz (Hz)</em>, which is the number of wave cycles per second.  This can be seen in the following image, which shows a ten wave cycles of a signal with the frequency of <em>10 Hz</em>.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/10CompleteCycles.gif">
+  <figcaption>Image Ref: http://www.minelab.com/__files/i/5872/10CompleteCycles.gif</figcaption>
+</figure>
+
+<p>Frequency also has a close relationship with the <strong>wavelength (<em>λ</em>)</strong>, which is the distance the wave travels in one wave cycle.  As EMR travels at the speed of light (<em>C</em>) through a vacuum, frequency and wavelength are inversely proportional.  To calculate this, the formula <strong>(<em>λ = f / v</em>)</strong> may be used, where <em>v</em> is the velocity in a given medium, generally around 300,000 kms/s (approx. speed of light in a vacuum).  Frequency is further categorised into frequency <strong>bands</strong>, which can be seen the following image, also showing the relationship between frequency and wavelength.  Why is wavelengthimportant you ask?  It directly relates to choosing an appropriate antenna length for a given signal, which we will cover later.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/freq_bands.png" height="80%" width="80%">
+  <figcaption>Image Ref: http://www.ni.com/cms/images/devzone/tut/a/706afe69127.gif</figcaption>
+</figure>
+
+<p>Frequencies are chosen depending on the needs of an application, for instance lower frequencies tend to propagate longer distances than higher frequencies, and is used in applications like over-the-horizon RADAR.  Similar frequencies can also interfere with each other, hence why radio stations are separated in frequency.  Many countries have government bodies that control the RF spectrum to avoid interference between applications, and regulate RF use.  Within Australia, this is the Australian Communications and Media Authority (ACMA).  An example of this spectrum allocation can be found <a href="http://acma.gov.au/~/media/Spectrum%20Transformation%20and%20Government/Publication/pdf/spectrum_chart2013%20pdf.pdf">here</a>.  Only a small portion of the RF spectrum allows transmission without the need for a licence.</p>
+
+<h3 id="amplitude">Amplitude</h3>
+<p>The amplitude of an RF signal can be thought of as a measure of the change in the electric field oscillation over a a single period.  For a sinusoidal wave, this is the magnitude the wave swings above and below a reference value, and can be measured in a few ways, such as <em>peak</em>, <em>peak-to-peak</em>, and <em>root mean square (RMS)</em> amplitude.  These are shown in the following image as items <em>1</em>, <em>2</em>, and <em>3</em>, respectively.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/amplitude.png" height="60%" width="60%">
+  <figcaption>Image Ref: https://en.wikipedia.org/wiki/Amplitude#/media/File:Sine_voltage.svg</figcaption>
+</figure>
+
+<p>For our purposes, we will only need to observe the changes in amplitude of signals and won’t need to measure this value, however within telecommunications this value is usually a measure of voltage, current, field intensity, or power.</p>
+
+<h3 id="phase">Phase</h3>
+<p>Lastly let’s have a look at the phase characteristic of an RF signal.  The <strong>phase</strong> of a wave can be thought of as the position of a single point in time during a wave cycle.  For a sinusoidal wave this is usually expressed in degrees, or radians, which is shown in the following image.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/phase1.gif" height="60%" width="60%">
+  <figcaption>Image Ref: https://en.wikipedia.org/wiki/Phase_(waves)#/media/File:Oscillating_sine_wave.gif</figcaption>
+</figure>
+
+<p>As you can see, if a wave was shifted 180 degrees out of phase, it would be the complete opposite of the original waveform.</p>
+
+<h3 id="modulation">Modulation</h3>
+<p>To be useful for any form of communication, an RF signal must have a way to carry information.  The previous three wave characteristics, frequency, amplitude, and phase, make up the building blocks for modifying an RF signal in some way to carry data.  This is called <strong>modulation</strong>, and involves mixing a modulating signal, which contains the information to be transmitted, into a periodic waveform called the <strong>carrier wave (<em>CW</em>)</strong>, which propagates the signal through the environment.</p>
+
+<h4 id="analogue-modulation-schemes">Analogue Modulation Schemes</h4>
+<p>Analogue modulation involves sending an analogue data signal, with an analogue carrier wave.  Examples of this would be analogue TV or radio station transmissions.  There are a few analogue modulation schemes, however the simplest are amplitude, frequency, and phase modulation.</p>
+
+<h5 id="amplitude-modulation-am">Amplitude Modulation (AM)</h5>
+<p>With amplitude modulation, the amplitude of the carrier wave is modulated with the data signal.  This can be seen in the diagram below</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AM.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<h5 id="frequency-modulation-fm">Frequency Modulation (FM)</h5>
+<p>Frequency modulation can be seen in the diagram below, and shows how the data signal is used to modulate the frequency characteristic of carrier wave.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/FM.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<h5 id="phase-modulation-pm">Phase Modulation (PM)</h5>
+<p>Analogue phase modulation looks very similar to frequency modulation and may be difficult to differentiate the two without some prior knowledge of how the signal is modulated.  With this modulation, the carrier wave’s phase is either pushed forward or backward by the modulating data signal.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/PM.jpg" height="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<h4 id="digital-modulation">Digital Modulation</h4>
+<p>Digital modulation comes from the need to represent a digital signal, i.e. ones and zeros, in the analogue medium of RF for transmission.  To achieve this, discrete RF energy states are used to representing some quantity of the digital information, these are called <strong>symbols</strong>.  The three most basic modulation schemes for transmitting digital data are <strong>Amplitude Shift Keying</strong>, <strong>Frequency Shift Keying</strong>, and <strong>Phase Shift Keying</strong>.</p>
+
+<h5 id="amplitude-shift-keying-ask-and-on-off-keying-ook">Amplitude Shift Keying (ASK) and On Off Keying (OOK)</h5>
+<p>ASK involves using the digital data to modulate the amplitude of the carrier wave.  This may be by altering the amplitude itself, or simply turning the signal off and on forming a pulse of energy, which is called On-Off Keying (OOK).  The following image shows how binary data might modulate the carrier wave through ASK and OOK.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/ASK1.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<p>Many forms of RADAR transmit pulses of energy like this, then listen to for the weak reflection of the pulse in order to determine the position of objects in an environment.</p>
+
+<h5 id="frequency-shift-keying-fsk">Frequency Shift Keying (FSK)</h5>
+<p>Similar to ASK, FSK modulates the frequency of the carrier wave with the binary data, forming symbols that have distinct changes in frequency to represent the bits, as seen below.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/FSK1.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<h5 id="phase-shift-keying-psk">Phase Shift Keying (PSK)</h5>
+<p>Finally, PSK uses the digital data to modulate the phase of the carrier wave, and forms distinct angular changes in the phase of the signal to represent the binary data as a symbol.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/PSK1.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<h4 id="can-you-identify-the-modulation-in-these-captured-signals">Can You Identify the Modulation in These Captured Signals?</h4>
+<p>Knowing what we just learned with respect to basic modulation schemes, can you identify the modulation used in the following captured signals?  Which are analogue and which are digital?</p>
+
+<p><strong>Note:</strong> <em>The animated gif of each signal shows a waterfall plot of time vs. frequency (higher amplitudes also showing as a brighter green) at the top, with a plot of amplitude vs. frequency at the bottom.  The image that follows each animated gif shows a subsection of the waveform which represents the wave’s amplitude vs. time.</em></p>
+
+<h5 id="signal-1">Signal 1</h5>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AM_76MHz_FFT.gif" alt="" height="50%" width="50%">
+<img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AM_76MHz_Osc2.png" alt=""></p>
+
+<h5 id="signal-2">Signal 2</h5>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/FM_104MHz_FFT.gif" alt="" height="50%" width="50%">
+<img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/FM_104MHz_Osc.png" alt=""></p>
+
+<h5 id="signal-3">Signal 3</h5>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AMOOK_433MHz_FFT_HackRF.gif" alt="" height="50%" width="50%">
+<img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/doorbell_433MHz_Osc2.png" alt=""></p>
+
+<p>If you said the first is AM, the second is FM, and the third is ASK or OOK.  Then you are correct, however the third signal implements a slightly more complex type of ASK, known as Pulse Duration Modulation (PDM) where the duration of the pulse relates to the modulating data.</p>
+
+<h4 id="more-complex-digital-modulation">More Complex Digital Modulation</h4>
+<p>Even with high speed systems, transmission of digital data in a format where a symbol represents a single one or a zero is very slow.  To increase the speed of data transfer, more complex forms of modulation are used, in which a single symbol represents several bits.  To give an idea about how this might be implemented, we will quickly look at <strong>Quadrature Phase Shift Keying (QPSK)</strong> and <strong>Quadrature Amplitude Modulation (QAM)</strong> which are the modulation components of WiFi signals.</p>
+
+<h5 id="quadrature-phase-shift-keying-qpsk">Quadrature Phase Shift Keying (QPSK)</h5>
+<p>QPSK involves modulating the signal to achieve four distinct phase shifted symbols, each representing a combination of two bits, as shown in the following image.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/QPSK.jpg" height="75%" width="75%">
+  <figcaption>Image Ref: http://ironbark.xtelco.com.au/subjects/DC/lectures/7/</figcaption>
+</figure>
+
+<p>This can be visualised by plotting the points on the circular nature of the sinusoidal pattern, shown in the diagram below, where the <em>I</em> plane represents the in-phase component, and <em>Q</em> the quadrature.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/QPSK2.png" height="50%" width="50%">
+  <figcaption>Image Ref: https://en.wikipedia.org/wiki/Phase-shift_keying#/media/File:QPSK_Gray_Coded.svg</figcaption>
+</figure>
+
+<p>Further modifications of this exist that add more phase points, such as 32-PSK, which produces more distinct symbols, and increases the data rate.</p>
+
+<h5 id="quadrature-amplitude-modulation-qam">Quadrature Amplitude Modulation (QAM)</h5>
+<p>QAM furthers the concept of QPSK by adding the modulation of amplitude in addition to the phase of the signal.  A good example of this can be seen in the following image, which shows 16-QAM.</p>
+
+<figure>
+  <img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/QAM16.gif" height="60%" width="60%">
+  <figcaption>Image Ref: https://reviseomatic.org/help/x-more/QAM16.gif</figcaption>
+</figure>
+
+<p>Here you can see there are sixteen distinct symbols, each relating to four bits of binary data.</p>
+
+<h4 id="spread-spectrum-systems">Spread Spectrum Systems</h4>
+<p>In combination with digital modulation, transmission of the data can be spread across multiple frequencies, this is called spread spectrum.  This is used to reduce the effect of interference and possibly make the signal more difficult to detect, as it appears similar to noise.  Two common forms of spread spectrum are <strong>Direct Sequence Spread Spectrum (DSSS)</strong>, and <strong>Frequency Hopping Spread Spectrum</strong>.</p>
+
+<p><em>DSSS</em> takes each transmitted bit and represents it with multiple bits called a spreading code, which is transmitted over a wide frequency range.</p>
+
+<p><em>FHSS</em> hops the transmission between a predetermined set of frequencies, in which the receiver is synchronised with the transmitter.</p>
+
+<hr>
+
+<h2 id="software-defined-radio-sdr">Software Defined Radio (SDR)</h2>
+<p>The example signals above were captured using a hardware SDR device, and displayed using signal analysis software, <em>Baudline</em>.</p>
+
+<p>As radio equipment can be very expensive, and is usually specific to particular applications, SDR solves this problem by removing components that would usually be implemented in hardware, such as mixers, amplifiers, modulators, and demodulators, and implements them in software.  This means we can analyse the raw signal being received, however it is up to us to implement the other components in software in order to retrieve the original data.  Doing this requires a deeper understanding, but for our purposes we will use inexpensive SDR hardware and software to take a look at some captured signals, and have a go at visually analysing them.</p>
+
+<h3 id="hardware-tools">Hardware Tools</h3>
+<p>There a several good and relatively inexpensive SDR hardware devices on the market that can be used to receive and transmit RF.  The ones used here are the following:</p>
+
+<ul>
+  <li>RTL_SDR</li>
+  <li>HackRF One</li>
+  <li>YardStick One (not SDR but can be used to receive and transmit modulated signals)</li>
+</ul>
+
+<h3 id="software-tools">Software Tools</h3>
+<p>The software tools I found most helpful for capturing and analysing RF signals on a Linux platform are as follows:</p>
+
+<ul>
+  <li>Baudline (recording and analysis)</li>
+  <li>osmocom_fft (recording and analysis)</li>
+  <li>Inspectrum (analysis)</li>
+  <li>GNU Radio Companion (recording, analysis, demodulation and a whole bunch more)</li>
+</ul>
+
+<p>All these software tools are free, and there are many more out there, including a lot that can automatically demodulate data for specific RF systems.</p>
+
+<p><strong>Note:</strong> <em>SDR can be quite resource intensive, the amount of data that is captured in a small time frame can be very large, and also requires high bandwidth from the USB port your SDR device is attached to.  This can also cause issues if using virtual machines.  There is plenty of information online about setting up SDR devices and software, so Google is your friend here.</em></p>
+
+<h3 id="capturing-and-analysing-rf-signals">Capturing and Analysing RF Signals</h3>
+<p>Because SDR converts the analogue signal received into digital data, something to note here is the concept of <strong>samplerate</strong>, and <strong>bandwidth</strong>.  Samplerate refers to the number of samples taken of the analogue signal per second, and directly relates to the bandwidth of the frequency spectrum that is visible at any particular point in time.  For example, the higher the samplerate the more frequencies you can see, however this also increases the amount of data being received.  The samplerate that is possible depends on your SDR device and the ability of your particular computing resources.  <strong>Gain</strong> is also another important concept, and relates to the amplification of signals.  It is worthwhile having a read about these with respect to your particular SDR device.</p>
+
+<p>To start to view and analyse a specific RF signal, I found the easiest way, with my particular resources, was to pipe the data received from the SDR device into <em>Baudline</em>.  This is quite simple with both an <em>RTL_SDR</em> device or the <em>HackRF</em>, using their CLI commands <code class="language-plaintext highlighter-rouge">rtl_sdr</code>, or <code class="language-plaintext highlighter-rouge">hackrf_transfer</code> respectively, however some characteristic of the particular device need to be known.  Both <em>RTL_SDR</em> and <em>HackRF</em> use two channels to sample the quadrature values <em>I</em> and <em>Q</em> previously talked about. In the case of the <em>HackRF</em>, the samples are 8-bit signed values, and this needs to be relayed to <em>Baudline</em> in order to correctly interpret the data.  To make this easier, I wrote the following bash script to pipe the <em>HackRF</em> output to <em>Baudline</em> and allow real-time viewing of the spectrum:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/bin/bash</span>
+<span class="c"># ./hackrf_baudline.sh &lt;frequency&gt; &lt;samplerate&gt; &lt;ifgain&gt; &lt;bbgain&gt;</span>
+
+<span class="c"># Pipe HackRF output to Baudline</span>
+hackrf_transfer <span class="nt">-r</span> - <span class="nt">-f</span> <span class="k">${</span><span class="nv">1</span><span class="k">}</span> <span class="nt">-s</span> <span class="k">${</span><span class="nv">2</span><span class="k">}</span> <span class="nt">-l</span> <span class="k">${</span><span class="nv">3</span><span class="k">}</span> <span class="nt">-g</span> <span class="k">${</span><span class="nv">4</span><span class="k">}</span> | baudline <span class="nt">-reset</span> <span class="nt">-basefrequency</span> <span class="k">${</span><span class="nv">1</span><span class="k">}</span> <span class="nt">-samplerate</span> <span class="k">${</span><span class="nv">2</span><span class="k">}</span> <span class="nt">-channels</span> 2 <span class="nt">-format</span> s8 <span class="nt">-quadrature</span> <span class="nt">-flipcomplex</span> <span class="nt">-stdin</span></code></pre></figure>
+
+<p>For example, running <code class="language-plaintext highlighter-rouge">./hackrf_baudline.sh 100000000 8000000 24 20</code>, might give you something similar to the following image in <em>Baudline</em>.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/baudline_spectrum.gif" alt=""></p>
+
+<p>There is some noise here in my set up, however this shows a portion of the RF spectrum around the centre frequency of <em>100 MHz</em>.  For me there are several FM radio stations in this range that are visible.</p>
+
+<p><strong>Note:</strong> <em>Something to mention here is that you can see a constant distinct signal right at the centre frequency.  This is called the Direct Current (DC) offset, and is an artifact of the measurement system that is implemented in the device.  This is apparently common in all quadrature sampling systems, however it seemed particularly pronounced with the *HackRF</em>.  The easiest way to deal with this is to offset the centre frequency slightly from the frequency you wish to analyse.*</p>
+
+<p><em>osmocom_fft</em> is also very useful for looking at large portion of the RF spectrum in order to identify a particular signal, however <em>baudline</em> appears to have a lot more features for analysing signals.  Although many of the features I have no idea what they do, some of the ones I found useful are as follows (usually found by right-clicking within a <em>baudline</em> window):</p>
+
+<ul>
+  <li><em>input-&gt;color aperture</em>, playing with these setting can help to reduce the noise.</li>
+  <li><em>input-&gt;devices</em>, the <em>decimate</em> and <em>down mixer</em> settings can help to reduce the visible spectrum and focus on a specific signal.</li>
+  <li><em>process-&gt;transform size</em>, increases and decreases size of the internal Fast Fourier Transform, and can help to give a better view in either the frequency or time domain.</li>
+  <li><em>displays-&gt;waveform</em>, gives a waveform output of the signal.</li>
+  <li><em>pause</em>, can be used to pause the output to inspect a signal.</li>
+  <li><em>measure-&gt;system-&gt;delta selected</em>, can be used to measure the time, for instance between OOK pulses.  The precision of this can also be increased.</li>
+  <li>Periodicity bars, used by pressing and holding your 2nd mouse button then tapping <em>shift</em>, this can help to measure symbols intervals.</li>
+  <li>Using <em>alt</em> and the arrow keys to zoom in or out within the windows.</li>
+</ul>
+
+<p>Both <em>baudline</em> and <em>osmocom_fft</em> have the option to save to a file, and this is also possible straight from the <em>RTL_SDR</em> and <em>HackRF</em> command line tools <code class="language-plaintext highlighter-rouge">rtl_sdr</code> and <code class="language-plaintext highlighter-rouge">hackrf_transfer</code>.</p>
+
+<p><strong>Note:</strong> <em>A quick note here on antennas.  Antenna theory is a whole science in itself, however to improve the received signal, it is a good idea to use an antenna that is quarter wavelength of the desired frequency to receive.  For a telescopic antenna this may be as simple as extending it to approximately to correct length.  Quarter wavelength in centimetres can be approximated by dividing 300 by the frequency in MHz, multiplying by 100, and dividing by 4.</em></p>
+
+<p>Another useful tool here is <em>Inspectrum</em>.  With <em>Inspectrum</em> you can load and view the frequency spectrum captured through the use of one of the other tools, however it offers a nice <em>cursor</em> function that allows you to easily identify the symbols and the symbol rate, otherwise known as <strong>baudrate</strong>.  You can see the use of this in the garage door example in the later sections.</p>
+
+<hr>
+
+<h2 id="a-methodology-for-reversing-rf-signals">A Methodology for Reversing RF Signals</h2>
+<p>If your ultimate goal is to reverse engineer an RF signal and understand it’s protocol, a nice methodology to follow can be found in a Hack In The Box (HITB) conference talk by Matt Knight and Marc Newlin, which can be found here <strong><a href="https://youtu.be/QeoGQwT0Z1Y">HITB 2017 - So You Want to Hack Radios?</a></strong>.</p>
+
+<p>It discusses the following steps:</p>
+
+<ol>
+  <li><strong>Open Source Intelligence (OSINT)</strong> - Attempt to easily find the characteristics and modulation of the signal.</li>
+  <li><strong>Characterise the channel</strong> - Find the frequencies and bandwidth in which the signal is operating.</li>
+  <li><strong>Identify the modulation</strong> - Determine the type of modulation that is being used.</li>
+  <li><strong>Determine the symbol rate</strong> - Calculate the baudrate of the signal.</li>
+  <li><strong>Determine the synchronisation</strong> - Identify any preamble or other synchronisation patterns in the signal.</li>
+  <li><strong>Extract symbols</strong> - Demodulate to extract the binary data, then continue to reverse like any other software reversing.</li>
+</ol>
+
+<p>For our purposes of visually analysing some RF signals, we will mainly look at aspects of steps 2-5.</p>
+
+<hr>
+
+<h2 id="analysing-some-common-household-rf-devices">Analysing Some Common Household RF Devices</h2>
+
+<h3 id="a-newish-but-cheap-wireless-doorbell">A Newish But Cheap Wireless Doorbell</h3>
+<p>First, we will take a look at a cheap wireless doorbell system purchased from a local electronics store.  Specifically, the RF signal that the doorbell remote transmits to the doorbell receiver.</p>
+
+<p>The doorbell remote in question can be seen in the following image.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/doorbell_ext.jpg" alt="" height="60%" width="60%"></p>
+
+<p>Already we can determine its operating frequency just by looking at the back of the device, <em>433.92MHz</em>.  The part number and model number are also seen here, which may be useful for some online OSINT.  Opening up the device, further information can be found, as shown in the following image.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/doorbell_int.jpg" alt="" height="60%" width="60%"></p>
+
+<p>To avoid ruining the surprise, no further OSINT was performed on the device.  We can now fire up the <em>HackRF</em> with <em>baudline</em> to take a look at the RF signal produced when pressing the button of the doorbell remote.  Using my previously mentioned script to pipe the received data to <em>baudline</em>, we can enter arguments to ensure we are in the correct frequency range to be viewed.  Something like <code class="language-plaintext highlighter-rouge">./hackrf_baudline 433000000 8000000 24 20</code>.  Using the functionality of <em>baudline</em> we can zero in on the signal when the remote’s button is pressed.  A waterfall plot of this signal can be seen in the following image.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AMOOK_433MHz_FFT_HackRF.gif" alt="" height="50%" width="50%"></p>
+
+<p>With this we can now characterise the channel, it’s operating at the base frequency of <em>433.92 MHz</em> and has a very narrow bandwidth.  Knowing the basic characteristics of a EM wave, what else can we tell about this signal?  Its amplitude is changing, in fact, the signal appears to be pulsed on and off, so this is likely to be a form of ASK with OOK.  It also appears to be a number of repeating packets with short gaps between.  Within <em>baudline</em> we can pause the output, and take a closer look at the signal.  Opening up the waveform window, we can now scroll through the entire transmission, in which we can each packet has the same sequence of OOK, as shown in the image below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/Doorbell_433MHz_Osc1.png" alt=""></p>
+
+<p>We can now clearly see that this is OOK, however there is a definite short pulse and a long pulse visible, so it is most likely PDM and answers our modulation question.</p>
+
+<p>We need to work out the symbol rate, so in this case we see there are two distinct symbols used to represent different information.  One might be a short gap with a long pulse, the other a long gap with a short pulse.  You can use the previously mentioned <em>delta selected</em> functionality of <em>baudline</em> to measure the time of these symbols and calculate how many would occur within one second to determine the baudrate (<em>1 baud = 1 symbol per second</em>).  However, in our case we might want to transmit this signal later and need to represent each symbol with 1’s and 0’s, for instance the short pulse symbol may be represented by <em>0001</em>.  For this, we will measure the shortest pulse or gap that appears.  Using the shortest pulse, we get a baud of <em>2960</em>.</p>
+
+<p>So, knowing this is PDM, we can assume that a short pulse may represent a <em>0</em>, whilst the long pulse may represent a <em>1</em>.  With this assumption, we can now say that the doorbell transmits multiple packets of the binary data <code class="language-plaintext highlighter-rouge">011111101101001111</code> on each click of the button.  Capturing another click of the remote, the sequence does not change.</p>
+
+<p>Also notice there is a short pulse at the very start, shown in waveform above, before the sequence of repeating packets.  This is most likely some kind of synchronisation for the receiver, not exactly a preamble, but something.</p>
+
+<p>So, what do we know about this RF signal now?</p>
+
+<ul>
+  <li>Channel  - 433.92 MHz Centre Frequency</li>
+  <li>Modulation - Pulse Duration Modulation (PDM)</li>
+  <li>Symbol Rate - 2960 baud</li>
+  <li>Synchronisation - A short pulse that occurs before the repeating packets</li>
+  <li>Symbols - We have made an assumption of two symbols representing the binary data <code class="language-plaintext highlighter-rouge">011111101101001111</code></li>
+</ul>
+
+<p>As there is no keying and only one button on the remote, we’re unable to determine the structure of the packets without another device.  However, let’s go ahead and test what we know by transmitting our own data, and attempting to ring the doorbell.  In this case we can use the <em>YardStick One</em> USB device to transmit data sent to it with <em>rf_cat</em>, a similar tool to <em>netcat</em> for RF.  To do this we can write a <em>python</em> script to interact with the <em>YardStick One</em> and send our data.</p>
+
+<p>We will need to represent the data with respect to the baudrate.  So as previously mentioned, for our assumed symbol representing <em>0</em> (a long gap with a short pulse), we will need to transmit <em>0001</em>.  For the symbol representing <em>1</em>, we will need to transmit <em>0111</em>.</p>
+
+<p>Other considerations are the gap between packets, which was measured to be four symbols in duration, and also the synchronisation pulse that appears, which was measured to occur four symbols prior to the first packet.</p>
+
+<p>The resulting <em>python</em> script can be seen below.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1">#!/usr/bin/python
+</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">rflib</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">bitstring</span>
+
+<span class="n">baseFreq</span> <span class="o">=</span> <span class="mi">433920000</span> <span class="c1"># 433.92 MHz
+</span><span class="n">baudRate</span> <span class="o">=</span> <span class="mi">2960</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="s">'000101110111011101110111011100010111011100010111000100010111011101110111'</span>
+<span class="n">pad</span> <span class="o">=</span> <span class="s">'0000000000000000'</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">RfCat</span><span class="p">()</span>
+<span class="n">d</span><span class="p">.</span><span class="n">setMdmModulation</span><span class="p">(</span><span class="n">MOD_ASK_OOK</span><span class="p">)</span> <span class="c1"># Setting the modulation
+</span><span class="n">d</span><span class="p">.</span><span class="n">setFreq</span><span class="p">(</span><span class="n">baseFreq</span><span class="p">)</span>             <span class="c1"># Setting the TX frequency
+</span><span class="n">d</span><span class="p">.</span><span class="n">setMdmSyncMode</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>             <span class="c1"># No sync mode
+</span><span class="n">d</span><span class="p">.</span><span class="n">setMdmDRate</span><span class="p">(</span><span class="n">baudRate</span><span class="p">)</span>         <span class="c1"># The symbol rate
+</span><span class="n">d</span><span class="p">.</span><span class="n">setMaxPower</span><span class="p">()</span>                 <span class="c1"># Max Power, YOLO!
+#d.setPktPQT(0) # Preamble Quality Threshold
+</span>
+<span class="n">full_pwm</span> <span class="o">=</span> <span class="s">'{}{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">pad</span><span class="p">)</span>
+<span class="n">rf_data</span> <span class="o">=</span> <span class="n">bitstring</span><span class="p">.</span><span class="n">BitArray</span><span class="p">(</span><span class="nb">bin</span><span class="o">=</span><span class="n">full_pwm</span><span class="p">).</span><span class="n">tobytes</span><span class="p">()</span> <span class="c1"># Convert to bytes
+</span><span class="n">d</span><span class="p">.</span><span class="n">makePktFLEN</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rf_data</span><span class="p">))</span>                          <span class="c1"># Set the packet length in bytes
+</span><span class="k">print</span> <span class="s">"Transmitting key {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rf_data</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'hex'</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">"Packet length: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rf_data</span><span class="p">))</span>
+
+<span class="n">d</span><span class="p">.</span><span class="n">RFxmit</span><span class="p">(</span><span class="s">'</span><span class="se">\x00\x01\x00\x00</span><span class="s">'</span><span class="p">)</span> <span class="c1"># TX synchronisation pulse
+</span><span class="n">d</span><span class="p">.</span><span class="n">RFxmit</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span> <span class="c1"># TX repeated packets
+</span>
+<span class="k">print</span> <span class="s">"Done."</span>
+<span class="n">d</span><span class="p">.</span><span class="n">setModeIDLE</span><span class="p">()</span></code></pre></figure>
+
+<h4 id="leet-doorbell-hax">Leet Doorbell Hax</h4>
+
+<iframe width="848" height="480" src="https://www.youtube.com/embed/ngmtphlKBwk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<hr>
+
+<h3 id="an-old-and-weird-garage-door-remote">An Old and Weird Garage Door Remote</h3>
+<p>Another device looked at was a very old and as you will see, strange, wireless garage door remote.  Looking at the device, we can again quickly determine the operating frequency, <em>26.995 MHz</em>, as shown in the image below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_ext.jpg" alt="" height="60%" width="60%"></p>
+
+<p>This is not a commonly used frequency for these types of devices anymore, in fact the antenna length needed for this is bigger than my telescopic antenna can go, however this is not too much of an issue.  The internals of this device reveal it includes the ability to set a code via DIP switches in order to pair it with the garage door receiver, shown below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_int.jpg" alt="" height="60%" width="60%"></p>
+
+<p><strong>Note:</strong> <em>That big cylinder in the centre is a ferrite coil antenna, and clearly this device was made in an era where electronic components were much bigger</em></p>
+
+<p>Again, without doing any further OSINT, we take a look at the signal this produces with the help of <em>HackRF</em> and <em>baudline</em>.  The first thing to notice is that the signal only transmits while the remote’s button is held, and will transmit constantly.  This can be seen below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garagedoor_26MHz_FFT.gif" alt="" height="50%" width="50%"></p>
+
+<p>Again, no apparent change in frequency, and a narrow bandwidth signal.  Taking a look at the waveform, we can see the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garagedoor_26MHz_Osc.png" alt=""></p>
+
+<p>Looking at this, there is no change in phase but appears to have subtle changes in amplitude.  So this is most likely ASK.  Within baudline I modified the <em>aperture color</em> in order to see the changes in amplitude more clearly on the waterfall plot, but was unsuccessful.  I decided to save this signal and load it into <em>Inspectrum</em>, where I was more successful in viewing the amplitude changes.  Fiddling with the <em>Power Max</em> and <em>Power Min</em> settings I was able to eliminate all but the highest amplitude, and started to see a repeating pattern of packets. One of these packets can be seen below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_org.png" alt=""></p>
+
+<p>Each repeating packet was the same, and there was no change with repeated presses of the garage remote button.  Enabling the <em>cursors</em> functionality helped here to discern the high and low amplitudes, along with the symbol rate.  Assuming a low amplitude represents a <em>0</em> and a high amplitude represents a <em>1</em>, the packet data appeared to be <code class="language-plaintext highlighter-rouge">00001100111101001</code>.  However, I was more interested in how this related to the DIP switch positions inside the device.</p>
+
+<p>There are sixteen DIP switches, in two sets of eight, which I thought might relate directly to the 16+1 apparent symbols.  I set all the DIP switches to their lower positions, which I will call the <em>0</em> setting, and take another look at the signal.  This time we get the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_A0B0_cropped.png" alt=""></p>
+
+<p>OK, so we’ve added some <em>1</em>’s, and the seventeenth symbol remained a <em>1</em>.  Let’s try setting the first DIP to its high setting.  We get the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_A1B0_cropped.png" alt=""></p>
+
+<p>Alright, so symbol position two went to a <em>0</em>, and again the seventeenth symbol remains the same.  Let’s try the first DIP in the second set of eight DIP switches.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_A0B1_cropped.png" alt=""></p>
+
+<p>There is no change from all the DIP switches off, in fact changing any of the second set of eight DIPs would produce the same result.</p>
+
+<p>Again, trying just the first DIP, and adding the second DIP, we get the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_A12B0_cropped.png" alt=""></p>
+
+<p>Now we are seeing some relationship, the first DIP seems to relate to the second symbol position, while the second DIP seemed to relate to the twelfth position.  Trying each DIP switch of the first set of eight DIPs, which I will call set <em>A</em>, I am able to determine the following relationship to the symbols.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_DIP_relations.png" alt=""></p>
+
+<p>At this point, this seemed to be a simple mapping of the DIP to a symbol, however when trying DIP <em>A1</em>, with the first DIP of the second set of eight, which I will call set <em>B</em>, the relationship seemed to become a little more complex.  This is shown below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_A1B1_cropped.png" alt=""></p>
+
+<p>Notice now, we have a <em>1</em> in the first symbol position, and also in the second position, which we were expecting to be <em>0</em>.  It seemed the DIP <em>B1</em> modified the resulting value of DIP <em>A1</em>.  Trying this with the other corresponding <em>A</em> and <em>B</em> DIPs produced the same respective result.</p>
+
+<p>After playing around with this, I realised I could describe this modification, and the result of the symbol position with respect to the <em>A</em> and <em>B</em> DIP switch pairs, with some discrete mathematics.  This can be seen in the following table.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/garage_final_mapping.png" alt=""></p>
+
+<p>To explain this table, <em>A</em> and <em>B</em> refer to the respective DIP switch positions, <em>1</em> being high and <em>0</em> being low. <code class="language-plaintext highlighter-rouge">A*B</code> refers to each odd symbol, and is the binary AND of DIP <em>A</em> and <em>B</em>.  Whilst <code class="language-plaintext highlighter-rouge">~A+B</code> refers to each even symbol, and is the binary OR of NOT <em>A</em> and <em>B</em>.</p>
+
+<p>With the original DIP positions of <code class="language-plaintext highlighter-rouge">11110111 01010010</code>, we see the result of <code class="language-plaintext highlighter-rouge">00110011010011001</code>, however this does not correspond to what we saw when analysing the signal, which was <code class="language-plaintext highlighter-rouge">00001100111101001</code>.  This because we still need to apply the previous relationship we first noted between the <em>A</em> DIPs and their symbol position.  Doing this, shown by the blue arrows above, we can now see the result of our discrete math now corresponds correctly.</p>
+
+<p>Given a captured signal from this garage remote, I am now reliably able to determine each of the sixteen DIP switch positions without ever seeing them.  From here I would have liked to attempt to transmit this signal in a similar manner to the doorbell, however the <em>YardStick One</em> is unable to transmit on that particular frequency.  However, as the transmitted data never changes, this garage door system should be vulnerable to a <strong>replay attack</strong>, in which the signal is simply recorded and retransmitted.  The <em>HackRF</em> has the ability to do this.</p>
+
+<hr>
+
+<h3 id="a-common-home-and-business-security-system">A Common Home and Business Security System</h3>
+<p>Another system that we will take a look at is a very common security system that seems to be used for many homes, and businesses.  This is a relatively modern system, that incorporates multiple sensors, alarms, and a polling to the security company’s monitoring service.  This system includes a keypad to arm and disarm the alarm, however it also includes a number of remotes that allow the arming and disarming of the security system from outside the building.  This is what we will briefly look at.</p>
+
+<p>In this case the, the key did not blatantly display the operating frequency of the device, however it was very simple to discover in the RF spectrum, as it operated in the <em>433 MHz</em> range, similar to the doorbell remote, which is common for these types of remotes.</p>
+
+<p>Having a look at the signal in <em>baudline</em>, we see the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AlarmKey_433MHz_FFT.gif" alt="" height="50%" width="50%"></p>
+
+<p>Observing this there again seems to be a number of packets sent with each click of the disarm button, however each signal seems much shorter and quicker than the doorbell remote.  It is a little difficult to see, but pausing the output and zooming in to the time domain in the waterfall plot, we are able to better discern the signal.  This is shown below.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AlarmKey_433MHZ_FFT.png" alt="" height="20%" width="20%"></p>
+
+<p>From this, we are able to determine the frequency, see that it has a narrow bandwidth, and is looking very similar to the doorbell remote signal.  Taking a look at the at the waveform, we see the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AlarmKey_433MHz_Osc1.png" alt=""></p>
+
+<p>This is now much easier to see a complete packet, and the modulation is again PDM.  The packet appears to be more well-formed than the doorbell, and appears to have a preamble, the initial seven long pulses, and a trailing sequence of short pulses.  The data in between must represent the button pressed, as there are separate buttons for arm and disarm, along with a few others.</p>
+
+<p>Each packet in the sequence that is sent with a click of the disarm button is the same, but one would expect that this packet would be different to packet sent in another key press.  Let’s take a look at another press of the same disarm button.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/AlarmKey_433MHz_Osc2.png" alt=""></p>
+
+<p>Exactly the same.</p>
+
+<p>This security system suffers from the same security vulnerability with both the doorbell and garage door remotes, I can simply record and replay this signal in a <strong>replay attack</strong> to disarm the security system of the home, business, or wherever this system is implemented.  To prevent this issue, this should really be a <strong>rolling code</strong> system, where the coding of the signal changes on each press of the remote’s button.</p>
+
+<p>This could be further analysed by trying different buttons and observing the changes, however for the purpose of this discussion, I went no further.</p>
+
+<hr>
+
+<h3 id="wifi-24ghz">WiFi 2.4GHz</h3>
+<p>Just out of curiosity let’s take a look at <em>2.4 GHz</em> WiFi to see some more complex signals and modulation.</p>
+
+<p>Using <em>baudline</em> again to observe a portion of the WiFi frequency range, we can see the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/WIFI_2.4GHz_FFT.gif" alt="" height="50%" width="50%"></p>
+
+<p>From this we can see flashes of wireless packets in four distinct channels.  <em>Peak Smoothing</em> was enabled to show the wide bandwidth of each channel in the spectrum display at the bottom of the image.  This wide frequency bandwidth of each signal is due to WiFi using spread spectrum schemes such as DSSS.</p>
+
+<p>Decimating the input to view one channel, then looking at the waveform of the signal, we see the following.</p>
+
+<p><img src="/img/blog/2017-06-13-brief-sdr-and-rf-analysis/WIFI_2.4GHz_Osc.png" alt=""></p>
+
+<p>This is an example of a signal that is much more difficult to determine the modulation in use visually.  OSINT would be necessary in this case, and looking up WiFi modulation will show you that the more complex forms of QAM is used.</p>
+
+<hr>
+
+<h2 id="demodulation">Demodulation</h2>
+<p>Ultimately to conduct a proper reverse engineering effort on an RF signal using SDR, requires some better understanding of RF engineering and the use of GNU Radio Companion to properly demodulate the signal.  Other possibilities are to find already made GNU Radio workflows, or other software, that can demodulate the RF signal with its particular characteristics.  This leaves the initial digital data, which may be further analysed using regular software reverse engineering techniques.</p>
+
+<hr>
+
+<h2 id="what-have-we-learned">What Have We Learned?</h2>
+<p>We looked at some RF theory to get a good basic understanding of what RF is, how data is transmitted using RF signals, and discussed some common analogue and digital modulation schemes that are the basis of more complex modulation.  We briefly described SDR, including some hardware and software SDR tools that are useful for RF signal analysis and reverse engineering, along with tips for using those tools to capture and view RF signals.  We identified a good methodology for attempting to reverse engineer and understand wireless protocols, and finally, we looked at the RF signals produced by some common devices in an effort to determine their characteristics, and identified some security issues along the way.</p>
+
+<p>Although this discussion is not exactly a deep guide on reversing RF signals with SDR, hopefully you have learned something, or at least found it an interesting read.</p>
+
+                    </div>
+                    <div class="post-tag">
+                        <span>
+                            Tags: 
+                            
+                                SDR
+                            
+                                RF
+                            
+                                reversing
+                            
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Blog Post Section -->
+
+
+            <!--Footer Section-->
+            <footer id="footer" class="footer section-padding gray-bg">
+                <div class="container text-center">
+                    <!--Footer Logo-->
+                    <div class="footer-logo mb-25 wow fadeInUp" data-wow-duration="1.5s" style="visibility: hidden; animation-duration: 1.5s; animation-name: none;">
+                        <a class="footer-logo" href="/#intro">
+                            <img src="/img/elttam_logo_full_orange_black.png" alt="elttam">
+                        </a>
+                    </div>
+                    <!--End Footer Logo-->
+
+                    <!-- Copyright -->
+                    <p class="copyright mb-25">
+                        © 2023 <a><b>elttam Pty Ltd</b></a><br>
+                        <span class="eltabn">ABN 46 779 503 499, ACN 605 531 502</span>
+                    </p>
+                    <!-- Copyright -->
+
+                    <!-- Social -->
+                    <ul class="social">
+                        <li><a href="https://www.twitter.com/elttam" title="Twitter" target="_blank"><i class="fa-brands fa-twitter"></i></a></li>
+                        <li><a href="https://www.linkedin.com/company/elttam/" title="LinkedIn" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li>
+                        <li><a href="/feed" title="RSS Feed" target="_blank"><i class="fas fa-rss"></i></a></li>
+                    </ul>
+                    <!-- End Social -->
+                </div>
+            </footer>
+            <!-- End Footer Section-->
+
+        </div>
+        <!-- Scroll Top Button -->
+        <a class="scroll-top" style="display: block;"><i class="fa fa-angles-up"></i></a>
+    </div>
+    <!-- End Page Wrapper -->
+
+    <!-- JS -->
+    <script src="/js/jquery-1.11.2.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.easing.1.3.js" type="text/javascript"></script>
+    <script src="/js/plugins/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.fitvids.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.stellar.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/isotope.pkgd.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.appear.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.fs.tipper.min.js" type="text/javascript"></script>
+    <!--<script src="/js/plugins/jquery.countTo.js" type="text/javascript"></script>-->
+    <script src="/js/plugins/owl.carousel.min.js" type="text/javascript"></script>
+    <!-- SLIDER REVOLUTION SCRIPTS  -->
+    <script src="/js/jquery.themepunch.tools.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.themepunch.revolution.min.js" type="text/javascript"></script>
+    <!-- End SLIDER REVOLUTION SCRIPTS  -->
+    <script src="/js/plugins/jquery.magnific-popup.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.singlePageNav.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/wow.min.js" type="text/javascript"></script>
+    <script src="/js/plugins/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="/js/theme.js" type="text/javascript"></script>
+    <!--
+    <script src="/js/ionicons.js"></script>
+    -->
+
+
+</body></html>

@@ -1,0 +1,529 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Obtaining Domain Admin from Azure AD by abusing Cloud Kerberos Trust - dirkjanm.io</title>
+<meta name="description" content="Many modern enterprises operate in a hybrid environment, where Active Directory is used together with Azure Active Directory. In most cases, identities will be synchronized from the on-premises Active Directory to Azure AD, and the on-premises AD remains authoritative. Because of this integration, it is often possible to move laterally towards Azure AD when the on-premises AD is compromised. Moving laterally from Azure AD to the on-prem AD is less common, as most of the information usually flows from on-premises to the cloud. The Cloud Kerberos Trust model is an exception here, since it creates a trust from the on-premises Active Directory towards Azure AD, and thus it trusts information from Azure AD to perform authentication. In this blog we will look at how this trust can be abused by an attacker that obtains Global Admin in Azure AD, to elevate their privileges to Domain Admin in environments that have the Cloud Kerberos Trust set up. Since this technique is a consequence of the design of this trust type, the blog will also highlight detection and prevention measures admins can implement.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="dirkjanm.io">
+<meta property="og:title" content="Obtaining Domain Admin from Azure AD by abusing Cloud Kerberos Trust">
+<meta property="og:url" content="https://dirkjanm.io/obtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust/">
+
+
+  <meta property="og:description" content="Many modern enterprises operate in a hybrid environment, where Active Directory is used together with Azure Active Directory. In most cases, identities will be synchronized from the on-premises Active Directory to Azure AD, and the on-premises AD remains authoritative. Because of this integration, it is often possible to move laterally towards Azure AD when the on-premises AD is compromised. Moving laterally from Azure AD to the on-prem AD is less common, as most of the information usually flows from on-premises to the cloud. The Cloud Kerberos Trust model is an exception here, since it creates a trust from the on-premises Active Directory towards Azure AD, and thus it trusts information from Azure AD to perform authentication. In this blog we will look at how this trust can be abused by an attacker that obtains Global Admin in Azure AD, to elevate their privileges to Domain Admin in environments that have the Cloud Kerberos Trust set up. Since this technique is a consequence of the design of this trust type, the blog will also highlight detection and prevention measures admins can implement.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2023-06-13T11:08:57+00:00">
+
+
+
+
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.33333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1em}.svg-inline--fa.fa-stack-2x{height:2em;width:2em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://dirkjanm.io/obtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="dirkjanm.io Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    
+  </head>
+
+  <body class="layout--single wide">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">dirkjanm.io</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/talks/">Presentations</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/thisisapicture.png" alt="Dirk-jan Mollema" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dirk-jan Mollema</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Hacker, red teamer, researcher. Likes to write infosec-focussed Python tools. This is my personal blog containing research on topics I find interesting, such as (Azure) Active Directory internals, protocols and vulnerabilities.<br><br>Looking for a security test or training? Business contact via <a href="https://outsidersecurity.nl">outsidersecurity.nl</a>
+
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="http://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Both sides of a security boundary</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/_dirkjan" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/dirkjanm" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        
+          <li>
+            <a href="https://www.youtube.com/c/dirkjanm" itemprop="sameAs">
+              <svg class="svg-inline--fa fa-youtube fa-w-18 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fab fa-fw fa-youtube" aria-hidden="true"></i> --> YouTube
+            </a>
+          </li>
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Obtaining Domain Admin from Azure AD by abusing Cloud Kerberos Trust">
+    <meta itemprop="description" content="Many modern enterprises operate in a hybrid environment, where Active Directory is used together with Azure Active Directory. In most cases, identities will be synchronized from the on-premises Active Directory to Azure AD, and the on-premises AD remains authoritative. Because of this integration, it is often possible to move laterally towards Azure AD when the on-premises AD is compromised. Moving laterally from Azure AD to the on-prem AD is less common, as most of the information usually flows from on-premises to the cloud. The Cloud Kerberos Trust model is an exception here, since it creates a trust from the on-premises Active Directory towards Azure AD, and thus it trusts information from Azure AD to perform authentication. In this blog we will look at how this trust can be abused by an attacker that obtains Global Admin in Azure AD, to elevate their privileges to Domain Admin in environments that have the Cloud Kerberos Trust set up. Since this technique is a consequence of the design of this trust type, the blog will also highlight detection and prevention measures admins can implement.">
+    <meta itemprop="datePublished" content="June 13, 2023">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Obtaining Domain Admin from Azure AD by abusing Cloud Kerberos Trust
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  19 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Many modern enterprises operate in a hybrid environment, where Active Directory is used together with Azure Active Directory. In most cases, identities will be synchronized from the on-premises Active Directory to Azure AD, and the on-premises AD remains authoritative. Because of this integration, it is often possible to move laterally towards Azure AD when the on-premises AD is compromised. Moving laterally from Azure AD to the on-prem AD is less common, as most of the information usually flows from on-premises to the cloud. The Cloud Kerberos Trust model is an exception here, since it creates a trust from the on-premises Active Directory towards Azure AD, and thus it trusts information <em>from</em> Azure AD to perform authentication. In this blog we will look at how this trust can be abused by an attacker that obtains Global Admin in Azure AD, to elevate their privileges to Domain Admin in environments that have the Cloud Kerberos Trust set up. Since this technique is a consequence of the design of this trust type, the blog will also highlight detection and prevention measures admins can implement.</p>
+
+<h1 id="attack-model">Attack model</h1>
+<p>Most attacks in hybrid environments exist of moving laterally from Active Directory towards Azure AD, since the source of identities is the on-premises Active Directory from where the identities are synced to Azure AD. As a result, a compromised Active Directory can almost always result in a compromised Azure AD. I have covered several of these attack paths in the past, during various talks and blogs:</p>
+
+<ul>
+  <li>Overwriting Azure AD admin credentials <a href="https://blog.fox-it.com/2019/06/06/syncing-yourself-to-global-administrator-in-azure-active-directory/">via a sync bug</a></li>
+  <li>Adding additional credentials to service principals <a href="https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/">via the Azure AD connect sync account</a></li>
+  <li>Abusing Seamless Single Sign-on to impersonate identities in the cloud <a href="https://troopers.de/downloads/troopers19/TROOPERS19_AD_Im_in_your_cloud.pdf">via Kerberos</a></li>
+</ul>
+
+<p>Attacks from Azure AD to on-prem AD are much rarer, since in many cases AD does not sync much information from Azure AD and the writeback functions that exist use the permission model of Active Directory to prevent changing information of Tier 0 resources such as Domain Admins. The Cloud Kerberos Trust feature is an exception on this, since it creates a Read Only Domain Controller (RODC) in AD and stores its credentials in Azure AD. This effectively gives Azure AD highly privileged keys that it can use to authenticate most accounts in Active Directory. While we can’t extract these keys from Azure AD, not even with Global Admin, there are some other attack paths that we can abuse to achieve Domain Admin in Active Directory. This attack path assumes the following starting prerequisites:</p>
+
+<ul>
+  <li>The attacker has obtained Global Admin privileges in Azure AD.</li>
+  <li>The attacker has network connectivity to at least one Domain Controller of the on-premises Active Directory.</li>
+  <li>The Cloud Kerberos Trust feature is set up and working properly.</li>
+</ul>
+
+<p>The network connectivity part makes this not an attack that can be done from a fully external perspective, but if there is any VPN between Azure hosted resources and an on-premises domain, or a VPN configuration is rolled out via Intune, this should not be too hard to obtain. This is also a valid attack if an attacker is in an Active Directory network and has obtained Global Admin privileges but not yet Domain Admin privileges for some reason.</p>
+
+<h1 id="the-cloud-kerberos-trust">The Cloud Kerberos Trust</h1>
+<p>Cloud Kerberos Trust was added as a method to enable signing in to Active Directory connected resources with accounts that use a passwordless authentication method. Like the name implies, passwordless methods do not involve a password, so it is not possible for Windows to calculate an NT hash or Kerberos keys for the account. Since Active Directory does not have a native implementation for things such as FIDO2 keys, a trust with Azure AD is established and Azure AD is given a set of keys that it can use to issue Kerberos tickets for Active Directory. The setup is usually performed with a PowerShell script that creates a Read Only Domain Controller (RODC) in AD. This RODC does not really exist as a Windows server in Active Directory, but instead is more like a virtual account that is purely used to establish this trust. The RODC consists of two important components:</p>
+
+<ul>
+  <li>The RODC computer account, named <code class="language-plaintext highlighter-rouge">AzureADKerberos$</code>. The presence of this account is also a good indicator that Cloud Kerberos is in use in the domain.</li>
+  <li>A secondary <code class="language-plaintext highlighter-rouge">krbtgt</code> account named <code class="language-plaintext highlighter-rouge">krbtgt_AzureAD</code>. This account contains the Kerberos keys used for tickets that Azure AD creates. The SAM account name of this account will include the key ID, for example <code class="language-plaintext highlighter-rouge">krbtgt_9898</code>.</li>
+</ul>
+
+<p>The RODC computer account and its secondary krbtgt account are linked together through the <code class="language-plaintext highlighter-rouge">msDS-KrbTgtLinkBl</code> attribute. This is important because an RODC comes with a set of restrictions which are set on the RODC computer account, but also apply to any tickets issued by the secondary krbtgt. As such, while Azure AD could technically issue tickets for users with administrator privileges, such as Domain Admins, these tickets will be refused by the AD domain controllers because the RODC is not allowed to issue tickets for them. This is managed in the attributes <code class="language-plaintext highlighter-rouge">msDS-RevealOnDemandGroup</code> and <code class="language-plaintext highlighter-rouge">msDS-NeverRevealGroup</code>, which are summarized in the GUI as the “Password Replication Policy”:</p>
+
+<p><img src="/assets/img/cloudkerberos/rodcaccount.png" alt="Password Replication allowed and denied group list" class="align-center"></p>
+
+<p>We see that since “Domain Users” is in the default scope, any user in the domain, excluding the users that are in any group explicitly denied, can be authenticated from Azure AD. While this includes most default high-privilege groups, in a real domain there will likely be more users with equivalent privileges that are not in any of those groups, so these will be our targets later on.</p>
+
+<h2 id="how-azure-ad-issues-kerberos-tickets">How Azure AD issues Kerberos tickets</h2>
+<p>If a Cloud Kerberos Trust is set up, Azure AD will issue partial Kerberos tickets when a user authenticates on Windows using a hybrid identity. This process occurs at the same time a Primary Refresh Token (PRT) is requested. Windows indicates it wants a TGT with the parameter <code class="language-plaintext highlighter-rouge">tgt=true</code> in the request. The request itself is a signed JWT that contains the users credentials or a Windows Hello assertion to authenticate. I’ve talked about the content of this request several times, for example in my <a href="https://dirkjanm.io/assets/raw/TR22_Mollema_Breaking_Azure_AD_joined_endpoints_in_zero-trust_environments_v1.0.pdf">TROOPERS</a> talk from last year, and some more this year at <a href="https://dirkjanm.io/assets/raw/Insomnihack%20Breaking%20and%20fixing%20Azure%20AD%20device%20identity%20security.pdf">Insomnihack</a>. The important part here is the <code class="language-plaintext highlighter-rouge">tgt</code> parameter, which will cause Azure AD to include at least a cloud TGT that can be used for Azure AD Kerberos (mostly relevant when you use Azure AD connected fileshares over SMB), and if configured also a TGT for AD:</p>
+
+<p><img src="/assets/img/cloudkerberos/tgt_req.png" alt="TGT in PRT request" class="align-center"></p>
+
+<p>The response will have the <code class="language-plaintext highlighter-rouge">tgt_cloud</code> and if configured and applicable to the account we authenticate with also the <code class="language-plaintext highlighter-rouge">tgt_ad</code> parameter:</p>
+
+<p><img src="/assets/img/cloudkerberos/tgt_resp.png" alt="TGT in PRT response" class="align-center"></p>
+
+<p>The <code class="language-plaintext highlighter-rouge">clientKey</code> parameter is the TGT session key, sent encrypted in JWE (JSON web encryption) format. Windows will first decrypt the session key of the PRT using the transport key of the device. Once it has the PRT session key, it can use that to decrypt the TGT session key. We call this a partial TGT because unlike a regular TGT, this does not include all the information of the user, simply because Azure AD does not have the full list of attributes or groups from the user account. The result is a TGT with a <a href="https://dirkjanm.io/active-directory-forest-trusts-part-one-how-does-sid-filtering-work/">PAC</a> that contains only the base attributes such as the user security identifier (SID) and their name. Windows can exchange this partial TGT for a full TGT by requesting a service ticket for the <code class="language-plaintext highlighter-rouge">krbtgt</code> service. The <code class="language-plaintext highlighter-rouge">krbtgt</code> service is normally used during the initial TGT request operation, but it can also be used in this flow to request a full TGT. The request is sent in a TGS-REQ message to a Domain Controller:</p>
+
+<p><img src="/assets/img/cloudkerberos/tgsreq.png" alt="TGS-REQ exchanging the partial TGT for a full TGT" class="align-center"></p>
+
+<p>The Domain Controller will reply with a TGS-REP message containing a new TGT, now including a full PAC with all the users attributes and group memberships. This TGT is encrypted with the primary <code class="language-plaintext highlighter-rouge">krbtgt</code> keys of the domain, and can be used to request service tickets for services accepting Kerberos authentication.</p>
+
+<h2 id="ntlm-authentication">NTLM Authentication</h2>
+<p>Having a Kerberos TGT still leaves a gap in authentication scenarios. After all, what if the user wants to authenticate to a service that doesn’t support Kerberos and only accepts NTLM authentication? For this Windows would need the NT hash to calculate the correct challenge/response for authentication. Having an NT hash implies that there is still a password, something we wanted to avoid by going passwordless in the first place. So Microsoft came up with an extension to the Kerberos protocol that allows Windows to obtain the NT hash of a user when exchanging a (partial) TGT signed using a secondary <code class="language-plaintext highlighter-rouge">krbtgt</code> key for a full one signed with the primary <code class="language-plaintext highlighter-rouge">krbtgt</code> key. Note that while this is only possible with secondary <code class="language-plaintext highlighter-rouge">krbtgt</code> keys signed tickets, this scenario is specifically designed for passwordless authentication and real RODCs do not use these protocol extensions. The exchange process, including the NT hash recovery was researched by <a href="https://twitter.com/0xdeaddood">Leandro Cuozzo</a>, who wrote a nice <a href="https://www.secureauth.com/blog/the-kerberos-key-list-attack-the-return-of-the-read-only-domain-controllers/">technical blog</a> about it and added support for this to the impacket library.</p>
+
+<p>The key in this process is including the <code class="language-plaintext highlighter-rouge">KERB-KEY-LIST-REQ</code> field in the PADATA part of the request. This behaviour is documented in <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/732211ae-4891-40d3-b2b6-85ebd6f5ffff">MS-KILE</a> and indicates that if encountered, the KDC should include the long-term secrets in the reply. The long-term secrets in this case being the NT hash of the user accounts password (I have tried to recover the AES keys too this way, but that does not seem to work). As we can see in the screenshot in the previous section, Windows does include this in the request as the PA-DATA type 161. If we look at the response below, we see that the NT hash is included in the encrypted part of the response. Windows can decrypt this using the TGT session key and load the NT hash into memory.</p>
+
+<p><img src="/assets/img/cloudkerberos/tgsrep.png" alt="TGS-REP containing the plain NT hash" class="align-center"></p>
+
+<h1 id="using-cloud-kerberos-trust-with-roadtx">Using Cloud Kerberos Trust with roadtx</h1>
+<p>The process of requesting a PRT for Azure AD or hybrid users has been part of roadtx since its <a href="https://dirkjanm.io/introducing-roadtools-token-exchange-roadtx/">release last year</a>. Requesting a PRT will automatically include a request for a TGT, and the resulting TGT will be included in the <code class="language-plaintext highlighter-rouge">.prt</code> file. Roadtx will automatically decrypt the TGT session key as well and include that in the <code class="language-plaintext highlighter-rouge">.prt</code> file so that other tools can use it as well. As an example, I’m obtaining a PRT here for a hybrid account. This assumes I have previously registered or joined a device to this Azure AD tenant, which can be done with the <a href="https://github.com/dirkjanm/ROADtools/wiki/ROADtools-Token-eXchange-%28roadtx%29#devices">roadtx device module</a>, for which the certificate and key is stored in the <code class="language-plaintext highlighter-rouge">talkdevice.pem</code> and <code class="language-plaintext highlighter-rouge">talkdevice.key</code> respectively. Something interesting to note here is that while this mechanism is designed for passwordless authentication methods, Azure AD will also include the TGT if we authenticate with a password. With the password we could as well request a full TGT directly from Active Directory, but this will be relevant later in this blog.</p>
+
+<p><img src="/assets/img/cloudkerberos/hybridprt.png" alt="PRT for hybrid account" class="align-center"></p>
+
+<p>Because this is an account that exists in both Active Directory and Azure AD, Azure AD includes the partial TGT with the PRT. This TGT can be extracted from the <code class="language-plaintext highlighter-rouge">.prt</code> file and exchanged for a full TGT with some utilities in the <a href="https://github.com/dirkjanm/ROADtools_hybrid">roadtools_hybrid</a> repository, which saves it in a ccache file. Ccache files are compatible with <a href="https://github.com/fortra/impacket">impacket</a>, so we can use the <code class="language-plaintext highlighter-rouge">getST.py</code> script to upgrade our partial TGT to a full one, as long as we have network connectivity to a Domain Controller.</p>
+
+<p><img src="/assets/img/cloudkerberos/loadticket_upgrade.png" alt="Upgrade the TGT" class="align-center"></p>
+
+<p>This TGT we can use to authenticate to Active Directory connected services. We can also recover the NT hash of the user by using a slightly different script. The <code class="language-plaintext highlighter-rouge">partialtofulltgt.py</code> script in the <code class="language-plaintext highlighter-rouge">roadtools_hybrid</code> toolkit combines both steps, taking either the partial TGT from the <code class="language-plaintext highlighter-rouge">.prt</code> file directly, or loading it from the ccache file that we saved it to. It will also automatically use the <code class="language-plaintext highlighter-rouge">KERB-KEY-LIST-REQ</code> option to ask the DC nicely to put the NT hash in the response:</p>
+
+<p><img src="/assets/img/cloudkerberos/partialtofulltgt.png" alt="Upgrade the TGT with NT hash recovery" class="align-center"></p>
+
+<p>In this case the NT hash is not really secret since we already knew the password at the beginning, but if we are doing any lateral movement in Azure AD between hybrid identities, having the NT hash could allow us to obtain the password for this user if it is weak enough and we manage to crack it.</p>
+
+<h1 id="abusing-cloud-kerberos-trust-to-obtain-domain-admin">Abusing Cloud Kerberos Trust to obtain Domain Admin</h1>
+<p>To abuse the knowledge from the previous sections, we need to take a closer look at how Azure AD determines for which user it would issue a partial TGT and what information to put in this TGT. The Azure Portal shows the various properties of our <code class="language-plaintext highlighter-rouge">hybrid</code> account that are relevant under the “on-premises” section:</p>
+
+<p><img src="/assets/img/cloudkerberos/on_prem_attributes.png" alt="Attributes of the hybrid account relevant for the on-premises sync" class="align-center"></p>
+
+<p>Azure AD uses the “On-premises SAM account name” and “On-premises security identifier” attributes to generate the ticket. As a Global Admin, one would assume that we can edit those, and maybe obtain a ticket for any user account in the AD domain, including those who are not synced. Modifying these attributes is not as easy as it sounds though, since the Microsoft Graph and the Azure AD Graph both disallow this, indicating these are read-only attributes. There is a third way to update accounts, which is more flexible in what it allows or not. This is the API Active Directory Connect uses to create and update synced users. Normally, this API is only used by “On-Premises Directory Synchronization Service Account”, which has the “Directory Synchronization Accounts” role. As a Global Admin, we could create a new sync account and obtain the same privileges. However, we don’t need to do this since the Global Admin role itself also allows usage of the sync API. I assume this is because the AD Connect account used to be a Global Admin itself, and some environments may still be operating in that way. When analyzing how Azure AD connect updates accounts, we run into this ugly mix of binary and textual data:</p>
+
+<p><img src="/assets/img/cloudkerberos/provisioning.png" alt="Sync account update via provisioning API" class="align-center"></p>
+
+<p>This is WCF binary xml, a standard used in .NET to transfer XML data in binary format. Lucky for me, there is an open source python parser that was released by <a href="https://github.com/ernw/python-wcfbin">ENRW</a> many years ago. There are even some recent patches for this that <a href="https://github.com/ernw/python-wcfbin/issues/15">fix</a> compatibility issues with the synchronization API, contributed by <a href="https://github.com/AndreasLrx">@AndreasLrx</a> and <a href="https://github.com/sfonteneau">@sfonteneau</a>. Using this library to decode the WCF binary data, we get a much more readable XML document:</p>
+
+<p><img src="/assets/img/cloudkerberos/provisioning_xml.png" alt="Provisioning data in XML format" class="align-center"></p>
+
+<p>We can use this API call to modify the SAM name and SID of any hybrid user, and then if we authenticate, we get a partial TGT containing the modified SID.</p>
+
+<p><img src="/assets/img/cloudkerberos/newpac.png" alt="Sync account update via provisioning API" class="align-center"></p>
+
+<p>Note that we can do the same with AADInternals, which also supports the binary XML format, and updates to synced users over this protocol via the <a href="https://aadinternals.com/aadinternals/#set-aadintazureadobject-a">Set-AADIntAzureADObject</a> cmdlet.</p>
+
+<h2 id="attack-prerequisites">Attack prerequisites</h2>
+<p>For the attack to succeed and give us Domain Admin privileges, we have a few requirements:</p>
+
+<ul>
+  <li>Privileges to modify accounts via the Synchronization API. We already mentioned that Global Admin or AD Connect sync account would work in this case. The Hybrid Identity Administrator role also would provide the neccessary permissions, since this can manage AD Connect and create new sync accounts.</li>
+  <li>At least one hybrid account which we can modify and also authenticate to. This could be the same account as in the previous point, but since best practices indicate that hybrid accounts should not have highly privileged roles it is unlikely that the admin account is synced from on-premises.</li>
+  <li>A victim account to target in Active Directory. While we could use this attack on any already synced account without the need to modify their attributes, we cannot have duplicate on-premises security identifiers in our Azure AD tenant, so to modify an account and obtain the ticket we need to have an account that is not synced.</li>
+</ul>
+
+<p>There are several methods to obtain access to a hybrid account. They all vary slightly in how much noise it generates and whether the real user that we are targeting can keep working or that their authentication will break.</p>
+
+<ul>
+  <li>Obtain the password for any synced account (for example using spraying, on-premises lateral movement, etc).</li>
+  <li>Reset the password for a hybrid account via an Admin Portal, this would also reset it in Active Directory if password writeback is enabled.</li>
+  <li>Change the password for a synchronized Azure AD account using the Synchronization API. This leaves the original password in Active Directory in place, but will cause a disconnect between the password in Azure AD and AD. We could obtain the NT hash for this account via the TGT upgrade request, and if we can recover the original password from the NT hash we could set the password back later.</li>
+  <li>Assign passwordless credentials to the account. It used to be possible to provision Windows Hello for Business keys directly on an account, as I talked about <a href="https://dirkjanm.io/assets/raw/Windows%20Hello%20from%20the%20other%20side_x33fcon.pdf">at various conferences this year</a>, but this has been fixed. An alternative workaround is to assign a Temporary Access Pass (TAP) to an account, set up the passwordless methods that way, and then obtain a PRT with them.</li>
+  <li>Create a new user account with a known password via the synchronization API and set the target SID directly.</li>
+</ul>
+
+<p>Lastly, we will need an account to target in the on-premises Active Directory that has Domain Admin or equivalent privileges, but is not denied in the replication configuration of the RODC. In any large domain, there are probably several accounts that have equivalent privileges without being explicitly in the Domain Admins group. For this scenario however, we will focus on an account that should be present in any domain that is set up as hybrid. The ideal victim for this attack is in fact the Active Directory account that is used by the AD Connect Sync service. This account is not synced to Azure AD, so its SID is available to target, and it has Domain Admin equivalent privileges because of its ability to synchronize password hashes (assuming Password Hash Sync is in use). If the domain uses the express installation, its name will start with <strong>MSOL_</strong>. If it has a different name, you should be able to find this by listing all the accounts that have Directory Replication privileges on the domain object.</p>
+
+<p><img src="/assets/img/cloudkerberos/replprivs.png" alt="Replication privileges on domain object for MSOL account" class="align-center"></p>
+
+<h2 id="the-full-attack">The full attack</h2>
+<p>Now that we know the requirements, lets go through the full attack. We have a Global Admin account <code class="language-plaintext highlighter-rouge">dirkjan@iminyour.cloud</code> to perform the attack with, and a hybrid account that we can modify to perform our attack <code class="language-plaintext highlighter-rouge">hybrid@hybrid.iminyour.cloud</code>. In this case we know the password for the hybrid account, which is all we need to get a PRT for the account. We also queried the Sync account, which is called <code class="language-plaintext highlighter-rouge">MSOL_9c3bf742d8e9</code> in my tenant and has security identifier <code class="language-plaintext highlighter-rouge">S-1-5-21-1414223725-1888795230-1473887622-1104</code>.</p>
+
+<p>The first step is obtaining an access token for the Global Admin. The synchronization service uses the same resource ID as the Azure AD Graph API, so we can use roadtx to get a token for our admin account. We can do this using the <code class="language-plaintext highlighter-rouge">gettokens</code> command if we don’t need MFA, or use the <code class="language-plaintext highlighter-rouge">interactiveauth</code> to have an interactive window that supports MFA as well. In my example my credentials are stored in a KeePass database so I use the <code class="language-plaintext highlighter-rouge">keepassauth</code> command:</p>
+
+<p><img src="/assets/img/cloudkerberos/roadtx_auth.png" alt="Obtaining an access token for the sync api" class="align-center"></p>
+
+<p>Next, we can modify the <code class="language-plaintext highlighter-rouge">hybrid@hybrid.iminyour.cloud</code> identity with the <code class="language-plaintext highlighter-rouge">modifyuser.py</code> script from <code class="language-plaintext highlighter-rouge">roadtools_hybrid</code>. An important parameter here is the <code class="language-plaintext highlighter-rouge">SourceAnchor</code>, since this is used to match the user with the Azure AD account. In the portal, this is called the “On-premises immutable ID” and in ROADrecon you can find this as the <code class="language-plaintext highlighter-rouge">immutableId</code> attribute on the user object. We can also use a non-existing <code class="language-plaintext highlighter-rouge">SourceAnchor</code> to create a new user, this just introduces an extra step to add a password to the account. We also supply the target SAM name and desired SID to the tool, which will change these on the <code class="language-plaintext highlighter-rouge">hybrid@hybrid.iminyour.cloud</code> user object:</p>
+
+<p><img src="/assets/img/cloudkerberos/modifycmd.png" alt="Modifying the user SID and SAM" class="align-center"></p>
+
+<p>We can confirm in the Azure Portal that the users properties have been changed:</p>
+
+<p><img src="/assets/img/cloudkerberos/syncchange.png" alt="New properties in the Azure Portal" class="align-center"></p>
+
+<p>Now the account is modified and we can request a PRT for this user, including the partial TGT. It is best to wait a minute to make sure our change is synchronized properly, but usually this is quite fast:</p>
+
+<p><img src="/assets/img/cloudkerberos/newprtrequest.png" alt="Requesting a new PRT" class="align-center"></p>
+
+<p>With the partial TGT we can request the full TGT and recover the NT hash, this time for the MSOL account:</p>
+
+<p><img src="/assets/img/cloudkerberos/msolntrecovery.png" alt="Modifying the user SID and SAM" class="align-center"></p>
+
+<p>With the full TGT (or the NT hash) we can talk to the Domain Controller and perform a DCSync attack, synchronizing all the hashes, including the hash of the full KRBTGT account, which allows us to forge our own TGTs, essentially elevating our access to full Domain Admin.</p>
+
+<p><img src="/assets/img/cloudkerberos/dcsync.png" alt="Performing DCSync with the MSOL account" class="align-center"></p>
+
+<p>As a last step, it is advisable to change the account back to its original SAM name and SID using the <code class="language-plaintext highlighter-rouge">modifyuser.py</code>, or to delete the account if we created a new one. This step is optional, since from what I have seen Azure AD connect will pick up the change and reverse the change automatically.</p>
+
+<h1 id="defenses-and-detection">Defenses and detection</h1>
+<p>The Cloud Kerberos Trust introduces a trust from Active Directory to Azure AD. If the Azure AD tenant is fully compromised, this would allow attackers to move laterally between synchronized identities via one of the methods from the previous section. This is not something that can be fully prevented, so one of the best defenses here is to use the tools available in Azure AD to protect your highly privileged identities. In addition, highly privileged users should exist in the environment they are managing only. That means no synced accounts in Azure AD administrator roles, and to not sync AD admin accounts to Azure AD.</p>
+
+<p>The RODC object that Azure AD creates also offers some possibilities for defenses. Like a normal RODC, you could add additional accounts and groups to the “Denied password replication” list. If you have highly privileged groups, it would make sense to deny those from Cloud Kerberos Trust, though this does mean they can no longer use passwordless methods to authenticate to on-premises resources since this blocks both the Kerberos authentication as well as the NT hash recovery. In any case, adding accounts that do not need to authenticate with passwordless methods (such as the MSOL sync account) would be a good starting point:</p>
+
+<p><img src="/assets/img/cloudkerberos/aadkerberos_denymsol.png" alt="Preventing abuse of the MSOL account" class="align-center"></p>
+
+<p>Impersonating an account that is denied will cause the attack to fail with a <code class="language-plaintext highlighter-rouge">KDC_ERR_TGT_REVOKED</code> error.</p>
+
+<p>On the detection side, there is some good and bad news. The bad news is that Azure AD does not log changes to the SAM name and SID property, so you have no way of creating targeted detections for this specific attack. The good news is that there are some ways to still identify parts of it. The change to the hybrid object is logged and shows the actor (our Global Admin) as well as the modified “LastDirSyncTime” property. The “LastDirSyncTime” property only gets updated when the synchronization API is used and not during regular user modifications.</p>
+
+<p><img src="/assets/img/cloudkerberos/syncaudit.png" alt="Audit log showing only the modified timestamp" class="align-center"></p>
+
+<p>Since in normal operations Global Admin accounts should not be using the synchronization API, this is a clear sign of something irregular going on. The other actions, such as resetting passwords or setting passwordless authentication methods on accounts are part of an admins normal work, so creating detections for those may be more noisy.</p>
+
+<h1 id="tooling-and-credits">Tooling and credits</h1>
+<p>The tools are available on the <a href="https://github.com/dirkjanm/ROADtools">ROADtools</a> and <a href="https://github.com/dirkjanm/ROADtools_hybrid">ROADtools hybrid</a> GitHub pages. Thanks to the following people for their prior work:</p>
+
+<ul>
+  <li><a href="https://github.com/ernw/python-wcfbin">Timo Schmid</a>, <a href="https://github.com/AndreasLrx">@AndreasLrx</a> and <a href="https://github.com/sfonteneau">@sfonteneau</a> for the python-wcfbin library.</li>
+  <li><a href="https://twitter.com/DrAzureAD">DrAzureAD</a> for some helpful details on how the AD Sync protocol works and his implementation in AADInternals.</li>
+  <li><a href="https://twitter.com/0xdeaddood">Leandro Cuozzo</a> for his blog on <a href="https://www.secureauth.com/blog/the-kerberos-key-list-attack-the-return-of-the-read-only-domain-controllers/">Cloud Kerberos Trust and the Key List attack</a>.</li>
+</ul>
+
+<p>Lastly, while finalizing this blog I also noticed that <a href="https://twitter.com/hotnops">Daniel Heinsen</a> and <a href="https://twitter.com/elad_shamir">Elad Shamir</a> gave <a href="https://pretalx.com/fwd-cloudsec-2023/talk/8MRJT3/">a talk</a> on a similar topic yesterday. While I have not yet seen the talk, I wanted to give a shout-out to them for their work as well and I’m looking forward to reading their approach on this topic.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M436 160H12c-6.6 0-12-5.4-12-12v-36c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48v36c0 6.6-5.4 12-12 12zM12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm116 204c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2023-06-13T11:08:57+00:00">June 13, 2023</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Obtaining+Domain+Admin+from+Azure+AD+by+abusing+Cloud+Kerberos+Trust%20https%3A%2F%2Fdirkjanm.io%2Fobtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdirkjanm.io%2Fobtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdirkjanm.io%2Fobtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><svg class="svg-inline--fa fa-google-plus fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="google-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm-70.7 372c-68.8 0-124-55.5-124-124s55.2-124 124-124c31.3 0 60.1 11 83 32.3l-33.6 32.6c-13.2-12.9-31.3-19.1-49.4-19.1-42.9 0-77.2 35.5-77.2 78.1s34.2 78.1 77.2 78.1c32.6 0 64.9-19.1 70.1-53.3h-70.1v-42.6h116.9c1.3 6.8 1.9 13.6 1.9 20.7 0 70.8-47.5 121.2-118.8 121.2zm230.2-106.2v35.5H372v-35.5h-35.5v-35.5H372v-35.5h35.5v35.5h35.2v35.5h-35.2z"></path></svg><!-- <i class="fab fa-fw fa-google-plus" aria-hidden="true"></i> --><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdirkjanm.io%2Fobtaining-domain-admin-from-azure-ad-via-cloud-kerberos-trust%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/introducing-roadtools-token-exchange-roadtx/" class="pagination--pager" title="Introducing ROADtools Token eXchange (roadtx) - Automating Azure AD authentication, Primary Refresh Token (ab)use and device registration
+">Previous</a>
+    
+    
+      <a href="/phishing-for-microsoft-entra-primary-refresh-tokens/" class="pagination--pager" title="Phishing for Primary Refresh Tokens and Windows Hello keys
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+    
+    
+    
+      <li><a href="https://github.com/dirkjanm"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+    <li><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/img/cc-by.png"></a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">All blog content is available under the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0 License</a> unless stated otherwise.
+  <br>Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> and a modified version of the "Minimal Mistakes" theme.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-G3JYRDGZVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G3JYRDGZVR', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+  
+</body></html>

@@ -1,0 +1,151 @@
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Webhacking.kr</title>
+    <link id="favicon" rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&amp;display=swap">
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body class="d-flex flex-column h-100">
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="/">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/chall.php">Challenge</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rank.php">Ranking</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/hof.php">Hall of Fame</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="rubiya805@gmail.com" data-bs-original-title="" title="">Contact</a>
+                </li>
+                </ul>                <li class="nav-item">
+                    <a class="btn btn-info" href="#" role="button" data-bs-toggle="modal" data-bs-target="#joinModal">Join</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-danger" href="#" role="button" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+                </li>            </div>
+            </div>
+        </nav>
+    </header>    <!-- Begin page content -->
+    <main class="flex-shrink-0">
+          <div class="container">
+            <h1 class="mt-5">Webhacking.kr</h1>
+            <p class="lead">Korean cyber-security challenge in which the competitors exploit or defend vulnerability in web application.</p>
+            <p><a href="https://discord.gg/B4b2vGd" target="_blank">Join chat <img src="/static/Discord-Logo-Black.png" height="20"></a></p>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">66,996</h5>
+                    <p class="card-text">Users.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">80</h5>
+                    <p class="card-text">Challenges.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">238,872</h5>
+                    <p class="card-text">times solved.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+    </main>    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form onsubmit="loginChk();return false;" action="/login.php?login" method="POST" class="needs-validation">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="id" name="id" placeholder="*Userid" required="">
+                            <label for="floatingUserid">*Userid</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="pw" name="pw" placeholder="*Password" required="">
+                            <label for="floatingPassword">*Password</label>
+                        </div>
+                        <div id="invalidFeedback" class="invalid-feedback">
+                            invalid feedback
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Login">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="joinModal" tabindex="-1" aria-labelledby="joinModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form onsubmit="joinChk();return false;" class="needs-validation">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="joinModalLabel">Join</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="jid" name="id" placeholder="*Userid" pattern="[^\x27\x22\x5c\x2f\x2e\x3c\x3e]+" title="',&quot;,\,.,<,> not allowed" maxlength="30" minlength="3" required="">
+                            <label for="floatingUserid">*Userid</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="jmail" name="mail" placeholder="*Email address" pattern="[^\x27\x22\x5c\x2f\x3c\x3e]+" title="',&quot;,\,<,> not allowed" maxlength="120" required="">
+                            <label for="email">*Email address</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="jpw" name="pw" placeholder="*Password" required="">
+                            <label for="floatingPassword">*Password</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="jpw2" name="pw2" placeholder="*Password check" required="">
+                            <label for="floatingPasswordCheck">*Password Check</label>
+                        </div>
+                        <div id="jInvalidFeedback" class="invalid-feedback">
+                            invalid feedback
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Join">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container">
+            <span class="text-muted">© 2023 Rubiya.</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="/static/main.js"></script>
+
+</body></html>

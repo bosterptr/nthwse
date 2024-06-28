@@ -1,0 +1,599 @@
+<html lang="en"><head>
+		<!-- Google tag (gtag.js) -->
+		<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-Z7Y7KMRFKV"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() { dataLayer.push(arguments); }
+			gtag('js', new Date());
+			gtag('config', 'G-Z7Y7KMRFKV');
+		</script>
+		<script>
+			function copy_to_clipboard() {
+				/* Get the text field */
+				var copyText = document.getElementById("citeTextarea");
+
+				/* Select the text field */
+				copyText.select();
+				copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+				/* Copy the text inside the text field */
+				document.execCommand("copy");
+			}
+		</script>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap and Font-Awesome -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+		<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet">
+
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&amp;display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&amp;display=swap" rel="stylesheet">
+
+		<link href="css/theme.css" rel="stylesheet">
+		<title>GoFetch</title>
+		<meta name="description" content="A new microarchitectural side-channel attack exploiting data memory-dependent prefetchers in Apple silicons.">
+
+		<meta property="og:url" content="https://gofetch.fail">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="GoFetch: Breaking Constant-Time Cryptographic Implementations Using Data Memory-Dependent Prefetchers">
+		<meta property="og:description" content="A new microarchitectural side-channel attack exploiting data memory-dependent prefetchers in Apple silicons.">
+		<meta property="og:image" content="https://gofetch.fail/img/gofetch_1000.jpg">
+
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:site" content="gofetch.fail">
+		<meta name="twitter:title" content="GoFetch: Breaking Constant-Time Cryptographic Implementations Using Data Memory-Dependent Prefetchers">
+		<meta name="twitter:description" content="A new microarchitectural side-channel attack exploiting data memory-dependent prefetchers in Apple silicons.">
+		<meta name="twitter:image:src" content="https://gofetch.fail/img/gofetch_1000.jpg">
+	</head>
+
+	<body>
+		<div class="jumbotron">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-sm-3">
+						<img style="max-height: 200px; max-width: 100%; margin: auto; display: block;" src="img/gofetch.svg" id="logo" alt="GoFetch Logo">
+					</div>
+					<div class="col-sm-8">
+						<h1 class="text-center"><span style="color: #000080;">GoFetch</span></h1>
+						<h3 class="text-center">Breaking Constant-Time Cryptographic Implementations Using Data Memory-Dependent Prefetchers</h3>
+					</div>
+					<div class="col-sm-1"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<section id="abstract">
+				<h4><i class="fa fa-key" style="padding-right: 10px;"></i>Overview of <span style="color: #000080;">GoFetch Attack</span></h4>
+				<div class="container">
+					<p>
+						GoFetch is a microarchitectural side-channel attack 
+						that can extract secret keys from 
+						constant-time cryptographic implementations via 
+						data memory-dependent prefetchers (DMPs).
+						<br>
+						<br>
+						We show that DMPs are present in many Apple CPUs 
+						and pose a real threat to multiple cryptographic implementations, 
+						allowing us to extract keys from OpenSSL Diffie-Hellman, 
+						Go RSA, as well as CRYSTALS Kyber and Dilithium.
+					</p>
+
+					<h5><i class="fa fa-bullhorn" style="padding-right: 10px;"></i>Update (April 2024)</h5>
+					<p>
+						A HID configuration bit (SYS_APL_HID11_EL1[30]) was found by Hector Martin (marcan) to disable DMPs on m1 and m2 CPUs. 
+						Setting this chicken bit requires kernel support that is not available in macOS at this time. 
+						See <a href="https://infosec.exchange/@marcan@treehouse.systems/112238390873024938">@marcan's post</a>
+						for further details (and thank you Hector!).
+					</p>
+
+					<div class="row" style="padding-top: 10px; text-align: center;">
+						<div class="col-xs-12 button-wrapper">
+							<a href="files/gofetch.pdf" target="_blank" class="btn btn-primary mr-2" style="margin-right: 10px;"><i class="fa fa-book" style="padding-right: 10px;"></i>Paper</a>
+							<a href="#" class="btn btn-primary" data-toggle="modal" data-target="#cite-gofetch" ,="" style="margin-right: 10px;"><i class="fa fa-quote-left" style="padding-right: 10px;"></i>Cite</a>
+							<a href="https://github.com/FPSG-UIUC/GoFetch" target="_blank" class="btn btn-primary mr-2" style="margin-right: 10px;"><i class="fa fa-github" style="padding-right: 10px;"></i>Tools</a>
+						</div>
+					</div>
+
+					<div class="modal fade" id="cite-gofetch" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLongTitle">Cite GoFetch</h5>
+								</div>
+
+								<div class="modal-body">
+									<textarea class="form-control rounded-0" id="citeTextarea" rows="8" readonly="">
+@inproceedings{gofetch,
+	title = {GoFetch: Breaking Constant-Time Cryptographic Implementations Using Data Memory-Dependent Prefetchers},
+	author = {Boru Chen and Yingchen Wang and Pradyumna Shome and Christopher W. Fletcher and David Kohlbrenner and Riccardo Paccagnella and Daniel Genkin},
+	booktitle = {USENIX Security},
+	year = {2024},
+}
+		
+										</textarea>
+								</div>
+
+								<div class="modal-footer">
+									<a href="javascript:copy_to_clipboard()" class="btn btn-primary mr-auto"><i class="fa fa-clipboard" style="margin-right: 10px;" aria-hidden="true"></i>
+										Copy to Clipboard</a>
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="demos">
+				<h4><i class="fa fa-play-circle-o" style="padding-right: 10px;"></i>Demo <span style="color: #000080;">Videos.</span></h4>
+				<div class="container">
+					<div class="row">
+						<div class="col-xl-2" style="margin-bottom: 20px;">
+						</div>
+						<div class="col-xl-8" style="margin-bottom: 20px;">
+							<h5 class="gray">Go's RSA-2048 Key Extraction on Apple m1</h5>
+							<div class="ratio ratio-16x9">
+								<video src="files/GoFetch-RSA-540p.mp4" controls="" muted=""></video>
+							</div>
+						</div>
+						<div class="col-xl-2" style="margin-bottom: 20px;">
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="people">
+				<h4 style="padding-top: 20px;"><i class="fa fa-user-plus" style="padding-right: 10px;"></i>People
+					<span style="color: #000080;">Behind GoFetch</span>
+				</h4>
+				<div class="container">
+					<div class="row">
+						<ul>
+							<li><a href="https://bluechen8.github.io/">Boru Chen </a><span class="badge badge-uiuc"><a class="univ" href="https://illinois.edu">University of Illinois Urbana-Champaign</a></span></li>
+							<li><a href="https://www.cs.utexas.edu/~yingchen/">Yingchen Wang</a> <span class="badge badge-uta"><a class="univ" href="https://www.utexas.edu">University of Texas at Austin</a></span></li>
+							<li><a href="https://pradyumnashome.com">Pradyumna Shome</a> <span class="badge badge-gatech"><a class="univ" href="https://www.gatech.edu/">Georgia Institute of Technology</a></span></li>
+							<li><a href="https://cwfletcher.github.io">Christopher W. Fletcher</a> <span class="badge badge-ucb"><a class="univ" href="https://www.berkeley.edu">University of California, Berkeley</a></span></li>
+							<li><a href="https://homes.cs.washington.edu/~dkohlbre/">David Kohlbrenner</a> <span class="badge badge-uw"><a class="univ" href="https://www.washington.edu">University of Washington</a></span></li>
+							<li><a href="https://www.cs.cmu.edu/~rpaccagn/">Riccardo Paccagnella</a> <span class="badge badge-cmu"><a class="univ" href="https://www.cmu.edu">Carnegie Mellon University</a></span></li>
+							<li><a href="https://faculty.cc.gatech.edu/~genkin/">Daniel Genkin</a> <span class="badge badge-gatech"><a class="univ" href="https://www.gatech.edu/">Georgia Institute of Technology</a></span></li>
+						</ul>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<p style="text-align: center;"><b>Contact us at <a href="mailto:info@gofetch.fail">info@gofetch.fail</a></b></p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="qa">
+				<h4 style="padding-top: 20px;"><i class="fa fa-hand-paper-o" style="padding-right: 10px;"></i>Frequently Asked <span style="color: #000080;">Questions</span></h4>
+
+				<div class="accordion accordion-flush" id="all-question-answer">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingAffected">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseAffected" aria-expanded="false" aria-controls="panelsStayOpen-collapseAffected">
+								What is the mechanism behind GoFetch?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseAffected" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingAffected">
+							<div class="accordion-body">
+								<p>
+									The GoFetch attack is based on a CPU feature 
+									called data memory-dependent prefetcher (DMP), 
+									which is present in the latest Apple processors. 
+									We reverse-engineered DMPs on Apple m-series CPUs 
+									and found that the DMP activates (and attempts to dereference) 
+									data loaded from memory that "looks like" a pointer. 
+									This explicitly violates a requirement 
+									of the constant-time programming paradigm, 
+									which forbids mixing data and memory access patterns. 
+								</p>
+								<p>
+									To exploit the DMP, we craft chosen inputs to cryptographic operations, 
+									in a way where pointer-like values only appear 
+									if we have correctly guessed some bits of the secret key. 
+									We verify these guesses by monitoring whether the DMP performs 
+									a dereference through cache-timing analysis. 
+									Once we make a correct guess, we proceed to guess the next batch of key bits. 
+									Using this approach, we show end-to-end key extraction attacks on popular 
+									constant-time implementations of classical 
+									(OpenSSL Diffie-Hellman Key Exchange, Go RSA decryption) 
+									and post-quantum cryptography (CRYSTALS-Kyber and CRYSTALS-Dilithium).
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingDifference">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseDifference" aria-expanded="false" aria-controls="panelsStayOpen-collapseDifference">
+								What processors have DMPs and are affected by GoFetch?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseDifference" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingDifference">
+							<div class="accordion-body">
+								We have mounted end-to-end GoFetch attacks on Apple hardware equipped with m1 processors. 
+								We also tested DMP activation patterns on other Apple processors 
+								and found that m2 and m3 CPUs also exhibit similar exploitable DMP behavior. 
+								While we have not tested other m-series variants (e.g., m2 Pro, etc), 
+								we hypothesize that since these parts have the same microarchitecture as their simpler counterparts, 
+								they are likewise equipped with exploitable DMPs. 
+								Finally, we found that Intel's 13th Gen Raptor Lake microarchitecture also features a DMP. 
+								However, its activation criteria are more restrictive, making it robust to our attacks.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingCacheAttack">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseCacheAttack" aria-expanded="false" aria-controls="panelsStayOpen-collapseCacheAttack">
+								What is the difference between GoFetch and Augury?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseCacheAttack" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingCacheAttack">
+							<div class="accordion-body">
+								<p>
+									The Apple m-series DMP was first discovered by <a href="https://www.prefetchers.info/">Augury</a>, 
+									which suggested that DMPs might mix data and addresses under some conditions. 
+									However, we found that the DMP activation criteria outlined by Augury are overly restrictive. 
+									This prevents Augury's findings from being sufficient to mount attacks on real-world constant-time cryptography. 
+								</p>
+								<p>
+									GoFetch shows that the DMP is significantly more aggressive than previously thought, 
+									and thus poses a much greater security risk. 
+									Specifically, we find that any value loaded from memory is a candidate for being dereferenced (literally!). 
+									This allows us to sidestep many of Augury's limitations and demonstrate end-to-end attacks on real constant-time code.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingConstantTime">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseConstantTime" aria-expanded="false" aria-controls="panelsStayOpen-collapseConstantTime">
+								What is a Cache Side-Channel Attack?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseConstantTime" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingConstantTime">
+							<div class="accordion-body">
+								Modern processors use caches to reduce a program's memory access latency. 
+								If data has been accessed before, it gets cached, which makes subsequent accesses to it faster. 
+								Since the cache is shared by processes running on the same machine, 
+								attackers co-located to the same machine can monitor the cache's state to deduce a victim's access pattern.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingDMP">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseDMP" aria-expanded="false" aria-controls="panelsStayOpen-collapseDMP">
+								What is constant-time programming?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseDMP" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingDMP">
+							<div class="accordion-body">
+								<p>
+									Constant-time programming is a paradigm that aims to harden code against side-channel attacks by ensuring that all operations take the same amount of time, regardless of their operands. In particular, constant-time code cannot contain secret-dependent branches, loops, or other control structures. Moreover, as the CPU caches different addresses with attacker-observable latency, constant-time code cannot mix data and addresses in any way and prohibits the use of secret-dependent memory accesses or array indices.
+								</p>
+								<p>
+									We show that even if a victim correctly separates data from addresses by following the constant-time paradigm, the DMP will generate secret-dependent memory access on the victim's behalf, resulting in variable-time code susceptible to our key-extraction attacks. 
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingOther">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOther" aria-expanded="false" aria-controls="panelsStayOpen-collapseOther">
+								What is a data memory-dependent prefetcher?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseOther" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOther">
+							<div class="accordion-body">
+								Prefetchers are a hardware optimization that predicts memory addresses to be accessed in the near future and fetches the data into the cache accordingly from the main memory. To make a prediction, classical prefetchers use the address trace of previous demand accesses. This strategy performs poorly when it comes to irregular access patterns like linked-list traversals. Aiming to handle such irregular patterns, data memory-dependent prefetchers (DMPs) also consider the content of memory to determine what to fetch, which is capable of capturing those indirect access patterns. Unfortunately, this behavior inherently mixes data and memory addresses at the hardware level, making the entire compute stack non-constant-time, enabling our attack.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingOthers">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOthers" aria-expanded="false" aria-controls="panelsStayOpen-collapseOthers">
+								Are there other DMP-vulnerable cryptographic implementations?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseOthers" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOthers">
+							<div class="accordion-body">
+								We don't know. Our attack relies on the fact that it is possible to craft inputs to control specific intermediate states, making them contain memory addresses in a key-dependent way. The DMP then serves as an oracle, allowing us to learn if the intermediate state indeed looks like a pointer and thus leaks secret key bits. Unfortunately, to assess if an implementation is vulnerable, cryptanalysis and code inspection are required to understand when and how intermediate values can be made to look like pointers in a way that leaks secrets. This process is manual and slow and does not rule out other attack approaches. 
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingDisable">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseDisable" aria-expanded="false" aria-controls="panelsStayOpen-collapseDisable">
+								Can the DMP be disabled?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseDisable" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingDisable">
+							<div class="accordion-body">
+								<p>
+									Yes, but only on some processors.
+									We observe that the <a href="https://developer.apple.com/documentation/xcode/writing-arm64-code-for-apple-platforms#Enable-DIT-for-constant-time-cryptographic-operations">DIT bit</a>
+									set on m3 CPUs effectively disables the DMP.
+									This is not the case for the m1 and m2.
+									Also, Intel's counterpart, <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/data-operand-independent-timing-isa-guidance.html">DOIT bit</a>, 
+									can be used to disable DMP on the Raptor Lake processors.
+								</p>
+								<p>
+									<b>Update (April 2024):</b> A HID configuration bit (SYS_APL_HID11_EL1[30]) was found by Hector Martin (marcan) to disable DMPs on m1 and m2 CPUs. 
+									Setting this chicken bit requires kernel support that is not available in macOS at this time. 
+									See <a href="https://infosec.exchange/@marcan@treehouse.systems/112238390873024938">@marcan's post</a>
+									for further details (and thank you Hector!).
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingCountermeasure">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseCountermeasure" aria-expanded="false" aria-controls="panelsStayOpen-collapseCountermeasure">
+								What can I do to protect myself against this attack?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseCountermeasure" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingCountermeasure">
+							<div class="accordion-body">
+								For users, we recommend using the latest versions of software, 
+								as well as performing updates regularly. 
+								Developers of cryptographic libraries can either set the 
+								<a href="https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/data-operand-independent-timing-isa-guidance.html">DOIT bit</a>
+								and 
+								<a href="https://developer.apple.com/documentation/xcode/writing-arm64-code-for-apple-platforms#Enable-DIT-for-constant-time-cryptographic-operations">DIT bit</a> 
+								bits, which disable the DMP on some CPUs. 
+								Additionally, input blinding can help some cryptographic schemes avoid having attacker-controlled intermediate values, 
+								avoiding key-dependent DMP activation. 
+								Finally, preventing attackers from measuring DMP activation in the first place, 
+								for example by avoiding hardware sharing, can further enhance the security of cryptographic protocols.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingPoC">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapsePoC" aria-expanded="false" aria-controls="panelsStayOpen-collapsePoC">
+								Is there a proof-of-concept code?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapsePoC" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingPoC">
+							<div class="accordion-body">
+								Yes, check our GitHub <a href="https://github.com/FPSG-UIUC/GoFetch">repository</a>.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingLogo">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseLogo" aria-expanded="false" aria-controls="panelsStayOpen-collapseLogo">
+								Can I use the logo?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseLogo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingLogo">
+							<div class="accordion-body">
+								Yes, <a href="img/gofetch.svg">SVG</a> and <a href="img/gofetch.png">PNG</a> versions 
+								of GoFetch logo are free to use under a <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a> licence.
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="panelsStayOpen-headingNotify">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseNotify" aria-expanded="false" aria-controls="panelsStayOpen-collapseNotify">
+								When did you notify Apple?
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseNotify" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingNotify">
+							<div class="accordion-body">
+								We disclosed our findings to Apple on December 5, 2023 (107 days before public release).
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="news">
+				<h4><i class="fa fa-newspaper-o" style="padding-right: 10px;"></i><span style="color: #000080;">GoFetch</span> in the News</h4>
+				<ul>
+					<li>
+						<img class="news" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Ars_Technica_logo_%282016%29.svg/640px-Ars_Technica_logo_%282016%29.svg.png">
+						<a href="https://arstechnica.com/security/2024/03/hackers-can-extract-secret-encryption-keys-from-apples-mac-chips/">Unpatchable vulnerability in Apple chip leaks secret encryption keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/zeroday.png">
+						<a href="https://www.zetter-zeroday.com/apple-chips/">Apple Chip Flaw Lets Hackers Steal Encryption Keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.bigabid.com/wp-content/uploads/2021/04/Apple-Insider-logo.png">
+						<a href="https://appleinsider.com/articles/24/03/21/apple-silicon-vulnerability-leaks-encryption-keys-and-cant-be-patched-easily">Apple Silicon vulnerability leaks encryption keys, and can't be patched easily
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://blogger.googleusercontent.com/img/a/AVvXsEgdHmhs6ZLT_dAXV5foooiEioJIF8B6iq3n1-3NF_PDwi2lv7dEYG1Kkbz66q2NV0Z9VeLanoqZBE7XkmiIZFxwVut4LomLrPVJEqJJOHoSQTF3wpFWvg7hLLiLWj8SIHkXS-dVhbeCIVk2W7hNnK13XBSnXIeSBkcCWYfPIcJy6BZ0ED_kJ9-Gq7NBdxY=w800">
+						<a href="https://www.cyberkendra.com/2024/03/gofetch-flaw-exposes-cryptographic-key.html">GoFetch Flaw Exposes Cryptographic Key Leakage Risk in Apple's M-Series Chips
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://asset.brandfetch.io/idDtKNgjAQ/idZUTeBdmu.png">
+						<a href="https://www.tomshardware.com/pc-components/cpus/new-chip-flaw-hits-apple-silicon-and-steals-cryptographic-keys-from-system-cache-gofetch-vulnerability-attacks-apple-m1-m2-m3-processors-cant-be-fixed-in-hardware">New chip flaw hits Apple Silicon and steals cryptographic keys from system cache — 'GoFetch' vulnerability attacks Apple M1, M2, M3 processors, can't be fixed in hardware
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://d15shllkswkct0.cloudfront.net/wp-content/themes/siliconangle/img/SA-web-logo-300x58.png" style="background-color: black;">
+						<a href="https://siliconangle.com/2024/03/21/researchers-uncover-unfixable-vulnerability-apple-cpus-affecting-cryptographic-security/">Researchers uncover unfixable vulnerability in Apple CPUs affecting cryptographic security
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://upload.wikimedia.org/wikipedia/commons/5/51/GIGAZINE_logo.svg">
+						<a href="https://gigazine.net/gsc_news/en/20240322-apple-silicon-gofetch/">It turns out that it is possible to steal private keys with the "GoFetch" attack that exploits the vulnerability of Apple silicon that cannot be patched
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.tftc.io/assets/img/logo.svg?v=8a9e81e880">
+						<a href="https://www.tftc.io/apple-m-vulnerability-gofetch/?ref=onepagecrypto.com">GoFetch: Critical Vulnerability in Apple's M-Series Chips
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://mspoweruser.com/wp-content/uploads/2023/12/mspoweruser-logo-default.png">
+						<a href="https://mspoweruser.com/apple-m-series-chips-found-to-leak-secret-encryption-keys/">Apple M-series chips found to leak secret encryption keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.securityweek.com/sites/default/files/logos/SecurityWeek-Logo.jpeg">
+						<a href="https://www.securityweek.com/new-gofetch-apple-cpu-attack-exposes-crypto-keys/">
+							New 'GoFetch' Apple CPU Attack Exposes Crypto Keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/cybernews.png">
+						<a href="https://cybernews.com/security/macs-can-leak-secrets-gofetch/">
+							M-series Macs can leak secrets due to inherent vulnerability
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/macworld.png">
+						<a href="https://www.macworld.com/article/2276399/gofetch-flaw-m1-m2-m3-processor-cryptographic-performance.html">
+							'GoFetch' flaw in Apple's M-series chips can leak hidden encryption keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/9to5Mac_Logo.jpg">
+						<a href="https://9to5mac.com/2024/03/22/unpatchable-security-flaw-mac/">
+							Unpatchable security flaw in Apple Silicon Macs breaks encryption
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://cdn.idropnews.com/wp-content/uploads/2017/06/13133217/idroplogo.png">
+						<a href="https://www.idropnews.com/news/new-apple-silicon-vulnerability-allows-attackers-to-access-user-data/210885/">
+							New Apple Silicon Vulnerability Allows Attackers to Access User Data
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://tpucdn.com/images/logo-v1706377735722.svg">
+						<a href="https://www.techpowerup.com/320693/apple-m-series-cpus-affected-by-gofetch-unpatchable-cryptographic-vulnerability">
+							Apple M-Series CPUs Affected by "GoFetch" Unpatchable Cryptographic Vulnerability
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/v1448602321/t6loybjsqbgthtxi859l.png">
+						<a href="https://www.theregister.com/2024/03/22/hardwarelevel_apple_silicon_vulnerability_can/">
+							Hardware-level Apple Silicon vulnerability can leak cryptographic keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.macobserver.com/wp-content/themes/observer_two/dist/images/logo.png">
+						<a href="https://www.macobserver.com/news/go-fetch-apple-m-series-chips/">
+							GoFetch Vulnerability in Apple M-Series Chips Can Lead to Leaked Encryption Keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.techopedia.com/wp-content/uploads/2023/08/techopedia-light.svg">
+						<a href="https://www.techopedia.com/news/new-apple-chip-flaw-could-expose-your-secrets-performance-at-risk">
+							New Apple Chip Flaw Could Expose Your Secrets: Performance at Risk
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.bleepstatic.com/images/site/logo.png" style="background-color: #212d47;">
+						<a href="https://www.bleepingcomputer.com/news/security/new-gofetch-attack-on-apple-silicon-cpus-can-steal-crypto-keys/#google_vignette">New GoFetch attack on Apple Silicon CPUs can steal crypto keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://seeklogo.com/images/T/techtarget-logo-36F14FA4A6-seeklogo.com.png">
+						<a href="https://www.techtarget.com/searchsecurity/news/366575096/GoFetch-attack-spells-trouble-for-Apple-M-series-chips">
+							'GoFetch' attack spells trouble for Apple M-series chips
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/itd.png">
+						<a href="https://www.ithinkdiff.com/apple-silicon-encryption-keys-theft-gofetch/">
+							PSA: Apple Silicon chips vulnerable to encryption key theft
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://www.gizchina.com/wp-content/uploads/images/2021/03/gizchina-logo-retina.png">
+						<a href="https://www.gizchina.com/2024/03/22/apple-chip-vulnerability/">
+							APPLE'S M-SERIES CHIPS EXPOSE CRITICAL VULNERABILITY
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://assets.kreatio.net/computing_redesign/svg/CTG23-50th-Logo.svg">
+						<a href="https://www.computing.co.uk/news/4188654/apple-series-cpu-vulnerability-enables-attackers-purloin-cryptographic-keys-macs">
+							Apple M-series CPU vulnerability enables attackers to purloin cryptographic keys from Macs
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://cdn.mos.cms.futurecdn.net/S3ntYCbvRMLSnjxFhhUpsF-650-80.jpg">
+						<a href="https://www.itpro.com/security/a-vulnerability-in-apple-m-series-chips-could-expose-encryption-keys-and-harm-performance-and-the-flaw-is-unpatchable">
+							A vulnerability in Apple M-series chips could expose encryption keys and harm performance — and the flaw is 'unpatchable'
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/coinspeaker.png">
+						<a href="https://www.coinspeaker.com/vulnerability-apple-m-series-chips/">
+							Major Vulnerability Discovered in Apple's M-Series Chips
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://logodix.com/logo/1872534.png">
+						<a href="https://www.techrepublic.com/article/gofetch-vulnerability-apple-m-chips/">
+							New GoFetch Vulnerability in Apple's M Chips Allows Secret Keys Leak on Compromised Computers
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://lifehacker.com/images/lifehacker-logo.svg">
+						<a href="https://lifehacker.com/tech/m-series-mac-has-serious-security-hardware-vulnerability">
+							Your Mac Has a Serious Security Vulnerability Baked Into Its Hardware
+						</a>
+					</li>
+					<li>
+						<img class="news" src="https://cdnp1.stackassets.com/e4c9d45ac2ed3b36d7f566e38921faca9ff2177a/store/6eeffe5fc60124a41358ee4f45bbb14d10c36fcc4f94d08e5871dae06bc9/233_logo-mobile.png">
+						<a href="https://thehackernews.com/2024/03/new-gofetch-vulnerability-in-apple-m.html">
+							New "GoFetch" Vulnerability in Apple M-Series Chips Leaks Secret Encryption Keys
+						</a>
+					</li>
+					<li>
+						<img class="news" src="img/androidautority.png">
+						<a href="https://www.androidauthority.com/apple-silicon-macs-gofetch-flaw-3428325/">
+							Ouch: Macs with Apple Silicon suffer from an unfixable flaw that leaks security keys
+						</a>
+					</li>
+				</ul>
+			</section>
+
+			<section id="acknowledgments">
+				<h4><i class="fa fa-certificate" style="padding-right: 10px;"></i>Acknowledgments</h4>
+				<div class="block">
+					<p>
+						This work was partially supported by
+						the Air Force Office of Scientific Research (AFOSR) under award number FA9550-20-1-0425;
+						the Defense Advanced Research Projects Agency (DARPA) under contract
+						numbers W912CG-23-C-0022 and HR00112390029;
+						the National Science Foundation (NSF) under grant numbers 1954712, 1954521, 2154183, 2153388, and 1942888;
+						the Alfred P. Sloan Research Fellowship;
+						and gifts from Intel, Qualcomm,
+						and Cisco.
+					</p>
+				</div>
+			</section>
+		</div>
+
+		<footer>
+			<div class="text-center w-100">
+				<span>Copyright © 2024 Georgia Institute of Technology. All rights reserved.</span>
+			</div>
+		</footer>
+
+		<!-- Cite breaks without older Bootstrap -->
+		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+
+</body></html>

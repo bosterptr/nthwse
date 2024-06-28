@@ -1,0 +1,1815 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+
+
+<meta name="description" content="Source Code Analysis Tools on the main website for The OWASP Foundation. OWASP is a nonprofit foundation that works to improve the security of software.">
+<meta property="og:description" content="Source Code Analysis Tools on the main website for The OWASP Foundation. OWASP is a nonprofit foundation that works to improve the security of software.">
+<meta propery="og:title" content="Source Code Analysis Tools | OWASP Foundation">
+<meta property="og:url" content="https://owasp.org/www-community/Source_Code_Analysis_Tools">
+<meta property="og:locale" content="en_US">
+
+<!-- should probably look at using article at some point for www-community at least -->
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://owasp.org/www--site-theme/favicon.ico">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+
+<link rel="canonical" href="https://owasp.org/www-community/Source_Code_Analysis_Tools">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-4531126-1"></script> -->
+<!-- <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-4531126-1');
+</script> -->
+<!-- Google Analytics -->
+
+
+<script src="https://owasp.org/www--site-theme/assets/js/js.cookie.min.js"></script>
+<script>
+  if(Cookies.get('cookies-ok') == 'true' && window.ga === undefined)
+  {
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-4531126-1', 'auto');
+    ga('send', 'pageview');
+  }
+  else if (Cookies.get('cookies-ok') == 'true')
+  {
+    ga('send', 'pageview');
+  }
+
+  function handleOutboundLinkClicks(event) {
+    var href = '';
+    if(event.target.href == undefined)
+      href = event.target.parentElement.href;
+    else
+      href = event.target.href
+  if(Cookies.get('cookies-ok') == 'true'){  
+    
+    ga('send', 'event', {
+      eventCategory: 'Outbound Link',
+      eventAction: 'click',
+      eventLabel: href,
+      transport: 'beacon'
+    });
+  }
+}
+</script>
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+<link rel="stylesheet" href="https://owasp.org/www--site-theme/assets/css/styles.css">
+<link rel="shortcut icon" type="images/x-icon" href="https://owasp.org/www--site-theme/favicon.ico">
+
+<script src="https://owasp.org/www--site-theme/assets/js/jquery-3.7.1.min.js"></script>
+<script src="https://owasp.org/www--site-theme/assets/js/util.js"></script>
+<script src="https://owasp.org/www--site-theme/assets/js/yaml.min.js"></script>
+<script src="https://owasp.org/www--site-theme/assets/js/kjua.min.js"></script>
+<title>Source Code Analysis Tools | OWASP Foundation</title>
+
+    <script type="text/javascript">
+      $(function(){
+        var baseurl = "https://github.com/OWASP/www-community/blob/master/";
+        var path = "pages/Source_Code_Analysis_Tools.md";
+        $('.repo').html('<a href=' + baseurl + path + '><div class="reset-3c756112--menuItemIcon-206eb252" style="float: left;"><svg preserveAspectRatio="xMidYMid meet" height="1em" width="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 438.549 438.549" stroke="none" class="icon-7f6730be--text-3f89f380"><g><path d="M409.132 114.573c-19.608-33.596-46.205-60.194-79.798-79.8-33.598-19.607-70.277-29.408-110.063-29.408-39.781 0-76.472 9.804-110.063 29.408-33.596 19.605-60.192 46.204-79.8 79.8C9.803 148.168 0 184.854 0 224.63c0 47.78 13.94 90.745 41.827 128.906 27.884 38.164 63.906 64.572 108.063 79.227 5.14.954 8.945.283 11.419-1.996 2.475-2.282 3.711-5.14 3.711-8.562 0-.571-.049-5.708-.144-15.417a2549.81 2549.81 0 0 1-.144-25.406l-6.567 1.136c-4.187.767-9.469 1.092-15.846 1-6.374-.089-12.991-.757-19.842-1.999-6.854-1.231-13.229-4.086-19.13-8.559-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-.951-2.568-2.098-3.711-3.429-1.142-1.331-1.997-2.663-2.568-3.997-.572-1.335-.098-2.43 1.427-3.289 1.525-.859 4.281-1.276 8.28-1.276l5.708.853c3.807.763 8.516 3.042 14.133 6.851 5.614 3.806 10.229 8.754 13.846 14.842 4.38 7.806 9.657 13.754 15.846 17.847 6.184 4.093 12.419 6.136 18.699 6.136 6.28 0 11.704-.476 16.274-1.423 4.565-.952 8.848-2.383 12.847-4.285 1.713-12.758 6.377-22.559 13.988-29.41-10.848-1.14-20.601-2.857-29.264-5.14-8.658-2.286-17.605-5.996-26.835-11.14-9.235-5.137-16.896-11.516-22.985-19.126-6.09-7.614-11.088-17.61-14.987-29.979-3.901-12.374-5.852-26.648-5.852-42.826 0-23.035 7.52-42.637 22.557-58.817-7.044-17.318-6.379-36.732 1.997-58.24 5.52-1.715 13.706-.428 24.554 3.853 10.85 4.283 18.794 7.952 23.84 10.994 5.046 3.041 9.089 5.618 12.135 7.708 17.705-4.947 35.976-7.421 54.818-7.421s37.117 2.474 54.823 7.421l10.849-6.849c7.419-4.57 16.18-8.758 26.262-12.565 10.088-3.805 17.802-4.853 23.134-3.138 8.562 21.509 9.325 40.922 2.279 58.24 15.036 16.18 22.559 35.787 22.559 58.817 0 16.178-1.958 30.497-5.853 42.966-3.9 12.471-8.941 22.457-15.125 29.979-6.191 7.521-13.901 13.85-23.131 18.986-9.232 5.14-18.182 8.85-26.84 11.136-8.662 2.286-18.415 4.004-29.263 5.146 9.894 8.562 14.842 22.077 14.842 40.539v60.237c0 3.422 1.19 6.279 3.572 8.562 2.379 2.279 6.136 2.95 11.276 1.995 44.163-14.653 80.185-41.062 108.068-79.226 27.88-38.161 41.825-81.126 41.825-128.906-.01-39.771-9.818-76.454-29.414-110.049z"></path></g></svg><span style="padding-left:8px;">Edit on GitHub</span></div></a>');
+      });
+    </script>
+    <script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+  </head>
+  <body class="base-grid col-sidebar">
+
+    <div id="blocker"></div>
+
+    <noscript>For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://turnonjs.com/"> instructions how to enable JavaScript in your web browser</a>.</noscript>
+    <header role="banner">
+  <div id="banner" class="notice" aria-label="announcement"><p>Please support the OWASP mission to improve software security through open source initiatives and community education. <a href="https://owasp.org/donate/">Donate Now!</a></p><a href="#" id="close-banner" aria-label="close announcement" style="float:right;"><i class="fa fa-times"></i></a></div>
+
+
+
+
+<style>
+  #banner img {
+    max-width: 30em;
+  }
+
+  @media (max-width: 1131px) {
+    #banner img {
+      max-width: 30em;
+    }
+  }
+
+  @media (max-width: 800px) {
+    #banner img {
+      max-width: 20em;
+    }
+  }
+
+  @media (max-width: 600px) {
+    #banner img {
+      max-width: 20em;
+    }
+  }
+
+  @media (max-width: 450px) {
+    #banner img {
+      max-width: 250px;
+    }
+  }
+</style>
+
+<script type="text/javascript">
+  $(function () {
+    var bannerdata = [];
+    banneryaml = YAML.load('https://owasp.org/www-community/assets/sitedata/banner-data.yml');
+    $.each(banneryaml, function (index) {
+      bannerdata.push(this);
+    });
+
+    if (bannerdata.length > 0) {
+      var htmlstring = "";
+      var usebanner = null;
+      var defbanner = null;
+      var checkdate = new Date(); //local time but who cares about the time?
+      bannerdata.forEach(data => {
+        if (data.start) {
+          var start = data.start;
+
+          if (data.start <= checkdate) {
+            if (data.end) {
+
+              var end = data.end;
+              if (checkdate < end) {
+                usebanner = data;
+              }
+            }
+            else
+              usebanner = data;
+          }
+        }
+        else {
+          defbanner = data;
+        }
+      });
+
+      if (defbanner && !usebanner)
+        usebanner = defbanner;
+      if (usebanner) {
+        htmlstring = usebanner.text;
+        htmlstring += "<a href='#' id='close-banner' aria-label='close announcement' style='float:right;'><i class='fa fa-times'></i></a>";
+
+        $("#banner").html(htmlstring);
+        $("#banner").removeClass("notice");
+        $("#banner").addClass(usebanner.type);
+
+        $("#close-banner").click(function() {
+          $(this).closest("#banner").remove();
+            Cookies.set('banner-seen', 'true', { expires: 7 });
+        });
+      }
+    }
+  });
+</script>
+  <div id="popup" class="notice" aria-label="announcement" style="display: none;">
+   
+</div>
+
+
+
+
+<style>
+  #banner img {
+    max-width: 30em;
+  }
+
+  @media (max-width: 1131px) {
+    #banner img {
+      max-width: 30em;
+    }
+  }
+
+  @media (max-width: 800px) {
+    #banner img {
+      max-width: 20em;
+    }
+    #popup {
+      visibility: hidden;
+    }
+  }
+
+  @media (max-width: 600px) {
+    #popup {
+      visibility: hidden;
+    }
+    #banner img {
+      max-width: 20em;
+    }
+  }
+
+  @media (max-width: 450px) {
+    #banner img {
+      max-width: 250px;
+    }
+    #popup {
+      visibility: hidden;
+    }
+  }
+</style>
+
+<script type="text/javascript">
+  $(function () {
+    var popdata = [];
+    $("#popup").hide();
+    popyaml = YAML.load('https://owasp.org/www-community/assets/sitedata/popup-data.yml');
+    $.each(popyaml, function (index) {
+      popdata.push(this);
+    });
+
+    if (popdata.length > 0) {
+      var htmlstring = "";
+      var usepop = null;
+      var defpop = null;
+      var checkdate = new Date(); //local time but who cares about the time?
+      popdata.forEach(data => {
+        if (data.start) {
+          var start = data.start;
+
+          if (data.start <= checkdate) {
+            if (data.end) {
+
+              var end = data.end;
+              if (checkdate < end) {
+                usepop = data;
+              }
+            }
+            else
+              usepop = data;
+          }
+        }
+        else {
+          defpop = data;
+        }
+      });
+
+      if (defpop && !usepop)
+        usepop = defpop;
+      if (usepop) {
+        htmlstring = usepop.text;
+        htmlstring += "<a href='#' id='close-popup' aria-label='close announcement' style='float:right;'><i class='fa fa-times'></i></a>";
+
+        $("#popup").html(htmlstring);
+        $("#popup").removeClass("notice");
+        $("#popup").addClass(usepop.type);
+        
+        if( Cookies.get('popup-seen')!='true')
+        {
+          $("#popup").show();
+        }
+
+        $("#close-popup").click(function() {
+          $(this).closest("#popup").remove();
+            Cookies.set('popup-seen', 'true', { expires: 7 });
+        });
+      }
+    }
+  });
+</script>
+  <div class="header-wrapper" aria-label="main navigation">
+    <nav class="alt-nav">
+      <a href="#" class="menu-toggler" aria-hidden="true">
+        <i class="fa fa-bars"></i>
+      </a>
+      <a href="https://owasp.org/" class="alt-logo" aria-label="go to homepage">
+          <img src="https://owasp.org/assets/images/logo.png" alt="OWASP logo">
+      </a>
+      <div id="overlay" class="remove-el">
+
+      </div><ul class="mobile-menu hide-el" role="navigation" aria-label="mobile primary navigation"><li><a href="#" class="menu-toggler" aria-hidden="true"><i class="fa fa-times"></i></a></li><li><form role="search" method="get" action="https://owasp.org/search"><div class="search-div"><input id="searchString" aria-label="search input" name="searchString" class="search-bar" type="search" placeholder="Search OWASP.org" required="true"><button id="search-button" aria-label="search button" type="submit" class="fa fa-search" style="padding-left: 8px;"></button></div></form></li><button class="accordion">PROJECTS</button><div class="panel"><ul><li><a href="https://owasp.org/projects/">Browse All Projects...</a></li><li class="separator"><a href="https://owasp.org/www-project-top-ten/">OWASP Top Ten</a></li><li><a href="https://owasp.org/www-project-dependency-track/">Dependency Track</a></li><li><a href="https://owasp.org/www-project-juice-shop/">Juice Shop</a></li><li><a href="https://owasp.org/mas/">Mobile Application Security</a></li><li><a href="https://owasp.org/www-project-modsecurity-core-rule-set/">ModSecurity Core Rule Set</a></li><li><a href="https://owasp.org/www-project-samm/">Software Assurance Maturity Model (SAMM)</a></li><li><a href="https://owasp.org/www-project-web-security-testing-guide/">Web Security Testing Guide</a></li><li class="separator"><a href="https://owasporg.atlassian.net/servicedesk/customer/portal/7/create/70?src=-1419759666">Start a New Project...</a></li><li class="separator"><a href="https://owasp.org/www-community/">Community Contributions</a></li><li><a href="https://owasp.org/gsoc/gsoc2023">Google Summer of Code 2023</a></li></ul></div><button class="accordion">CHAPTERS</button><div class="panel"><ul><li><a href="https://owasp.org/chapters/">Find a Local Chapter...</a></li><li class="separator"><a href="https://owasp.org/chapters/#Africa">Africa</a></li><li><a href="https://owasp.org/chapters/#Asia">Asia</a></li><li><a href="https://owasp.org/chapters/#TheCarribean">Caribbean</a></li><li><a href="https://owasp.org/chapters/#CentralAmerica">Central America</a></li><li><a href="https://owasp.org/chapters/#Europe">Europe</a></li><li><a href="https://owasp.org/chapters/#NorthAmerica">North America</a></li><li><a href="https://owasp.org/chapters/#Oceania">Oceania</a></li><li><a href="https://owasp.org/chapters/#SouthAmerica">South America</a></li><li class="separator"><a href="https://owasporg.atlassian.net/servicedesk/customer/portal/8/group/20/create/90?src=-1419759666" target="_blank" rel="noopener noreferrer">Start a Local Chapter...</a></li></ul></div><button class="accordion">EVENTS</button><div class="panel"><ul><li><a href="https://basconf.org/" target="_blank" rel="noopener noreferrer">OWASP Boston Application Security Conference 2024</a></li><li><a href="https://www.eventbrite.com/e/848566494227?aff=oddtdtcreator" target="_blank" rel="noopener noreferrer">OWASP Spring Virtual Training Days</a></li><li><a href="https://appsecpnw.org/" target="_blank" rel="noopener noreferrer">OWASP AppSec Days Pacific Northwest 2024</a></li><li><a href="https://owasp.org/www-chapter-italy/" target="_blank" rel="noopener noreferrer">OWASP Italy Day 2024</a></li><li><a href="https://lisbon.globalappsec.org/" target="_blank" rel="noopener noreferrer">OWASP Global AppSec Lisbon 2024</a></li><li><a href="https://sf.globalappsec.org/" target="_blank" rel="noopener noreferrer">OWASP Global AppSec San Francisco 2024</a></li><li><a href="https://lascon.org/" target="_blank" rel="noopener noreferrer">OWASP LASCON 2024</a></li><li><a href="https://www.owaspbenelux.eu/" target="_blank" rel="noopener noreferrer">OWASP BeNeLux 2024</a></li><li><a href="https://owasp.org/chapters/events/">Upcoming Chapter Events</a></li><li class="separator"><a href="https://owasp.org/events/">Browse All Events...</a></li></ul></div><button class="accordion">ABOUT</button><div class="panel"><ul><li><a href="https://owasp.org/about/">About OWASP</a></li><li><a href="https://owasp.org/awards/">Awards</a></li><li><a href="https://owasp.org/careers/">Careers</a></li><li><a href="https://owasp.org/committees/">Committees</a></li><li><a href="https://owasp.org/contact/">Contact Us</a></li><li><a href="https://owasp.org/www-community">Contributed Content</a></li><li><a href="https://owasp.org/supporters/">Corporate Supporters</a></li><li><a href="https://owasp.org/donate/">Donate</a></li><li><a href="https://owasp.org/finance/">Finance</a></li><li><a href="https://owasp.org/store">Get OWASP Gear</a></li><li><a href="https://owasp.org/www-board/">Global Board</a></li><li><a href="https://owasp.org/www-board-eu/">Global Board EU</a></li><li><a href="https://owasp.org/governance/">Governance</a></li><li><a href="https://owasp.org/membership/">Membership</a></li><li><a href="https://members.owasp.org/">Membership Portal</a></li><li><a href="https://owasp.org/news/">Opinions &amp; News</a></li><li><a href="https://owasp.org/www-policy/">Policies</a></li><li><a href="https://owasp.org/corporate/">Staff</a></li><li><a href="https://owasp.org/www-staff/">Staff Projects &amp; Procedures</a></li><li><a href="https://owasp.us17.list-manage.com/subscribe?u=a8012c9e2e384bf8ea8d7deb7&amp;id=22be76c892">Subscribe to our Mailing List</a></li><li><a href="https://www.youtube.com/user/OWASPGLOBAL/videos" target="_blank" rel="noopener noreferrer">Video</a></li></ul></div><li><a href="https://owasp.org/donate">MAKE A DONATION</a></li><li><a href="https://owasp.org/membership">BECOME A MEMBER</a></li><li><a href="https://owasp.org/sitemap">SITEMAP</a></li></ul>
+      <!-- jekyll menu stuff -->
+    </nav>
+    
+    <nav class="top-nav" role="navigation" aria-label="primary navigation">
+      <a href="https://owasp.org/" class="desktop-logo" aria-label="go to homepage">
+        <img src="https://owasp.org/assets/images/logo.png" alt="">
+      </a>
+      <!-- jekyll menu stuff -->
+      <div id="midmenu" class="top-nav"><ul aria-label="header menu"><li><a href="https://owasp.org/projects/">PROJECTS</a><ul class="dropdown-menu"><li><a href="https://owasp.org/projects/">Browse All Projects...</a></li><li class="separator"><a href="https://owasp.org/www-project-top-ten/">OWASP Top Ten</a></li><li><a href="https://owasp.org/www-project-dependency-track/">Dependency Track</a></li><li><a href="https://owasp.org/www-project-juice-shop/">Juice Shop</a></li><li><a href="https://owasp.org/mas/">Mobile Application Security</a></li><li><a href="https://owasp.org/www-project-modsecurity-core-rule-set/">ModSecurity Core Rule Set</a></li><li><a href="https://owasp.org/www-project-samm/">Software Assurance Maturity Model (SAMM)</a></li><li><a href="https://owasp.org/www-project-web-security-testing-guide/">Web Security Testing Guide</a></li><li class="separator"><a href="https://owasporg.atlassian.net/servicedesk/customer/portal/7/create/70?src=-1419759666">Start a New Project...</a></li><li class="separator"><a href="https://owasp.org/www-community/">Community Contributions</a></li><li><a href="https://owasp.org/gsoc/gsoc2023">Google Summer of Code 2023</a></li></ul></li><li><a href="https://owasp.org/chapters/">CHAPTERS</a><ul class="dropdown-menu"><li><a href="https://owasp.org/chapters/">Find a Local Chapter...</a></li><li class="separator"><a href="https://owasp.org/chapters/#Africa">Africa</a></li><li><a href="https://owasp.org/chapters/#Asia">Asia</a></li><li><a href="https://owasp.org/chapters/#TheCarribean">Caribbean</a></li><li><a href="https://owasp.org/chapters/#CentralAmerica">Central America</a></li><li><a href="https://owasp.org/chapters/#Europe">Europe</a></li><li><a href="https://owasp.org/chapters/#NorthAmerica">North America</a></li><li><a href="https://owasp.org/chapters/#Oceania">Oceania</a></li><li><a href="https://owasp.org/chapters/#SouthAmerica">South America</a></li><li class="separator"><a href="https://owasporg.atlassian.net/servicedesk/customer/portal/8/group/20/create/90?src=-1419759666" target="_blank" rel="noopener noreferrer">Start a Local Chapter...</a></li></ul></li><li><a href="/events/">EVENTS</a><ul class="dropdown-menu"><li><a href="https://basconf.org/" target="_blank" rel="noopener noreferrer">OWASP Boston Application Security Conference 2024</a></li><li><a href="https://www.eventbrite.com/e/848566494227?aff=oddtdtcreator" target="_blank" rel="noopener noreferrer">OWASP Spring Virtual Training Days</a></li><li><a href="https://appsecpnw.org/" target="_blank" rel="noopener noreferrer">OWASP AppSec Days Pacific Northwest 2024</a></li><li><a href="https://owasp.org/www-chapter-italy/" target="_blank" rel="noopener noreferrer">OWASP Italy Day 2024</a></li><li><a href="https://lisbon.globalappsec.org/" target="_blank" rel="noopener noreferrer">OWASP Global AppSec Lisbon 2024</a></li><li><a href="https://sf.globalappsec.org/" target="_blank" rel="noopener noreferrer">OWASP Global AppSec San Francisco 2024</a></li><li><a href="https://lascon.org/" target="_blank" rel="noopener noreferrer">OWASP LASCON 2024</a></li><li><a href="https://www.owaspbenelux.eu/" target="_blank" rel="noopener noreferrer">OWASP BeNeLux 2024</a></li><li><a href="https://owasp.org/chapters/events/">Upcoming Chapter Events</a></li><li class="separator"><a href="https://owasp.org/events/">Browse All Events...</a></li></ul></li><li><a href="https://owasp.org/about/">ABOUT</a><ul class="dropdown-menu"><li><a href="https://owasp.org/about/">About OWASP</a></li><li><a href="https://owasp.org/awards/">Awards</a></li><li><a href="https://owasp.org/careers/">Careers</a></li><li><a href="https://owasp.org/committees/">Committees</a></li><li><a href="https://owasp.org/contact/">Contact Us</a></li><li><a href="https://owasp.org/www-community">Contributed Content</a></li><li><a href="https://owasp.org/supporters/">Corporate Supporters</a></li><li><a href="https://owasp.org/donate/">Donate</a></li><li><a href="https://owasp.org/finance/">Finance</a></li><li><a href="https://owasp.org/store">Get OWASP Gear</a></li><li><a href="https://owasp.org/www-board/">Global Board</a></li><li><a href="https://owasp.org/www-board-eu/">Global Board EU</a></li><li><a href="https://owasp.org/governance/">Governance</a></li><li><a href="https://owasp.org/membership/">Membership</a></li><li><a href="https://members.owasp.org/">Membership Portal</a></li><li><a href="https://owasp.org/news/">Opinions &amp; News</a></li><li><a href="https://owasp.org/www-policy/">Policies</a></li><li><a href="https://owasp.org/corporate/">Staff</a></li><li><a href="https://owasp.org/www-staff/">Staff Projects &amp; Procedures</a></li><li><a href="https://owasp.us17.list-manage.com/subscribe?u=a8012c9e2e384bf8ea8d7deb7&amp;id=22be76c892">Subscribe to our Mailing List</a></li><li><a href="https://www.youtube.com/user/OWASPGLOBAL/videos" target="_blank" rel="noopener noreferrer">Video</a></li></ul></li><li><a href="#"><icon style="margin-left:50%;" class="fa fa-search"></icon></a><ul class="dropdown-menu"><li><a href="#"><form style="display:inline-block;" role="search" method="get" action="https://owasp.org/search"><div class="search-div"><input id="searchString" name="searchString" class="mini-search-bar" type="search" placeholder="Search OWASP.org" required="true"><button id="search-button" type="submit" class="fa fa-search"></button></div></form></a></li></ul></li></ul></div>
+      
+      
+
+      <div class="interactive-wrapper">                
+        <div class="nav-button" aria-label="donate to or join OWASP">
+        
+          <a href="https://owasp.org/store" class="cta-button white inset"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Store</a>
+          <a href="https://owasp.org/donate?reponame=www-community" class="cta-button green">Donate</a>
+          <a href="https://owasp.org/membership" class="cta-button">Join</a>
+        </div>
+      </div>
+    </nav>
+    <div id="disclaimer-container" style="opacity: 1;">
+<div id="disclaimer">
+    <p>This website uses cookies to analyze our traffic and only share that information with our analytics partners.</p><a class="disclaimerOK">Accept</a>
+</div>
+<div id="close-disclaimer">x</div>
+</div>
+  </div>
+  <div class="mobile" style="width:100%;display: flex; justify-content: space-evenly;align-items: center;padding: 8px; background-color: #98afc7;">
+    <div><a href="https://owasp.org/store" class="cta-button white inset"><i class="fa fa-shopping-cart" aria-hidden="true"></i>Store</a></div>
+    <div><a href="https://owasp.org/donate?reponame=www-community" class="cta-button green">Donate</a></div>
+    <div><a href="https://owasp.org/membership" class="cta-button">Join</a></div>
+  </div>
+
+
+
+<script type="text/javascript">
+  $(function(){
+      
+      url = $(location).attr('href');
+      if(url.includes('www2'))
+      {
+        url = url.replace(/www2./, '');
+        $(location).attr('href',url);
+        return;
+      }
+    // this works to get data from a json file NOT in data
+      $.getJSON("https://owasp.org/www--site-theme/assets/sitedata/menus.json", function(data) {
+         var listr = "<ul aria-label='header menu'>";
+         
+         var mlistr = "<ul class='mobile-menu hide-el' role='navigation' aria-label='mobile primary navigation'>";
+
+          mlistr += "<li><a href='#' class='menu-toggler' aria-hidden='true'><i class='fa fa-times'></i></a></li>";
+          mlistr += "<li>";
+          mlistr += "<form role='search' method='get' action='https://owasp.org/search'>";   
+          mlistr += "<div class='search-div'>";
+          mlistr += "<input id='searchString' aria-label='search input' name='searchString' class='search-bar' type='search' placeholder='Search OWASP.org' required='true'>";
+          mlistr += "<button id='search-button' aria-label='search button' type='submit' class='fa fa-search' style='padding-left: 8px;'></button></div></form>";
+          mlistr += "</li>";
+          $.each(data.menus, function (ndx, menu){
+              listr += "<li><a href='" + menu.url + "'>" + menu.title + "</a>";
+              searchitem = issearch(menu.title);
+              if(!menu.items && !searchitem)
+              {
+                  mlistr += "<li><a href='" + menu.url + "'>" + menu.title + "</a>";
+              }
+              
+              if(menu.items){
+                  listr += "<ul class='dropdown-menu'>";
+                  if(!searchitem) {
+                    mlistr += "<button class='accordion'>" + menu.title + "</button>";
+                    mlistr += "<div class='panel'>";
+                    mlistr += "<ul>";
+                  }
+                $.each(menu.items, function(ndx, item){
+                
+                  if(item.separator)
+                  {
+                      listr += "<li class='separator'>";
+                      if(!searchitem)
+                        mlistr += "<li class='separator'>";
+                  }
+                  else
+                  {
+                      listr += "<li>";
+                      if(!searchitem)
+                        mlistr += "<li>";
+                  }
+                  listr += "<a href='" + item.url + "'";
+                  if(!searchitem)
+                    mlistr += "<a href='" + item.url + "'";
+                  if(item.opentab)
+                  {
+                    listr += " target='_blank' rel='noopener noreferrer'";
+                    if(!searchitem)
+                      mlistr += " target='_blank' rel='noopener noreferrer'";
+                  }
+
+                  listr += ">" + item.title + "</a></li>";
+                  if(!searchitem)
+                    mlistr += ">" + item.title + "</a></li>";
+                });
+                listr += "</ul>";
+                if(!searchitem){
+                  mlistr += "</ul>";
+                  mlistr += "</div>";
+                }
+              }
+              
+              listr += "</li>";
+              if(!searchitem)
+                mlistr += "</li>";
+          });
+          listr += "</ul>";
+          mlistr += "<li><a href='https://owasp.org/donate'>MAKE A DONATION</a></li>";
+          mlistr += "<li><a href='https://owasp.org/membership'>BECOME A MEMBER</a></li>";
+          mlistr += "<li><a href='https://owasp.org/sitemap'>SITEMAP</a></li>";
+          mlistr += "</ul>";
+          
+          //$('.desktop-logo').after(listr);
+          $('#midmenu').html(listr);
+          $('#overlay').after(mlistr);
+
+          $(".accordion").click(function () {
+              $(this).toggleClass("active");
+              if($(this).next('.panel').css('display') == 'block'){
+                $(this).next('.panel').css('display', 'none');
+              }
+              else {
+                $(this).next('.panel').css('display', 'block');
+              }
+            });
+            $(".menu-toggler").click(function() {
+              $(".mobile-menu").toggleClass('hide-el');
+            });
+      });
+    });
+
+    function issearch(title) {
+      return title.indexOf('fa fa-search') > -1;
+    }
+  </script>
+</header>
+
+
+    <main role="main">
+      <div class="main-wrapper">
+        
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+        <h1 class="page-title">Source Code Analysis Tools</h1>
+        <div id="main" class="page-body tab" role="tabpanel" aria-labelledby="main-link" tabindex="0">
+          
+          <section id="sec-main" class="page-body">
+          <div style="font-size: 75%">
+
+
+  <b>Contributor(s):</b> Dave Wichers, itamarlavender, will-obrien, Eitan Worcel, Prabhu Subramanian, kingthorin, coadaflorin, hblankenship, GovorovViva64, pfhorman, GouveaHeitor, Clint Gibler, DSotnikov, Ajin Abraham, Noam Rathaus, Mike Jang <br>
+
+</div>
+
+<p><a href="controls/Static_Code_Analysis">Source code analysis</a> tools, also known as Static Application Security Testing (SAST) Tools, can help analyze source code or compiled versions of code to help find security flaws.</p>
+
+<p>SAST tools can be added into your IDE. Such tools can help you detect issues during software development.
+SAST tool feedback can save time and effort, especially when compared to finding vulnerabilities later in the development cycle.</p>
+
+<h2 id="strengths-and-weaknesses">Strengths and Weaknesses</h2>
+
+<h3 id="strengths">Strengths</h3>
+
+<ul>
+  <li>Scales well – can be run on lots of software, and can be run repeatedly (as with nightly builds or continuous integration).</li>
+  <li>Identifies certain well-known vulnerabilities, such as:
+    <ul>
+      <li>Buffer overflows</li>
+      <li>SQL injection flaws</li>
+    </ul>
+  </li>
+  <li>Output helps developers, as SAST tools highlight the problematic code, by filename,
+location, line number, and even the affected code snippet.</li>
+</ul>
+
+<h3 id="weaknesses">Weaknesses</h3>
+
+<ul>
+  <li>Difficult to automate searches for many types of security vulnerabilities, including:
+    <ul>
+      <li>Authentication problems</li>
+      <li>Access control issues</li>
+      <li>Insecure use of cryptography</li>
+    </ul>
+  </li>
+  <li>Current SAST tools are limited. They can automatically identify only a relatively
+small percentage of application security flaws.</li>
+  <li>High numbers of false positives.</li>
+  <li>Frequently unable to find configuration issues, since they are not represented in the code.</li>
+  <li>Difficult to ‘prove’ that an identified security issue is an actual vulnerability.</li>
+  <li>Many SAST tools have difficulty analyzing code that can’t be compiled.
+    <ul>
+      <li>Analysts frequently cannot compile code unless they have:
+        <ul>
+          <li>Correct libraries</li>
+          <li>Compilation instructions</li>
+          <li>All required code</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="important-selection-criteria">Important Selection Criteria</h2>
+
+<ul>
+  <li>Prerequisite: Support your programming language.</li>
+  <li>Ability to detect vulnerabilities, based on:
+    <ul>
+      <li>The <a href="/www-project-top-ten/">OWASP Top Ten</a></li>
+      <li>Other criteria such as:
+        <ul>
+          <li><a href="https://www.isecom.org/OSSTMM.3.pdf">OSSTMM</a></li>
+          <li><a href="https://www.ncsc.gov.uk/information/check-penetration-testing">CHECK</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Accuracy:
+    <ul>
+      <li>False Positive/False Negative rates</li>
+      <li>OWASP <a href="/www-project-benchmark/">Benchmark</a> score</li>
+    </ul>
+  </li>
+  <li>Ability to understand the libraries/frameworks you need</li>
+  <li>Requirement for buildable source code</li>
+  <li>Ability to run against binaries (instead of source)</li>
+  <li>Availability as a plugin into preferred developer IDEs</li>
+  <li>Ease of setup/use</li>
+  <li>Ability to include in Continuous Integration/Deployment tools</li>
+  <li>License cost (May vary by user, organization, app, or lines of code)</li>
+  <li>Interoperability of output:
+    <ul>
+      <li>See OASIS <a href="https://rawgit.com/sarif-standard/sarif-spec/master/ standard">SARIF (Static Analysis Results Interchange Format)</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="disclaimer">Disclaimer</h2>
+
+<p><strong>The tools listed in the tables below are presented in alphabetical order. <em>OWASP does not endorse any of the vendors or tools by listing them in the table below.</em> We have made every effort to provide this information as accurately as possible. If you are the vendor of a tool below and think that this information is incomplete or incorrect, please send an e-mail to our mailing list and we will make every effort to correct this information.</strong></p>
+
+<table>
+  <tbody><tr>
+    <th nowrap="nowrap">Name/Link</th>
+    <th nowrap="nowrap">Owner</th>
+    <th nowrap="nowrap">License</th>
+    <th nowrap="nowrap">Platforms</th>
+    <th nowrap="nowrap">Note</th>
+  </tr>
+
+  <tr>
+    <td><a href="https://security-code-scan.github.io/">.NET Security Guard</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>.NET, C\#, VB.net</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://42crunch.com">42Crunch</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>REST API security platform that includes Security Audit (SAST), dynamic conformance scan, runtime protection, and monitoring.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://vulert.com/abom">ABOM Scanner</a></td>
+    <td>Vulert</td>
+    <td>Free</td>
+    <td>SaaS</td>
+    <td>ABOM is an online SCA ( software composition analysis ) tool that scans your application for open-source vulnerabilities using only a manifest file. Covering PHP, JavaScript, Rust, Python, and other top languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://sourceforge.net/projects/agnitiotool/">Agnitio</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td>Windows</td>
+    <td>ASP, ASP.NET, C\#, Java, Javascript, Perl, PHP, Python, Ruby, VB.NET, XML</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://aikido.dev">Aikido Security</a></td>
+    <td>Aikido Security</td>
+    <td>Commercial or Free</td>
+    <td>SaaS</td>
+    <td>Aikido Security is a developer-friendly software security platform. It scans your code, containers &amp; cloud in 9 different ways, showing you which security issues and vulnerabilities are actually important to solve. We speed up triaging massively by cutting out the false-positives, and making things human-readable.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://anchore.com/platform/">Anchore Enterprise</a></td>
+    <td>Anchore Inc.</td>
+    <td>Commercial</td>
+    <td>Docker, AWS, Kubernetes, Azure, GCP</td>
+    <td>An SBOM-powered platform that protects and secures your software supply chain end-to-end. Free trial available.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://apisecurity.io/tools/audit/">APIsecurity.io Security Audit</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>online tool for OpenAPI / Swagger file static security analysis</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.guardsquare.com/appsweep-mobile-application-security-testing">AppSweep</a></td>
+    <td>Guardsquare</td>
+    <td>Open Source or Free</td>
+    <td>SaaS</td>
+    <td>Mobile application security testing tool for compiled Android apps with support of CI/CD integration</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://arnica.io">Arnica</a></td>
+    <td>Arnica.io</td>
+    <td>Commercial or Free</td>
+    <td>SaaS</td>
+    <td>Arnica is an end to end security solution that includes SAST, SCA, IaC, Licensing, Reputation, Hardcoded Secrets Mitigation, Permissions and more. Arnica's pipelineless approach empowers developers through automated mitigations and real time feedback.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/aws-samples/automated-security-helper">Automated Security Helper</a></td>
+    <td>AWS</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>ASH is a one stop shop for security scanners, and does not require any installation. It will identify the different frameworks, and download the relevant, up to date tools. ASH is running on isolated Docker containers, keeping the user environment clean, with a single aggregated report. The following frameworks are supported: Git, Python, Javascript, Cloudformation, Terraform and Jupyter.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/PyCQA/bandit">Bandit</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Bandit is a comprehensive source vulnerability scanner for Python</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/bearer/bearer">Bearer CLI</a></td>
+    <td>Bearer</td>
+    <td>Open Source or Free</td>
+    <td>CLI on Windows, MacOS, Linux, Docker, CI/CD integration</td>
+    <td>Static Application Security Testing (SAST) to discover, filter and prioritize security and privacy risks using sensitive data flow analysis. Currently supports Java, Ruby, JavaScript and TypeScript.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/marcinguy/betterscan-ce">Betterscan CE (Community Edition)</a></td>
+    <td>Marcin Kozlowski</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>Code Scanning/SAST/Static Analysis/Linting using many tools/Scanners with One Report. Currently supports:  PHP, Java, Scala, Python, Ruby, Javascript, GO, Secret Scanning, Dependency Confusion, Trojan Source, Open Source and Proprietary Checks (total ca. 1000 checks). Supports also Differential analysis. Goal is to have one report using many tools/scanners</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://beyondsecurity.com/solutions/besource.html">Beyond Security beSOURCE</a></td>
+    <td>Beyond Security</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Static application security testing (SAST) used to be divorced from Code quality reviews, resulting in limited impact and value. beSOURCE addresses the code security quality of applications and thus integrates SecOps into DevOps.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.blueclosure.com">BlueClosure BC Detect</a></td>
+    <td>BlueClosure</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Analyzes client-side JavaScript.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://brakemanscanner.org/">Brakeman</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Brakeman is an open source vulnerability scanner specifically designed for Ruby on Rails applications</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://bugscout.io/en/">bugScout</a></td>
+    <td>Nalbatech, Formerly Buguroo</td>
+    <td>Commercial</td>
+    <td></td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.castsoftware.com/products/application-intelligence-platform">CAST AIP</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Performs static and architectural analysis to identify numerous types of security issues. Supports over 30 languages. [AIP's security specific coverage is here](https://www.castsoftware.com/solutions/application-security/cwe#SupportedSecurityStandards).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/clj-holmes/clj-holmes">clj-holmes</a></td>
+    <td>clj-holmes</td>
+    <td>Open Source</td>
+    <td>Linux and MacOs</td>
+    <td>A CLI SAST (Static application security testing) tool which was built with the intent of finding vulnerable Clojure code via rules that use a simple pattern language.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://clouddefense.ai">CloudDefense</a></td>
+    <td>CloudDefense</td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>CloudDefense provides holistic threat intelligence across all attack surfaces - Containers, Kubernetes, Code, Open Source Libraries, APIs and more...</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.codacy.com/">Codacy</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Offers security patterns for languages such as Python, Ruby, Scala, Java, JavaScript and more. Integrates with tools such as Brakeman, Bandit, FindBugs, and others. (free for open source projects)</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.codescan.io/">CodeScan Cloud</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>A Salesforce focused, SaaS code quality tool leveraging SonarQube's OWASP  security hotspots to give security visibility on Apex, Visualforce, and Lightning proprietary languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://codesecure.com/our-products/codesonar/">CodeSonar</a></td>
+    <td>CodeSecure</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>CodeSonar is a static code analysis solution that helps you find and understand quality and security defects in your source code or binaries. It supports C/C++, Java, C#, Kotlin, Python, Go, Rust, JavaScript, and TypScript.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.codethreat.com/">CodeThreat</a></td>
+    <td>CodeThreat</td>
+    <td>Commercial or Free</td>
+    <td>SaaS or On-Premises</td>
+    <td>Developer-friendly SAST and SCA solutions, Integration with CI/CD pipelines complements a robust DevSecOps strategy, and AI-powered features provide actionable insights with code fix suggestions and potential attack scenarios, helping developers remediate identified issues promptly.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://codiga.io/">Codiga</a></td>
+    <td>Codiga</td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>Codiga scans your code and find security, safety, design, performance and maintainability issues in your code at each push or pull request. It integrates with GitHub, GitLab and Bitbucket.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.coguard.io/">CoGuard</a></td>
+    <td>Heinle Solutions Inc.</td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>A SAST tool for infrastructure configuration analysis. Support for common web servers, databases, streaming services, authentication services, container orchestration and Infrastructure-as-Code tools.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.contrastsecurity.com/interactive-application-security-testing-iast">Contrast Assess</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Contrast performs code security without actually doing static analysis. Contrast does Interactive Application Security Testing (IAST), correlating runtime code &amp; data analysis. It provides code level results without actually relying on static analysis.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html">Coverity Static Analysis</a></td>
+    <td>Synopsys</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Apex, C/C++, C#, CUDA, Java#, JavaScript, PHP, Python, .NET Core, ASP.NET, Objective-C, Go, JSP, Ruby, Swift, Fortran, Scala, VB.NET, iOS, Android, TypeScript, Kotlin</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://checkmarx.com/product/cxsast-source-code-scanning/">CxSAST</a></td>
+    <td>Checkmarx</td>
+    <td>Commercial</td>
+    <td>Saas, or on-premises. Windows and Linux with CI/CD and IDE plugin integration</td>
+    <td>Run full or incremental source code security scans. Supported languages include Javascript, Java, Apex, PHP, Python, Swift, Scala, Perl, Groovy, Ruby, C++, C#.NET, PL/SQL, VB.NET, ASP.NET, HTML 5, Windows Mobile, Go, and Kotlin.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.cycode.com">Cycode | Complete ASPM</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td>SaaS, On-Premises, IDE Plugin</td>
+    <td>Cycode is a complete ASPM that also has its own native scanners tools from code to cloud, including native SAST and native SCA scanners.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://rubygems.org/gems/dawnscanner">Dawnscanner</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Dawnscanner is an open source security source code analyzer for Ruby, supporting major MVC frameworks like Ruby on Rails, Padrino, and Sinatra. It also works on non-web applications written in Ruby.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://deepsource.io/">DeepSource</a></td>
+    <td>DeepSource Corp.</td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>DeepSource helps companies ship clean and secure code with powerful static analysis, OWASP Top 10 compliance, and Autofix. Supports all major programming languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://derscanner.com/">DerScanner</a></td>
+    <td>DerScanner Ltd.</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Capable of identifying vulnerabilities and backdoors (undocumented features) in over 30 programming languages by analyzing source code or executables, without requiring debug info.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.laravel-enlightn.com/">Enlightn</a></td>
+    <td>Enlightn Software</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>Enlightn is a vulnerability scanner specifically designed for Laravel PHP applications that combines SAST, DAST, IAST and configuration analysis techniques to detect vulnerabilities.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://find-sec-bugs.github.io/">Find Security Bugs</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Java, Scala, Groovy</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/findbugsproject/findbugs">FindBugs</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Find bugs (including a few security flaws) in Java programs [Legacy - NOT  Maintained - Use SpotBugs (see other entry) instead]</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://find-sec-bugs.github.io/">FindSecBugs</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A security specific plugin for SpotBugs that significantly improves SpotBugs's ability to find security vulnerabilities in Java programs. Works with the old FindBugs too.</td>
+  </tr>
+
+  <tr>
+    <td><a href="http://www.dwheeler.com/flawfinder/">Flawfinder</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Scans C and C++.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://docs.fluidattacks.com/machine/scanner">Fluid Attack's Scanner</a></td>
+    <td>Fluid Attacks</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>SAST, DAST and SCA vulnerability detection tool with perfect OWASP Benchmark score.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.microfocus.com/en-us/products/static-code-analysis-sast/overview">Fortify</a></td>
+    <td>Micro Focus</td>
+    <td>Commercial</td>
+    <td>Windows, Linux, and MacOSX</td>
+    <td>Free trial scan available. Supported languages include: ABAP/BSP, ActionScript/MXML (Flex), APEX, ASP.NET, VB.NET, C\# (.NET), C/C++, Classic ASP (w/VBScript), COBOL, ColdFusion CFML, Go, HTML, Java (including Android), JavaScript/AJAX, JSP, Kotlin, Objective-C, PHP, PL/SQL, Python, Typescript, T-SQL, Ruby, Scala, Swift, Visual Basic (VB.NET), Visual Basic 6, VBScript, XML</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.gitguardian.com">GitGuardian — Automated Secrets Detection</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>Secure your software development with automated secrets detection &amp; remediation for private or public source code.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/features/security">GitHub Advanced Security</a></td>
+    <td>GitHub</td>
+    <td>Open Source or Free</td>
+    <td>SaaS or On-Premises</td>
+    <td>GitHub Advanced Security uses CodeQL for Static Code Analysis, and GitHub Secret Scanning for identifying tokens. GitHub code scanning can import SARIF from any other SAST tool </td>
+  </tr>
+
+  <tr>
+    <td><a href="https://docs.gitlab.com/ee/user/application_security/sast/index.html">GitLab</a></td>
+    <td>GitLab</td>
+    <td>Commercial</td>
+    <td>SaaS, Linux, Windows</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td><a href="https://golangci-lint.run/">GolangCI-Lint</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A Go Linters aggregator - One of the Linters is [gosec (Go Security)](https://github.com/securego/gosec), which is off by default but can easily be enabled.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.bishopfox.com/resources/tools/google-hacking-diggity/attack-tools/">Google CodeSearchDiggity</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Uses Google Code Search to identify vulnerabilities in open source code projects hosted by Google Code, MS CodePlex, SourceForge, Github, and more. The tool comes with over 130 default searches that identify SQL injection, cross-site scripting (XSS), insecure remote and local file includes, hard-coded passwords, and much more.  *Essentially, Google CodeSearchDiggity provides a source code security analysis of nearly every single open source code project in existence – simultaneously.*</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/wireghoul/graudit/">Graudit</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td>Linux</td>
+    <td>Scans multiple languages for various security flaws. Basically security enhanced code Grep.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/anchore/grype">Grype</a></td>
+    <td>Anchore Inc.</td>
+    <td>Open Source</td>
+    <td>Linux, MacOS, Windows</td>
+    <td>A vulnerability scanner for container images and filesystems.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://hclsw.co/codesweepgithub">HCL AppScan CodeSweep - GitHub Action</a></td>
+    <td>HCL Software</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Scan the new code on a push/pull request using a GitHub action. Findings are highlighted in the `Files Changed` view and details about the issue and mitigation steps can be found in the `Actions` page. Unrestricted usage allowed with a free trial account. The tool currently supports Python, Ruby, JS (Vue, React, Node, Angular, JQuery, etc), PHP, Perl, COBOL, APEX &amp; a few more.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://hclsw.co/codesweep">HCL AppScan CodeSweep - IDE</a></td>
+    <td>HCL Software</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>This is the first Community edition version of AppScan. It is delivered as a VS Code [https://hclsw.co/codesweep] and JetBrains [https://hclsw.co/codesweep-jetbrains] (IntelliJ IDEA, CLion, GoLand, PhpStorm, PyCharm , Rider, RubyMine, WebStorm) plugin and scans files upon saving them. The results show the location of a finding, type and remediation advice. The tool currently supports Java, .Net, Go, Python, Ruby, JS (Node, Angular, JQuery, etc) , PHP, Perl, COBOL, APEX &amp; a few more. Auto-fix for some of the issues is available with a free trial.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://cloud.appscan.com/">HCL AppScan on Cloud</a></td>
+    <td>HCL Software</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Apex, ASP, C, C++, COBOL, ColdFusion, Go, Java, JavaScript(Client-side JavaScript, Kotlin, NodeJS, and AngularJS), .NET (C#, ASP.NET, VB.NET), .NET Core, Perl, PHP, PL/SQL, Python, Ruby, T-SQL, Swift, Visual Basic 6</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.hcltechsw.com/wps/portal/products/appscan/offerings/source">HCL AppScan Source</a></td>
+    <td>HCL Software</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Android, Apex, ASP, C, C++, COBOL, ColdFusion, Go, Java, JavaScript(Client-side JavaScript, NodeJS, and AngularJS), .NET (C#, ASP.NET, VB.NET), .NET Core, Perl, PHP, PL/SQL, Python, Ruby, T-SQL, Visual Basic 6</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://hdivsecurity.com/interactive-application-security-testing-iast">Hdiv Detection</a></td>
+    <td>Hdiv Security</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Hdiv performs code security without actually doing static analysis. Hdiv does Interactive Application Security Testing (IAST), correlating runtime code &amp; data analysis. It provides code-level results without actually relying on static analysis.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/ZupIT/horusec">Horusec</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>C#, Java, Kotlin, Python, Ruby, Golang, Terraform, Javascript, Typescript, Kubernetes, PHP, C, HTML, JSON, Dart, Elixir, Shell, Nginx, Swift</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/globocom/huskyCI">HuskyCI</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>HuskyCI is an open-source tool that orchestrates security tests inside CI pipelines of multiple projects and centralizes all results into a database for further analysis and metrics. HuskyCI can perform static security analysis in Python (Bandit and Safety), Ruby (Brakeman), JavaScript (Npm Audit and Yarn Audit), Golang (Gosec), and Java(SpotBugs plus Find Sec Bugs)</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/insidersec/insider">Insider CLI</a></td>
+    <td>InsiderSec</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A open source Static Application Security Testing tool (SAST) written in GoLang for Java Maven and Android), Kotlin (Android), Swift (iOS), .NET Full Framework, C#, and Javascript (Node.js).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.kiuwan.com/">Kiuwan</a></td>
+    <td>a division of Idera, Inc.</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>provides an application security  testing and analytics platform –    including SAST and SCA solutions – that reduces risk and  improves change management and DevOps processes</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.perforce.com/products/klocwork">Klocwork</a></td>
+    <td>Perforce</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Static Code Analysis for C, C++, C#, Java, JavaScript, Python, Kotlin</td>
+  </tr>
+
+  <tr>
+    <td><a href="http://www.kroogal.com/">Kroogal</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>C, C++</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/VulnPlanet/l3x">L3X</a></td>
+    <td>VulnPlanet</td>
+    <td>Open Source or Free</td>
+    <td>GitHub</td>
+    <td>L3X detects vulnerabilities in Rust and Solidity code based on patterns and AI code analysis. Various LLMs act as validators for vulnerabilities detected by patterns and validate each others' results in AI code analysis. Vulnerabilities are confirmed when they receive confirmation from a majority of validators.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.lucentsky.com/avm">Lucent Sky AVM</a></td>
+    <td>Lucent Sky</td>
+    <td>Commercial</td>
+    <td>SaaS or On-Premises</td>
+    <td>Automatically finds and fixes application vulnerabilities in source code. Supports .NET, ASP, Android, C and C++, ECMAScript, Go, iOS, Java, PHP, Pytohn, Ruby, and Visual Basic applications.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.lunasec.io/">LunaTrace by LunaSec</a></td>
+    <td>LunaSec</td>
+    <td>Open Source or Free</td>
+    <td>SaaS or On-Premises</td>
+    <td>Software Composition Analysis (SCA) tool to generate SBOMs, identify vulnerabilities in dependencies, and generate patches. Leverages Static Analysis to reduce false positives by filtering non-exploitable CVEs.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.mend.io/sast/">Mend SAST</a></td>
+    <td>Mend</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Static security analysis for 27+ languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-3.0/bb429476%28v=vs.80%29">Microsoft FxCop</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>.NET</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://docs.microsoft.com/en-us/previous-versions/windows/embedded/ms933794%28v=msdn.10%29">Microsoft PREFast</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>C, C++</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://mobsf.github.io/Mobile-Security-Framework-MobSF/">MobSF</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Mobile Security Framework (MobSF) is an automated, all-in-one mobile application (Android/iOS/Windows) pen-testing, malware analysis and security assessment framework capable of performing static and dynamic analysis.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/MobSF/Mobile-Security-Framework-MobSF">MobSF</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td>Windows, Unix</td>
+    <td>Android Java, Objective C, Swift</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/naivesystems/analyze">NaiveSystems Analyze</a></td>
+    <td>Naive Systems Ltd.</td>
+    <td>Open Source or Free</td>
+    <td>Windows, MacOS and Linux</td>
+    <td>NaiveSystems Analyze ensures compliance with functional safety and coding standards including MISRA, AUTOSAR, and Google C++ Style Guide. Supports C, C++, Java, and more languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.shiftleft.io/nextgen-static-analysis/">NextGen Static Analysis</a></td>
+    <td>ShiftLeft</td>
+    <td>Commercial</td>
+    <td>SaaS</td>
+    <td>Free version available. Currently supports Java, JavaScript, C\#, TypeScript, Python, and Terraform. Create your free account at https://shiftleft.io/register.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/ajinabraham/nodejsscan">nodejsscan</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td>Unix</td>
+    <td>Node.js</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://nucleaus.com/products/">Nucleaus Core</a></td>
+    <td>Nucleaus</td>
+    <td>Commercial</td>
+    <td>SaaS</td>
+    <td>Scans Git repos daily and provides a web-based dashboard to track code and dependency vulnerabilities. Handles team-based access patterns, vulnerability exception lifecycle, and is built on API first principles.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://offensive360.com/">Offensive360</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>SAST technology that attacks the source code from all corners it has all in one. Malware, SCA, License, and deep source code analysis.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://oversecured.com/">Oversecured</a></td>
+    <td>Oversecured Inc</td>
+    <td>Commercial</td>
+    <td>iOS, Android</td>
+    <td>Enterprise vulnerability scanner for Android and iOS apps. It offers app owners and developers the ability to secure each new version of a mobile app by integrating Oversecured into the development process.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/OWASP/ASST">OWASP ASST (Automated Software Security Toolkit)</a></td>
+    <td>Tarik Seyceri &amp; OWASP</td>
+    <td>Open Source or Free</td>
+    <td>Ubuntu, MacOSX and Windows</td>
+    <td>An Open Source, Source Code Scanning Tool, developed with JavaScript (Node.js framework), Scans for PHP &amp; MySQL Security Vulnerabilities According to OWASP Top 10 and Some other OWASP's famous vulnerabilities, and it teaches developers of how to secure their codes after scan.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://wiki.owasp.org/index.php/Category:OWASP_Code_Crawler">OWASP Code Crawler</a></td>
+    <td>OWASP</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>.NET, Java</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://wiki.owasp.org/index.php/OWASP_LAPSE_Project">OWASP LAPSE Project</a></td>
+    <td>OWASP</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>Java</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://wiki.owasp.org/index.php/Category:OWASP_Orizon_Project">OWASP Orizon Project</a></td>
+    <td>OWASP</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>Java</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://wiki.owasp.org/index.php/OWASP_WAP-Web_Application_Protection">OWASP WAP (Web Application Protection)</a></td>
+    <td>OWASP</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>PHP</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.parasoft.com/">ParaSoft</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>C, C++, Java, .NET</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.parasoft.com/products">Parasoft Test</a></td>
+    <td>Parasoft</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Test tools for C/C++, .NET, Java</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/FloeDesignTechnologies/phpcs-security-audit">phpcs-security-audit</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A set of PHP_CodeSniffer rules to finds flaws or weaknesses related to security in PHP and its popular CMS or frameworks. It currently has core PHP rules as well as Drupal 7 specific rules.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://phpstan.org/">PHPStan</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>PHP Static Analysis Tool</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://pitss.com/products/pitss-con/">PITSS.CON</a></td>
+    <td>PITTS</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Scans Oracle Forms and Reports Applications</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.pixee.ai/">Pixeebot</a></td>
+    <td>Pixee</td>
+    <td>Commercial or Free</td>
+    <td>GitHub</td>
+    <td>Pixeebot finds security and code quality issues in your code and creates merge-ready pull requests with recommended fixes.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://pmd.github.io/">PMD</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>PMD scans Java source code and looks for potential code problems (this is a code quality tool that does not focus on security issues).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.mathworks.com/products/polyspace.html">Polyspace Static Analysis Tools</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>C, C++, Ada</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://docs.microsoft.com/en-us/previous-versions/windows/embedded/ms933794(v=msdn.10)?redirectedfrom=MSDN">PreFast</a></td>
+    <td>Microsoft</td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>PREfast is a static analysis tool that identifies defects in C/C++ programs. Last update 2006.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/designsecurity/progpilot">Progpilot</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Progpilot is a static analyzer tool for PHP that detects security vulnerabilities such as XSS and SQL Injection.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://psalm.dev/docs/security_analysis/">Psalm</a></td>
+    <td>Vimeo, Inc.</td>
+    <td>Open Source</td>
+    <td></td>
+    <td>Static code analysis for PHP projects, written in PHP.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.ptsecurity.com/ww-en/products/ai/">PT Application Inspector</a></td>
+    <td>Positive Technologies</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Combines SAST, DAST, IAST, SCA, configuration analysis and other technologies for high accuracy. Can generate special test queries (exploits) to verify detected vulnerabilities during SAST analysis. Supports Java, C\#, PHP,  JavaScript, Objective C, VB.Net, PL/SQL, T-SQL, and others.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://pumascanpro.com/">Puma Scan</a></td>
+    <td>Puma Security</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>A .NET C\# static source code analyzer that runs as a Visual Studio IDE extension, Azure DevOps extension, and Command Line (CLI) executable.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://pumascan.com/pricing/">Puma Scan Professional</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>.NET, C\#</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.viva64.com/en/pvs-studio/">PVS-Studio</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>C, C++, C\#</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.viva64.com/en/pvs-studio/">PVS-Studio Analyzer</a></td>
+    <td>PVS-Studio</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Static code security analysis for C, C++, C#, and Java. A commercial B2B solution,  but provides several free [licensing options](https://www.viva64.com/en/b/0614/).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://pyre-check.org/">Pyre</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A performant type-checker for Python 3, that also has [limited security/data flow analysis](https://pyre-check.org/docs/pysa-basics.html) capabilities.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.reshiftsecurity.com">reshift</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>A CI/CD  static code security analysis tool for Java that uses machine learning to give a prediction on false positives.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://community.synopsys.com/s/article/SecureAssist-Overview">SecureAssist</a></td>
+    <td>Synopsys</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Scans code for insecure coding and configurations automatically as an IDE plugin for Eclipse, IntelliJ, and Visual Studio, etc. Supports Java, .NET, PHP, and JavaScript.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://security-code-scan.github.io/">Security Code Scan</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Static code analyzer for .NET. It will find SQL injections, LDAP injections, XXE, cryptography weakness, XSS and more.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.synopsys.com/software-integrity/security-testing/interactive-application-security-testing.html">Seeker</a></td>
+    <td>Synopsys</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Seeker performs code security without actually doing static analysis. Seeker does Interactive Application Security Testing (IAST), correlating runtime code &amp; data analysis with simulated attacks. It provides code level results without actually relying on static analysis.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/returntocorp/semgrep">Semgrep</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Semgrep is a fast, open-source, static analysis engine for finding bugs, detecting vulnerabilities in third-party dependencies, and enforcing code standards. Semgrep analyzes code locally on your computer or in your build environment: code is never uploaded.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://semgrep.dev/products/semgrep-supply-chain">Semgrep Supply Chain</a></td>
+    <td></td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Semgrep Supply Chain’s reachability analysis lets you quickly find and remediate the 2% of dependency vulnerabilities that are actually reachable.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.whitehatsec.com/products/static-application-security-testing/">Sentinel Source</a></td>
+    <td>Whitehat</td>
+    <td>Commercial</td>
+    <td></td>
+    <td>Static security analysis for 10+ languages.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/ShiftLeftSecurity/sast-scan">ShiftLeft Scan</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>A free open-source DevSecOps platform for detecting security issues in source ode and dependencies. It supports a broad range of languages and CI/CD pipelines by bundling various open source scanners into the pipeline.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://snyk.io">Snyk Cloud</a></td>
+    <td>Snyk Limited</td>
+    <td>Commercial or Free</td>
+    <td>SaaS, IDE Plugin</td>
+    <td>Detects cloud security issues as soon as developers start designing configurations, providing expert guidance to cloud, platform, and security teams in the tools and workflows they use every day.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://snyk.io/product/snyk-code/">Snyk Code</a></td>
+    <td>Snyk Limited</td>
+    <td>Commercial or Free</td>
+    <td>SaaS, IDE Plugin</td>
+    <td>AI-powered code checker that analyzes your code for security issues, providing actionable advice directly from your IDE to help you fix vulnerabilities quickly</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://snyk.io/product/container-vulnerability-management/">Snyk Container</a></td>
+    <td>Snyk Limited</td>
+    <td>Commercial or Free</td>
+    <td>SaaS, IDE Plugin</td>
+    <td>Container and Kubernetes security that helps developers and DevOps find and fix vulnerabilities throughout the SDLC.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://snyk.io/product/infrastructure-as-code-security/">Snyk IaC</a></td>
+    <td>Snyk Limited</td>
+    <td>Commercial or Free</td>
+    <td>SaaS, IDE Plugin</td>
+    <td>Reduce risk by automating Infrastructure as Code (IaC) security and compliance in development workflows pre-deployment and detecting drifted and missing resources post-deployment.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://snyk.io/product/open-source-security-management/">Snyk Open Source</a></td>
+    <td>Snyk Limited</td>
+    <td>Commercial or Free</td>
+    <td>SaaS, IDE Plugin</td>
+    <td>Software composition analysis (SCA) solution helping developers find, prioritize, and fix security vulnerabilities and license issues in open source dependencies.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://sonarcloud.io/about">SonarCloud</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>ABAP, C, C++, Objective-C, COBOL, C\#, CSS, Flex, Go, HTML, Java, Javascript, Kotlin, PHP, PL/I, PL/SQL, Python, RPG, Ruby, Swift, T-SQL, TypeScript, VB6, VB, XML</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.sonarqube.org/downloads/">SonarQube</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Scans source code for 15 languages for Bugs, Vulnerabilities, and Code Smells. SonarQube IDE plugins for Eclipse, Visual Studio, and IntelliJ provided by [SonarLint](https://www.sonarlint.org/).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://spectralops.io">Spectral</a></td>
+    <td>SpectralOps</td>
+    <td>Open Source or Free</td>
+    <td>Multi-platform &amp; Multi-architecture. Linux/Windows/MacOSx/*nix. Programming-language agnostic</td>
+    <td>Discover, classify, and protect your codebases, logs, and other assets. Monitor and detect API keys, tokens, credentials, high-risk security misconfiguration and more.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.splint.org/">Splint</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>C</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://spotbugs.github.io/">SpotBugs</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Java. This is the active fork replacement for FindBugs, which is not maintained anymore. Very little security. FindSecBugs plugin provides security rules.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://sast.online">Static application security testing Online</a></td>
+    <td>PENTESTON</td>
+    <td>Commercial or Free</td>
+    <td>SaaS</td>
+    <td>Examine the Android Source code to identify any security issues or vulnerabilities.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.securityreviewer.net/">Static Reviewer</a></td>
+    <td>Security Reviewer</td>
+    <td>Commercial</td>
+    <td>Windows and Linux; on-Premises and in Cloud; Desktop, CLI and CI/CD &amp; IDE plugin integration</td>
+    <td>Static Reviewer executes code checks according to the most relevant Secure Coding Standards for 40+ programming languages, using 1000+ built-in validation rules.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://github.com/anchore/syft">Syft</a></td>
+    <td>Anchore Inc.</td>
+    <td>Open Source</td>
+    <td>Linux, MacOS, Windows</td>
+    <td>CLI tool and library for generating a Software Bill of Materials from container images and filesystems.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.scitools.com">Understand</a></td>
+    <td>SciTools</td>
+    <td>Commercial</td>
+    <td>Windows, MacOSX, Linux</td>
+    <td>IDE that provides static code analysis using graphs, documentation, and metrics. Scans code to check for vulnerabilities and ensures compliance with standards like MISRA and AUTOSAR. Works with 20 languages including C, C++, C#, JavaScript, Python, and Java.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.veracode.com/">Veracode</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Android, ASP.NET, C\#, C, C++, Classic ASP, COBOL, ColdFusion/Java, Go, Groovy, iOS, Java, JavaScript, Perl, PhoneGap/Cordova, PHP, Python, React Native, RPG, Ruby on Rails, Scala, Titanium, TypeScript, VB.NET, Visual Basic 6, Xamarin</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://www.veracode.com/products/binary-static-analysis-sast">Veracode Static Analysis</a></td>
+    <td>Veracode</td>
+    <td>Commercial</td>
+    <td></td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td><a href="https://sourceforge.net/projects/visualcodegrepp/">VisualCodeGrepper (VCG)</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Scans C/C++, C\#, VB, PHP, Java, PL/SQL, and COBOL for security issues and for comments which may indicate defective code. The config files can be used to carry out additional checks for banned functions or functions which commonly cause security issues.</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi">VS Code OpenAPI (Swagger) Editor extension</a></td>
+    <td></td>
+    <td>Open Source or Free</td>
+    <td></td>
+    <td>Plugin to Microsoft Visual Studio Code that enables rich editing capabilities   for REST API contracts and also includes linting and Security Audit (static security analysis).</td>
+  </tr>
+
+  <tr>
+    <td><a href="https://vulert.com">Vulert</a></td>
+    <td>Vulert</td>
+    <td>Commercial or Free</td>
+    <td>SaaS</td>
+    <td>An SCA solution that seamlessly monitors applications for open-source vulnerabilities without code access or installations, delivering real-time alerts.</td>
+  </tr>
+
+</tbody></table>
+
+<h2 id="more-info">More info</h2>
+
+<ul>
+  <li><a href="https://samate.nist.gov/index.php/Source_Code_Security_Analyzers.html">NIST’s list of Source Code Security Analysis Tools</a>.</li>
+  <li><a href="/www-community/Vulnerability_Scanning_Tools">DAST Tools</a> - Similar info on Dynamic Application Security Testing (DAST) Tools.</li>
+  <li><a href="/www-community/Free_for_Open_Source_Application_Security_Tools">Free for Open Source Application Security Tools</a> - This page lists the Commercial Source Code Analysis Tools (SAST) we know of that are free for Open Source.</li>
+</ul>
+
+          </section>
+          
+
+          
+          
+          
+          
+          
+          
+          
+       </div>
+       <hr>
+       <div class="repo"><a href="https://github.com/OWASP/www-community/blob/master/pages/Source_Code_Analysis_Tools.md"><div class="reset-3c756112--menuItemIcon-206eb252" style="float: left;"><svg preserveAspectRatio="xMidYMid meet" height="1em" width="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 438.549 438.549" stroke="none" class="icon-7f6730be--text-3f89f380"><g><path d="M409.132 114.573c-19.608-33.596-46.205-60.194-79.798-79.8-33.598-19.607-70.277-29.408-110.063-29.408-39.781 0-76.472 9.804-110.063 29.408-33.596 19.605-60.192 46.204-79.8 79.8C9.803 148.168 0 184.854 0 224.63c0 47.78 13.94 90.745 41.827 128.906 27.884 38.164 63.906 64.572 108.063 79.227 5.14.954 8.945.283 11.419-1.996 2.475-2.282 3.711-5.14 3.711-8.562 0-.571-.049-5.708-.144-15.417a2549.81 2549.81 0 0 1-.144-25.406l-6.567 1.136c-4.187.767-9.469 1.092-15.846 1-6.374-.089-12.991-.757-19.842-1.999-6.854-1.231-13.229-4.086-19.13-8.559-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-.951-2.568-2.098-3.711-3.429-1.142-1.331-1.997-2.663-2.568-3.997-.572-1.335-.098-2.43 1.427-3.289 1.525-.859 4.281-1.276 8.28-1.276l5.708.853c3.807.763 8.516 3.042 14.133 6.851 5.614 3.806 10.229 8.754 13.846 14.842 4.38 7.806 9.657 13.754 15.846 17.847 6.184 4.093 12.419 6.136 18.699 6.136 6.28 0 11.704-.476 16.274-1.423 4.565-.952 8.848-2.383 12.847-4.285 1.713-12.758 6.377-22.559 13.988-29.41-10.848-1.14-20.601-2.857-29.264-5.14-8.658-2.286-17.605-5.996-26.835-11.14-9.235-5.137-16.896-11.516-22.985-19.126-6.09-7.614-11.088-17.61-14.987-29.979-3.901-12.374-5.852-26.648-5.852-42.826 0-23.035 7.52-42.637 22.557-58.817-7.044-17.318-6.379-36.732 1.997-58.24 5.52-1.715 13.706-.428 24.554 3.853 10.85 4.283 18.794 7.952 23.84 10.994 5.046 3.041 9.089 5.618 12.135 7.708 17.705-4.947 35.976-7.421 54.818-7.421s37.117 2.474 54.823 7.421l10.849-6.849c7.419-4.57 16.18-8.758 26.262-12.565 10.088-3.805 17.802-4.853 23.134-3.138 8.562 21.509 9.325 40.922 2.279 58.24 15.036 16.18 22.559 35.787 22.559 58.817 0 16.178-1.958 30.497-5.853 42.966-3.9 12.471-8.941 22.457-15.125 29.979-6.191 7.521-13.901 13.85-23.131 18.986-9.232 5.14-18.182 8.85-26.84 11.136-8.662 2.286-18.415 4.004-29.263 5.146 9.894 8.562 14.842 22.077 14.842 40.539v60.237c0 3.422 1.19 6.279 3.572 8.562 2.379 2.279 6.136 2.95 11.276 1.995 44.163-14.653 80.185-41.062 108.068-79.226 27.88-38.161 41.825-81.126 41.825-128.906-.01-39.771-9.818-76.454-29.414-110.049z"></path></g></svg><span style="padding-left:8px;">Edit on GitHub</span></div></a></div>
+
+          <div class="github-buttons">
+    <span></span>
+    <span></span>
+ </div>
+
+          <div class="sidebar" role="complementary">
+    
+
+    
+    
+       
+
+
+
+  
+  <div class="owasp-sidebar-top">
+    <strong>The OWASP<sup>®</sup> Foundation</strong> works to improve the security of software through its community-led open source software projects, 
+     hundreds of chapters worldwide, tens of thousands of members, and by hosting local and global conferences.
+</div>
+
+
+  
+  
+  
+
+  <div class="owasp-sidebar-bottom">
+   <h3>Upcoming OWASP Global Events</h3>
+   <div id="global-event-div"><ul><li><a href="https://lisbon.globalappsec.org/" target="_blank rel=" noopener"="">OWASP Global AppSec Lisbon 2024</a><ul><li style="list-style-type: circle;margin-top: 0px;padding:0px;margin-left:16px;">June 24-28, 2024</li></ul></li><li><a href="https://sf.globalappsec.org/" target="_blank rel=" noopener"="">OWASP Global AppSec San Francisco 2024</a><ul><li style="list-style-type: circle;margin-top: 0px;padding:0px;margin-left:16px;">September 23-27, 2024</li></ul></li><li><a href="https://owasp.org/events/" target="_blank rel=" noopener"="">OWASP Global AppSec Washington DC 2025</a><ul><li style="list-style-type: circle;margin-top: 0px;padding:0px;margin-left:16px;">November 3-7, 2025</li></ul></li><li><a href="https://owasp.org/events/" target="_blank rel=" noopener"="">OWASP Global AppSec San Francisco 2026</a><ul><li style="list-style-type: circle;margin-top: 0px;padding:0px;margin-left:16px;">November 2-6, 2026</li></ul></li></ul></div>
+</div>
+
+<script type="text/javascript">
+   var events = [];
+   $(function () {
+      eventsyml = YAML.load('https://owasp.org/assets/sitedata/events.yml');
+
+      $.each(eventsyml, function (index) {
+         if (this.category == 'Global') {
+            for (e in this.events) {
+               events.push(this.events[e]);
+            }
+         }
+      });
+
+      if (events.length > 0) {
+         var htmlstring = "<ul>";
+         for (evnt in events) {
+            if (events[evnt].url)
+               htmlstring += '<li><a href="' + events[evnt].url
+            else
+               htmlstring += '<li><a href="https://owasp.org/events/'
+
+            htmlstring += '" target="_blank rel="noopener">' + events[evnt].name + '</a>';
+
+            if (typeof events[evnt].dates === 'undefined') {
+               events[evnt].dates = 'TBA';
+            }
+
+            htmlstring += "<ul><li style='list-style-type: circle;margin-top: 0px;padding:0px;margin-left:16px;'>" + events[evnt].dates + "</li></ul></li>";
+         }
+         htmlstring += "</ul>";
+
+         $("#global-event-div").html(htmlstring);
+      }
+   });
+</script>
+
+  <!--<div>
+    <h3>OWASP News & Opinions</h3>
+    <ul>
+    	
+    </ul>	
+  </div>-->
+</div>
+
+      </div>
+    </main>
+    <footer>
+  
+  <section class="member">
+
+  <script type="text/javascript">
+    var members = [];
+    var plat_indices = [];
+    var gold_indices = [];
+    var other_indices = [];
+
+    function get_next_member(members, indexUsed){
+      // random 6
+      // 0 to 2 = Platinum (.2 > Other)
+      // 3 to 4 = Gold (.1 > Other)
+      // 5 = Other  
+      member = null;
+      chosenIndex = -1;
+      var pick = Math.floor(Math.random() * 100);      
+      var randomIndex = -1;
+      if(pick < 44){
+        // pick a platinum member
+        randomIndex = Math.floor(Math.random() * plat_indices.length);
+        pIndex = plat_indices[randomIndex];            
+        cycleIndex = randomIndex
+        while(chosenIndex == -1)
+        {
+          randomIndex++;
+          if(indexUsed.indexOf(pIndex)== -1){
+            chosenIndex = pIndex;
+            
+          }else if(randomIndex >= plat_indices.length){
+            randomIndex = 0;
+            
+          }
+          if (randomIndex == cycleIndex){ // we could not find a plat member not already in the list....            
+            break;
+          }
+        }
+      }
+      if (chosenIndex == -1 && pick < 77) {
+        // pick a gold member
+        randomIndex = Math.floor(Math.random() * gold_indices.length);
+        pIndex = gold_indices[randomIndex];            
+        cycleIndex = randomIndex
+        while(chosenIndex == -1)
+        {
+          randomIndex++;
+          if(indexUsed.indexOf(pIndex)== -1){
+            chosenIndex = pIndex;
+            
+          }else if(randomIndex >= gold_indices.length){
+            randomIndex = 0;
+            
+          }
+          if (randomIndex == cycleIndex){ // we could not find a plat member not already in the list....            
+            break;
+          }
+        }
+      }
+      if (chosenIndex == -1){
+        // pick an other member
+        randomIndex = Math.floor(Math.random() * other_indices.length);
+        pIndex = other_indices[randomIndex];            
+        cycleIndex = randomIndex
+        while(chosenIndex == -1)
+        {
+          randomIndex++;
+          if(indexUsed.indexOf(pIndex)== -1){
+            chosenIndex = pIndex;
+            
+          }else if(randomIndex >= other_indices.length){
+            randomIndex = 0;
+            
+          }
+          if (randomIndex == cycleIndex){ // we could not find a plat member not already in the list....            
+            break;
+          }
+        }
+      }    
+      if(chosenIndex >= 0){          
+        member = members[chosenIndex];
+        indexUsed.push(chosenIndex);
+        var membertype = 'not a member';
+        if(member.member && (member.membertype == 1 || !member.membertype))
+          membertype = 'silver member';
+        else if(member.member && member.membertype == 2)
+          membertype = 'platinum member';
+        else if(member.member && member.membertype == 3)
+          membertype = 'gold member';
+        else if(member.member && member.membertype)
+          membertype = member.membertype;        
+      }
+      return member;      
+    }
+
+    $(function() {  
+      var corp_members = YAML.load('https://owasp.org/assets/sitedata/corp_members.yml');
+      $.each(corp_members, function (index) {
+          index = members.push(this) - 1;  
+          if(this.member && this.membertype == 3)
+            gold_indices.push(index);
+          else if (this.member && this.membertype == 2)
+            plat_indices.push(index);
+          else
+            other_indices.push(index);        
+        });
+
+        var indexUsed = [];
+
+        var counter = 0;
+        var numberOfImages = 9;
+        var member = get_next_member(members, indexUsed);
+        htmlstring = '<h2>Spotlight: ' + member["name"] + '</h2>';
+        htmlstring += '<a href="'+ member["url"] + '" rel="sponsored nopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org' + member["image"] + '" alt="image" /></a>';
+        htmlstring += '<p>' + member["description"] + '</p>';
+        $(".member-spotlight").html(htmlstring);
+
+        if(members.length > 0)
+        {
+          var htmlstring = "";
+          while (counter < numberOfImages)
+          {
+            member = get_next_member(members, indexUsed)
+            if (member)
+            {
+                counter++;
+                htmlstring += '<a href="'+ member["url"] + '" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org' + member["image"] + '" alt="image"/></a>';                                
+            }
+          }
+
+          $("#corp_member_div").html(htmlstring);
+         
+          
+        }
+    });
+  </script>
+  <div class="member-wrapper">
+    <section class="member-spotlight"><h2>Spotlight: ArmorCode</h2><a href="http://www.armorcode.com/" rel="sponsored nopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/armorcode_logo.png" alt="image"></a><p>Software development has accelerated dramatically. We have gone from once a year releases, to one every day. However, the application security has not kept pace. Application security professionals and developers increasingly find themselves unable to keep up with security requirements — and many are forced to piece together stopgap tools.  So, ArmorCode delivers application security at the speed of DevOps. With its centralized platform, enterprises can radically simplify and accelerate application security while cutting costs by up to 50%. ArmorCode Platform is SOC2 Type II certified and is already used by several marquee customers. Visit www.armorcode.com for more details.</p></section>
+    <section class="member-list">
+      <h2>Corporate Supporters</h2>
+      <div id="corp_member_div"><a href="http://checkmarx.com" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/checkmarx_logo__rgb_blue.png" alt="image"></a><a href="https://www.bionic.ai/" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/bionic_logo_1.png" alt="image"></a><a href="https://www.bloomberg.com/company/values/tech-at-bloomberg/" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/Bloomberg.png" alt="image"></a><a href="https://www.invicti.com/" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/invicti_logo_300x90_black.png" alt="image"></a><a href="https://www.salesforce.com/" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/salesforce.png" alt="image"></a><a href="http://apiiro.com" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/Apiiro.png" alt="image"></a><a href="http://www.wallarm.com" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/WallarmLogo.png" alt="image"></a><a href="https://www.specialistdata.com/" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/SpecialistDataSolutions.png" alt="image"></a><a href="http://www.approach-cyber.com" class="member-logo" rel="sponsored noopener noreferrer" target="_blank" onclick="handleOutboundLinkClicks(event);"><img src="https://owasp.org/assets/images/corp-member-logo/approach_logo.png" alt="image"></a></div>
+      <div class="member-cta">
+        <a class="callout-link" href="https://owasp.org/supporters">Become a corporate supporter</a>
+      </div>
+    </section>
+  </div>
+</section>
+
+  
+  <section class="footer-wrapper">
+    <section class="social">
+<a href="https://github.com/OWASP/" aria-label="github organization" target="_blank" rel="noopener noreferrer"><i class="fa fa-lg fa-github"></i></a>
+<a href="https://owasp.org/slack/invite" aria-label="slack group" target="_blank" rel="noopener noreferrer"><i class="fa fa-lg fa-slack"></i></a>
+<a href="https://www.facebook.com/OWASPFoundation" aria-label="facebook group" target="_blank" rel="noopener noreferrer"><i class="fa fa-lg fa-facebook-square"></i></a>
+<!-- Mastodon Icon will not load; FA instance is too old. Use the SVG instead-->
+<a href="https://infosec.exchange/@owasp" aria-label="mastodon account" target="_blank" rel="me"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M433 179.1c0-97.2-63.7-125.7-63.7-125.7-62.5-28.7-228.6-28.4-290.5 0 0 0-63.7 28.5-63.7 125.7 0 115.7-6.6 259.4 105.6 289.1 40.5 10.7 75.3 13 103.3 11.4 50.8-2.8 79.3-18.1 79.3-18.1l-1.7-36.9s-36.3 11.4-77.1 10.1c-40.4-1.4-83-4.4-89.6-54a102.5 102.5 0 0 1 -.9-13.9c85.6 20.9 158.7 9.1 178.8 6.7 56.1-6.7 105-41.3 111.2-72.9 9.8-49.8 9-121.5 9-121.5zm-75.1 125.2h-46.6v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.3V197c0-58.5-64-56.6-64-6.9v114.2H90.2c0-122.1-5.2-147.9 18.4-175 25.9-28.9 79.8-30.8 103.8 6.1l11.6 19.5 11.6-19.5c24.1-37.1 78.1-34.8 103.8-6.1 23.7 27.3 18.4 53 18.4 175z"></path></svg></a>
+<!-- Twitter X Icon will not load; I suspect another dependency (Jekyll?) is using an older version that is conflicting. So use the SVG instead-->
+<a href="https://twitter.com/owasp" aria-label="twitter account" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"></path></svg></a>
+<a href="https://www.linkedin.com/company/owasp/" aria-label="linkedin account" target="_blank" rel="noopener noreferrer"><i class="fa fa-lg fa-linkedin"></i></a>
+<a href="https://www.youtube.com/user/OWASPGLOBAL" aria-label="youtube account" target="_blank" rel="noopener noreferrer"><i class="fa fa-lg fa-youtube-square"></i></a>
+</section>
+
+    <nav class="bot-nav" role="navigation" aria-label="secondary navigation">
+      <ul>
+        <li><a href="https://owasp.org/">HOME</a></li>
+        <li><a href="https://owasp.org/projects/">PROJECTS</a></li>
+        <li><a href="https://owasp.org/chapters/">CHAPTERS</a></li>
+        <li><a href="https://owasp.org/events/">EVENTS</a></li>
+        <li><a href="https://owasp.org/about/">ABOUT</a></li>
+        <li><a href="https://owasp.org/www-policy/operational/privacy">PRIVACY</a></li>
+        <li><a href="https://owasp.org/sitemap/">SITEMAP</a></li>
+        <li><a href="https://owasp.org/contact/">CONTACT</a></li>
+      </ul>
+    </nav>
+    <p class="disclaimer">
+      OWASP, the OWASP logo, and Global AppSec are registered trademarks and AppSec Days, AppSec California, AppSec Cali, SnowFROC, and LASCON are trademarks of the OWASP Foundation, Inc. Unless otherwise specified, all content on the site is Creative Commons Attribution-ShareAlike v4.0 and provided without warranty of service or accuracy. For more information, please refer to our <a href="/www-policy/operational/general-disclaimer.html">General Disclaimer</a>. OWASP does not endorse or recommend commercial products or services, allowing our community to remain vendor neutral with the collective wisdom of the best minds in software security worldwide. Copyright 2024, OWASP Foundation, Inc.
+    </p>
+  </section>
+</footer>
+
+  
+
+
+
+</body></html>

@@ -1,0 +1,2708 @@
+<html lang="en-US"><head>
+<meta charset="UTF-8">
+<link rel="profile" href="https://gmpg.org/xfn/11">
+<script type="text/html" id="tmpl-bb-link-preview">
+<% if ( link_scrapping ) { %>
+	<% if ( link_loading ) { %>
+		<span class="bb-url-scrapper-loading bb-ajax-loader"><i class="bb-icon-l bb-icon-spinner animate-spin"></i>Loading preview...</span>
+	<% } %>
+	<% if ( link_success || link_error ) { %>
+		<a title="Cancel Preview" href="#" id="bb-close-link-suggestion">Remove Preview</a>
+		<div class="bb-link-preview-container">
+
+			<% if ( link_images && link_images.length && link_success && ! link_error && '' !== link_image_index ) { %>
+				<div id="bb-url-scrapper-img-holder">
+					<div class="bb-link-preview-image">
+						<div class="bb-link-preview-image-cover">
+							<img src="<%= link_images[link_image_index] %>"/>
+						</div>
+						<div class="bb-link-preview-icons">
+							<%
+							if ( link_images.length > 1 ) { %>
+								<a data-bp-tooltip-pos="up" data-bp-tooltip="Change image" href="#" class="icon-exchange toolbar-button bp-tooltip" id="icon-exchange"><i class="bb-icon-l bb-icon-exchange"></i></a>
+							<% } %>
+							<% if ( link_images.length ) { %>
+								<a data-bp-tooltip-pos="up" data-bp-tooltip="Remove image" href="#" class="icon-image-slash toolbar-button bp-tooltip" id="bb-link-preview-remove-image"><i class="bb-icon-l bb-icon-image-slash"></i></a>
+							<% } %>
+							<a data-bp-tooltip-pos="up" data-bp-tooltip="Confirm" class="toolbar-button bp-tooltip" href="#" id="bb-link-preview-select-image">
+								<i class="bb-icon-check bb-icon-l"></i>
+							</a>
+						</div>
+					</div>
+					<% if ( link_images.length > 1 ) { %>
+						<div class="bb-url-thumb-nav">
+							<button type="button" id="bb-url-prevPicButton"><span class="bb-icon-l bb-icon-angle-left"></span></button>
+							<button type="button" id="bb-url-nextPicButton"><span class="bb-icon-l bb-icon-angle-right"></span></button>
+							<div id="bb-url-scrapper-img-count">
+								Image <%= link_image_index + 1 %>&nbsp;of&nbsp;<%= link_images.length %>
+							</div>
+						</div>
+					<% } %>
+				</div>
+			<% } %>
+
+			<% if ( link_success && ! link_error && link_url ) { %>
+				<div class="bb-link-preview-info">
+					<% var a = document.createElement('a');
+						a.href = link_url;
+						var hostname = a.hostname;
+						var domainName = hostname.replace('www.', '' );
+					%>
+
+					<% if ( 'undefined' !== typeof link_title && link_title.trim() && link_description ) { %>
+						<p class="bb-link-preview-link-name"><%= domainName %></p>
+					<% } %>
+
+					<% if ( link_success && ! link_error ) { %>
+						<p class="bb-link-preview-title"><%= link_title %></p>
+					<% } %>
+
+					<% if ( link_success && ! link_error ) { %>
+						<div class="bb-link-preview-excerpt"><p><%= link_description %></p></div>
+					<% } %>
+				</div>
+			<% } %>
+			<% if ( link_error && ! link_success ) { %>
+				<div id="bb-url-error" class="bb-url-error"><%= link_error_msg %></div>
+			<% } %>
+		</div>
+	<% } %>
+<% } %>
+</script>
+<style id="bb_learndash_30_custom_colors">
+
+                
+                
+                
+                .learndash-wrapper .ld-item-list .ld-item-list-item.ld-item-lesson-item .ld-item-name .ld-item-title .ld-item-components span.ld-status-waiting,
+                .learndash-wrapper .ld-item-list .ld-item-list-item.ld-item-lesson-item .ld-item-name .ld-item-title .ld-item-components span.ld-status-waiting span.ld-icon,
+                .learndash-wrapper .ld-status-waiting {
+                    background-color: #ffd200 !important;
+                }
+
+                
+            </style>
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+<title>Beginner's Guide to AWS CloudTrail for Security - Cybr</title>
+<meta name="description" content="Get started with AWS CloudTrail: one of the most important security services that AWS offer. Learn important concepts and jump in hands-on.">
+<link rel="canonical" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Beginner's Guide to AWS CloudTrail for Security - Cybr">
+<meta property="og:description" content="Get started with AWS CloudTrail: one of the most important security services that AWS offer. Learn important concepts and jump in hands-on.">
+<meta property="og:url" content="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/">
+<meta property="og:site_name" content="Cybr">
+<meta property="article:publisher" content="https://www.facebook.com/cybrcom">
+<meta property="article:modified_time" content="2024-04-13T17:13:38+00:00">
+<meta property="og:image" content="https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2.jpeg">
+<meta property="og:image:width" content="900">
+<meta property="og:image:height" content="506">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@cybrcom">
+<meta name="twitter:label1" content="Est. reading time">
+<meta name="twitter:data1" content="1 minute">
+<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/","url":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/","name":"Beginner's Guide to AWS CloudTrail for Security - Cybr","isPartOf":{"@id":"https://cybr.com/#website"},"primaryImageOfPage":{"@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/#primaryimage"},"image":{"@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/#primaryimage"},"thumbnailUrl":"https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2.jpeg","datePublished":"2023-11-05T20:26:34+00:00","dateModified":"2024-04-13T17:13:38+00:00","description":"Get started with AWS CloudTrail: one of the most important security services that AWS offer. Learn important concepts and jump in hands-on.","breadcrumb":{"@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/"]}]},{"@type":"ImageObject","inLanguage":"en-US","@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/#primaryimage","url":"https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2.jpeg","contentUrl":"https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2.jpeg","width":900,"height":506,"caption":"Beginner's Guide to AWS CloudTrail for Security Course"},{"@type":"BreadcrumbList","@id":"https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://cybr.com/"},{"@type":"ListItem","position":2,"name":"Beginner&#8217;s Guide to AWS CloudTrail for Security"}]},{"@type":"WebSite","@id":"https://cybr.com/#website","url":"https://cybr.com/","name":"Cybr","description":"The best way to learn AWS cloud security","publisher":{"@id":"https://cybr.com/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://cybr.com/?s={search_term_string}"},"query-input":"required name=search_term_string"}],"inLanguage":"en-US"},{"@type":"Organization","@id":"https://cybr.com/#organization","name":"Cybr","url":"https://cybr.com/","logo":{"@type":"ImageObject","inLanguage":"en-US","@id":"https://cybr.com/#/schema/logo/image/","url":"https://cybr.com/wp-content/uploads/2020/03/cybr_logo_white_bg_facebook.jpg","contentUrl":"https://cybr.com/wp-content/uploads/2020/03/cybr_logo_white_bg_facebook.jpg","width":600,"height":315,"caption":"Cybr"},"image":{"@id":"https://cybr.com/#/schema/logo/image/"},"sameAs":["https://www.facebook.com/cybrcom","https://x.com/cybrcom","https://linkedin.com/company/cybr-training","https://www.youtube.com/channel/UCHniAWK7wYu9EYbz64cOL_A"]}]}</script>
+
+<link rel="dns-prefetch" href="//plausible.io">
+<link rel="dns-prefetch" href="//stats.wp.com">
+<link rel="dns-prefetch" href="//c0.wp.com">
+<link rel="alternate" type="application/rss+xml" title="Cybr » Feed" href="https://cybr.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Cybr » Comments Feed" href="https://cybr.com/comments/feed/">
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/cybr.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.5.4"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link rel="stylesheet" id="mp-theme-css" href="https://cybr.com/wp-content/plugins/memberpress/css/ui/theme.css?ver=1.11.31" type="text/css" media="all">
+<link rel="stylesheet" id="bp-nouveau-icons-map-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/icons/css/icons-map.min.css?ver=2.6.10" type="text/css" media="screen">
+<link rel="stylesheet" id="bp-nouveau-bb-icons-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/icons/css/bb-icons.min.css?ver=1.0.5" type="text/css" media="screen">
+<link rel="stylesheet" id="dashicons-css" href="https://c0.wp.com/c/6.5.4/wp-includes/css/dashicons.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="bp-nouveau-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/css/buddypress.min.css?ver=2.6.10" type="text/css" media="screen">
+<style id="bp-nouveau-inline-css" type="text/css">
+.list-wrap .bs-group-cover a:before{ background:unset; }
+</style>
+<link rel="stylesheet" id="buddyboss_legacy-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/inc/plugins/buddyboss-menu-icons/vendor/kucrut/icon-picker/css/types/buddyboss_legacy.css?ver=1.0" type="text/css" media="all">
+<link rel="stylesheet" id="wp-block-library-css" href="https://c0.wp.com/c/6.5.4/wp-includes/css/dist/block-library/style.min.css" type="text/css" media="all">
+<style id="wp-block-library-inline-css" type="text/css">
+.has-text-align-justify{text-align:justify;}
+</style>
+<link rel="stylesheet" id="mediaelement-css" href="https://c0.wp.com/c/6.5.4/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="wp-mediaelement-css" href="https://c0.wp.com/c/6.5.4/wp-includes/js/mediaelement/wp-mediaelement.min.css" type="text/css" media="all">
+<style id="jetpack-sharing-buttons-style-inline-css" type="text/css">
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link rel="stylesheet" id="bb_theme_block-buddypanel-style-css-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/blocks/buddypanel/build/style-buddypanel.css?ver=a43481f57c3cc73f6cce06223a569c14" type="text/css" media="all">
+<link rel="stylesheet" id="syntax-highlighting-code-block-theme-css" href="https://cybr.com/wp-content/plugins/syntax-highlighting-code-block/vendor/scrivo/highlight-php/styles/a11y-dark.css?ver=1.5.0" type="text/css" media="all">
+<style id="syntax-highlighting-code-block-inline-css" type="text/css">
+.wp-block-code {
+	border: 0;
+	padding: 0;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+.wp-block-code > span {
+	display: block;
+	overflow: auto;
+}
+
+.shcb-language {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	-webkit-clip-path: inset(50%);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal;
+	word-break: normal;
+}
+
+.hljs {
+	box-sizing: border-box;
+}
+
+.hljs.shcb-code-table {
+	display: table;
+	width: 100%;
+}
+
+.hljs.shcb-code-table > .shcb-loc {
+	color: inherit;
+	display: table-row;
+	width: 100%;
+}
+
+.hljs.shcb-code-table .shcb-loc > span {
+	display: table-cell;
+}
+
+.wp-block-code code.hljs:not(.shcb-wrap-lines) {
+	white-space: pre;
+}
+
+.wp-block-code code.hljs.shcb-wrap-lines {
+	white-space: pre-wrap;
+}
+
+.hljs.shcb-line-numbers {
+	border-spacing: 0;
+	counter-reset: line;
+}
+
+.hljs.shcb-line-numbers > .shcb-loc {
+	counter-increment: line;
+}
+
+.hljs.shcb-line-numbers .shcb-loc > span {
+	padding-left: 0.75em;
+}
+
+.hljs.shcb-line-numbers .shcb-loc::before {
+	border-right: 1px solid #ddd;
+	content: counter(line);
+	display: table-cell;
+	padding: 0 0.75em;
+	text-align: right;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	white-space: nowrap;
+	width: 1%;
+}
+
+.hljs > mark.shcb-loc { background-color: #4a4a4a; }
+</style>
+<link rel="stylesheet" id="convertkit-broadcasts-css" href="https://cybr.com/wp-content/plugins/convertkit/resources/frontend/css/broadcasts.css?ver=2.4.9" type="text/css" media="all">
+<link rel="stylesheet" id="convertkit-button-css" href="https://cybr.com/wp-content/plugins/convertkit/resources/frontend/css/button.css?ver=2.4.9" type="text/css" media="all">
+<link rel="stylesheet" id="convertkit-form-css" href="https://cybr.com/wp-content/plugins/convertkit/resources/frontend/css/form.css?ver=2.4.9" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="bb-pro-enqueue-scripts-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/assets/css/index.min.css?ver=2.5.20" type="text/css" media="all">
+<link rel="stylesheet" id="bb-access-control-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/access-control/assets/css/bb-access-control.min.css?ver=2.5.20" type="text/css" media="all">
+<link rel="stylesheet" id="bb-schedule-posts-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/schedule-posts/assets/css/bb-schedule-posts.min.css?ver=2.5.20" type="text/css" media="all">
+<link rel="stylesheet" id="bb-tutorlms-admin-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/integrations/tutorlms/assets/css/bb-tutorlms-admin.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="bp-mentions-css-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/css/mentions.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="cybrlabs-style-css" href="https://cybr.com/wp-content/plugins/cybr-labs-wordpress/resources/css/cybrlabs-plugin.css?ver=1.0.1" type="text/css" media="all">
+<link rel="stylesheet" id="learndash_quiz_front_css-css" href="//cybr.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_quiz_front.min.css?ver=4.15.1" type="text/css" media="all">
+<link rel="stylesheet" id="learndash-css" href="//cybr.com/wp-content/plugins/sfwd-lms/src/assets/dist/css/styles.css?ver=4.15.1" type="text/css" media="all">
+<link rel="stylesheet" id="jquery-dropdown-css-css" href="//cybr.com/wp-content/plugins/sfwd-lms/assets/css/jquery.dropdown.min.css?ver=4.15.1" type="text/css" media="all">
+<link rel="stylesheet" id="learndash_lesson_video-css" href="//cybr.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_lesson_video.min.css?ver=4.15.1" type="text/css" media="all">
+<link rel="stylesheet" id="h5p-plugin-styles-css" href="https://cybr.com/wp-content/plugins/h5p/h5p-php-library/styles/h5p.css?ver=1.15.8" type="text/css" media="all">
+<link rel="stylesheet" id="noty-style-css" href="https://cybr.com/wp-content/plugins/learndash-achievements/lib/noty/noty.css?ver=1.2.1" type="text/css" media="screen">
+<link rel="stylesheet" id="ld-achievements-style-css" href="https://cybr.com/wp-content/plugins/learndash-achievements/assets/css/style.css?ver=1.2.1" type="text/css" media="screen">
+<link rel="stylesheet" id="redux-extendify-styles-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/inc/admin/framework/redux-core/assets/css/extendify-utilities.css?ver=4.4.11" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-fonts-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/fonts/fonts.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="learndash-front-css" href="//cybr.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/css/learndash.min.css?ver=4.15.1" type="text/css" media="all">
+<link rel="stylesheet" id="bp-zoom-css" href="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/integrations/zoom/assets/css/bp-zoom.min.css?ver=2.5.20" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-magnific-popup-css-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/vendors/magnific-popup.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-select2-css-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/vendors/select2.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-css-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/theme.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-template-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/template-v1.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-buddypress-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/buddypress.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-forums-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/bbpress.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-learndash-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/learndash.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-elementor-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/elementor.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-theme-memberpress-css" href="https://cybr.com/wp-content/themes/buddyboss-theme/assets/css/memberpress.min.css?ver=2.6.10" type="text/css" media="all">
+<link rel="stylesheet" id="buddyboss-child-css-css" href="https://cybr.com/wp-content/themes/buddyboss-theme-child/assets/css/custom.css?ver=1.0.0" type="text/css" media="all">
+<link rel="stylesheet" id="jetpack_css-css" href="https://c0.wp.com/p/jetpack/13.4.3/css/jetpack.css" type="text/css" media="all">
+<script type="text/javascript" id="bb-twemoji-js-extra">
+/* <![CDATA[ */
+var bbemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/svg\/","svgExt":".svg"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/twemoji.min.js" id="bb-twemoji-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/bb-emoji-loader.min.js?ver=2.6.10" id="bb-emoji-loader-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/jquery/jquery.min.js" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/jquery/jquery-migrate.min.js" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="bb-reaction-js-extra">
+/* <![CDATA[ */
+var bbReactionVars = {"ajax_url":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/reactions/assets/js/bb-reaction.min.js?ver=2.5.20" id="bb-reaction-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/widget-members.min.js?ver=2.6.10" id="bp-widget-members-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/jquery-query.min.js?ver=2.6.10" id="bp-jquery-query-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/jquery-cookie.min.js?ver=2.6.10" id="bp-jquery-cookie-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/jquery-scroll-to.min.js?ver=2.6.10" id="bp-jquery-scroll-to-js"></script>
+<script type="text/javascript" id="bb-tutorlms-admin-js-extra">
+/* <![CDATA[ */
+var bbTutorLMSVars = {"ajax_url":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","select_course_placeholder":"Start typing a course name to associate with this group."};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/integrations/tutorlms/assets/js/bb-tutorlms-admin.min.js?ver=2.6.10" id="bb-tutorlms-admin-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/magnific-popup.js?ver=2.6.10" id="bp-nouveau-magnific-popup-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme-child/assets/js/custom.js?ver=1.0.0" id="buddyboss-child-js-js"></script>
+<link rel="https://api.w.org/" href="https://cybr.com/wp-json/"><link rel="alternate" type="application/json" href="https://cybr.com/wp-json/wp/v2/sfwd-courses/20879"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://cybr.com/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.5.4">
+<link rel="shortlink" href="https://cybr.com/?p=20879">
+<link rel="alternate" type="application/json+oembed" href="https://cybr.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fcybr.com%2Fcourses%2Fbeginners-guide-to-aws-cloudtrail-for-security%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://cybr.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fcybr.com%2Fcourses%2Fbeginners-guide-to-aws-cloudtrail-for-security%2F&amp;format=xml">
+<script type="text/javascript">var ajaxurl = 'https://cybr.com/wp-admin/admin-ajax.php';</script>
+<script type="text/javascript">var _rollbarConfig = {"accessToken":"0c1aa90a29e6420a8d4e9c551fc93ce1","captureUncaught":true,"payload":{"environment":"production"}};!function(r){var e={};function o(n){if(e[n])return e[n].exports;var t=e[n]={i:n,l:!1,exports:{}};return r[n].call(t.exports,t,t.exports,o),t.l=!0,t.exports}o.m=r,o.c=e,o.d=function(r,e,n){o.o(r,e)||Object.defineProperty(r,e,{enumerable:!0,get:n})},o.r=function(r){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(r,"__esModule",{value:!0})},o.t=function(r,e){if(1&e&&(r=o(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var n=Object.create(null);if(o.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var t in r)o.d(n,t,function(e){return r[e]}.bind(null,t));return n},o.n=function(r){var e=r&&r.__esModule?function(){return r.default}:function(){return r};return o.d(e,"a",e),e},o.o=function(r,e){return Object.prototype.hasOwnProperty.call(r,e)},o.p="",o(o.s=0)}([function(r,e,o){"use strict";var n=o(1),t=o(4);_rollbarConfig=_rollbarConfig||{},_rollbarConfig.rollbarJsUrl=_rollbarConfig.rollbarJsUrl||"https://cdn.rollbar.com/rollbarjs/refs/tags/v2.17.0/rollbar.min.js",_rollbarConfig.async=void 0===_rollbarConfig.async||_rollbarConfig.async;var a=n.setupShim(window,_rollbarConfig),l=t(_rollbarConfig);window.rollbar=n.Rollbar,a.loadFull(window,document,!_rollbarConfig.async,_rollbarConfig,l)},function(r,e,o){"use strict";var n=o(2);function t(r){return function(){try{return r.apply(this,arguments)}catch(r){try{console.error("[Rollbar]: Internal error",r)}catch(r){}}}}var a=0;function l(r,e){this.options=r,this._rollbarOldOnError=null;var o=a++;this.shimId=function(){return o},"undefined"!=typeof window&&window._rollbarShims&&(window._rollbarShims[o]={handler:e,messages:[]})}var i=o(3),s=function(r,e){return new l(r,e)},d=function(r){return new i(s,r)};function c(r){return t((function(){var e=this,o=Array.prototype.slice.call(arguments,0),n={shim:e,method:r,args:o,ts:new Date};window._rollbarShims[this.shimId()].messages.push(n)}))}l.prototype.loadFull=function(r,e,o,n,a){var l=!1,i=e.createElement("script"),s=e.getElementsByTagName("script")[0],d=s.parentNode;i.crossOrigin="",i.src=n.rollbarJsUrl,o||(i.async=!0),i.onload=i.onreadystatechange=t((function(){if(!(l||this.readyState&&"loaded"!==this.readyState&&"complete"!==this.readyState)){i.onload=i.onreadystatechange=null;try{d.removeChild(i)}catch(r){}l=!0,function(){var e;if(void 0===r._rollbarDidLoad){e=new Error("rollbar.js did not load");for(var o,n,t,l,i=0;o=r._rollbarShims[i++];)for(o=o.messages||[];n=o.shift();)for(t=n.args||[],i=0;i<t.length;++i)if("function"==typeof(l=t[i])){l(e);break}}"function"==typeof a&&a(e)}()}})),d.insertBefore(i,s)},l.prototype.wrap=function(r,e,o){try{var n;if(n="function"==typeof e?e:function(){return e||{}},"function"!=typeof r)return r;if(r._isWrap)return r;if(!r._rollbar_wrapped&&(r._rollbar_wrapped=function(){o&&"function"==typeof o&&o.apply(this,arguments);try{return r.apply(this,arguments)}catch(o){var e=o;throw e&&("string"==typeof e&&(e=new String(e)),e._rollbarContext=n()||{},e._rollbarContext._wrappedSource=r.toString(),window._rollbarWrappedError=e),e}},r._rollbar_wrapped._isWrap=!0,r.hasOwnProperty))for(var t in r)r.hasOwnProperty(t)&&(r._rollbar_wrapped[t]=r[t]);return r._rollbar_wrapped}catch(e){return r}};for(var u="log,debug,info,warn,warning,error,critical,global,configure,handleUncaughtException,handleAnonymousErrors,handleUnhandledRejection,captureEvent,captureDomContentLoaded,captureLoad".split(","),p=0;p<u.length;++p)l.prototype[u[p]]=c(u[p]);r.exports={setupShim:function(r,e){if(r){var o=e.globalAlias||"Rollbar";if("object"==typeof r[o])return r[o];r._rollbarShims={},r._rollbarWrappedError=null;var a=new d(e);return t((function(){e.captureUncaught&&(a._rollbarOldOnError=r.onerror,n.captureUncaughtExceptions(r,a,!0),e.wrapGlobalEventHandlers&&n.wrapGlobals(r,a,!0)),e.captureUnhandledRejections&&n.captureUnhandledRejections(r,a,!0);var t=e.autoInstrument;return!1!==e.enabled&&(void 0===t||!0===t||"object"==typeof t&&t.network)&&r.addEventListener&&(r.addEventListener("load",a.captureLoad.bind(a)),r.addEventListener("DOMContentLoaded",a.captureDomContentLoaded.bind(a))),r[o]=a,a}))()}},Rollbar:d}},function(r,e,o){"use strict";function n(r,e,o,n){r._rollbarWrappedError&&(n[4]||(n[4]=r._rollbarWrappedError),n[5]||(n[5]=r._rollbarWrappedError._rollbarContext),r._rollbarWrappedError=null);var t=e.handleUncaughtException.apply(e,n);o&&o.apply(r,n),"anonymous"===t&&(e.anonymousErrorsPending+=1)}function t(r,e,o){if(e.hasOwnProperty&&e.hasOwnProperty("addEventListener")){for(var n=e.addEventListener;n._rollbarOldAdd&&n.belongsToShim;)n=n._rollbarOldAdd;var t=function(e,o,t){n.call(this,e,r.wrap(o),t)};t._rollbarOldAdd=n,t.belongsToShim=o,e.addEventListener=t;for(var a=e.removeEventListener;a._rollbarOldRemove&&a.belongsToShim;)a=a._rollbarOldRemove;var l=function(r,e,o){a.call(this,r,e&&e._rollbar_wrapped||e,o)};l._rollbarOldRemove=a,l.belongsToShim=o,e.removeEventListener=l}}r.exports={captureUncaughtExceptions:function(r,e,o){if(r){var t;if("function"==typeof e._rollbarOldOnError)t=e._rollbarOldOnError;else if(r.onerror){for(t=r.onerror;t._rollbarOldOnError;)t=t._rollbarOldOnError;e._rollbarOldOnError=t}e.handleAnonymousErrors();var a=function(){var o=Array.prototype.slice.call(arguments,0);n(r,e,t,o)};o&&(a._rollbarOldOnError=t),r.onerror=a}},captureUnhandledRejections:function(r,e,o){if(r){"function"==typeof r._rollbarURH&&r._rollbarURH.belongsToShim&&r.removeEventListener("unhandledrejection",r._rollbarURH);var n=function(r){var o,n,t;try{o=r.reason}catch(r){o=void 0}try{n=r.promise}catch(r){n="[unhandledrejection] error getting `promise` from event"}try{t=r.detail,!o&&t&&(o=t.reason,n=t.promise)}catch(r){}o||(o="[unhandledrejection] error getting `reason` from event"),e&&e.handleUnhandledRejection&&e.handleUnhandledRejection(o,n)};n.belongsToShim=o,r._rollbarURH=n,r.addEventListener("unhandledrejection",n)}},wrapGlobals:function(r,e,o){if(r){var n,a,l="EventTarget,Window,Node,ApplicationCache,AudioTrackList,ChannelMergerNode,CryptoOperation,EventSource,FileReader,HTMLUnknownElement,IDBDatabase,IDBRequest,IDBTransaction,KeyOperation,MediaController,MessagePort,ModalWindow,Notification,SVGElementInstance,Screen,TextTrack,TextTrackCue,TextTrackList,WebSocket,WebSocketWorker,Worker,XMLHttpRequest,XMLHttpRequestEventTarget,XMLHttpRequestUpload".split(",");for(n=0;n<l.length;++n)r[a=l[n]]&&r[a].prototype&&t(e,r[a].prototype,o)}}}},function(r,e,o){"use strict";function n(r,e){this.impl=r(e,this),this.options=e,function(r){for(var e=function(r){return function(){var e=Array.prototype.slice.call(arguments,0);if(this.impl[r])return this.impl[r].apply(this.impl,e)}},o="log,debug,info,warn,warning,error,critical,global,configure,handleUncaughtException,handleAnonymousErrors,handleUnhandledRejection,_createItem,wrap,loadFull,shimId,captureEvent,captureDomContentLoaded,captureLoad".split(","),n=0;n<o.length;n++)r[o[n]]=e(o[n])}(n.prototype)}n.prototype._swapAndProcessMessages=function(r,e){var o,n,t;for(this.impl=r(this.options);o=e.shift();)n=o.method,t=o.args,this[n]&&"function"==typeof this[n]&&("captureDomContentLoaded"===n||"captureLoad"===n?this[n].apply(this,[t[0],o.ts]):this[n].apply(this,t));return this},r.exports=n},function(r,e,o){"use strict";r.exports=function(r){return function(e){if(!e&&!window._rollbarInitialized){for(var o,n,t=(r=r||{}).globalAlias||"Rollbar",a=window.rollbar,l=function(r){return new a(r)},i=0;o=window._rollbarShims[i++];)n||(n=o.handler),o.handler._swapAndProcessMessages(l,o.messages);window[t]=n,window._rollbarInitialized=!0}}}}]);;</script> <style>img#wpstats{display:none}</style>
+<style type="text/css" media="screen">
+			.noty_theme__learndash.noty_type__success {
+							 background-color: #333333;
+				border-bottom: 1px solid#333333;
+			 				 color: #ffffff;
+						}
+		</style>
+<meta name="generator" content="Redux 4.4.11"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"><meta name="generator" content="Elementor 3.21.8; features: e_optimized_assets_loading, additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-auto">
+<link rel="icon" href="https://cybr.com/wp-content/uploads/2020/03/cropped-cybr_logo_badge_gradient-32x32.png" sizes="32x32">
+<link rel="icon" href="https://cybr.com/wp-content/uploads/2020/03/cropped-cybr_logo_badge_gradient-192x192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="https://cybr.com/wp-content/uploads/2020/03/cropped-cybr_logo_badge_gradient-180x180.png">
+<meta name="msapplication-TileImage" content="https://cybr.com/wp-content/uploads/2020/03/cropped-cybr_logo_badge_gradient-270x270.png">
+<style id="buddyboss_theme-style">:root{--bb-primary-color:#007CFF;--bb-primary-color-rgb:0, 124, 255;--bb-body-background-color:#121212;--bb-body-background-color-rgb:18, 18, 18;--bb-content-background-color:#333333;--bb-content-alternate-background-color:#FBFBFC;--bb-content-border-color:#333333;--bb-content-border-color-rgb:51, 51, 51;--bb-cover-image-background-color:#607387;--bb-headings-color:#FFFFFF;--bb-headings-color-rgb:255, 255, 255;--bb-body-text-color:#AAAAAA;--bb-body-text-color-rgb:170, 170, 170;--bb-alternate-text-color:#A3A5A9;--bb-alternate-text-color-rgb:163, 165, 169;--bb-primary-button-background-regular:#385DFF;--bb-primary-button-background-hover:#1E42DD;--bb-primary-button-border-regular:#385DFF;--bb-primary-button-border-hover:#1E42DD;--bb-primary-button-text-regular:#FFFFFF;--bb-primary-button-text-regular-rgb:255, 255, 255;--bb-primary-button-text-hover:#FFFFFF;--bb-primary-button-text-hover-rgb:255, 255, 255;--bb-secondary-button-background-regular:#F2F4F5;--bb-secondary-button-background-hover:#385DFF;--bb-secondary-button-border-regular:#F2F4F5;--bb-secondary-button-border-hover:#385DFF;--bb-secondary-button-text-regular:#1E2132;--bb-secondary-button-text-hover:#FFFFFF;--bb-header-background:#232323;--bb-header-alternate-background:#F2F4F5;--bb-header-links:#939597;--bb-header-links-hover:#007CFF;--bb-header-mobile-logo-size:px;--bb-header-height:76px;--bb-sidenav-background:#232323;--bb-sidenav-text-regular:#939597;--bb-sidenav-text-hover:#939597;--bb-sidenav-text-active:#232323;--bb-sidenav-menu-background-color-regular:#232323;--bb-sidenav-menu-background-color-hover:#F2F4F5;--bb-sidenav-menu-background-color-active:#007CFF;--bb-sidenav-count-text-color-regular:#939597;--bb-sidenav-count-text-color-hover:#232323;--bb-sidenav-count-text-color-active:#007CFF;--bb-sidenav-count-background-color-regular:#F2F4F5;--bb-sidenav-count-background-color-hover:#007CFF;--bb-sidenav-count-background-color-active:#232323;--bb-footer-background:#121212;--bb-footer-widget-background:#232323;--bb-footer-text-color:#5A5A5A;--bb-footer-menu-link-color-regular:#5A5A5A;--bb-footer-menu-link-color-hover:#385DFF;--bb-footer-menu-link-color-active:#1E2132;--bb-admin-screen-bgr-color:#FAFBFD;--bb-admin-screen-txt-color:#007CFF;--bb-login-register-link-color-regular:#5A5A5A;--bb-login-register-link-color-hover:#1E42DD;--bb-login-register-button-background-color-regular:#385DFF;--bb-login-register-button-background-color-hover:#1E42DD;--bb-login-register-button-border-color-regular:#385DFF;--bb-login-register-button-border-color-hover:#1E42DD;--bb-login-register-button-text-color-regular:#FFFFFF;--bb-login-register-button-text-color-hover:#FFFFFF;--bb-label-background-color:#D7DFFF;--bb-label-text-color:#385DFF;--bb-tooltip-background:#A3A5A9;--bb-tooltip-background-rgb:163, 165, 169;--bb-tooltip-color:#FFFFFF;--bb-default-notice-color:#007CFF;--bb-default-notice-color-rgb:0, 124, 255;--bb-success-color:#1CD991;--bb-success-color-rgb:28, 217, 145;--bb-warning-color:#F7BA45;--bb-warning-color-rgb:247, 186, 69;--bb-danger-color:#EF3E46;--bb-danger-color-rgb:239, 62, 70;--bb-login-custom-heading-color:#FFFFFF;--bb-button-radius:100px;--bb-block-radius:4px;--bb-option-radius:3px;--bb-block-radius-inner:4px;--bb-input-radius:4px;--bb-checkbox-radius:2.7px;--bb-primary-button-focus-shadow:none;--bb-secondary-button-focus-shadow:none;--bb-outline-button-focus-shadow:none;--bb-input-focus-shadow:none;--bb-input-focus-border-color:var(--bb-content-border-color);--bb-label-type-radius:100px;--bb-widget-title-text-transform:uppercase;}h1 { line-height:1.2; }h2 { line-height:1.2; }h3 { line-height:1.4; }h4 { line-height:1.4; }h5 { line-height:1.4; }h6 { line-height:1.4; }.bb-style-primary-bgr-color {background-color:#007CFF;}.bb-style-border-radius {border-radius:100px;}.footer-logo img {max-width:50px;}.site-header-container #site-logo .bb-logo img,.site-header-container #site-logo .site-title img.bb-logo,.site-title img.bb-mobile-logo {max-height:76px}.sticky-header .site-content,body.buddypress.sticky-header .site-content,.bb-buddypanel.sticky-header .site-content,.single-sfwd-quiz.bb-buddypanel.sticky-header .site-content,.single-sfwd-lessons.bb-buddypanel.sticky-header .site-content,.single-sfwd-topic.bb-buddypanel.sticky-header .site-content {padding-top:76px}.site-header .site-header-container,.header-search-wrap,.header-search-wrap input.search-field,.header-search-wrap form.search-form {height:76px;}.sticky-header .bp-feedback.bp-sitewide-notice {top:76px;}@media screen and (max-width:767px) {.bb-mobile-header {height:76px;}#learndash-content .lms-topic-sidebar-wrapper .lms-topic-sidebar-data {height:calc(90vh - 76px);}}[data-balloon]:after,[data-bp-tooltip]:after {background-color:rgba( 163,165,169,1 );box-shadow:none;}[data-balloon]:before,[data-bp-tooltip]:before {background:no-repeat url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%2236px%22%20height%3D%2212px%22%3E%3Cpath%20fill%3D%22rgba( 163,165,169,1 )%22%20transform%3D%22rotate(0)%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E");background-size:100% auto;}[data-bp-tooltip][data-bp-tooltip-pos="right"]:before,[data-balloon][data-balloon-pos='right']:before {background:no-repeat url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%2212px%22%20height%3D%2236px%22%3E%3Cpath%20fill%3D%22rgba( 163,165,169,1 )%22%20transform%3D%22rotate(90 6 6)%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E");background-size:100% auto;}[data-bp-tooltip][data-bp-tooltip-pos="left"]:before,[data-balloon][data-balloon-pos='left']:before {background:no-repeat url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%2212px%22%20height%3D%2236px%22%3E%3Cpath%20fill%3D%22rgba( 163,165,169,1 )%22%20transform%3D%22rotate(-90 18 18)%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E");background-size:100% auto;}[data-bp-tooltip][data-bp-tooltip-pos="down-left"]:before,[data-bp-tooltip][data-bp-tooltip-pos="down"]:before,[data-balloon][data-balloon-pos='down']:before {background:no-repeat url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%2236px%22%20height%3D%2212px%22%3E%3Cpath%20fill%3D%22rgba( 163,165,169,1 )%22%20transform%3D%22rotate(180 18 6)%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E");background-size:100% auto;}</style>
+<style id="buddyboss_theme-bp-style">
+                #buddypress #header-cover-image.has-default,#buddypress #header-cover-image.has-default .guillotine-window img,.bs-group-cover.has-default a {background-color:#607387;}body.buddypress.register.login-split-page .login-split .split-overlay,body.buddypress.activation.login-split-page .login-split .split-overlay {opacity:0.3;}body.buddypress.register .register-section-logo img,body.buddypress.activation .activate-section-logo img {width:145px;}
+            </style>
+<style id="buddyboss_theme-forums-style">
+                .bbpress .widget_display_forums > ul.bb-sidebar-forums > li a:before {border-color:#7381bf;}.bbpress .widget_display_forums > ul.bb-sidebar-forums > li a:before {background-color:rgba( 115,129,191,0.5 );}
+            </style>
+<style id="buddyboss_theme-learndash-style">
+                .learndash-wrapper .bb-ld-tabs #learndash-course-content {top:-118px;}html[dir="rtl"] .learndash_next_prev_link a.next-link,html[dir="rtl"] .learndash_next_prev_link span.next-link {border-radius:100px 0 0 100px;}html[dir="rtl"] .learndash_next_prev_link a.prev-link,html[dir="rtl"] .learndash_next_prev_link span.prev-link {border-radius:0 100px 100px 0;}
+            </style>
+<style id="buddyboss_theme-custom-style">
+
+		a.bb-close-panel i {top:21px;}
+		</style>
+<style type="text/css" id="wp-custom-css">
+			/* #wpadminbar {
+    display: none;
+}
+html {
+    margin-top: 0 !important;
+} */
+
+/* General styling */
+/* Increase general font size */
+html {
+	font-size: 18px;
+}
+
+/* Re-style header tags */
+.h1, h1 {
+	font-size: 2.6rem;
+}
+.h2, h2 {
+	font-size: 2.1rem;
+  line-height: 1.15;
+}
+.h3, h3 {
+	font-size: 1.65rem;
+	line-height: 1.25;
+}
+.h4, h4 {
+	font-size: 1.40rem;
+	line-height: 1.25;
+}
+.h5, h5 {
+	font-size: 1.15rem;
+	line-height: 1.5;
+}
+.h6, h6 {
+	font-size: 1.075rem;
+	line-height: 1.55;
+}
+
+/* General font weight */
+b, strong {
+	font-weight: bold;
+}
+
+figcaption {
+	font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Remove excessive margins after un-ordered lists */
+ul ul, ul ol {
+	margin-bottom: 0;
+}
+
+/* Remove excessive spacing between paragraphs and their un-ordered lists */
+p + ul, p + ol {
+	margin-top: -20px;
+}
+
+
+/* dark mode input fields and drop downs */
+.bb-courses-directory .sfwd-courses-filters .select-wrap select, .bb-courses-directory .grid-filters, .grid-filters .layout-grid-view .dashicons:before, .grid-filters .layout-list-view .dashicons:before, #notifications-filter-by, #header-aside > div > div.user-wrap.user-wrap-container.menu-item-has-children.selected > div > div > ul > li:nth-child(1) > a:hover {
+  background-color: #333;
+	color: #fff;
+	border: 0;
+}
+
+/* Notification bell */
+.notification-header, .notification-dropdown, .notification-footer, .notification-list>li:hover, #header-notifications-dropdown-elem > a:before, #primary-menu ul:before, #header-aside > div > div.user-wrap.user-wrap-container.menu-item-has-children.selected > div:before {
+	background-color: #333;
+	color: #fff;
+	border-color: #333;
+	background: #333;
+	border: 0;
+}
+
+.notification-list .unread {
+	background: none;
+}
+
+/* Deprecating */
+.site-header .header-aside .menu-item-has-children.selected>.sub-menu, #buddypress .bb-bp-settings-content .bp-tables-user td, .site-header .sub-menu, .site-header .sub-menu .current-menu-item>a, .site-header .sub-menu .current-menu-ancestor>a, #primary-menu .sub-menu .menu-item >a:hover {
+	background-color: #333;
+	color: #fff;
+	border: none;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu {
+	background: #333;
+	padding: 25px;
+	min-width: 185px;
+	box-shadow: 0 2px 7px 1px rgb(0 0 0 / 45%), 0 6px 32px 0 rgb(18 43 70 / 10%);
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu:before {
+	border: 7px solid #000;
+	border-color: #333 #333 transparent transparent;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu {
+	list-style: none;
+  margin: 0;
+  line-height: normal;
+  background: #333;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu .menu-item a {
+	padding: .8rem .9375rem;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu .menu-item a:hover {
+	background: #333;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu .menu-item:hover>a {
+  background: #333;
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu .menu-item:hover .ab-submenu {
+	left: -webkit-calc(100% + 5px);
+  left: calc(100% + 5px);
+}
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu .bb-sub-menu .menu-item.menu-item-has-children:after {
+	-webkit-transform: translate(-5px,-50%);
+  -ms-transform: translate(-5px,-50%);
+  transform: translate(5px,-50%);
+}
+
+/* User dropdown */
+.site-header .sub-menu {
+	background: #333;
+	color: #fff;
+	box-shadow: 0 2px 7px 1px rgb(0 0 0 / 45%), 0 6px 32px 0 rgb(18 43 70 / 10%);
+}
+
+.site-header .sub-menu .current-menu-ancestor>a, .site-header .sub-menu .current-menu-item>a, .site-header .sub-menu .current-menu-parent>a, .site-header .sub-menu a:hover {
+	background: #333;
+}
+
+.user-wrap-container .sub-menu .ab-sub-wrapper .ab-submenu {
+	background: #333;
+}
+
+.header-aside .wrapper li .wrapper {
+	box-shadow: 0 2px 7px 1px rgb(0 0 0 / 45%), 0 6px 32px 0 rgb(18 43 70 / 10%);
+}
+
+.header-aside .wrapper li .wrapper:before {
+ background: #333;
+}
+
+/* End depracating */
+
+.site-header #primary-navbar .primary-menu .menu-item>.ab-submenu {
+	background: #333;
+	padding: 25px;
+	min-width: 185px;
+	box-shadow: 0 2px 7px 1px rgb(0 0 0 / 45%), 0 6px 32px 0 rgb(18 43 70 / 10%);
+}
+
+/* Font size for main nav sub-menu */
+.site-header .sub-menu a {
+	font-size: .855rem;
+}
+
+
+/* Temporary size increase of sub-menu to fit (coming soon) */
+#menu-item-1857 .sub-menu {
+	min-width: 280px;
+}
+
+.user-wrap.menu-item-has-children .sub-menu a {
+	border: 0;
+}
+
+/* Search Bar */
+.bb-buddypanel .header-search-wrap, .header-search-wrap input.search-field-top, .header-search-wrap {
+	background-color: #333;
+	color: #fff;
+}
+
+/* Deprecated */
+.widget_search .search-field-top {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+}
+
+.widget.widget_search input[type=search] {
+  background-color: #232323;
+  border: 0;
+  color: #aaa;
+	border-radius: 3px;
+}
+
+.widget_search .search-field-top::placeholder {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+} 
+.widget_search .search-field-top::-webkit-input-placeholder {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+} 
+.widget_search .search-field-top:-moz-placeholder {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+	opacity: 1;
+} 
+.widget_search .search-field-top::-moz-placeholder {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+	opacity: 1;
+} 
+.widget_search .search-field-top:-ms-input-placeholder { 
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+}
+.widget_search .search-field-top::-ms-input-placeholder {
+	background-color: #232323;
+	border: 0;
+	color: #aaa;
+}
+
+
+/* select arrow for courses page */
+.select-wrap select, #notifications-filter-by {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Ctitle%3Edown-arrow%3C%2Ftitle%3E%3Cg%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M10.293%2C3.293%2C6%2C7.586%2C1.707%2C3.293A1%2C1%2C0%2C0%2C0%2C.293%2C4.707l5%2C5a1%2C1%2C0%2C0%2C0%2C1.414%2C0l5-5a1%2C1%2C0%2C1%2C0-1.414-1.414Z%22%20fill%3D%22%23000000%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E");;
+}
+
+.buddypress-wrap .select-wrap, .buddypress-wrap .select-wrap:hover {
+	background-color: #333;
+	border: 0;
+}
+#buddypress .notifications-header .bp-navs > ul.subnav, .buddypress-wrap .select-wrap:hover {
+	background-color: #121212;
+	box-shadow: none;
+}
+
+/* dark color for account settings side bar */
+#buddypress .bp-settings-container .bp-navs {
+	background-color: #232323;
+}
+
+/* Improve color contrast for "My Courses" count on /courses page */
+.bp-navs ul li .count, .buddypress-wrap .bp-navs li.dynamic a .count { 
+	background: #333;
+	color: #939597
+}
+
+.bb-courses-directory .bp-navs .selected .count { 
+	color: #fff;
+}
+
+/* Set color for course tooltip */
+.bb-cover-list-item .ld-third-background {
+	background-color: green;
+}
+
+/* Display up to 6 subforums in forum cards */
+.forums-meta span:nth-child(n+3) {
+	display: inline-block;
+}
+
+.forums-meta span:nth-child(n+7) {
+	display: none;
+}
+
+/* Hovering action for discussions */
+.bs-item-list.list-view .bs-item-wrap:not(.no-hover-effect):not(.header-total-reply-count):hover {
+	border-left-color: #333333;
+	border-right-color: #333333;
+}
+
+/* Hide the notice that the forum is closed to be more user friendly */
+#post-76 .bp-feedback.info {
+	display: none;
+}
+
+
+/* forum subforum text */
+.bs-forum-content {
+  font-size: 1rem;	
+}
+
+a.bbp-forum-link {
+	color: #fff !important;
+}
+
+/* forum subforum contrast color */
+.bs-card-list .forums-meta span {
+	background: #043ba2;
+}
+
+/* Forum New Discussion styling */
+div#bbp_editor_topic_content_forums_editor_1 {
+	background-color: #fff;
+}
+
+.emojionearea-button {
+	background-color: #fff;
+}
+
+.emojionearea .emojionearea-picker .emojionearea-filters .emojionearea-filter.active {
+	background: none;
+}
+
+.bbp-topic-form #whats-new-toolbar .medium-editor-toolbar .medium-editor-toolbar-actions  {
+	background-color: #333;
+}
+
+body:not(.topic-edit) #new-post input.select2-search__field {
+	color: #fff
+}
+
+.medium-editor-placeholder:after {
+	color: #333;
+}
+
+.bbp-the-content-wrapper p {
+	color: #fff;
+}
+
+.bbp-form #whats-new-toolbar .toolbar-button.active .bb-icon.bb-icon-text-format:before {
+	color: #122b46;
+}
+
+#new-post .bbp-form #whats-new-toolbar .bb-icon {
+	color: #aaa;
+}
+
+#new-post .bbp-form .active#forums-media-button .bb-icon {
+	color: #122b46;
+}
+
+/* Forum tags/categories */
+.bs-meta-item {
+	background: none;
+}
+
+/* forum comments */
+.comment-body, .comment-text, a.comment-date, a.comment-date:hover {
+	background-color: #232323;
+	color: #fff;
+	border: 0;
+}
+
+/* forum poster name */
+.comment-author a.url {
+	color: #a3a5a9;
+}
+
+/* forum edit */
+input#bbp_topic_title {
+	color: #fff;
+}
+
+.bs-item-list.list-view .bs-dropdown-link {
+	color: white;
+}
+
+.select2-container--default .select2-search--inline .select2-search__field::placeholder {
+	color: var(--bb-body-text-color);
+}
+
+input#bbp_topic_edit_reason::placeholder {
+	color: var(--bb-body-text-color);
+}
+
+/* Forum reply */
+.bb-modal {
+	background-color: var(--bb-body-background-color);
+}
+
+#bbpress-forums .bbp-reply-form.bb-modal .bb-form-select-fields {
+	background: var(--bb-body-background-color);
+}
+
+.bs-styled-checkbox+label:before {
+	background: #FFF;
+}
+
+#bbpress-forums#bbpress-forums .bs-forums-items.list-view li .bs-reply-list-item:hover, #bbpress-forums#bbpress-forums .bs-forums-items.list-view li.dropdown-open>.bs-reply-list-item {
+	background-color: transparent;
+}
+
+.emojionearea-button {
+	background: none;
+}
+
+/* recent blog posts */
+a.bb-title {
+	color: #a3a5a9 !important;
+}
+
+a.bb-title:hover {
+  color: #0378f4 !important;
+}
+
+/* News Feed - New Post */
+span.user-name {
+	color: #fff;
+}
+
+.activity-update-form #whats-new-avatar {
+	border: 0;
+}
+
+#whats-new-form {
+  border-radius: 0;
+	background: #232323;
+}
+
+.activity-form .bb-model-header {
+	background: var(--bb-body-background-color);
+}
+
+#whats-new-toolbar .emojionearea .emojionearea-button:before, #whats-new-toolbar .dashicons-admin-media:before {
+	color: #c9c9c9;
+}
+
+#whats-new-form #whats-new-toolbar .emojionearea .emojionearea-button.active:before,
+#new-post #whats-new-toolbar .emojionearea .emojionearea-button.active:before {
+	color: #fff
+}
+
+#whats-new-form .emojionearea.emojionearea-standalone {
+	background:none;
+}
+
+#whats-new-form #whats-new-toolbar .bb-icon, #new-post #whats-new-toolbar .bb-icon {
+	color: #aaa
+}
+#whats-new-toolbar .toolbar-button.active .bb-icon.bb-icon-text-format:before {
+	color: #fff
+}
+
+/* These seem to have broken after an update, so the above is valid now, but keeping for backwards compatibility
+ * START */
+#whats-new-form #whats-new-toolbar .dashicons {
+	color: #aaa
+}
+
+#whats-new-form #whats-new-toolbar .toolbar-button.active .dashicons-editor-textcolor:before {
+	color: #fff;
+}
+/* END
+ * ------------------- */
+
+.activity-update-form #whats-new pre {
+	color: #fff
+}
+
+/* News Feed entries */
+.activity-link-preview-container, blockquote.wp-embedded-content {
+	background-color: #333333;
+	border-color: #232323;
+	border: 0;
+}
+
+.activity-link-preview-title a, .activity-inner blockquote p a, blockquote.wp-embedded-content>p:first-child>a, #whats-new-attachments > div.activity-url-scrapper-container > div > p {
+  color: #fff;
+	word-break: normal;
+}
+
+.activity-link-preview-title a:hover, .activity-inner blockquote p a.customize-unpreviewable:hover, blockquote.wp-embedded-content>p:first-child>a:hover {
+  color: #0378f4;
+}
+
+.activity-link-preview-excerpt {
+	color: #fff;
+	overflow: hidden;
+	word-break: normal;
+}
+
+/* Quoting text format */
+/* News feed */
+.activity-list .activity-item .bp-generic-meta.action {
+	background: #333;
+}
+
+.activity-list .activity-item .activity-inner blockquote:not(.wp-embedded-content) {
+	background: #333;
+}
+
+/* Blog posts in news feed */
+.activity-list li.blogs .activity-content .activity-inner {
+	border: none;
+}
+
+.activity-list li.blogs .activity-content .activity-inner .bb-content-wrp {
+	background-color: transparent;
+}
+
+/* Forums */
+.bs-forum-content blockquote:not(.wp-embedded-content), .medium-editor-element>blockquote:not(.wp-embedded-content) {
+	background: #333;
+}
+
+.bs-forum-content blockquote:not(.wp-embedded-content) em, .medium-editor-element>blockquote:not(.wp-embedded-content) em {
+	color: #fff;
+}
+
+/* Display breadcrumbs on discussion pages ... */
+#bbpress-forums .bbp-breadcrumb {
+	display: block;
+}
+
+/* ... but hide the Home breadcrumb */
+a.bbp-breadcrumb-home, a.bbp-breadcrumb-home + span {
+	display: none;
+}
+
+/* Hide the 'forum is closed' notification for content & feature requests forum */
+.post-157.forum .bp-feedback.info {
+	display: none;
+}
+
+/* News feed posts styling */
+
+/* feed likes text */
+div.activity-content > div.activity-state.has-likes > a.activity-state-likes > span {
+	background-color: #333;
+	color: #a3a5a9;
+}
+
+/* feed comment indicator */
+.buddypress .buddypress-wrap .activity-state a {
+	background-color: transparent;
+	color: #ccc;
+}
+
+/* feed comments */
+.buddypress-wrap .activity-comments>ul {
+	background: #232323;
+}
+
+.acomment-meta .author-name {
+	color: #fff;
+}
+
+.buddypress-wrap .activity-comments .acomment-content {
+	margin-top: 5px;
+	margin-bottom: 15px;
+}
+
+.activity-list .activity-item .activity-content .activity-inner {
+	margin: 0;
+}
+
+.activity-list .activity-item .activity-inner p {
+	margin-bottom: 20px;
+}
+
+/* resize padding on news feed container */
+.activity-link-preview-container {
+	padding: 5px 10px 20px 10px;
+}
+
+/* Profile - nav */
+.bp-dir-hori-nav nav#object-nav {
+	background-color: #232323;
+}
+
+ul.subnav {
+	background-color: #232323;
+	padding: 10px 20px 0;
+}
+
+.profile-loop-header {
+	background-color: #232323
+}
+/* Profile - Email invites */
+#member-invites-table th {
+	background-color: #232323;
+}
+
+#member-invites-table td {
+	background-color: #333;
+}
+
+/* Profile - Photos */
+.bb-media-container {
+	background-color: #232323;
+	border: 0;
+}
+
+/* Edit profile - background photo */
+#page #buddypress #item-body .bp-profile-wrapper #subnav, #page #buddypress #item-body .bp-profile-wrapper #subnav .selected a {
+	background-color: #232323;
+}
+
+.mp_wrapper label {
+	color: #000;
+}
+
+/* Profile Membership Tabs Styling, including Subscriptions & Payments tables */
+#mepr-address-country1, #mepr-address-state1 {
+	background-color: #FFF;
+}
+
+#mepr-address-country1.valid, #mepr-address-state1.valid {
+	color: #333;
+}
+
+.mepr_email .mp-form-label label {
+	color: #fff;
+}
+
+.mepr-signup-form .mepr_email .mp-form-label label {
+	color: #000;
+}
+
+.mp_wrapper table.mepr-account-table,
+.mp_wrapper_subscriptions,
+.mepr-subscription-row .mepr-account-subscr-id, .mepr-subscription-row .mepr-account-terms {
+	color:#333;
+}
+
+/* Profile Subscriptions Team Account */
+.bbp-user-page .mp_wrapper label {
+   color: var(--bb-body-text-color);
+}
+
+.mepr-account-table th {
+	color: #333;
+}
+
+/* Profile input boxes */
+#buddypress .standard-form input[type=text], #buddypress .bb-bp-invites-content textarea, #buddypress .standard-form input[type=password], #buddypress .standard-form input[type=email] {
+	background-color: #fff;
+}
+
+/* Profile 2FA settings */
+#two-factor-options .two-factor-methods-table, 
+#two-factor-options .two-factor-methods-table thead, 
+#two-factor-options .two-factor-methods-table tfoot {
+	background-color: #333;
+}
+
+#two-factor-options .two-factor-methods-table tbody tr:nth-child(odd) {
+	background-color: #232323;
+}
+
+#two-factor-options input#two-factor-totp-authcode {
+	background-color: #FFF;
+}
+
+table#two-factor-options tr:last-child th {
+	vertical-align: top;
+}
+
+/* Job Detail */
+.job_description h3 {
+	color: #fff;
+}
+
+.single-job-sidebar .company-bar, 
+.single-job_listing article.job_listing .entry-content-job .entry-primary .entry-content,.entry-content-job .entry-secondary .single-job-sidebar {
+	background-color: #232323;
+	border: 0;
+	border-radius: 4px;
+}
+
+/* Jobs Position Text */
+.position h3 {
+	font-weight: bold;
+}
+
+/* Jobs UL > LI Background Color */
+ul.job_listings li.job_listing a, ul.job_listings li.job_listing a:hover, ul.job_listings li.job_listing {
+  background-color: #232323;	
+	border: 0;
+}
+
+/* Textarea, input boxes, and their placeholder text color */
+input, textarea {
+	color: #333;
+}
+
+div#whats-new {
+	color: #fff;
+}
+
+input::placeholder {
+	color: #333;
+	opacity: 1;
+}
+input::-webkit-input-placeholder {
+	color: #333;
+} 
+input:-moz-placeholder {
+	color: #333;
+	opacity: 1;
+} 
+input::-moz-placeholder {
+	color: #333;
+	opacity: 1;
+}
+input:-ms-input-placeholder {
+	color: #333;
+} 
+input::-ms-input-placeholder {
+	color: #333;
+}
+
+textarea::placeholder {
+	color: #333;
+}
+textarea::-webkit-input-placeholder {
+	color: #333;
+}
+textarea:-moz-placeholder {
+	color: #333;
+	opacity: 1;
+}
+textarea::-moz-placeholder {
+	color: #333;
+	opacity: 1;
+}
+textarea:-ms-input-placeholder {
+	color: #333;
+}
+textarea::-ms-input-placeholder {
+	color: #333;
+}
+
+#whats-new-textarea [contenteditable=true]:empty:before {
+	color: var(--bb-body-text-color);
+}
+
+
+/* Labs styling */
+.cybrlabs-plugin {
+	background-color: #101827;
+  padding: 30px;
+  border-radius: 10px;
+  color: #FFF;
+	margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+#cybrlabs-name {
+	color: #FFF;
+	margin-top: 20px;
+	margin-bottom: 15px;
+}
+
+#cybrlabs-description {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+#cybrlabs-terminate {
+	background: #dc4c64;
+  border-color: #dc4c64;
+}
+
+#cybrlabs-access {
+	font-size: 13px;
+	color: #ac94fb;
+	border-width: 1px;
+	border-color: #9061f9;
+	border-style: solid;
+	background-color: #374151;
+	border-radius: 0.375rem;
+	padding-top: 0.125rem;
+	padding-bottom: 0.125rem;
+	padding-left: 0.625rem;
+	padding-right: 0.625rem;
+	display: inline-block;
+}
+
+#cybrlabs {
+	margin-left: 10px;
+	font-size: 13px;
+	color: #0c9f6e;
+	border-width: 1px;
+	border-color: #0c9f6e;
+	border-style: solid;
+	background-color: #374151;
+	border-radius: 0.375rem;
+	padding-top: 0.125rem;
+	padding-bottom: 0.125rem;
+	padding-left: 0.625rem;
+	padding-right: 0.625rem;
+	display: inline-block;
+}
+
+#cybrlabs-alpha {
+	margin-left: 10px;
+    font-size: 13px;
+    color: #f87171;
+    border-width: 1px;
+    border-color: #f87171;
+    border-style: solid;
+    background-color: #374151;
+    border-radius: 0.375rem;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    display: inline-block;
+	
+}
+
+#cybrlabs-docs {
+	margin-left: 10px;
+    font-size: 13px;
+    color: rgb(120 123 130);
+    border-width: 1px;
+    border-color: rgb(120 123 130);
+    border-style: solid;
+    background-color: #374151;
+    border-radius: 0.375rem;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    display: inline-block;
+	text-decoration: underline;
+}
+
+#cybrlabs-docs a {
+	text-decoration: none;
+	color: rgb(120 123 130);
+}
+
+#cybrlabs .cybrlabs-icon,
+#cybrlabs-timelimit .cybrlabs-icon {
+	padding-right: 5px;
+}
+
+textarea.lab-input {
+	border-width: 1px;
+    border-radius: 0.5rem;
+    width: 100%;
+    padding: 0.625rem;
+    display: block;
+    resize: none;
+    font-size: 16px;
+    border-color: #4b5563;
+    background-color: #364050;
+    color: #fff;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+#cybrlabs-loading {
+	color: #0c9f6e;
+	margin-top: 10px
+}
+
+#cybrlabs-timelimit {
+	color: rgb(120 123 130);
+	font-size: 1rem;
+}
+
+#cybrlabs-buttons {
+	margin-top: 20px;
+}
+
+#cybrlabs-timeleft {
+	font-size: 1rem;
+}
+
+
+/* Course pages styling */
+/* Course video preview */
+.bb-learndash-content-wrap h2, .learndash-wrapper .ld-section-heading h2 {
+	font-size: 28px !important;
+	text-transform: none;
+}
+
+.bb-ld-tabs {
+	margin-top: 50px;
+}
+
+
+.bb-learndash-banner:before {
+	background-color: transparent;
+}
+.bb-course-video-overlay {
+ background-color: #333;
+	opacity: 0.65;
+}
+
+.learndash-wrapper .ld-status-complete {
+  color: #000;
+}
+
+.learndash-wrapper .ld-alert-success .ld-button {
+  color: #000;
+}
+
+.learndash-wrapper .ld-alert-certificate.ld-alert-success {
+  color: #FFF;
+}
+
+.learndash-wrapper .ld-course-status .ld-status.ld-status-complete {
+  color: #000;
+}
+
+.learndash-wrapper .ld-lesson-status {
+	background: none;
+}
+
+.learndash-wrapper .ld-course-status.ld-course-status-enrolled {
+	background: rgba(146,164,183,.05);
+}
+
+.learndash-wrapper .ld-course-status.ld-course-status-not-enrolled {
+	background: #333333;
+}
+
+.learndash-wrapper .ld-status-waiting {
+	background-color: transparent !important;
+}
+
+.learndash-wrapper .ld-course-status.ld-course-status-not-enrolled .ld-course-status-price {
+	color: #fff;
+	font-size: 22px;
+}
+
+.learndash-wrapper .ld-course-status.ld-course-status-not-enrolled>* {
+	border-right: 2px solid #838483;
+}
+
+.learndash-wrapper .ld-tabs .ld-tabs-navigation:after {
+	background: rgba(146,164,183,.05);
+}
+
+.learndash-wrapper .ld-tabs .ld-tabs-navigation .ld-tab.ld-active:after {
+background: #007CFF
+}
+
+.learndash-wrapper .ld-tabs .ld-tabs-navigation .ld-tab:after {
+ height: 4px;
+}
+
+.learndash-wrapper .ld-item-list .ld-item-list-item {
+	border: none;
+	background: rgba(146,164,183,.05);
+}
+
+.learndash-wrapper .ld-item-list .ld-item-list-item .ld-item-list-item-preview {
+ padding: 20px 15px;
+}
+
+.learndash-wrapper .ld-status-incomplete.ld-status-icon {
+background: none;
+}
+
+.learndash-wrapper .ld-pagination .ld-pages {
+	background: var(--bb-primary-button-background-regular);
+}
+
+.learndash-wrapper .ld-pagination {
+	color: #FFF;
+}
+
+/* Course lesson pages */
+/* Light mode */
+#learndash-page-content {
+	background-color: #FFF;
+}
+
+.lms-header-title h1, .learndash_content_wrap h2, .learndash_content_wrap h3, .learndash_content_wrap h4, .learndash_content_wrap h5 {
+	color: #121212;
+}
+
+.bb-sfwd-aside.bb-dark-theme .lms-header-title h1 {
+	color: #FFF;
+}
+
+.learndash-wrapper .bb-ld-info-bar .ld-breadcrumbs .ld-breadcrumbs-segments span a {
+	color: #050505;
+}
+
+
+.lms-header-instructor .bb-about-instructor h5 a {
+	color: #050505;
+}
+
+.sfwd-lessons-template-default.single-sfwd-lessons {
+	color: #050505;
+}
+
+.bb-dark-theme .sfwd-quiz .learndash-wrapper {
+	color: #aaa;
+}
+
+.sfwd-quiz {
+	color: #050505;
+}
+
+.wpProQuiz_content .wpProQuiz_questionList li.wpProQuiz_questionListItem {
+	background: none;
+}
+
+.wpProQuiz_questionListItem label {
+	color: #050505;
+}
+
+.bb-dark-theme .wpProQuiz_question_text {
+	color: #FFF
+}
+
+.bb-dark-theme .wpProQuiz_results {
+	color: #FFF;
+}
+
+.bb-dark-theme .wpProQuiz_questionListItem.wpProQuiz_answerCorrect {
+	color: #FFF;
+}
+
+#content li.wpProQuiz_questionListItem.wpProQuiz_answerIncorrect {
+	background-color: rgba(var(--bb-danger-color-rgb),.1)
+}
+
+.bb-sfwd-aside.bb-dark-theme.sfwd-lessons-template-default.single-sfwd-lessons {
+	color: #dcdcdc;
+}
+
+/* Syllabus column */
+/* Highlight current lesson */
+li.lms-lesson-item.current a {
+	color: #007CFF !important;
+}
+
+.lms-lesson-item.current>.bb-lesson-head, .lms-quiz-item.current>.bb-lms-title-wrap, .lms-topic-item.current>.bb-lms-title-wrap {
+	background: rgba(146,164,183,0.2);
+}
+
+/* Lesson & Header column */
+.learndash-wrapper .bb-lms-header .lms-header-instructor, .learndash-wrapper .bb-lms-header .lms-header-title {
+	max-width: 1100px;
+}
+
+.learndash-wrapper .learndash_content_wrap {
+	max-width: 1100px;
+}
+
+/* Course lesson video player resizing & margins */
+figure.wp-block-video,
+.video-player {
+	margin-bottom: 30px;
+}
+
+.wp-block-embed__wrapper {
+	position: relative;
+	padding-bottom: 56.25%;
+	height: 0;
+}
+
+.wp-block-embed__wrapper iframe {
+	width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+figure.wp-block-embed {
+	margin-bottom: 30px;
+}
+
+/* Lesson main header */
+div.bb-lms-header h1 {
+	font-size: 2.6rem;
+}
+
+/* Course lesson text */
+.learndash_content_wrap {
+	font-size: 1.05rem;
+	line-height: 1.65;
+	font-weight: 100;
+	text-rendering: optimizeLegibility;
+}
+
+.learndash_content_wrap li ol {
+	margin-bottom: 0px
+}
+
+/* Course lesson images */
+.learndash_content_wrap img {
+	border-radius: 10px;
+}
+
+/* Course lesson tables */
+.single-sfwd-lessons.bb-dark-theme table {
+	border: 1px solid #FFF;
+}
+
+.single-sfwd-lessons table {
+	border: 1px solid #e9e9e7;
+}
+
+.single-sfwd-lessons.bb-dark-theme .wp-block-table table thead th, .single-sfwd-lessons.bb-dark-theme .wp-block-table table td {
+	border: 1px solid #fff;
+	color: #fff;
+}
+
+.single-sfwd-lessons .wp-block-table table thead th, .single-sfwd-lessons .wp-block-table table td {
+	border: 1px solid #e9e9e7;
+	color: #050505;
+}
+
+.wp-block-table table tr td:last-child, .wp-block-table table tr th:last-child {
+	border-right: 1px solid #e9e9e7;
+}
+
+.wp-block-table table thead th {
+	border: 1px solid #FFF;
+}
+
+.wp-block-table.is-style-regular thead tr th {
+	border-color: #fff;
+}
+
+.wp-block-table table td, .wp-block-table table th {
+	border-color: #fff;
+}
+
+.wp-block-table.is-style-regular tbody tr td {
+	border-color: #333;
+}
+
+/* Course quiz styling */
+.learndash-wrapper .ld-breadcrumbs {
+	background: rgba(146,164,183,.05);
+}
+
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_response {
+ color: #aaa
+}
+
+.wpProQuiz_content .wpProQuiz_quiz .wpProQuiz_response {
+  background-color: #333;
+}
+
+.learndash-wrapper .wpProQuiz_graded_points, .learndash-wrapper .wpProQuiz_points {
+  background-color: #333;
+  color: #aaa;
+}
+
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_questionListItem.wpProQuiz_answerCorrectIncomplete {
+	border-color: #6db46d !important;
+}
+
+bb-.wpProQuiz_answerCorrectIncomplete
+
+.wpProQuiz_AnswerMessage {
+	text-align: left;
+}
+
+.wpProQuiz_content .wpProQuiz_reviewQuestion {
+	max-height: 130px;
+}
+
+.learndash-wrapper .wpProQuiz_reviewDiv {
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+
+/* Quiz tip */
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_tipp>div {
+  background-color: #333;
+}
+
+.wpProQuiz_content .wpProQuiz_tipp>div {
+  box-shadow: 0 3px 20px 0px rgba(18,43,70,1);
+}
+
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_tipp>div:before {
+  background: #333;
+  background-color: #333;
+}
+
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_reviewLegend span.wpProQuiz_reviewColor_Answer {
+	background-color: #6ca54c;
+}
+
+.learndash-wrapper .wpProQuiz_content .wpProQuiz_box li.wpProQuiz_reviewQuestionSolved, .learndash-wrapper .wpProQuiz_content .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionSolved {
+	background-color: #6ca54c;
+}
+
+/* End quiz tip */
+
+/* Course lesson comments */
+/* Make Akismet text smaller */
+p.akismet_comment_form_privacy_notice {
+  font-size: 0.6em;
+}
+/* Make comments header larger */
+.comments-title {
+  font-size: 1.40rem;
+}
+
+/* Comment placeholder color for dark mode */
+#email-notes, #respond .required-field-message {
+	color: #fff;
+}
+
+.bb-dark-theme #respond #author, .bb-dark-theme #respond #email, .bb-dark-theme #respond #url {
+	background-color: var(--bb-content-background-color);
+	border-color: var(--bb-content-background-color);
+	color: #aaa;
+}
+
+#respond #author, #respond #email, #respond #url {
+	background-color: var(--bb-content-alternate-background-color);
+}
+
+.bb-dark-theme .comment-form-comment #comment::placeholder {
+	color: #aaa;
+} 
+.bb-dark-theme .comment-form-comment #comment::-webkit-input-placeholder {
+	color: #aaa;
+} 
+.bb-dark-theme .comment-form-comment #comment:-moz-placeholder {
+	color: #aaa;
+	opacity: 1;
+} 
+.bb-dark-theme .comment-form-comment #comment::-moz-placeholder {
+	color: #aaa;
+	opacity: 1;
+} 
+.bb-dark-theme .comment-form-comment #comment:-ms-input-placeholder { 
+	color: #aaa;
+}
+.bb-dark-theme .comment-form-comment #comment::-ms-input-placeholder {
+	color: #aaa;
+}
+
+.bb-dark-theme input[type=submit].outline {
+	color: var(--bb-primary-button-text-regular);
+}
+
+.bb-dark-theme input[type=submit].outline:hover {
+	color: #007CFF;
+}
+
+/* Background color for each comment block */
+.bb-sfwd-aside.bb-dark-theme .comment-list .comment-body {
+	background-color: #232323;
+}
+
+/* Set label inline with checkbox */
+p.comment-form-cookies-consent label {
+  display: inline;
+}
+
+/* Comment block for blog and lessons */
+.comment-form-comment textarea {
+	background: #fff;
+}
+
+ */
+/* Blog styling */
+/* Blog post styling */
+.post {
+	font-size: 1.05rem;
+	font-weight: 100;
+	line-height: 1.65;
+	text-rendering: optimizeLegibility;
+	max-width: 750px;
+}
+
+.single-post .entry-content p, .single-post .entry-content li {
+	font-size: 1.05rem;
+}
+
+.single-post .wp-block-image, .learndash-wrapper .wp-block-image {
+	margin-bottom: 40px;
+}
+
+.single .default-fi .entry-img {
+	border-radius: 10px;
+}
+
+/* Newsletter footer of blog */
+.bb-subscribe-wrap {
+ background: none;
+ border: none;
+ padding-top: 50px;
+ padding-bottom: 0px;
+ padding-left: 0px;
+ padding-right: 0px;
+ margin-bottom: 0px;
+}
+
+.bb-subscribe-wrap form {
+	margin-bottom: 1rem;
+}
+
+.formkit-form[data-uid="d547d1c775"] {
+	max-width: 100% !important;
+}
+
+.formkit-form[data-uid="d547d1c775"][min-width~="600"] [data-style="minimal"] {
+	padding:60px !important;
+}
+
+.formkit-form[data-uid="d547d1c775"] h2 {
+	font-size: 2.1rem !important;
+}
+/* End newsletter footer of blog */
+
+/* Single post main header */
+.single .entry-title {
+	font-size: 2.6rem;
+}
+
+.hentry blockquote.wp-block-quote {
+	background-color: #333 
+}
+
+.hentry blockquote.wp-block-quote {
+ font-size: 1.1rem;
+}
+
+.hentry blockquote.wp-block-quote cite {
+ font-size: 0.8rem;
+}
+
+/* Article header on archive page */
+.bb-standard .entry-title {
+	font-size: 2.1rem;
+  line-height: 1.15;
+}
+
+/* Archive page comment color */
+.top-meta i {
+	color: #fff;
+}
+
+
+/* Code snippets */
+code, kbd, pre, samp {
+	font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
+	background: #2b2b2b;
+	border: none;
+}
+
+pre.wp-block-code code {
+	font-size: 17px;
+}
+
+/* For lessons */
+.single-sfwd-lessons.bb-dark-theme code, .single-sfwd-lessons.bb-dark-theme kbd, .single-sfwd-lessons.bb-dark-theme pre, .single-sfwd-lessons.bb-dark-theme samp {
+	background: #2b2b2b;
+	border: none;
+	color: #eb5758;
+}
+
+.single-sfwd-lessons code, .single-sfwd-lessons kbd, .single-sfwd-lessons pre, .single-sfwd-lessons samp {
+	background: #ededeb;
+	color: #eb5758;
+}
+
+.hljs-title, .hljs-section {
+	color: #658c15 !important;
+}
+
+.bb-dark-theme .hljs-title, .bb-dark-theme .hljs-section {
+	color: #00e0e0 !important;
+}
+
+.hljs-keyword, .hljs-selector-tag {
+color: #d500fc !important;
+}
+
+.hljs-string, .hljs-symbol, .hljs-bullet, .hljs-addition {
+	color: #658c15 !important;
+}
+
+.hljs-number, .hljs-built_in, .hljs-builtin-name, .hljs-literal, .hljs-type, .hljs-params, .hljs-meta, .hljs-link {
+	color: #990055 !important;
+}
+
+.bb-dark-theme .hljs-number, .bb-dark-theme .hljs-built_in, 
+.bb-dark-theme .hljs-builtin-name, 
+.bb-dark-theme .hljs-literal, 
+.bb-dark-theme .hljs-type, 
+.bb-dark-theme .hljs-params, .bb-dark-theme .hljs-meta, .bb-dark-theme .hljs-link {
+	color: #e68d00 !important;
+}
+	
+.hljs-comment, .hljs-quote {
+	color: #6b6955 !important;
+}
+
+.bb-dark-theme .hljs-comment, .bb-dark-theme .hljs-quote {
+	color: #aca98e !important;
+}
+
+.hljs-variable, .hljs-template-variable, .hljs-tag, .hljs-name, .hljs-selector-id, .hljs-selector-class, .hljs-regexp, .hljs-deletion {
+	color: #732f14 !important;
+}
+
+.bb-dark-theme .hljs-variable, .bb-dark-theme .hljs-template-variable, .bb-dark-theme .hljs-tag, .bb-dark-theme .hljs-name, .bb-dark-theme .hljs-selector-id, .bb-dark-theme .hljs-selector-class, .bb-dark-theme .hljs-regexp, .bb-dark-theme .hljs-deletion {
+	color: #d6d6d6 !important;
+}
+
+.hljs.shcb-code-table > .shcb-loc {
+	color: #37352f !important;
+}
+
+.bb-dark-theme .hljs.shcb-code-table > .shcb-loc {
+	color: #838383 !important;
+}
+
+/* Highlight code line or block */
+.bb-dark-theme .hljs > mark.shcb-loc {
+	background-color: #4a4a4a !important;
+}
+
+.hljs > mark.shcb-loc {
+	background-color: rgb(255 255 0 / 30%) !important;
+}
+
+.single-sfwd-lessons .hljs-selector-tag {
+	color: #333;
+}
+
+.single-sfwd-lessons.bb-dark-theme .hljs-selector-tag {
+	color: #dcc6e0;
+}
+
+pre.wp-block-code {
+	margin-bottom: 40px;
+}
+
+/* For blog posts specifically */
+.single-post code.wp-block-code , 
+.single-post kbd.wp-block-code , 
+.single-post pre.wp-block-code , 
+.single-post samp.wp-block-code  {
+	background: #2b2b2b;
+	border: none;
+	color: #eb5758;
+}
+
+.single-post .wp-block-code .hljs.shcb-code-table > .shcb-loc {
+	color: #f8f8f3 !important;
+}
+
+.single-post code.wp-block-code .hljs-keyword, 
+.single-post pre.wp-block-code .hljs-keyword, 
+.single-post code.wp-block-code .hljs-selector-tag,
+.single-post pre.wp-block-code .hljs-selector-tag{
+color: #f4b7ff !important;
+}
+
+.single-post pre.wp-block-code .hljs-variable, 
+.single-post pre.wp-block-code .hljs-template-variable, 
+.single-post pre.wp-block-code .hljs-tag, 
+.single-post pre.wp-block-code .hljs-name, 
+.single-post pre.wp-block-code .hljs-selector-id, 
+.single-post pre.wp-block-code .hljs-selector-class, 
+.single-post pre.wp-block-code .hljs-regexp, 
+.single-post pre.wp-block-code .hljs-deletion {
+	color: #ff6c31 !important;
+}
+
+.single-post pre.wp-block-code .hljs-number, 
+.single-post pre.wp-block-code .hljs-built_in, 
+.single-post pre.wp-block-code .hljs-builtin-name, 
+.single-post pre.wp-block-code .hljs-literal, 
+.single-post pre.wp-block-code .hljs-type, 
+.single-post pre.wp-block-code .hljs-params, 
+.single-post pre.wp-block-code .hljs-meta, 
+.single-post pre.wp-block-code .hljs-link {
+	color: #ff62b9 !important;
+}
+
+/* Forums code snippets */
+#bbpress-forums code, #bbpress-forums kbd, #bbpress-forums pre, #bbpress-forums samp {
+	background: #121212;
+	font-size: 0.9rem !important;
+}
+
+/* Author post meta styling */
+.author-post-meta i {
+	color: #fafbfd;
+}
+
+/* Related Articles styling */
+.post-related-posts a.slick-arrow i {
+	color: #fafbfd;
+}
+
+.post-related-posts a.slick-arrow.slick-disabled i {
+	opacity: 0.1
+}
+
+.post-related-posts a.slick-arrow.slick-disabled:hover i {
+	color: #fafbfd;
+}
+
+/* Badge award notifications */
+.message {
+	background: none;
+}		</style>
+<style id="buddyboss_theme_options-dynamic-css" title="dynamic-css" class="redux-options-output">.site-header .site-title{font-family:"SF UI Display";font-weight:500;font-style:normal;font-size:30px;font-display:swap;}body{font-family:"SF UI Text";font-weight:400;font-style:normal;font-size:16px;font-display:swap;}h1{font-family:"SF UI Display";font-weight:700;font-style:normal;font-size:34px;font-display:swap;}h2{font-family:"SF UI Display";font-weight:700;font-style:normal;font-size:30px;font-display:swap;}h3{font-family:"SF UI Display";font-weight:500;font-style:normal;font-size:22px;font-display:swap;}h4{font-family:"SF UI Display";font-weight:400;font-style:normal;font-size:18px;font-display:swap;}h5{font-family:"SF UI Display";font-weight:400;font-style:normal;font-size:16px;font-display:swap;}h6{font-family:"SF UI Display";font-weight:500;font-style:normal;font-size:12px;font-display:swap;}</style>
+</head>
+<body class="bp-nouveau sfwd-courses-template-default single single-sfwd-courses postid-20879 buddyboss-theme bb-template-v1 buddypanel-logo-off default-fi header-style-1 menu-style-standard sticky-header elementor-default elementor-kit-130 learndash-cpt learndash-cpt-sfwd-courses learndash-template-ld30 learndash-embed-responsive learndash-theme js bb-page-loaded">
+<div id="page" class="site">
+<header id="masthead" class="site-header site-header--bb">
+<div class="container site-header-container flex default-header">
+<a href="#" class="bb-toggle-panel"><i class="bb-icon-l bb-icon-sidebar"></i></a>
+<div id="site-logo" class="site-branding">
+<h2 class="site-title">
+<a href="https://cybr.com/" rel="home">
+<img width="190" height="80" src="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_280x80_white_font.png" class="bb-logo" alt="" decoding="async"> </a>
+</h2>
+</div>
+<nav id="site-navigation" class="main-navigation" data-menu-space="120">
+<div id="primary-navbar">
+<ul id="primary-menu" class="primary-menu"><li id="menu-item-125" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-125 no-icon"><a href="#"><span>Community</span></a>
+<div class="wrapper ab-submenu"><ul class="bb-sub-menu">
+<li id="menu-item-2817" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2817 no-icon"><a href="/discord"><span>Join Discord</span></a></li>
+<li id="menu-item-126" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-126 no-icon"><a href="https://cybr.com/news-feed/"><span>Industry News</span></a></li>
+<li id="menu-item-127" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-127 no-icon"><a href="https://cybr.com/forums/"><span>Discussions</span></a></li>
+<li id="menu-item-1864" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1864 no-icon"><a href="/contact/"><span>Contact &amp; Support</span></a></li>
+</ul></div>
+</li>
+<li id="menu-item-1855" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1855 no-icon"><a href="#"><span>Learn</span></a>
+<div class="wrapper ab-submenu"><ul class="bb-sub-menu">
+<li id="menu-item-19407" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19407 no-icon"><a href="https://cybr.com/hands-on-labs/"><span>🧪 Hands-On Labs</span></a></li>
+<li id="menu-item-7521" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-7521 no-icon"><a href="/products/"><span>Featured Courses</span></a></li>
+<li id="menu-item-49" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-49 no-icon"><a href="/courses/"><span>All Courses</span></a></li>
+<li id="menu-item-1857" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1857 no-icon"><a href="#"><span>Categories</span></a>
+<div class="wrapper ab-submenu"><ul class="bb-sub-menu">
+<li id="menu-item-6466" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6466 no-icon"><a href="/courses/?search=&amp;filter-categories=cybersecurity-fundamentals"><span>Cybersecurity Fundamentals</span></a></li>
+<li id="menu-item-8298" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-8298 no-icon"><a href="/courses/?search=&amp;filter-categories=networking-security"><span>Networking Security</span></a></li>
+<li id="menu-item-2131" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2131 no-icon"><a href="/application-security"><span>Application Security</span></a></li>
+<li id="menu-item-6465" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6465 no-icon"><a href="/courses/?search=&amp;filter-categories=ethical-hacking"><span>Ethical Hacking</span></a></li>
+<li id="menu-item-14649" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-14649 no-icon"><a href="https://cybr.com/courses/?search=&amp;filter-categories=cloud-security"><span>Cloud Security</span></a></li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+<li id="menu-item-1860" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1860 no-icon"><a href="#"><span>Resources</span></a>
+<div class="wrapper ab-submenu"><ul class="bb-sub-menu">
+<li id="menu-item-98" class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-98 no-icon"><a href="https://cybr.com/blog/"><span>Blog</span></a></li>
+<li id="menu-item-1861" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1861 no-icon"><a href="/ebooks/"><span>Ebooks</span></a></li>
+<li id="menu-item-1862" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1862 no-icon"><a href="https://anchor.fm/cybr"><span>Podcasts</span></a></li>
+<li id="menu-item-10778" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10778 no-icon"><a href="https://cybr.com/webinars/"><span>Webinars</span></a></li>
+</ul></div>
+</li>
+<li id="menu-item-14648" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-14648 no-icon"><a href="https://cybr.com/pricing/"><span>Pricing</span></a></li>
+<li id="menu-item-1863" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1863 no-icon"><a href="/about-us/"><span>About Cybr</span></a></li>
+</ul> <div id="navbar-collapse">
+<a class="more-button" href="#"><i class="bb-icon-f bb-icon-ellipsis-h"></i></a>
+<div class="sub-menu">
+<div class="wrapper">
+<ul id="navbar-extend" class="sub-menu-inner"></ul>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div id="header-aside" class="header-aside name_and_avatar">
+<div class="header-aside-inner">
+<a href="#" class="header-search-link" data-balloon-pos="down" data-balloon="Search"><i class="bb-icon-l bb-icon-search"></i></a>
+<span class="search-separator bb-separator"></span>
+<div class="bb-header-buttons">
+<a href="https://cybr.com/login/" class="button small outline signin-button link">Sign in</a>
+<a href="/register/" class="button small signup">Sign up</a>
+</div>
+</div>
+</div>
+</div>
+<div class="bb-mobile-header-wrapper bb-single-icon">
+<div class="bb-mobile-header flex align-items-center">
+<div class="bb-left-panel-icon-wrap">
+<a href="#" class="push-left bb-left-panel-mobile"><i class="bb-icon-menu-left"></i></a>
+</div>
+<div class="flex-1 mobile-logo-wrapper">
+<h2 class="site-title">
+<a href="https://cybr.com/" rel="home">
+<img fetchpriority="high" width="400" height="400" src="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient.png" class="bb-mobile-logo" alt="Cybr logo badge" decoding="async" srcset="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient.png 400w, https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient-300x300.png 300w, https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient-150x150.png 150w" sizes="(max-width: 400px) 100vw, 400px"> </a>
+</h2>
+</div>
+<div class="header-aside">
+</div>
+</div>
+<div class="header-search-wrap">
+<div class="container">
+<form role="search" method="get" class="search-form" action="https://cybr.com/">
+<label>
+<span class="screen-reader-text">Search for:</span>
+<input type="search" class="search-field-top" placeholder="Search" value="" name="s">
+</label>
+</form>
+<a data-balloon-pos="left" data-balloon="Close" href="#" class="close-search"><i class="bb-icon-close-circle"></i></a>
+</div>
+</div>
+</div>
+<div class="bb-mobile-panel-wrapper left light closed">
+<a href="#" class="bb-close-panel"><i class="bb-icon-close"></i></a>
+<div class="bb-mobile-panel-inner">
+<div class="bb-mobile-panel-header">
+<div class="logo-wrap">
+<a href="https://cybr.com/" rel="home">
+<img fetchpriority="high" width="400" height="400" src="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient.png" class="bb-mobile-logo" alt="Cybr logo badge" decoding="async" srcset="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient.png 400w, https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient-300x300.png 300w, https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient-150x150.png 150w" sizes="(max-width: 400px) 100vw, 400px"> </a>
+</div>
+</div>
+<hr>
+<nav class="main-navigation" data-menu-space="120">
+<ul id="menu-navbar" class="bb-primary-menu mobile-menu buddypanel-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-125"><a href="#">Community<i class="bb-icon-l bb-icon-angle-down bs-submenu-toggle"></i></a>
+<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2817"><a href="/discord">Join Discord</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-126"><a href="https://cybr.com/news-feed/">Industry News</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-127"><a href="https://cybr.com/forums/">Discussions</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1864"><a href="/contact/">Contact &amp; Support</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1855"><a href="#">Learn<i class="bb-icon-l bb-icon-angle-down bs-submenu-toggle"></i></a>
+<ul class="sub-menu">
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19407"><a href="https://cybr.com/hands-on-labs/">🧪 Hands-On Labs</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-7521"><a href="/products/">Featured Courses</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-49"><a href="/courses/">All Courses</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1857"><a href="#">Categories<i class="bb-icon-l bb-icon-angle-down bs-submenu-toggle"></i></a>
+<ul class="sub-menu">
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6466"><a href="/courses/?search=&amp;filter-categories=cybersecurity-fundamentals">Cybersecurity Fundamentals</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-8298"><a href="/courses/?search=&amp;filter-categories=networking-security">Networking Security</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2131"><a href="/application-security">Application Security</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6465"><a href="/courses/?search=&amp;filter-categories=ethical-hacking">Ethical Hacking</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-14649"><a href="https://cybr.com/courses/?search=&amp;filter-categories=cloud-security">Cloud Security</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1860"><a href="#">Resources<i class="bb-icon-l bb-icon-angle-down bs-submenu-toggle"></i></a>
+<ul class="sub-menu">
+<li class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-98"><a href="https://cybr.com/blog/">Blog</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1861"><a href="/ebooks/">Ebooks</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1862"><a href="https://anchor.fm/cybr">Podcasts</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10778"><a href="https://cybr.com/webinars/">Webinars</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-14648"><a href="https://cybr.com/pricing/">Pricing</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1863"><a href="/about-us/">About Cybr</a></li>
+</ul> </nav>
+<div class="bb-login-section">
+<a href="https://cybr.com/login/" class="button outline small full secondary sign-in">Sign in</a>
+<a href="/register/" class="button small full sing-up">Sign up</a>
+</div>
+</div>
+</div>
+<div class="header-search-wrap">
+<div class="container">
+<form role="search" method="get" class="search-form" action="https://cybr.com/">
+<label>
+<span class="screen-reader-text">Search for:</span>
+<input type="search" class="search-field-top" placeholder="Search" value="" name="s">
+</label>
+</form>
+<a href="#" class="close-search"><i class="bb-icon-l bb-icon-times"></i></a>
+</div>
+</div> </header>
+<div id="content" class="site-content">
+<div class="container">
+<div class="bb-grid site-content-grid">
+<div id="primary" class="content-area bb-grid-cell">
+<main id="main" class="site-main">
+<div class="learndash learndash_post_sfwd-courses user_has_no_access" id="learndash_post_20879">
+<div class="learndash-wrapper">
+<div class="bb-vw-container bb-learndash-banner">
+<div class="bb-course-banner-info container bb-learndash-side-area">
+<div class="flex flex-wrap">
+<div class="bb-course-banner-inner">
+<div class="bb-course-category">
+<span class="course-category-item">
+<a title="Beginner" href="https://cybr.com/courses/?search=&amp;filter-categories=beginner">
+Beginner </a>
+<span>,</span>
+</span>
+<span class="course-category-item">
+<a title="Cloud Security" href="https://cybr.com/courses/?search=&amp;filter-categories=cloud-security">
+Cloud Security </a>
+<span>,</span>
+</span>
+</div>
+<h1 class="entry-title">Beginner’s Guide to AWS CloudTrail for Security</h1>
+<div class="bb-course-excerpt">
+<p>Get started with AWS CloudTrail: one of the most important security services that AWS offers. While the CloudTrail service is enabled by default when you create an AWS account, it's enabled with limited functionality that can leave you blind and can hinder your ability to investigate security incidents. For example, there's a very big difference between Management Events, Data Events, and Insights Events, and only one of those is enabled by default. This course will teach you those differences and the 3 main ways that CloudTrail records data so that you can make an informed decision about what you or your organization needs.</p>
+<p>After covering important concepts, we'll jump in hands-on and learn how to use CloudTrail's Event History, how to create your first trail, how to enable notifications with CloudWatch and SNS, how to use CloudTrail Insights, and how to work with CloudTrail Lake.</p>
+<p>Finally, you will learn how to secure your CloudTrail trails and log files with best practices using IAM, log file integrity, encryption, and the Security Hub Controls checklist.</p>
+<p>Whenever someone wants to get started with AWS security, coupled with our Introduction to AWS Security course, we highly recommend starting with this course and understanding CloudTrail. This service gives you visibility into your AWS environments, and without visibility, you do not have security.</p> </div>
+<div class="bb-course-points">
+<a class="anchor-course-points" href="#learndash-course-content">
+View Course details <i class="bb-icon-l bb-icon-angle-down"></i>
+</a>
+</div>
+<div class="bb-course-single-meta flex align-items-center bb_single_meta_pfx">
+<a href="https://cybr.com/members/christophe/">
+<img alt="" src="https://cybr.com/wp-content/uploads/avatars/2/64813a6df3d15-bpthumb.jpg" srcset="https://cybr.com/wp-content/uploads/avatars/2/64813a6df3d15-bpthumb.jpg 2x" class="avatar avatar-80 photo" height="80" width="80"> <span class="author-name">Christophe</span>
+</a>
+<span class="meta-saperator">·</span>
+<span class="course-date">November 5, 2023</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bb-grid">
+<div class="bb-learndash-content-wrap">
+<div class="bb-ld-tabs"><div id="learndash-course-content"></div>
+<div class="ld-tabs ld-tab-count-2">
+<div role="tablist" class="ld-tabs-navigation">
+<button aria-selected="&quot;true&quot;" role="tab" aria-controls="content-tab" id="ld-content-tab-20879" class="ld-tab ld-active" data-ld-tab="ld-tab-content-20879">
+<span class="ld-icon ld-icon-content"></span>
+<span class="ld-text">Course</span>
+</button>
+<button role="tab" aria-controls="materials-tab" id="ld-materials-tab-20879" class="ld-tab " data-ld-tab="ld-tab-materials-20879">
+<span class="ld-icon ld-icon-materials"></span>
+<span class="ld-text">Materials</span>
+</button>
+</div>
+<div class="ld-tabs-content">
+<div role="tabpanel" tabindex="0" aria-labelledby="content" class="ld-tab-content ld-visible" id="ld-tab-content-20879">
+</div>
+<div role="tabpanel" tabindex="0" aria-labelledby="materials" class="ld-tab-content " id="ld-tab-materials-20879">
+<ul>
+<li><a href="https://cybr.com/mp-files/beginners-guide-to-aws-cloudtrail-for-security-ebook.pdf/">Ebook Download</a></li>
+<li><a href="https://cybr.com/wp-content/uploads/2023/11/aws-cloudtrail-1716x2048.jpg" target="_blank" rel="noopener">[Cheat Sheet] CloudTrail Events and Data Recording</a></li>
+<li><a href="https://cybr.com/wp-content/uploads/2023/11/cloudtrail-security-controls-v2-1716x2048.jpg" target="_blank" rel="noopener">[Checklist] Security Hub Controls for CloudTrail</a></li>
+<li><a href="https://cybr.com/wp-content/uploads/2023/11/cloudtrail-cli-cheatsheet-wider-2048x1579.jpg" target="_blank" rel="noopener">[Cheat Sheet] Useful CloudTrail CLI command</a></li>
+</ul>
+</div>
+</div> 
+</div> 
+</div><div class="learndash-wrapper learndash-wrap learndash-shortcode-wrap learndash-shortcode-wrap-course_content-20879_20879_0"><div class="learndash user_has_no_access" id="learndash_post_20879"> <div class="learndash-wrapper">
+<div class="ld-item-list ld-lesson-list ld-course-content-20879" data-shortcode_instance="{&quot;course_id&quot;:20879,&quot;post_id&quot;:20879,&quot;group_id&quot;:0,&quot;paged&quot;:1,&quot;num&quot;:40,&quot;wrapper&quot;:true,&quot;user_id&quot;:0}">
+<div class="ld-section-heading">
+<h2>
+Course Content </h2>
+<div class="ld-item-list-actions" data-ld-expand-list="true">
+</div> 
+</div> 
+<div class="ld-item-list-items  ld-item-list-20879" id="ld-item-list-20879" data-ld-expand-id="ld-item-list-20879" data-ld-expand-list="true">
+<div class="ld-item-list-section-heading ld-item-section-heading-1699214761471">
+<h3 class="ld-lesson-section-heading" aria-role="heading" aria-level="3">Introduction and Important Concepts</h3>
+</div>
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20880 is_sample learndash-not-available learndash-incomplete" id="ld-expand-20880" data-ld-expand-id="ld-expand-20880">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/about-the-course-7/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>About the course and author</span>
+<span class="ld-item-components">
+<span class="ld-status ld-status-unlocked ld-primary-color">
+<span class="ld-icon ld-icon-unlocked"></span>
+Sample Lesson </span>
+</span> 
+</div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20882 is_sample learndash-not-available learndash-incomplete" id="ld-expand-20882" data-ld-expand-id="ld-expand-20882">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/what-is-cloudtrail/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>What is CloudTrail?</span>
+<span class="ld-item-components">
+<span class="ld-status ld-status-unlocked ld-primary-color">
+<span class="ld-icon ld-icon-unlocked"></span>
+Sample Lesson </span>
+</span> 
+</div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20884 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20884" data-ld-expand-id="ld-expand-20884" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/management-data-and-insights-events/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>Management, Data, and Insights Events<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20886 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20886" data-ld-expand-id="ld-expand-20886" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/the-3-ways-of-recording-data/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>The 3 ways of recording data<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-21147 is_sample learndash-not-available learndash-incomplete" id="ld-expand-21147" data-ld-expand-id="ld-expand-21147">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/cheat-sheet-cloudtrail-events-and-data-recording/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[Cheat Sheet] CloudTrail Events and Data Recording</span>
+<span class="ld-item-components">
+<span class="ld-status ld-status-unlocked ld-primary-color">
+<span class="ld-icon ld-icon-unlocked"></span>
+Sample Lesson </span>
+</span> 
+</div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-section-heading ld-item-section-heading-1699214800531">
+<div class="ld-lesson-section-heading" aria-role="heading" aria-level="3">Working with CloudTrail</div>
+</div>
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20889 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20889" data-ld-expand-id="ld-expand-20889" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-working-with-event-history/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Working with Event History<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20891 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20891" data-ld-expand-id="ld-expand-20891" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-create-your-first-trail/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Create your first trail<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20893 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20893" data-ld-expand-id="ld-expand-20893" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-working-with-cloudtrail-trails/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Working with CloudTrail trails<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20895 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20895" data-ld-expand-id="ld-expand-20895" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-working-with-cloudwatch-logs-and-sns-notifications/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Working with CloudWatch Logs and SNS notifications<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20911 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20911" data-ld-expand-id="ld-expand-20911" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-working-with-cloudtrail-insights/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Working with CloudTrail Insights<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20897 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20897" data-ld-expand-id="ld-expand-20897" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/demo-working-with-cloudtrail-lake/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[DEMO] Working with CloudTrail Lake<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-section-heading ld-item-section-heading-1699214898497">
+<div class="ld-lesson-section-heading" aria-role="heading" aria-level="3">Security and Best Practices</div>
+</div>
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20937 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20937" data-ld-expand-id="ld-expand-20937" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/monitor-cloudtrail-itself/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>Monitor CloudTrail itself<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20901 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20901" data-ld-expand-id="ld-expand-20901" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/iam/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>IAM<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20903 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20903" data-ld-expand-id="ld-expand-20903" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/log-file-integrity/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>Log file integrity<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20905 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20905" data-ld-expand-id="ld-expand-20905" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/encryption/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>Encryption<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20907 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20907" data-ld-expand-id="ld-expand-20907" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/checklist-security-hub-controls-for-cloudtrail/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[Checklist] Security Hub Controls for CloudTrail<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-section-heading ld-item-section-heading-1699214937945">
+<div class="ld-lesson-section-heading" aria-role="heading" aria-level="3">Conclusion</div>
+</div>
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-21149 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-21149" data-ld-expand-id="ld-expand-21149" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/cheat-sheet-useful-cloudtrail-cli-command/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>[Cheat Sheet] Useful CloudTrail CLI command<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+<div class="ld-item-list-item ld-item-lesson-item ld-lesson-item-20909 is_not_sample learndash-not-available learndash-incomplete" id="ld-expand-20909" data-ld-expand-id="ld-expand-20909" data-balloon-pos="up" data-balloon="You don't currently have access to this content">
+<div class="ld-item-list-item-preview">
+<a class="ld-item-name ld-primary-color-hover" href="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/lessons/next-steps/">
+<div class="ld-status-icon ld-status-incomplete"></div> <div class="ld-item-title">
+<span>Next steps<span class="lms-is-locked-ico"><i class="bb-icon-f bb-icon-lock"></i></span></span> </div> 
+</a>
+<div class="ld-item-details">
+</div> 
+</div> 
+</div> 
+</div> 
+</div> 
+</div> 
+</div></div>
+<div class="bb-about-instructor bb-about-instructor--is-info">
+<h4 class="bb-instructor-heading">About Instructor</h4>
+<div class="bb-grid">
+<div class="bb-instructor-wrap flex">
+<div class="bb-avatar-wrap">
+<div>
+<a href="https://cybr.com/members/christophe/">
+<img alt="" src="https://cybr.com/wp-content/uploads/avatars/2/64813a6de6f51-bpfull.jpg" srcset="https://cybr.com/wp-content/uploads/avatars/2/64813a6de6f51-bpfull.jpg 2x" class="avatar avatar-300 photo round avatar" height="300" width="300"> </a>
+</div>
+</div>
+<div class="bb-content-wrap">
+<h5>
+<a href="https://cybr.com/members/christophe/">
+Christophe </a>
+</h5>
+<p class="bb-author-info"></p>
+<p class="bb-author-meta">18 Courses</p>
+</div>
+</div>
+<div class="bb-instructor-message">
+</div>
+</div>
+</div>
+</div>
+<div class="bb-single-course-sidebar bb-preview-wrap">
+<div class="bb-ld-sticky-sidebar">
+<div class="widget bb-enroll-widget">
+<div class="bb-enroll-widget flex-1 push-right">
+<div class="bb-course-preview-wrap bb-thumbnail-preview">
+<div class="bb-preview-course-link-wrap">
+<div class="thumbnail-container thumbnail-container-vid">
+<div class="bb-course-video-overlay">
+<div>
+<span class="bb-course-play-btn-wrapper"><span class="bb-course-play-btn"></span></span>
+<div>
+Preview this Course </div>
+</div>
+</div>
+<img width="624" height="351" src="https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2-624x351.jpeg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="Beginner's Guide to AWS CloudTrail for Security Course" srcset="https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2-624x351.jpeg 624w, https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2-300x169.jpeg 300w, https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2-768x432.jpeg 768w, https://cybr.com/wp-content/uploads/2023/11/beginner-cloudtrail-banner-v2.jpeg 900w" sizes="(max-width: 624px) 100vw, 624px"> </div>
+</div>
+</div>
+</div>
+<div class="bb-course-preview-content">
+<div class="bb-course-status-wrap">
+<div class="bb-course-status-content"><div class="ld-status ld-status-incomplete ld-third-background" data-ld-tooltip="Enroll in this course to get access">Not Enrolled </div></div> </div>
+<div class="bb-button-wrap">
+<div class="learndash_join_button btn-advance-start"><a href="https://cybr.com/login/?redirect_to=https%3A%2F%2Fcybr.com%2Fcourses%2Fbeginners-guide-to-aws-cloudtrail-for-security%2F" class="btn-advance ld-primary-background">Login to Enroll</a></div><span class="bb-course-type bb-course-type-free">Free</span> </div>
+<div class="bb-course-volume">
+<h4>Course Includes</h4>
+<ul class="bb-course-volume-list">
+<li>
+<i class="bb-icon-l bb-icon-book"></i>18 Lessons </li>
+<li>
+<i class="bb-icon-l bb-icon-certificate"></i>Course Certificate </li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bb-modal bb_course_video_details mfp-hide">
+<iframe src="https://player.vimeo.com/video/884876081?dnt=1&amp;app_id=122963" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write"></iframe></div>
+</div>
+<div class="learndash-wrapper learndash-wrapper-login-modal">
+<div class="ld-modal ld-login-modal ld-can-register">
+<span class="ld-modal-closer ld-icon ld-icon-delete"></span>
+<div class="ld-login-modal-login">
+<div class="ld-login-modal-wrapper">
+<div class="ld-modal-heading">
+Login </div>
+<div class="ld-modal-text">
+Accessing this course requires a login. Please enter your credentials below! </div>
+<div class="ld-login-modal-form">
+<form name="loginform" id="loginform" action="https://cybr.com/wp-login.php" method="post"><input id="learndash-login-form" type="hidden" name="learndash-login-form" value="0909275eef"><input name="learndash-login-form-course" value="20879" type="hidden"><input type="hidden" id="learndash-login-form-course-nonce" name="learndash-login-form-course-nonce" value="aeedd3cfbd"><p class="login-username">
+<label for="user_login">Email Address</label>
+<input type="text" name="log" id="user_login" autocomplete="username" class="input" value="" size="20">
+</p><p class="login-password">
+<label for="user_pass">Password</label>
+<input type="password" name="pwd" id="user_pass" autocomplete="current-password" spellcheck="false" class="input" value="" size="20">
+</p><p class="login-remember"><label><input name="rememberme" type="checkbox" id="rememberme" value="forever"> Remember Me</label></p><p class="login-submit">
+<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary" value="Log In">
+<input type="hidden" name="redirect_to" value="/courses/beginners-guide-to-aws-cloudtrail-for-security/">
+</p></form> <a class="ld-forgot-password-link" href="https://cybr.com/wp-login.php?action=lostpassword&amp;redirect_to=https%3A%2F%2Fcybr.com%2Fcourses%2Fbeginners-guide-to-aws-cloudtrail-for-security%2F%3Fld-resetpw%3Dtrue%23login">Lost Your Password?</a>
+</div> 
+</div> 
+</div> 
+<div class="ld-login-modal-register">
+<div class="ld-login-modal-wrapper">
+<div class="ld-content">
+<div class="ld-modal-heading">
+Register </div>
+<div class="ld-modal-text">Don't have an account? Register one!</div>
+<a href="#ld-user-register" class="ld-button ld-button-reverse ld-js-register-account">Register an Account</a>
+</div> 
+<div id="ld-user-register" class="ld-hide">
+<form name="registerform" id="registerform" action="https://cybr.com/wp-login.php?action=register" method="post" novalidate="novalidate">
+<p>
+<label for="user_reg_login">Username<br>
+<input type="text" name="user_login" id="user_reg_login" class="input" value="" size="20"></label>
+</p>
+<p>
+<label for="user_reg_email">Email<br>
+<input type="email" name="user_email" id="user_reg_email" class="input" value="" size="25"></label>
+</p>
+<input name="learndash-registration-form-post" value="20879" type="hidden">
+<input type="hidden" id="learndash-registration-form-post-nonce" name="learndash-registration-form-post-nonce" value="5e07c105d0"><input type="hidden" name="_wp_http_referer" value="/courses/beginners-guide-to-aws-cloudtrail-for-security/"> <input name="learndash-registration-form" value="2d1dfe1788" type="hidden">
+<input name="redirect_to" type="hidden" value="https://cybr.com/courses/beginners-guide-to-aws-cloudtrail-for-security/?ld-registered=true#login">
+<p id="reg_passmail">Registration confirmation will be emailed to you.</p>
+<br class="clear">
+<p class="submit"><input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="Register"></p>
+</form>
+</div> 
+</div> 
+</div> 
+</div> 
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer-bottom bb-footer style-2">
+<div class="container flex">
+<div class="footer-bottom-left"> <div class="footer-logo-wrap">
+<a class="footer-logo" href="https://cybr.com/" rel="home">
+<img width="400" height="400" src="https://cybr.com/wp-content/uploads/2020/03/cybr_logo_badge_gradient.png" class="attachment-full size-full" alt="Cybr logo badge"> </a>
+</div>
+<div class="footer-copyright-wrap"> <div class="copyright">© 2024 - Cybr, Inc</div>
+<ul id="menu-footer-menu" class="footer-menu secondary"><li id="menu-item-932" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-932"><a href="https://cybr.com/contact/"><i class="bb-icon-file"></i><span class="link-text">Contact</span></a></li>
+<li id="menu-item-832" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-832"><a href="/courses/"><i class="bb-icon-file"></i><span class="link-text">Courses</span></a></li>
+<li id="menu-item-15936" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15936"><a href="https://cybr.com/discord"><i class="bb-icon-file"></i><span class="link-text">Discord</span></a></li>
+<li id="menu-item-827" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-827"><a href="https://cybr.com/terms-of-service/"><i class="bb-icon-file"></i><span class="link-text">Terms of Service</span></a></li>
+<li id="menu-item-828" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-828"><a href="https://cybr.com/privacy-policy/"><i class="bb-icon-file"></i><span class="link-text">Privacy Policy</span></a></li>
+</ul></div></div><div class="footer-bottom-right push-right"><ul class="footer-socials"><li><a href="https://www.facebook.com/cybrcom" target="_blank" data-balloon-pos="up" data-balloon="facebook"><i class="bb-icon-f bb-icon-brand-facebook"></i></a></li><li><a href="https://linkedin.com/company/cybr-training" target="_blank" data-balloon-pos="up" data-balloon="linkedin"><i class="bb-icon-f bb-icon-brand-linkedin"></i></a></li><li><a href="https://twitter.com/cybrcom" target="_blank" data-balloon-pos="up" data-balloon="twitter"><i class="bb-icon-f bb-icon-brand-twitter"></i></a></li><li><a href="https://www.youtube.com/channel/UCHniAWK7wYu9EYbz64cOL_A" target="_blank" data-balloon-pos="up" data-balloon="youtube"><i class="bb-icon-f bb-icon-brand-youtube"></i></a></li></ul></div> </div>
+</footer>
+</div>
+<div id="content-report" class="content-report-popup moderation-popup mfp-hide">
+<div class="modal-mask bb-white bbm-model-wrap bbm-uploader-model-wrap">
+<div class="modal-wrapper">
+<div class="modal-container">
+<header class="bb-model-header">
+<h4>Report <span class="bp-reported-type"></span></h4>
+<button title="Close (Esc)" type="button" class="mfp-close">
+<span class="bb-icon-l bb-icon-times"></span>
+</button>
+</header>
+<div class="bp-feedback bp-feedback-v2 error" id="notes-error" style="display: none;">
+<span class="bp-icon" aria-hidden="true"></span>
+<p>There was a problem reporting this post.</p>
+</div>
+<div class="bb-report-type-wrp">
+<form id="bb-report-content" action="javascript:void(0);">
+<div class="form-item form-item-category content">
+<label for="report-category-244">
+<input type="radio" id="report-category-244" name="report_category" value="244" checked="">
+<span>Harassment</span>
+</label>
+<span>Harassment or bullying behavior</span>
+</div>
+<div class="form-item form-item-category content">
+<label for="report-category-241">
+<input type="radio" id="report-category-241" name="report_category" value="241">
+<span>Inappropriate</span>
+</label>
+<span>Contains mature or sensitive content</span>
+</div>
+<div class="form-item form-item-category content">
+<label for="report-category-242">
+<input type="radio" id="report-category-242" name="report_category" value="242">
+<span>Misinformation</span>
+</label>
+<span>Contains misleading or false information</span>
+</div>
+<div class="form-item form-item-category content">
+<label for="report-category-240">
+<input type="radio" id="report-category-240" name="report_category" value="240">
+<span>Offensive</span>
+</label>
+<span>Contains abusive or derogatory content</span>
+</div>
+<div class="form-item form-item-category content">
+<label for="report-category-243">
+<input type="radio" id="report-category-243" name="report_category" value="243">
+<span>Suspicious</span>
+</label>
+<span>Contains spam, fake content or potential malware</span>
+</div>
+<div class="form-item">
+<label for="report-category-other">
+<input type="radio" id="report-category-other" name="report_category" value="other">
+<span>Other</span>
+</label>
+</div>
+<div class="form-item bp-hide">
+<label for="report-note">
+<span class="screen-reader-text">Report note</span>
+<textarea id="report-note" placeholder="Enter your reason for reporting..." name="note" class="bp-other-report-cat"></textarea>
+</label>
+</div>
+<footer class="bb-model-footer">
+<input type="button" class="bb-cancel-report-content button" value="Cancel">
+<button type="submit" class="report-submit button">Report</button>
+<input type="hidden" name="content_id" class="bp-content-id">
+<input type="hidden" name="content_type" class="bp-content-type">
+<input type="hidden" name="_wpnonce" class="bp-nonce">
+</footer>
+</form>
+<div class="bp-report-form-err"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="block-member" class="block-member-popup moderation-popup mfp-hide">
+<div class="modal-mask bb-white bbm-model-wrap bbm-uploader-model-wrap">
+<div class="modal-wrapper">
+<div class="modal-container">
+<header class="bb-model-header">
+<h4>Block Member?</h4>
+<button title="Close (Esc)" type="button" class="mfp-close">
+<span class="bb-icon-l bb-icon-times"></span>
+</button>
+</header>
+<div class="bb-report-type-wrp">
+<p>
+Please confirm you want to block this member. </p>
+<p>
+You will no longer be able to: </p>
+<ul>
+<li>
+See blocked member's posts </li>
+<li>
+Mention this member in posts </li>
+</ul>
+<p>
+Please allow a few minutes for this process to complete. </p>
+<form id="bb-block-member" action="javascript:void(0);">
+<footer class="bb-model-footer">
+<input type="button" class="bb-cancel-report-content button" value="Cancel">
+<button type="submit" class="report-submit button">Confirm</button>
+<input type="hidden" name="content_id" class="bp-content-id">
+<input type="hidden" name="content_type" class="bp-content-type">
+<input type="hidden" name="_wpnonce" class="bp-nonce">
+</footer>
+</form>
+<div class="bp-report-form-err"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="reported-content" class="content-report-popup moderation-popup mfp-hide">
+<div class="modal-mask bb-white bbm-model-wrap bbm-uploader-model-wrap">
+<div class="modal-wrapper">
+<div class="modal-container">
+<header class="bb-model-header">
+<h4>
+Report <span class="bp-reported-type"></span> </h4>
+<button title="Close (Esc)" type="button" class="mfp-close">
+<span class="bb-icon-l bb-icon-times"></span>
+</button>
+</header>
+<div class="bb-report-type-wrp">
+You have already reported this <span class="bp-reported-type"></span>. </div>
+</div>
+</div>
+</div>
+</div>
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;68f4bcb02e434c00883a3e0dc57f6c51&quot;}" type="text/javascript"></script><script type="text/javascript" id="convertkit-broadcasts-js-extra">
+/* <![CDATA[ */
+var convertkit_broadcasts = {"ajax_url":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","action":"convertkit_broadcasts_render","debug":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/convertkit/resources/frontend/js/broadcasts.js?ver=2.4.9" id="convertkit-broadcasts-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/isInViewport.min.js?ver=2.6.10" id="isInViewport-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/vendor/moment.min.js" id="moment-js"></script>
+<script type="text/javascript" id="moment-js-after">
+/* <![CDATA[ */
+moment.updateLocale( 'en_US', {"months":["January","February","March","April","May","June","July","August","September","October","November","December"],"monthsShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"weekdaysShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"week":{"dow":1},"longDateFormat":{"LT":"g:i a","LTS":null,"L":null,"LL":"F j, Y","LLL":"F j, Y g:i a","LLLL":null}} );
+moment.updateLocale( 'en_US', {"relativeTime":{"future":"in %s","past":"%s ago","s":"second","ss":"%d seconds","m":"a minute","mm":"%d minutes","h":"an hour","hh":"%d hours","d":"a day","dd":"%d days","w":"a week","ww":"%d weeks","M":"a month","MM":"%d months","y":"a year","yy":"%d years"}} );
+/* ]]> */
+</script>
+<script type="text/javascript" id="bp-livestamp-js-extra">
+/* <![CDATA[ */
+var bb_livestamp = {"year_in_seconds":"31536000","day_in_seconds":"86400","week_in_seconds":"604800","hour_in_seconds":"3600","minute_in_seconds":"60","chunks":[31536000,5256000,2592000,604800,86400,3600,60,1],"unknown_text":"sometime","right_now_text":"a second","ago_text":"%s ago","second_text":"a second","seconds_text":"seconds","minute_text":"a minute","minutes_text":"minutes","hour_text":"an hour","hours_text":"hours","day_text":"a day","days_text":"days","week_text":"a week","weeks_text":"weeks","month_text":"a month","months_text":"months","year_text":"a year","years_text":"years"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/livestamp.min.js?ver=2.6.10" id="bp-livestamp-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/underscore.min.js" id="underscore-js"></script>
+<script type="text/javascript" id="wp-util-js-extra">
+/* <![CDATA[ */
+var _wpUtilSettings = {"ajax":{"url":"\/wp-admin\/admin-ajax.php"}};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/wp-util.min.js" id="wp-util-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/vendor/wp-polyfill-inert.min.js" id="wp-polyfill-inert-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/vendor/regenerator-runtime.min.js" id="regenerator-runtime-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/vendor/wp-polyfill.min.js" id="wp-polyfill-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/hooks.min.js" id="wp-hooks-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/dist/i18n.min.js" id="wp-i18n-js"></script>
+<script type="text/javascript" id="wp-i18n-js-after">
+/* <![CDATA[ */
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+/* ]]> */
+</script>
+<script type="text/javascript" id="bp-nouveau-js-extra">
+/* <![CDATA[ */
+var BP_Nouveau = {"ajaxurl":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","only_admin_notice":"As you are the only organizer of this group, you cannot leave it. You can either delete the group or promote another member to be an organizer first and then leave the group.","is_friend_confirm":"Are you sure you want to remove your connection with this member?","confirm":"Are you sure?","confirm_delete_set":"Are you sure you want to delete this set? This cannot be undone.","show_x_comments":"View more comments","unsaved_changes":"Your profile has unsaved changes. If you leave the page, the changes will be lost.","object_nav_parent":"#buddypress","anchorPlaceholderText":"Paste or type a link","empty_field":"New Field","close":"Close","parent_group_leave_confirm":"By leaving this main group you will automatically be removed and unsubscribed to any subgroups relating to this group.","group_leave_confirm":"<p>Are you sure you want to leave <span class=\"bb-group-name\"><\/span>?<\/p>","wpTime":"2024-06-15 06:07:10","wpTimezone":"America\/Denver","objects":{"0":"activity","1":"members","3":"blogs","4":"xprofile","6":"media","7":"document","8":"video","10":"settings","11":"notifications","13":"moderation"},"nonces":{"activity":"3b278b25cd","members":"c76f89617b","blogs":"2c324dd631","xprofile":"6906fd9d5e","media":"4b20b2ad78","document":"d4b12275fc","video":"7cec2f92c3","settings":"c911fee226","notifications":"33cc6e00b7","moderation":"c34f2e1141"},"is_send_ajax_request":"1","modbypass":null,"forums":{"params":{"bb_current_user_id":0,"link_preview":true},"nonces":{"post_topic_reply_draft":"687aec5ce0"},"strings":{"discardButton":"Discard Draft"},"draft":[]},"activity":{"params":{"user_id":0,"object":"user","backcompat":false,"post_nonce":"b40a5b56c0","post_draft_nonce":"8a687bdbf5","excluded_hosts":[],"user_can_post":false,"is_activity_edit":false,"displayed_user_id":0,"errors":{"empty_post_update":"Sorry, Your update cannot be empty.","post_fail":"An error occurred while saving your post.","media_fail":"To change the media type, remove existing media from your post."},"avatar_url":"https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform\/bp-core\/images\/profile-avatar-buddyboss-50.png","avatar_width":150,"avatar_height":150,"user_display_name":false,"user_domain":"","avatar_alt":"Profile photo of ","link_preview":true,"objects":{"profile":{"text":"Post in: Profile","autocomplete_placeholder":"","priority":5}},"draft_activity":false,"access_control_settings":{"can_create_activity":true,"can_create_activity_media":true,"can_create_activity_document":true}},"strings":{"whatsnewPlaceholder":"Share what's on your mind, ...","whatsnewLabel":"Post what&#039;s new","whatsnewpostinLabel":"Post in","postUpdateButton":"Post","updatePostButton":"Update Post","cancelButton":"Cancel","commentLabel":"%d Comment","commentsLabel":"%d Comments","loadingMore":"Loading...","discardButton":"Discard Draft","pinPost":"Pin to Feed","unpinPost":"Unpin from Feed","pinGroupPost":"Pin to Group","unpinGroupPost":"Unpin from Group","pinPostError":"There was a problem marking this operation. Please try again.","reactionAjaxError":"There was a problem marking this operation. Please try again.","closeComments":"Turn off commenting","uncloseComments":"Turn on commenting","closeCommentsError":"There was a problem marking this operation. Please try again.","commentPostError":"There was a problem posting your comment.","muteNotification":"Turn off notifications","unmuteNotification":"Turn on notifications"}},"media":{"max_upload_size":256,"profile_media":false,"profile_album":false,"group_media":false,"group_album":true,"messages_media":false,"messages_media_active":false,"dropzone_media_message":"<strong>Add Photos<\/strong> Or drag and drop","media_select_error":"This file type is not supported for photo uploads.","empty_media_type":"Empty media file will not be uploaded.","invalid_media_type":"Unable to upload the file","media_size_error_header":"File too large ","media_size_error_description":"This file type is too large.","dictFileTooBig":"Sorry, file size is too big ({{filesize}} MB). Max file size limit: {{maxFilesize}} MB.","cover_photo_size_error_header":"Unable to reposition the image ","cover_photo_size_error_description":"To reposition your cover photo, please upload a larger image and then try again.","maxFiles":10,"is_media_directory":"no","create_album_error_title":"Please enter title of album","current_album":0,"current_type":"","move_to_id_popup":0,"media_dict_file_exceeded":"You are allowed to upload only 10 photos at a time.","can_manage_media":false,"create_album_title":"Create Album","dictCancelUploadConfirmation":"Are you sure you want to cancel this upload?","connection_lost_error":"Connection lost with the server.","emoji":{"profile":true,"groups":false,"messages":false,"forums":true,"document":false},"emoji_filter_url":"https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform\/bp-core\/images\/emojifilter\/","gif":{"profile":false,"groups":false,"messages":false,"forums":false,"document":false},"gif_api_key":"","i18n_strings":{"select":"Select","unselect":"Unselect","selectall":"Select All","unselectall":"Unselect All","no_photos_found":"Sorry, no photos were found","upload":"Upload","uploading":"Uploading","upload_status":"%1$d out of %2$d uploaded","album_delete_confirm":"Are you sure you want to delete this album? Photos in this album will also be deleted.","album_delete_error":"There was a problem deleting the album.","media_delete_confirm":"Are you sure you want to delete this media?","folder_delete_confirm":"Are you sure you want to delete this folder? Documents in this folder will also be deleted?","document_delete_confirm":"Are you sure you want to delete this document?","folder_delete_error":"There was a problem deleting the folder.","folder_move_error":"Please select destination folder."},"profile_document":false,"group_document":false,"messages_document":false,"messages_document_active":false,"document_type":"application\/x-abiword,text\/xml,application\/x-ace-compressed,application\/postscript,application\/pdf,application\/vnd.android.package-archive,application\/java-archive,text\/css,text\/plain,text\/csv,application\/msword,application\/vnd.ms-word.document.macroenabled.12,application\/vnd.openxmlformats-officedocument.wordprocessingml.document,application\/vnd.ms-word.template.macroenabled.12,image\/x-eps,image\/gif,application\/x-gzip,application\/gzip,text\/html,image\/x-icon,text\/calendar,application\/octet-stream,image\/jpeg,application\/javascript,audio\/mpeg,application\/vnd.oasis.opendocument.spreadsheet,application\/vnd.oasis.opendocument.text,image\/png,application\/vnd.ms-powerpoint.template.macroenabled.12,application\/vnd.openxmlformats-officedocument.presentationml.template,application\/vnd.openxmlformats-officedocument.presentationml.presentation,application\/vnd.ms-powerpoint,application\/vnd.openxmlformats-officedocument.presentationml.slideshow,application\/vnd.ms-powerpoint.presentation.macroenabled.12,image\/vnd.adobe.photoshop,application\/x-rar-compressed,application\/x-rar,application\/rss+xml,application\/rtf,application\/x-sqlite3,image\/svg+xml,application\/x-tar,image\/tiff,text\/x-vcard,text\/vcard,audio\/x-wav,application\/vnd.ms-excel.sheet.binary.macroenabled.12,application\/vnd.ms-excel,application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application\/vnd.ms-excel.sheet.macroenabled.12,application\/vnd.ms-excel.template.macroenabled.12,application\/vnd.openxmlformats-officedocument.spreadsheetml.template,text\/yaml,application\/zip,application\/x-7z-compressed,video\/mp4,video\/webm,video\/ogg,video\/quicktime,.abw,.ace,.ai,.apk,.css,.csv,.doc,.docm,.docx,.dotm,.dotx,.eps,.gif,.gz,.gzip,.htm,.html,.ico,.ics,.ipa,.jar,.jpeg,.jpg,.js,.mp3,.ods,.odt,.pdf,.png,.potm,.potx,.pps,.ppsx,.ppt,.pptm,.pptx,.psd,.rar,.rss,.rtf,.sketch,.svg,.tar,.tiff,.txt,.vcf,.wav,.xlam,.xls,.xlsb,.xlsm,.xlsx,.xltm,.xltx,.xml,.yaml,.zip,.7z,.mp4,.webm,.ogg,.mov","empty_document_type":"Empty documents will not be uploaded.","current_folder":0,"current_user_id":0,"current_group_id":0,"target_text":"Documents","create_folder_error_title":"Please enter title of folder","invalid_file_type":"Unable to upload the file","document_select_error":"Please upload only the following file types: <br \/><div class=\"bb-allowed-file-types\">.abw, .ace, .ai, .apk, .css, .csv, .doc, .docm, .docx, .dotm, .dotx, .eps, .gif, .gz, .gzip, .htm, .html, .ico, .ics, .ipa, .jar, .jpeg, .jpg, .js, .mp3, .ods, .odt, .pdf, .png, .potm, .potx, .pps, .ppsx, .ppt, .pptm, .pptx, .psd, .rar, .rss, .rtf, .sketch, .svg, .tar, .tiff, .txt, .vcf, .wav, .xlam, .xls, .xlsb, .xlsm, .xlsx, .xltm, .xltx, .xml, .yaml, .zip, .7z, .mp4, .webm, .ogg, .mov<\/div>","dropzone_document_message":"<strong>Add Files<\/strong> Or drag and drop","is_document_directory":"no","document_preview_error":"Sorry! something went wrong we are not able to preview.","move_to_folder":"Move folder to...","move_to_file":"Move document to...","copy_to_clip_board_text":"Copied to Clipboard","download_button":"Download","document_size_error_header":"File too large ","document_size_error_description":"This file type is too large.","sidebar_download_text":"Download","sidebar_view_text":"View","create_folder":"Create Folder","document_dict_file_exceeded":"You are allowed to upload only 10 documents at a time.","can_manage_document":false},"video":{"max_upload_size":256,"video_type":"video\/mp4,video\/webm,video\/ogg,video\/quicktime,.mp4,.webm,.ogg,.mov","profile_video":false,"profile_album":false,"group_video":false,"group_album":true,"messages_video":false,"messages_video_active":false,"dropzone_video_message":"<strong>Add Videos<\/strong> Or drag and drop","dropzone_video_thumbnail_message":"Upload thumbnail","video_select_error":"This file type is not supported for video uploads.","empty_video_type":"Empty video file will not be uploaded.","invalid_video_type":"Unable to upload the file","video_size_error_header":"File too large ","video_size_error_description":"This file type is too large.","dictFileTooBig":"Sorry, file size is too big ({{filesize}} MB). Max file size limit: {{maxFilesize}} MB.","maxFiles":10,"is_video_directory":"no","create_album_error_title":"Please enter title of album","cover_video_size_error_header":"Unable to reposition the image ","cover_video_size_error_description":"To reposition your cover video, please upload a larger image and then try again.","current_album":0,"current_type":"","move_to_id_popup":0,"video_dict_file_exceeded":"You are allowed to upload only 10 videos at a time.","thumb_dict_file_exceeded":"You are allowed to upload only 1 thumb at a time.","dictInvalidFileType":"Please upload only the following file types: <br \/><div class=\"bb-allowed-file-types\">video\/mp4, video\/webm, video\/ogg, video\/quicktime, .mp4, .webm, .ogg, .mov<\/div>","is_ffpmeg_installed":false,"generating_thumb":"Generating thumbnail\u2026","dictCancelUploadConfirmation":"Are you sure you want to cancel this upload?","i18n_strings":{"select":"Select","unselect":"Unselect","selectall":"Select All","unselectall":"Unselect All","no_videos_found":"Sorry, no videos were found","upload":"Upload","upload_thumb":"Change Thumbnail","uploading":"Uploading","upload_status":"%1$d out of %2$d uploaded","album_delete_confirm":"Are you sure you want to delete this album? Videos in this album will also be deleted.","album_delete_error":"There was a problem deleting the album.","video_delete_confirm":"Are you sure you want to delete this video?","video_enlarge_text":"Enlarge","video_fullscreen_text":"Full screen","video_play_text":"Play","video_pause_text":"Pause","video_uploaded_text":"Uploaded","video_volume_text":"Volume","video_miniplayer_text":"Miniplayer","video_speed_text":"Speed","video_skip_back_text":"Step Back (5)","video_skip_forward_text":"Step Forward (5)","video_picture_in_text":"This video is playing in the miniplayer."}},"moderation":{"unblock_user_msg":"Are you sure you want to unblock this member?","no_user_msg":"No blocked members found."},"document":{"dictInvalidFileType":"Please upload only the following file types: <br \/><div class=\"bb-allowed-file-types\">.abw, .ace, .ai, .apk, .css, .csv, .doc, .docm, .docx, .dotm, .dotx, .eps, .gif, .gz, .gzip, .htm, .html, .ico, .ics, .ipa, .jar, .jpeg, .jpg, .js, .mp3, .ods, .odt, .pdf, .png, .potm, .potx, .pps, .ppsx, .ppt, .pptm, .pptx, .psd, .rar, .rss, .rtf, .sketch, .svg, .tar, .tiff, .txt, .vcf, .wav, .xlam, .xls, .xlsb, .xlsm, .xlsx, .xltm, .xltx, .xml, .yaml, .zip, .7z, .mp4, .webm, .ogg, .mov<\/div>","max_upload_size":256,"maxFiles":10,"mp3_preview_extension":"mp3,wav,ogg"}};
+var BB_Nouveau_Presence = {"heartbeat_enabled":"1","presence_interval":"60","presence_default_interval":"60","presence_time_span":"20","idle_inactive_span":"180","rest_nonce":"a788c66ea3","native_presence":"1","native_presence_url":"https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform\/bp-core\/bb-core-native-presence.php","presence_rest_url":"https:\/\/cybr.com\/wp-json\/buddyboss\/v1\/members\/presence"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/js/buddypress-nouveau.min.js?ver=2.6.10" id="bp-nouveau-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/backbone.min.js" id="backbone-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/wp-backbone.min.js" id="wp-backbone-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/schedule-posts/assets/js/bb-schedule-posts.min.js?ver=2.5.20" id="bb-schedule-posts-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/js/jquery.guillotine.min.js?ver=2.6.10" id="guillotine-js-js"></script>
+<script async="async" type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/comment-reply.min.js" id="comment-reply-js" data-wp-strategy="async"></script>
+<script type="text/javascript" id="heartbeat-js-extra">
+/* <![CDATA[ */
+var heartbeatSettings = {"ajaxurl":"\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/heartbeat.min.js" id="heartbeat-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-templates/bp-nouveau/js/buddypress-moderation.min.js?ver=2.6.10" id="bp-nouveau-moderation-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/draggabilly.min.js?ver=2.6.10" id="draggabilly-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/plugins/bbp-scrubber.min.js?ver=2.6.10" id="buddyboss-theme-bbp-scrubber-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/jquery.caret.min.js?ver=2.6.10" id="jquery-caret-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/vendor/jquery.atwho.min.js?ver=2.6.10" id="jquery-atwho-js"></script>
+<script type="text/javascript" id="bp-mentions-js-extra">
+/* <![CDATA[ */
+var BP_Mentions_Options = {"selectors":[".bp-suggestions","#comments form textarea",".wp-editor-area",".bbp-the-content"],"insert_tpl":"@${ID}","display_tpl":"<li data-value=\"@${ID}\"><img src=\"${image}\" \/><span class=\"username\">@${ID}<\/span><small>${name}<\/small><\/li>","extra_options":[]};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform/bp-core/js/mentions.min.js?ver=2.6.10" id="bp-mentions-js"></script>
+<script type="text/javascript" id="convertkit-js-js-extra">
+/* <![CDATA[ */
+var convertkit = {"ajaxurl":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","debug":"","nonce":"f79a51b2af","subscriber_id":"","tag":"","post_id":"20879"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/convertkit/resources/frontend/js/convertkit.js?ver=2.4.9" id="convertkit-js-js"></script>
+<script type="text/javascript" id="cybrlabs-script-js-extra">
+/* <![CDATA[ */
+var cybrlabs_plugin_vars = {"api_url":"https:\/\/broad-cloud-6b70.cybrlabs.workers.dev","rest_nonce":"a788c66ea3"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/cybr-labs-wordpress/resources/js/cybrlabs-plugin.js?ver=1.1.0" id="cybrlabs-script-js"></script>
+<script type="text/javascript" src="//cybr.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_pager.min.js?ver=4.15.1" id="learndash_pager_js-js"></script>
+<script type="text/javascript" id="learndash_template_script_js-js-extra">
+/* <![CDATA[ */
+var sfwd_data = {"json":"{\"ajaxurl\":\"https:\\\/\\\/cybr.com\\\/wp-admin\\\/admin-ajax.php\"}"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="//cybr.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_template_script.min.js?ver=4.15.1" id="learndash_template_script_js-js"></script>
+<script type="text/javascript" src="//cybr.com/wp-content/plugins/sfwd-lms/assets/js/jquery.dropdown.min.js?ver=4.15.1" id="jquery-dropdown-js-js"></script>
+<script async="" src="https://plausible.io/js/plausible.js" data-domain="cybr.com" type="text/javascript"></script><script type="text/javascript">window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script><script type="text/javascript" src="https://cybr.com/wp-content/plugins/learndash-achievements/lib/noty/noty.min.js?ver=1.2.1" id="noty-script-js"></script>
+<script type="text/javascript" id="ld-achievements-script-js-extra">
+/* <![CDATA[ */
+var LD_Achievements_Data = {"notifications":"[]","settings":{"popup_time":5,"background_color":"#333333","text_color":"#ffffff","rtl":0},"user_id":"0","ajaxurl":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/learndash-achievements/assets/js/script.js?ver=1.2.1" id="ld-achievements-script-js"></script>
+<script type="text/javascript" id="learndash-front-js-extra">
+/* <![CDATA[ */
+var ldVars = {"postID":"20879","videoReqMsg":"You must watch the video before accessing this content","ajaxurl":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="//cybr.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/js/learndash.js?ver=4.15.1" id="learndash-front-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/assets/js/vendor/jquery.mask.js?ver=5.0.4" id="bp-zoom-mask-js-js"></script>
+<script type="text/javascript" id="bp-zoom-js-js-extra">
+/* <![CDATA[ */
+var bp_zoom_vars = {"ajax_url":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","home_url":"https:\/\/cybr.com\/courses\/beginners-guide-to-aws-cloudtrail-for-security","is_single_meeting":"","is_single_webinar":"","group_id":"","group_meetings_url":"","group_meetings_past_url":"","group_webinars_url":"","group_webinar_past_url":"","meeting_delete_nonce":"546a53aee2","meeting_confirm_msg":"Are you sure you want to delete this meeting?","webinar_delete_nonce":"d8a2c49f5e","webinar_confirm_msg":"Are you sure you want to delete this webinar?","user":{"name":"Guest","email":"guest@domain.com"},"scripts":["https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/react.production.min.js","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/react-dom.production.min.js","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/redux.min.js","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/redux-thunk.min.js","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/lodash.min.js","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/jquery.min.js"],"styles":["https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/bootstrap.css","https:\/\/cybr.com\/wp-content\/plugins\/buddyboss-platform-pro\/includes\/integrations\/zoom\/assets\/js\/zoom-web-sdk\/react-select.css"],"strings":{"day":"day","month":"month","week":"week"},"lang":"en-US","is_zoom_sdk":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/includes/integrations/zoom/assets/js/bp-zoom.min.js?ver=2.5.20" id="bp-zoom-js-js"></script>
+<script type="text/javascript" id="bb-countdown-js-js-extra">
+/* <![CDATA[ */
+var bb_countdown_vars = {"daysStr":"Days","hoursStr":"Hours","minutesStr":"Minutes","secondsStr":"Seconds"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/plugins/buddyboss-platform-pro/assets/js/bb-countdown.min.js?ver=1.0.1" id="bb-countdown-js-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/imagesloaded.min.js" id="imagesloaded-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.5.4/wp-includes/js/masonry.min.js" id="masonry-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/menu.js?ver=2.6.10" id="boss-menu-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/fitvids.js?ver=2.6.10" id="boss-fitvids-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/slick.min.js?ver=2.6.10" id="boss-slick-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/panelslider.min.js?ver=2.6.10" id="boss-panelslider-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/sticky-kit.js?ver=2.6.10" id="boss-sticky-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/jssocials.min.js?ver=2.6.10" id="boss-jssocials-js-js"></script>
+<script type="text/javascript" id="buddyboss-theme-main-js-js-extra">
+/* <![CDATA[ */
+var bs_data = {"jm_ajax":"https:\/\/cybr.com\/jm-ajax\/","ajaxurl":"https:\/\/cybr.com\/wp-admin\/admin-ajax.php","show_notifications":"1","show_messages":"1","facebook_label":"Share on Facebook","twitter_label":"Tweet","translation":{"comment_posted":"Your comment has been posted.","comment_btn_loading":"Please Wait...","choose_a_file_label":"Choose a file","email_validation":"Please enter a valid email address."},"gamipress_badge_label":"Badge","nonce_list_grid":"215532b659","learndash":{"nonce_get_courses":"6c01ae58c9","course_archive_url":"\/"}};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/main.min.js?ver=2.6.10" id="buddyboss-theme-main-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/validate.min.js?ver=2.6.10" id="boss-validate-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/select2.full.min.js?ver=2.6.10" id="select2-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/progressbar.min.js?ver=2.6.10" id="progressbar-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/vendors/mousewheel.min.js?ver=2.6.10" id="mousewheel-js-js"></script>
+<script type="text/javascript" id="buddyboss-theme-learndash-js-js-extra">
+/* <![CDATA[ */
+var BBTHEME_LEARNDASH_FRONT_VIDEO = {"hide_wrapper":"show","video_progression_enabled":"off","video_type":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/plugins/learndash.min.js?ver=2.6.10" id="buddyboss-theme-learndash-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/plugins/learndash-sidebar.min.js?ver=2.6.10" id="buddyboss-theme-learndash-sidebar-js-js"></script>
+<script type="text/javascript" src="https://cybr.com/wp-content/themes/buddyboss-theme/assets/js/plugins/elementor.min.js?ver=2.6.10" id="buddyboss-theme-elementor-js-js"></script>
+<script type="text/javascript" src="https://stats.wp.com/e-202424.js" id="jetpack-stats-js" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="jetpack-stats-js-after">
+/* <![CDATA[ */
+_stq = window._stq || [];
+_stq.push([ "view", JSON.parse("{\"v\":\"ext\",\"blog\":\"169129662\",\"post\":\"20879\",\"tz\":\"-6\",\"srv\":\"cybr.com\",\"j\":\"1:13.4.3\"}") ]);
+_stq.push([ "clickTrackerInit", "169129662", "20879" ]);
+/* ]]> */
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8942702ba8731c09',t:'MTcxODQ1MzIzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: medium; visibility: hidden;"></iframe>
+
+</body></html>

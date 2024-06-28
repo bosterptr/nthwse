@@ -1,0 +1,436 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>The worst of both worlds: Combining NTLM Relaying and Kerberos delegation - dirkjanm.io</title>
+<meta name="description" content="After my in-depth post last month about unconstrained delegation, this post will discuss a different type of Kerberos delegation: resource-based constrained delegation. The content in this post is based on Elad Shamir’s Kerberos research and combined with my own NTLM research to present an attack that can get code execution as SYSTEM on any Windows computer in Active Directory without any credentials, if you are in the same network segment. This is another example of insecure Active Directory default abuse, and not any kind of new exploit.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="dirkjanm.io">
+<meta property="og:title" content="The worst of both worlds: Combining NTLM Relaying and Kerberos delegation">
+<meta property="og:url" content="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">
+
+
+  <meta property="og:description" content="After my in-depth post last month about unconstrained delegation, this post will discuss a different type of Kerberos delegation: resource-based constrained delegation. The content in this post is based on Elad Shamir’s Kerberos research and combined with my own NTLM research to present an attack that can get code execution as SYSTEM on any Windows computer in Active Directory without any credentials, if you are in the same network segment. This is another example of insecure Active Directory default abuse, and not any kind of new exploit.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-03-04T18:08:57+00:00">
+
+
+
+
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.33333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1em}.svg-inline--fa.fa-stack-2x{height:2em;width:2em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="dirkjanm.io Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+  <body class="layout--single wide" style="margin-bottom: 229.767px;">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">dirkjanm.io</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/talks/">Presentations</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/thisisapicture.png" alt="Dirk-jan Mollema" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dirk-jan Mollema</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Hacker, red teamer, researcher. Likes to write infosec-focussed Python tools. This is my personal blog containing research on topics I find interesting, such as (Azure) Active Directory internals, protocols and vulnerabilities.<br><br>Looking for a security test or training? Business contact via <a href="https://outsidersecurity.nl">outsidersecurity.nl</a>
+
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="http://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Both sides of a security boundary</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/_dirkjan" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/dirkjanm" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        
+          <li>
+            <a href="https://www.youtube.com/c/dirkjanm" itemprop="sameAs">
+              <svg class="svg-inline--fa fa-youtube fa-w-18 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fab fa-fw fa-youtube" aria-hidden="true"></i> --> YouTube
+            </a>
+          </li>
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="The worst of both worlds: Combining NTLM Relaying and Kerberos delegation">
+    <meta itemprop="description" content="After my in-depth post last month about unconstrained delegation, this post will discuss a different type of Kerberos delegation: resource-based constrained delegation. The content in this post is based on Elad Shamir’s Kerberos research and combined with my own NTLM research to present an attack that can get code execution as SYSTEM on any Windows computer in Active Directory without any credentials, if you are in the same network segment. This is another example of insecure Active Directory default abuse, and not any kind of new exploit.">
+    <meta itemprop="datePublished" content="March 04, 2019">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">The worst of both worlds: Combining NTLM Relaying and Kerberos delegation
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  5 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>After my in-depth post last month about <a href="https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/">unconstrained delegation</a>, this post will discuss a different type of Kerberos delegation: resource-based constrained delegation. The content in this post is based on <a href="https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html">Elad Shamir’s Kerberos research</a> and combined with my own NTLM research to present an attack that can get <strong>code execution as SYSTEM</strong> on any Windows computer in Active Directory <strong>without any credentials</strong>, if you are in the same network segment. This is another example of insecure Active Directory default abuse, and not any kind of new exploit.</p>
+
+<h1 id="attack-tldr">Attack TL;DR</h1>
+<p>If an attacker is on the local network, either physically (via a drop device) or via an infected workstation, it is possible to perform a DNS takeover using <a href="https://github.com/fox-it/mitm6">mitm6</a>, provided IPv6 is not already in use in the network. When this attack is performed, it is also possible to make computer accounts and users authenticate to us over HTTP by spoofing the <code class="language-plaintext highlighter-rouge">WPAD</code> location and requesting authentication to use our rogue proxy. This attack is described in detail in <a href="https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/">my blog post on this subject</a> from last year.</p>
+
+<p>We can relay this NTLM authentication to LDAP (unless mitigations are applied) with ntlmrelayx and authenticate as the victim computer account. Computer accounts can modify some of their own properties via LDAP, which includes the <code class="language-plaintext highlighter-rouge">msDS-AllowedToActOnBehalfOfOtherIdentity</code> attribute. This attribute controls which users can authenticate to the computer <strong>as almost any account in AD</strong> via impersonation using Kerberos. This concept is called Resource-Based constrained delegation, and is described in detail by <a href="https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html">Elad Shamir</a> and <a href="https://posts.specterops.io/another-word-on-delegation-10bdbe3cd94a">harmj0y</a>. Because of this, when we relay the computer account, we can modify the account in Active Directory and give ourselves permission to impersonate users on that computer. We can then connect to the computer with a high-privilege user and execute code, dump hashes, etc.
+The beauty of this attack is that it works by default and does not require any AD credentials to perform.</p>
+
+<h1 id="no-credentials-no-problem">No credentials, no problem</h1>
+<p>If you’ve already read the blog of Elad, you may have noticed that control over a computer account (or any other account with a Service Principal Name) is required to perform the S4U2Proxy attack. By default, any user in Active Directory can create up to 10 computer accounts. Interesting enough, this is not limited to user accounts, but can be done by existing computer accounts as well! If we can get any user or computer to connect to our NTLM relay, we can create a computer account with ntlmrelayx:</p>
+
+<p><img src="/assets/img/kerberos/computer-create.png" alt="create computer account" class="align-center"></p>
+
+<p>It is required here to relay to LDAP over TLS because creating accounts is not allowed over an unencrypted connection.
+These computer account credentials can be used for all kinds of things in AD, such as querying domain information or even running BloodHound:</p>
+
+<p><img src="/assets/img/kerberos/computer-bloodhound.png" alt="running bloodhound" class="align-center"></p>
+
+<h1 id="relaying-and-configuring-delegation">Relaying and configuring delegation</h1>
+<p>Let’s run the full attack. First we start <code class="language-plaintext highlighter-rouge">mitm6</code> to take over the DNS on our target, in this case <code class="language-plaintext highlighter-rouge">ICORP-W10</code> (a fully patched default Windows 10 installation), I’m limiting the attack to just this host here:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo mitm6 -hw icorp-w10 -d internal.corp --ignore-nofqnd
+</code></pre></div></div>
+<p>Now it might take a while before the host requests an IPv6 address via DHCPv6, or starts requesting a <code class="language-plaintext highlighter-rouge">WPAD</code> configuration. Your best chances are when the victim reboots or re-plugs their network cable, so if you’re on a long term assignment, early mornings are probably the best time to perform this attack. In either case you’ll have to be patient (or just attack more hosts, but that’s also less quiet). 
+In the meantime, we also start ntlmrelayx using the <code class="language-plaintext highlighter-rouge">--delegate-access</code> argument to enable the delegation attack and with the <code class="language-plaintext highlighter-rouge">-wh attacker-wpad</code> argument to enable <code class="language-plaintext highlighter-rouge">WPAD</code> spoofing and authentication requests:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -t ldaps://icorp-dc.internal.corp -wh attacker-wpad --delegate-access
+</code></pre></div></div>
+<p>After a while <code class="language-plaintext highlighter-rouge">mitm6</code> should show our victim connecting to us as DNS server for the WPAD host we set:</p>
+
+<p><img src="/assets/img/kerberos/mitm6-wpad.png" alt="wpad and mitm6" class="align-center"></p>
+
+<p>And we see ntlmrelayx receiving the connection, creating a new computer account and granting it delegation rights to the victim computer:</p>
+
+<p><img src="/assets/img/kerberos/ntlmrelayx-delegation.png" alt="ntlmrelayx adding delegation" class="align-center"></p>
+
+<p>Next we can use <code class="language-plaintext highlighter-rouge">getST.py</code> from <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/getST.py">impacket</a>, which will do all the S4U2Self an S4U2Proxy magic for us. You will need the latest version of <a href="https://github.com/SecureAuthCorp/impacket">impacket from git</a> to include resource based delegation support. In this example we will be impersonating the user <code class="language-plaintext highlighter-rouge">admin</code>, which is a member of the <code class="language-plaintext highlighter-rouge">Domain Admins</code> group and thus has administrative access on <code class="language-plaintext highlighter-rouge">ICORP-W10</code>:</p>
+
+<p><img src="/assets/img/kerberos/admin-st.png" alt="getting a service ticket for the admin user" class="align-center"></p>
+
+<p>We obtained a Kerberos Service Ticket now for the user <code class="language-plaintext highlighter-rouge">admin</code>, which is valid for <code class="language-plaintext highlighter-rouge">cifs/icorp-w10.internal.corp</code>. This only lets us impersonate this user to this specific host, not to other hosts in the network. With this ticket we can do whatever we want on the target host, for example dumping hashes with secretsdump:</p>
+
+<p><img src="/assets/img/kerberos/secretsdump-kerberos.png" alt="dumping hashes with secretsdump" class="align-center"></p>
+
+<p>The attacker now has full control over the victim workstation.</p>
+
+<h1 id="other-abuse-avenues">Other abuse avenues</h1>
+<p>This blog highlights the use of mitm6 and WPAD to perform the relay attack entirely without credentials. Any connection over HTTP to a host that is considered part of the <code class="language-plaintext highlighter-rouge">Intranet Zone</code> by Windows can be used in an identical matter (provided automatic intranet detection is enabled). Elad’s original blog described using WebDAV to exploit this on hosts. Another attack avenue is (again) <a href="https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/">PrivExchange</a>, which makes Exchange authenticate as SYSTEM unless the latest patches are installed.</p>
+
+<h1 id="tools">Tools</h1>
+<p>The updated version of ntlmrelayx is available in a branch on <a href="https://github.com/dirkjanm/impacket/tree/rbdelrelay">my fork of impacket</a>. I’ll update the post once this branch gets merged into the main repository.</p>
+
+<h1 id="mitigations">Mitigations</h1>
+<p>As this attack consists of several components, there are several mitigations that apply to it.</p>
+<h3 id="mitigating-mitm6">Mitigating mitm6</h3>
+<p>mitm6 abuses the fact that Windows queries for an IPv6 address even in IPv4-only environments. If you don’t use IPv6 internally, the safest way to prevent mitm6 is to block DHCPv6 traffic and incoming router advertisements in Windows Firewall via Group Policy. Disabling IPv6 entirely may have unwanted side effects. Setting the following predefined rules to Block instead of Allow prevents the attack from working:</p>
+<ul>
+  <li><em>(Inbound) Core Networking - Dynamic Host Configuration Protocol for IPv6(DHCPV6-In)</em></li>
+  <li><em>(Inbound) Core Networking - Router Advertisement (ICMPv6-In)</em></li>
+  <li><em>(Outbound) Core Networking - Dynamic Host Configuration Protocol for IPv6(DHCPV6-Out)</em></li>
+</ul>
+
+<h3 id="mitigating-wpad-abuse">Mitigating WPAD abuse</h3>
+<p>If WPAD is not in use internally, disable it via Group Policy and by disabling the <code class="language-plaintext highlighter-rouge">WinHttpAutoProxySvc</code> service. Further mitigation and detection measures are discussed <a href="https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/">in the original mitm6 blog</a>.</p>
+
+<h3 id="mitigating-relaying-to-ldap">Mitigating relaying to LDAP</h3>
+<p>Relaying to LDAP and LDAPS can only be mitigated by enabling both LDAP signing and <a href="https://support.microsoft.com/en-us/help/4034879/how-to-add-the-ldapenforcechannelbinding-registry-entry">LDAP channel binding</a>.</p>
+
+<h3 id="mitigating-resource-based-delegation-abuse">Mitigating resource based delegation abuse</h3>
+<p>This is hard to mitigate as it is a legitimate Kerberos concept. The attack surface can be reduced by adding Administrative users to the <code class="language-plaintext highlighter-rouge">Protected Users</code> group or marking them as <code class="language-plaintext highlighter-rouge">Account is sensitive and cannot be delegated</code>, which will prevent any impersonation of that user via delegation. Further mitigations and detection methods are <a href="https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html">available here</a>.</p>
+
+<h2 id="credits">Credits</h2>
+<ul>
+  <li><a href="https://twitter.com/elad_shamir">@Elad_Shamir</a> and <a href="https://twitter.com/3xocyte">@3xocyte</a> for the original research and relay POC</li>
+  <li><a href="https://twitter.com/agsolino/">@agsolino</a> for building and maintaining impacket and implementing all the cool Kerberos stuff</li>
+  <li><a href="https://twitter.com/gentilkiwi">@gentilkiwi</a> for Kekeo and <a href="https://twitter.com/harmj0y">@harmj0y</a> for Rubeus and their Kerberos research</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M436 160H12c-6.6 0-12-5.4-12-12v-36c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48v36c0 6.6-5.4 12-12 12zM12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm116 204c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2019-03-04T18:08:57+00:00">March 04, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=The+worst+of+both+worlds%3A+Combining+NTLM+Relaying+and+Kerberos+delegation%20https%3A%2F%2Fdirkjanm.io%2Fworst-of-both-worlds-ntlm-relaying-and-kerberos-delegation%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdirkjanm.io%2Fworst-of-both-worlds-ntlm-relaying-and-kerberos-delegation%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdirkjanm.io%2Fworst-of-both-worlds-ntlm-relaying-and-kerberos-delegation%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><svg class="svg-inline--fa fa-google-plus fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="google-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm-70.7 372c-68.8 0-124-55.5-124-124s55.2-124 124-124c31.3 0 60.1 11 83 32.3l-33.6 32.6c-13.2-12.9-31.3-19.1-49.4-19.1-42.9 0-77.2 35.5-77.2 78.1s34.2 78.1 77.2 78.1c32.6 0 64.9-19.1 70.1-53.3h-70.1v-42.6h116.9c1.3 6.8 1.9 13.6 1.9 20.7 0 70.8-47.5 121.2-118.8 121.2zm230.2-106.2v35.5H372v-35.5h-35.5v-35.5H372v-35.5h35.5v35.5h35.2v35.5h-35.2z"></path></svg><!-- <i class="fab fa-fw fa-google-plus" aria-hidden="true"></i> --><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdirkjanm.io%2Fworst-of-both-worlds-ntlm-relaying-and-kerberos-delegation%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/krbrelayx-unconstrained-delegation-abuse-toolkit/" class="pagination--pager" title="“Relaying” Kerberos - Having fun with unconstrained delegation
+">Previous</a>
+    
+    
+      <a href="/getting-in-the-zone-dumping-active-directory-dns-with-adidnsdump/" class="pagination--pager" title="Getting in the Zone: dumping Active Directory DNS using adidnsdump
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+    
+    
+    
+      <li><a href="https://github.com/dirkjanm"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+    <li><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/img/cc-by.png"></a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">All blog content is available under the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0 License</a> unless stated otherwise.
+  <br>Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> and a modified version of the "Minimal Mistakes" theme.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-G3JYRDGZVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G3JYRDGZVR', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+  
+</body></html>

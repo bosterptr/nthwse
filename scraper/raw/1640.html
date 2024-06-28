@@ -1,0 +1,341 @@
+<html><head>
+<title>SCADA HoneyNet Project: Building Honeypots for Industrial Networks</title>
+</head>
+
+<body>
+
+
+<font face="arial">
+
+<h2 align="CENTER">
+SCADA HoneyNet Project: Building Honeypots for Industrial Networks
+</h2> 
+
+<center>
+<a href="mailto:vpothams@cisco.com">Venkat Pothamsetty</a> and <a href="mailto:mfranz@cisco.com">Matthew Franz</a>
+
+<br><a href="http://www.cisco.com/security_services/ciag/initiatives/research/index.html">Critical
+Infrastructure Assurance Group</a>(CIAG)
+
+<br>Cisco Systems, Inc.
+</center>
+
+
+<h3>Links</h3>
+
+<li><a href="http://www.sf.net/projects/scadahoneynet">Download</a>
+</li><li><a href="http://lists.sourceforge.net/lists/listinfo/scadahoneynet-talk">Mailing List</a>
+</li><li><a href="plc.html">PLC Simulation Case Study</a>
+</li><li><a href="http://www.honeyd.org">Honeyd</a> - a small daemon that creates virtual hosts on a network. The hosts can be configured to run arbitrary services, and their personality can be adapted so that they appear to be running certain operating systems
+
+<h3>News &amp; Updates</h3>
+</li><li>7/15/05/(released version 0.3) - Converted teh stand-alone scripts to work with honeyd, changes to html scripts.  See  <a href="honeyd-scada.html">Release Notes</a> for more details. </li>
+
+<br>
+
+<li>6/01/04/(released version 0.2) - Fixed the bug regarding the absense of modbusHdrs.py, included sample nmap OS fingerprints of some PLCs, included a test file to generate custom Modbus packets to test the modbusSrve.py implementation</li>
+
+<li>5/13/04 - Major cleanup of content
+
+</li></font><li><font face="arial">3/20/04 - PLC Simulation scripts available for down and <a href="plc.html">PLC Simulation Case Study</a> complete.
+
+<h3><a name="SECTION00010000000000000000">
+Objectives</a>
+</h3>
+
+The short-term goal of the project is to determine the feasibility of building
+a software-based framework to simulate a variety of industrial networks such as
+SCADA, DCS, and PLC architectures. We plan to document the requirements and
+release proof of concept code (in the form of <a href="http://www.honeyd.org">honeyd</a> scripts) so that a single Linux host
+can simulate multiple industrial devices and complex network topologies.  Given
+the variety of deployments and the lack of standard, well-defined architectures
+for industrial networks, this project attempts to create the building blocks so
+that users can simulate their networks own networks--not make assumptions about
+what "real world" SCADA/DCS/PLC look like. Assuming deployment of "SCADA
+HoneyNets" ever reach critical mass, the longer term objective of the project
+is to gather information about general attack patterns and specific exploits
+that could be used to write signature for commercial and Open Source IDS
+products.
+
+
+<p>
+
+</p><h3><a name="SECTION00020000000000000000">
+
+Introduction</a>
+</h3>
+
+There is still little information about SCADA vulnerabilities and attacks,
+despite the growing awareness of security issues in industrial networks. As is
+the case with IT security, owner-operators are often unwilling to release
+attack or incident data. However, unlike IT products and protocols, there are
+<b>not</b> the sort of public repositories of vendor advisories and
+vulnerabilities in industrial devices. Although some vulnerability research is
+being conducted in this area, very little has been released publically and no
+"SCADA security tools" (whatever that might mean) have been released to the
+public.
+
+<p>
+To address these limitations, this goal of this project is to provide tools and
+to simulate a variety of industrial networks and devices. We see several uses for this project:
+
+</p><ul>
+<li>Build a HoneyNet for attackers, to gather data on attacker trends and
+tools
+</li>
+
+<li>Provide a scriptable industrial protocol simulators to test a real live
+protocol implementation </li> 
+
+<li>Research countermeasures, such as device hardening, stack obfuscation,
+reducing application information, and the effectiveness network access controls
+</li> </ul>
+
+<p>
+
+</p><h3><a name="SECTION00030000000000000000">
+Feature Requirements</a>
+</h3>
+
+Based on our knowledge of industrial network applications, products, and
+protocols, we identified the following requirements:
+
+<p>
+
+</p><h4><a name="SECTION00031000000000000000">
+Individual Device Simulation</a>
+</h4>
+
+To simulate individual devices, the following functionality is needed:
+
+<p>
+</p><ul>
+
+<li><b>Stack level</b>: To simulate the TCP/IP stack of a Ethernet-based device
+device to a script kiddie type attacker who is scanning the network with OS
+detection tools such as Nmap and Xprobe.</li>
+
+<li><b>Protocol level</b>: To simulate industrial protocols for skilled
+attackers who have the tools which interrogate  protocols and want to do
+something meaningful using the protocol features 
+
+</li> <li><b>Application level</b>: To simulate various applications on a SCADA
+device such as web servers and management applications such as SNMP and Telnet.
+</li>
+
+<li><b>Hardware level</b>:Many of the SCADA devices use serial interfaces such
+as modems and RS232 interfaces for both SCADA protocol communication and for
+management purposes.  An attacker who either "logs into" a SCADA device or has
+access to the serial network, needs to be presented with a serial device and/or
+a protocol communication over a serial device.  </li> </ul>
+
+<p>
+
+</p><h4><a name="SECTION00032000000000000000">
+
+Simulate Network</a>
+</h4>
+
+We need to simulate various entry points so that when an attacker encounters a
+perimeter device, he will be presented the same network as a real SCADA network
+at that particular network entry point
+
+<br>
+Various network entry points that we need to simulate include:
+
+<p>
+
+</p><ol>
+
+<li><b>A router directly connected to the Internet</b>: Control system networks are typically not directly conne 
+a control network is located inside a corporate network.  Assuming 
+the corporate network as Internet, we need to simulate the entry 
+point of a router that seperates the control network and the 
+corporate network.  The devices that are normally connected to 
+such routers would be Industrial Ethernet switches or industrial 
+devices with an IP stack, such as some IP enabled PLCs and wireless 
+access points.
+</li>
+
+<li><b>Direct serial device</b>:Some of the industrial devices 
+have a modem that can be directly dialed into from a PSTN.  We 
+need to simulate a "modem server" that can take connections and 
+behaves like a industrial device or is connected to a industrial 
+device.
+</li>
+
+<li><b>A Ethernet enabled industrial device directly connected 
+to the Internet</b>: Such a scenario should be the same as simulating 
+the stack, the protocols and applications on that device and connecting 
+that to Internet
+
+</li>
+<li><b>An Ethernet serial gateway directly plugged into the 
+Internet</b>:An Ethernet serial gateway is a bridge between the IP 
+network and the serial interface.  The IP side of the device 
+would be connected to the network, either a Industrial switch or 
+a router to which other IP industrial devices are connected to.  
+The serial side of the device would be connected to a serial device 
+or a serial network.
+</li>
+
+<li><b>Wireless</b>: Wireless is one of the entry points into a 
+Industrial network.  Most of the Industrial wireless devices use 
+proprietary wireless protocols and some of them use 802.1b standard.  
+Typically the serial interface of the device would be connected to a 
+wireless bridge.  
+</li>
+
+<li><b>Remote desktop access and HMIs</b>:The Human Machine Interfaces 
+and the software that communicates with Industrial devices usually run
+on a Windows machine.  Administrators who want remote access to these 
+devices would typically run a remote desktop viewer, such as VNC or 
+PC anywhere.  An attacker would normally find it through a port scan '
+after he gets into the control network and might get to it using a 
+VNC client.  Simulating this would probably need a custom made VNC 
+protocol simulation.
+</li>
+
+<li><b>Remote Access Server (RAS)</b>:Another possible entry point into a
+control network is to dial into the network using PPP and use the PPP password
+to authenticate yourself to a Network Access Server and then directly access
+the Industrial device.  </li> </ol>
+
+<p>
+
+</p><h4><a name="SECTION00033000000000000000">
+Capture the attacker tools and tracks</a>
+</h4>
+
+Our scripts need to capture the attacker tools and tracks.  That 
+should include keystroke logging and facilities to capture the 
+tools and binaries he might be up loading, if the attack.  Our scripts also need 
+to capture network traffic.
+
+<p>
+
+</p><h3><a name="SECTION00040000000000000000">
+Review of existing technologies and relavency</a>
+</h3>
+
+<p>
+
+</p><h4><a name="SECTION00041000000000000000">
+Honeyd</a>
+</h4>
+
+Honeyd has facilities for easy simulation of TCP/IP stacks
+and applications.
+
+<br>
+Honeynet takes Nmap and Xprobe signatures through configuration 
+files and sends packet responses to scans matching those signatures.  
+Users can set up profiles, mapping IP addresses that Honeyd should 
+respond to a corresponding device profile.  When attackers Nmap or 
+Xprobe scan the IP address which Honeyd is taking care of, he will 
+be returned with packets matching the corresponding device profile.
+
+<p>
+Therefore using Honeyd, it would be possible to simultaneously 
+simulate stacks of multiple IP based Industrial devices, provided 
+the corresponding scanning tools (Nmap or Xprobe) has the knowledge 
+of the signature.  As of now, there are no signatures of Industrial 
+devices in Nmap's database.
+
+<br>
+Honeyd allows the user to listen on a port and run a script on that 
+particular port when anybody connects to that port.  As of now, there 
+are many scripts contributed to the project, which can simulate web 
+pages, WSFTP servers and Cisco telnet servers.
+
+</p><p>
+
+Using this feature on Honeyd, it is possible to write scripts that simulated
+various Industrial Ethernet protocols. For example, it would be possible to
+simulate a Modbus/TCP server on port 502 and EtherNet/IP on ports 44818/2222.
+
+</p><p>
+
+</p><h4><a name="SECTION00042000000000000000">
+Serial interface simulation</a>
+</h4>
+
+Many industrial network devices use RS-232/485 for communication.  Typically
+the serial port of a PC would be directly (or indirectly, via a serial Ethernet
+gateway) connected to the serial port of the device.  There would be a software
+running on the PC, which sends commands to the device over the serial
+interface. By some accounts there are hundreds of serial protocols in use in
+SCADA networks. Some of the more common protocols are MODBUS and DNP.
+
+
+<p>
+We need to simulate those protocols over the serial port, so as to present a
+protocol interface to an attacker who connects to the serial port. Many
+languages support serial interface programming including Python and Java.  We
+were able to achieve serial communication through a open source Python serial
+programming module (<a href="http://pyserial.sf.net">pyserial.sf.net</a>).
+
+</p><p>
+
+</p><h4><a name="SECTION00044000000000000000">
+Simulating 802.11</a>
+</h4>
+The HostAP driver(http://hostap.epitest.fi/), replies for 802.1b 
+management packets and converts a client adapter an access point.
+The driver can be used to simulate an access point which is inside
+a automation or a SCADA network
+
+<h3><a name="SECTION00043000000000000000">
+Capturing attack tools and capturing the attackers' track</a>
+</h3>
+
+Though not part of Honeyd, there are lots of keystroke loggers available.  We
+need a mechanism to track the attacker on the web interface of the device.  We
+do not know of any tools which can provide that functionality, however we
+explored some possibilities where the the Java applet (running on the
+"attackers" web browser) is able to comm
+
+<p>
+
+
+</p><p>
+
+</p><h3><a name="SECTION00050000000000000000">
+Challenges</a>
+</h3>
+
+<p>
+
+</p><h4><a name="SECTION00051000000000000000">
+Deployment and Testing</a>
+</h4>
+
+An ideal deployment site for such a script would be a subnet close 
+to a real Industrial/SCADA network or a phone number which belongs 
+to a SCADA/Automation plant.  We are not aware of any active and 
+on-going SCADA specific attacks, it would be difficult to get a 
+SCADA aware attacker into the honeypot.
+
+
+
+</font><p><font face="arial">
+Send comments to <a href="mailto:scadahoneynet-talk@lists.sourceforge.net">scadahoneynet-talk@lists.sourceforge.net</a> or <a href="mailto:ciag-tools@cisco.com">ciag-tools@cisco.com</a>
+
+</font>
+</p><p>
+
+
+
+<img src="http://sourceforge.net/sflogo.php?group_id=93178&amp;type=1" width="88" height="31" border="0" alt="SourceForge Logo">  
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-74693-3";
+urchinTracker();
+</script>
+
+
+
+
+</p></li></body></html>

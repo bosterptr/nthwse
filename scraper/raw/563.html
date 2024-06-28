@@ -1,0 +1,334 @@
+<html lang="en" class=" js no-touch" style=""><head>
+<style>
+#title{
+	color: #fefefe;
+	font-size:22px;
+	font-family: Copperplate / Copperplate Gothic Light, sans-serif;
+}
+#login{
+	width:600px; height:400px; position:fixed; 
+	text-align:center; left:50%; top:50%; margin-top:-210px; 
+	margin-left:-310px; border:4px solid #92F; background:#fff; 
+	display:block; z-index:2; visibility:hidden;
+	border-radius: 10px 10px 10px 10px;
+}
+#join{
+	width:600px; height:400px; position:fixed; 
+	text-align:center; left:50%; top:50%; margin-top:-210px; 
+	margin-left:-310px; border:4px solid #1a3; background:#fff; 
+	display:block; z-index:2; visibility:hidden;
+	border-radius: 10px 10px 10px 10px;
+}
+#myinfo{
+	width:600px; height:400px; position:fixed; 
+	text-align:center; left:50%; top:50%; margin-top:-210px; 
+	margin-left:-310px; border:4px solid #ebc; background:#fff; 
+	display:block; z-index:2; visibility:hidden;
+	border-radius: 10px 10px 10px 10px;
+}
+#back{
+	width:100%; height:100%; position:fixed; 
+	top:0; left:0; background-color:rgba(0, 0, 0, 0.5); 
+	z-index:1; visibility:hidden;
+}
+</style>
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-TT8WJ005BW&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript">
+function myinfo_check_submit(){
+		
+	if(!document.myinfo.id.value){
+		alert("Input ID");
+		document.join.id.focus();
+		return false;
+	}
+	if(!document.myinfo.pw.value) 
+	{
+		alert("Input PW");
+		document.myinfo.pw.focus();
+		return false;
+	}  
+	if(!document.myinfo.name.value) 
+	{
+		alert("Input NAME");
+		document.myinfo.name.focus();
+		return false;
+	}  
+	if(!document.myinfo.email.value) 
+	{
+		alert("Input EMAIL");
+		document.myinfo.email.focus();
+		return false;
+	}  	
+	if(document.myinfo.npw.value != document.myinfo.npw2.value) 
+	{
+		alert("Password Doesn't Match!");
+		document.myinfo.pw.focus();
+		return false;
+	}  		
+	document.myinfo.submit();	
+	return true;
+}
+function join_check_submit(){
+		
+	if(!document.join.id.value){
+		alert("Input ID");
+		document.join.id.focus();
+		return false;
+	}
+	if(!document.join.pw.value) 
+	{
+		alert("Input PW");
+		document.join.pw.focus();
+		return false;
+	}  
+	if(!document.join.name.value) 
+	{
+		alert("Input NAME");
+		document.join.name.focus();
+		return false;
+	}  
+	if(!document.join.email.value) 
+	{
+		alert("Input EMAIL");
+		document.join.email.focus();
+		return false;
+	}  	
+	if(document.join.pw.value != document.join.pw2.value) 
+	{
+		alert("Password Doesn't Match!");
+		document.join.pw.focus();
+		return false;
+	}  		
+	document.join.submit();	
+	return true;
+}
+function closeLayer(){
+	var back = document.getElementById("back");
+	back.style.visibility = "hidden";
+	var l = document.getElementById("login");
+	l.style.visibility ="hidden";
+	var l = document.getElementById("join");
+	l.style.visibility ="hidden";
+	var l = document.getElementById("myinfo");
+	l.style.visibility ="hidden";
+}
+function onLayer(layer){
+	var back = document.getElementById("back");
+	back.style.visibility ="visible";
+	back.onclick = function () { 
+		var offsets = document.getElementById(layer).getBoundingClientRect();
+		var top = offsets.top; var left = offsets.left;
+		var bottom = offsets.bottom; var right = offsets.right;
+		var e = window.event; var X = e.clientX; 	var Y = e.clientY;		
+		if( X < left || X > right || Y < top || Y > bottom ){
+			closeLayer(); 			
+		}
+	};
+	var l = document.getElementById(layer);
+	l.style.visibility = "visible";
+}
+function login_check_submit(){
+        if(!document.login.id.value){
+                alert("Input ID");
+                document.login.id.focus();
+                return false;
+        }
+        if(!document.login.pw.value) 
+        {
+                alert("Input PW");
+                document.login.pw.focus();
+                return false;
+        }
+        document.join.submit(); 
+        return true;
+}
+function toggle(){
+    var div = document.getElementById('pwreset');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+</script>
+<link rel="stylesheet" type="text/css" href="css/default.css">
+<link rel="stylesheet" type="text/css" href="css/component.css">
+<script src="js/modernizr.custom.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52224222-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<div id="back"></div>
+<div id="login">
+	<br><br><br><br>
+	<h2>Login</h2>
+	<form method="post" name="login" action="lib.php?cmd=login" onsubmit="return login_check_submit()">
+	ID <input type="text" name="id" value=""> <br>
+	PW <input type="password" name="pw" value=""> <br>
+	<input type="submit" value="login"> <input type="button" onclick="onLayer('join');" value="JOIN"> <input type="button" onclick="toggle()" value="forgot pw">
+	</form>
+	<br>
+	<div id="pwreset" style="display: none;">
+	    <form method="post" action="lib.php?cmd=pwreset">
+	    ID <input type="text" name="id" value=""> <input type="submit" value="RESET PASSWORD (slow! u gotta wait)">
+	    </form>
+	</div>	
+</div>
+<div id="join">
+	<br><br><br><br>
+	<h2>Join</h2>			
+	<form method="post" name="join" action="lib.php?cmd=join" onsubmit="return join_check_submit()">
+	<center>
+	*passwords are encrypted. but avoid using important password (i.e., password for your google account).
+	<table>
+	<tbody><tr><td>ID</td>		<td><input type="text" name="id"></td></tr>
+	<tr><td>NAME</td>	<td><input type="text" name="name"></td></tr>
+	<tr><td>E-MAIL</td>	<td><input type="text" name="email"></td></tr>
+	<tr><td>PW</td>		<td><input type="password" name="pw"></td></tr>
+	<tr><td>PW Confirm</td>	<td><input type="password" name="pw2"></td></tr>
+	<tr><td colspan="2" align="center"><font size="2">Input valid E-MAIL if you want wechall scoring and password recovery</font></td></tr>
+	<tr><td colspan="2" align="center"><input type="submit" value="OK"></td></tr>
+	</tbody></table>		
+	
+</center></form></div>
+<div id="myinfo">
+	Login first	
+i</div>
+
+<div class="container">
+<!-- Top Navigation -->
+<div class="codrops-top clearfix">
+<a href="#" onclick="location.href=&quot;index.php&quot;" class="codrops-icon"><span>Home</span></a>
+<a href="#" onclick="location.href=&quot;play.php&quot;" class="codrops-icon"><span>Play</span></a>
+<a href="#" onclick="location.href=&quot;rank.php&quot;" class="codrops-icon"><span>Rank</span></a>
+	<span class="right"><a class="codrops-icon codrops-icon-drop" href="#" onclick="onLayer(&quot;login&quot;);"><span>Login</span></a></span>
+	</div>
+
+<header>
+<a href="https://www.youtube.com/watch?v=HPKxrwrmOgk"><img src="logo.png" width="35%"></a><br>
+
+</header>
+<section class="color-1">
+<center>
+	<span id="title">What is pwnable.kr?</span><br><br>
+	<table width="700">
+	<tbody><tr><td>
+	&nbsp;&nbsp; 'pwnable.kr' is a non-commercial <i><a href="https://en.wikipedia.org/wiki/Wargame_(hacking)">wargame site</a></i> 
+        which provides various pwn challenges regarding system exploitation.
+	the main purpose of pwnable.kr is <i>'fun'</i>. &nbsp;&nbsp; please consider each of the challenges as a game.
+	But, if you want to just study pwn-related stuffs, check out the following video lectures.
+	</td></tr>
+<tr><td>
+	<iframe style="border-width:2px; border-color:white; border-style:solid" width="330" height="220" src="https://www.youtube.com/embed/RCJdPiogUIk?wmode=transparent" frameborder="0" wmode="Opaque"></iframe>
+	<iframe style="border-width:2px; border-color:white; border-style:solid" width="330" height="220" src="https://www.youtube.com/embed/jwzeJU_62IQ?wmode=transparent" frameborder="0" wmode="Opaque"></iframe>
+<br>
+	<iframe style="border-width:2px; border-color:white; border-style:solid" width="330" height="220" src="https://www.youtube.com/embed/eWEgUcHPle0?wmode=transparent" frameborder="0" wmode="Opaque"></iframe>
+	<iframe style="border-width:2px; border-color:white; border-style:solid" width="330" height="220" src="https://www.youtube.com/embed/eTcVLqKpZJc?wmode=transparent" frameborder="0" wmode="Opaque"></iframe>
+</td></tr>
+	<tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr>
+	</tbody></table>
+
+	<span id="title">How do I play?</span><br><br>
+	<table width="700">
+	<tbody><tr><td>
+	&nbsp;&nbsp; there are <i>flag</i> &nbsp; files corresponding to each challenges (similar to <a href="https://ctftime.org/ctf-wtf/">CTF</a>), you need to read it and submit to pwnable.kr to get the corresponding point.
+	in order to read the flag file, you need some skills regarding programming, reverse-engineering, bug exploitation, system knowledge, cryptography.
+	each challenges have author's <i>intended solution</i>, however, there are a lot of unintended solutions as well :)
+	the challenges are divided into four categories.<br>
+	<br>
+	[Toddler's Bottle] &nbsp;-&nbsp; very easy challenges with simple mistakes.<br>
+	[Rookiss] &nbsp;-&nbsp; typical bug exploitation challenges for rookies.<br>
+	[Grotesque] &nbsp;-&nbsp; these challenges are grotesque-y. painful to solve it, but very tasty flag :)<br>
+	[Hacker's Secret] &nbsp;-&nbsp; intended solution for these challenges involves special techniques.<br>
+	<br>
+	</td></tr>
+	<tr><td>&nbsp;</td></tr>
+	</tbody></table>
+
+	<span id="title">Disclaimer</span><br><br>
+	<table width="700">
+	<tbody><tr><td>1. pwnable.kr is a <i>non-commercial</i> website.</td></tr>
+	<tr><td>2. the contents and services provided by pwnable.kr is absolutly free to individuals for non-commercial use, 
+	however it is <i>prohibited</i> from being utilized in commercial manner.</td></tr>
+	<tr><td>3. contact admin or use proper citation in case of using the contents of pwnable.kr for non-commercial *public* use (e.g., academic class exercise).</td></tr>
+	<tr><td>4. never use pwnable.kr's resources or information learned from pwnable.kr for illegal purpose.</td></tr>
+	<tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr>
+	</tbody></table>
+	
+	<span id="title">Rules &amp; Tips</span><br><br>
+	<table border="1" bordercolor="white" cellpadding="10" cellspacing="0" width="700">
+	<tbody><tr><td>1. all kinds of DoS activities (i.e., too many process/file creation, or network access) are forbidden. 
+	<b>there is no challenge which requires *excessive brute-forcing*</b>. the intended solution always gets you the flag in less than a minuet</td></tr>
+	<tr><td>2. if you find any unintended bug or system deficiency, please report admin. you will be thanked and get some credit</td></tr>
+	<tr><td>3. challenges in Toddler's Bottle are allowed to freely post the solutions online. However, please refrain from posting solution for challenges in other categories. But if you insist, post easy ones (solved by many people) and do not spoil too much details for the sake of fun. </td></tr>
+	<tr><td>4. you can ask/answer hints for challenges in IRC, but again, don't spoil too much</td></tr>
+	<tr><td>5. all challenges are solvable. but if you think something is wrong, feel free to report admin</td></tr>
+	<tr><td>6. google is the best teacher in the world, but if you are hopelessly stuck, feel free to contact admin or IRC for advice</td></tr>
+	<tr><td>7. difficulties of pwnable.kr is orders of magnitude easier than top class CTF such as <a href="https://legitbs.net/">DEFCON CTF</a> or real world hacking contest such as <a href="https://en.wikipedia.org/wiki/Pwn2Own">PWN2OWN</a></td></tr>	
+	</tbody></table>
+
+	<br><br>
+	<span id="title">Contact</span><br><br>
+	<table border="1" bordercolor="white" cellpadding="10" cellspacing="0" width="700">
+	<tbody><tr><td>admin</td><td> daehee (daehee87@khu.ac.kr) </td></tr>
+	<tr><td>irc</td><td> irc.netgarage.org:6667/#pwnable.kr (or type "irssi" from pwnable.kr server)</td></tr>
+	</tbody></table>
+	<br><br>
+	<span id="title">Credits</span><br><br>
+	<table width="700">
+	<tbody><tr><td>jonathanxz22 : reporting server vulnerability (weak password)</td></tr>
+	<tr><td>N1kasu, martin : reporting server vulnerability (local privilege escalation)</td></tr>
+	<tr><td>veritas501 : reporting configuration error that allows unintended access for all QEMU-based tasks</td></tr>
+	<tr><td>haber : reporting multiple vulnerabilities in configuration</td></tr>
+	<tr><td>afang : reporting unintended solution (dos4fun)</td></tr>
+	<tr><td>debukuk : reporting CSRF vulnerability on webpage</td></tr>
+	<tr><td>yelang123 : reporting XSS vulnerability on webpage</td></tr>
+	<tr><td>5unKn0wn : reporting unintended solution (pwnsandbox)</td></tr>
+	<tr><td>Charo : reporting web server configuration error</td></tr>
+	<tr><td>martin : reporting server vulnerability (local privilege escalation on proxy-server challenge)</td></tr>
+	<tr><td>bla : IRC channel support</td></tr>
+	<tr><td>neomant : reporting site management mistake (information disclosure)</td></tr>
+	<tr><td>null0 : reporting site configuration error (duplicate flag authentication)</td></tr>
+	<tr><td>acez : reporting server configuration error (unintended access for all QEMU-based tasks)</td></tr>
+	<tr><td>sweetchip : reporting server configuration error (unintended ssh access)</td></tr>
+	</tbody></table>
+
+	<br><br>
+	<span id="title">Cool wargame sites &amp; CTF competition</span><br><br>
+	<table width="700">
+	<tbody><tr><td>
+	<center><a href="http://io.netgarage.org"><img width="300" height="100" src="img/sts.png"></a> <a href="https://w3challs.com/"><img width="300" height="100" src="img/w3challs.png"></a><br>
+	<center><a href="https://ctftime.org"><img width="300" height="100" src="img/ctftime.png"></a> <a href="https://legitbs.net/"><img width="300" height="100" src="img/defcon.png"></a><br>
+	<center><a href="http://ghostintheshellcode.com"><img width="300" height="100" src="img/gits.png"></a> <a href="http://codegate.org/"><img width="300" height="100" src="img/codegate.png"></a><br>
+	<br>
+	</center></center></center></td></tr>	
+	</tbody></table>	
+
+        <br><br>
+        <span id="title">pwnable.kr is powered/supported by SSLab@Gatech, Pwnlab@KHU</span><br><br>
+        <table width="700">
+        <tbody><tr><td>
+        <center><a href="https://gts3.org/"><img width="300" height="100" src="img/sslab.png"></a>
+                <a href="https://pwnlab.kr"><img width="300" height="100" src="https://pwnlab.kr/images/lablogo.png"></a><br>
+        <br>
+        </center></td></tr>
+        </tbody></table>
+
+
+</center></section>
+<center><font size="2">© PWNABLE.KR SINCE 2014 - ALL RIGHTS RESERVED. OPTIMIZED TO CHROME
+</font></center></div><!-- /container --><font size="2">
+<script src="js/classie.js"></script>
+
+
+
+
+</font></body></html>

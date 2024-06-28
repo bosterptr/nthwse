@@ -1,0 +1,1470 @@
+<html ng-app="app" ng-controller="AppController" class="ng-scope"><head><style>@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>
+    <title>Webhook.site - Test, transform and automate Web requests and emails</title>
+
+    <script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-FYRV1HFMZK&amp;cx=c&amp;_slc=1"></script><script>
+        window.AppConfig = {
+            Debug: false,
+            Title: "Webhook.site - Test, transform and automate Web requests and emails",
+            Broadcaster: "socket.io",
+            EchoHostMode: "url",
+            EchoUrl: "ws.webhook.site",
+            PusherToken: "",
+            MaxRequests: 100,
+            CdnUrl: "https://cdn.webhook.site",
+            EmailDomain: "emailhook.site",
+        };
+    </script>
+
+    <link href="https://cdn.webhook.site/css/app.css?1718368178" rel="stylesheet">
+    <script src="https://cdn.webhook.site/js/libs.js?1718368178"></script>
+    <script src="https://cdn.webhook.site/js/bundle.js?1718368178"></script>
+    <script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+
+    <meta name="description" content="Instantly generate a free, unique URL and email address to test, inspect, and automate (with a visual workflow editor and scripts) incoming HTTP requests and emails">
+    <meta charset="utf8">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.webhook.site/assets/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.webhook.site/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.webhook.site/assets/icons/favicon-16x16.png">
+    <link rel="manifest" href="/assets/icons/site.webmanifest">
+    <link rel="preload" as="font" href="https://cdn.webhook.site/fonts/bootstrap/bootstrap-icons.woff2" crossorigin="anonymous">
+    <link rel="preload" as="font" href="https://cdn.webhook.site/fonts/bootstrap/glyphicons-halflings-regular.woff2" crossorigin="anonymous">
+    <link rel="canonical" href="https://webhook.site">
+    <meta name="msapplication-TileColor" content="#bbbbbb">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body style="padding-top: 90.2px;">
+<!-- uiView: --><div class="mainView ng-scope" ui-view="">
+    <nav class="navbar navbar-inverse navbar-fixed-top navbar-primary ng-scope">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#!/" ui-sref="home()">
+                    <img src="https://cdn.webhook.site/icon.png" style="display:inline; width: 22px; height: 22px" alt="Icon">
+                    <span class="hidden-sm">Webhook.site</span></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left small">
+                    <li><a ga-on="click" ga-event-category="NavLink" ga-event-action="docs-api" href="http://docs.webhook.site" target="_blank">Docs &amp; API</a></li>
+                    <li class="hidden-sm hidden-md"><a ga-on="click" ga-event-category="NavLink" ga-event-action="custom-actions" href="http://docs.webhook.site/custom-actions.html" target="_blank">Custom Actions</a></li>
+                    <li><a class="hidden-sm hidden-md" ga-on="click" ga-event-category="NavLink" ga-event-action="webhookscript" href="http://docs.webhook.site/webhookscript.html" target="_blank">WebhookScript</a></li>
+                    <li><a ga-on="click" ga-event-category="NavLink" ga-event-action="terms-privacy" href="/terms" target="_blank">Terms &amp; Privacy</a></li>
+                    <li><a ga-on="click" ga-event-category="NavLink" ga-event-action="support" href="https://support.webhook.site" target="_blank">Support</a></li>
+                </ul>
+                <div class="nav navbar-right navbar-form">&nbsp;
+                    <div class="btn-group hidden-md hidden-sm">
+                        <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="bi-clipboard-check"></span> Copy <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a ng-click="copyUrlToClipboard()" ga-on="click" ga-event-category="URLCopy" ga-event-action="copy-nav">
+                                    URL<br>
+                                    <span class="small text-muted ng-binding">https://webhook.site/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e</span>
+                                </a></li>
+                            <li class="divider"></li>
+                            <li><a ng-click="copyEmailToClipboard()" ga-on="click" ga-event-category="EmailCopy" ga-event-action="copy-nav">
+                                    Email Address<br>
+                                    <span class="small text-muted ng-binding">6395ab7a-aba2-45fc-9e02-2e20c4c06c1e@emailhook.site</span>
+                                </a></li>
+                            <li class="divider"></li>
+                            <li><a ng-click="copyIdToClipboard()" ga-on="click" ga-event-category="EmailCopy" ga-event-action="copy-nav">
+                                    ID<br>
+                                    <span class="small text-muted ng-binding">6395ab7a-aba2-45fc-9e02-2e20c4c06c1e</span>
+                                </a></li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-link openModal" data-modal="#editUrlModal" ga-on="click" ga-event-category="Request" ga-event-action="click-newurl">
+                        <span class="bi-pencil-square"></span> Edit
+                    </button>
+                    <button type="button" class="btn btn-link openModal" data-modal="#newUrlModal" ga-on="click" ga-event-category="Request" ga-event-action="click-editurl">
+                        <span class="bi-plus-lg"></span> New
+                    </button>
+                    <span class="vertSpacer"> </span>
+                                            <a type="button" class="btn btn-link" ga-event-category="LogIn" ga-on="click" ga-event-action="click-nav" href="https://webhook.site/login?highlight_token=6395ab7a-aba2-45fc-9e02-2e20c4c06c1e">
+                            <span class="bi-person-fill"></span> Login
+                        </a>
+                        <a class="btn btn-primary strong" ng-hide="token.premium" href="/register?token_id=6395ab7a-aba2-45fc-9e02-2e20c4c06c1e" ng-click="upgrade()" ga-on="click" ga-event-category="Premium" ga-event-action="upgrade-header">
+                            <span class="bi-arrow-up-square-fill"></span> Upgrade Now
+                        </a>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="navbar controls navbar-fixed-top navbar-secondary ng-scope" style="top: 50px;">
+        <div class="controlsActions">
+            <span class="small label label-primary ng-hide" data-placement="bottom" data-toggle="tooltip" title="Upgraded features unlocked for this URL" ng-show="token.premium"><i class="bi-check-circle-fill"></i></span>
+            <span class="small label label-default-" data-placement="bottom" data-toggle="tooltip" title="This URL will expire on 2024-06-22T12:16:40.000000Z" ng-show="token.expires_at"><i class="bi-clock-fill"></i></span>
+
+            <span class="vertSpacer" ng-show="token.premium || token.expires_at"> </span>
+
+            <!-- Password -->
+            <a href="" class="btn btn-xs ng-binding" ga-on="click" ga-event-category="Password" ga-event-action="set" ng-click="setPassword()" title="[Upgrade Required] Require a password to see the requests" data-toggle="tooltip" data-placement="bottom">
+                 Password
+            </a>
+
+            <span class="vertSpacer"> </span>
+
+            <!-- Alias -->
+            <a href="" class="btn btn-xs ng-binding" ga-on="click" ga-event-category="Alias" ga-event-action="set" ng-click="setAlias()" title="[Upgrade Required] Get a vanity URL that is easier to remember (webhook.site/your-alias)" data-toggle="tooltip" data-placement="bottom">
+                Alias</a>
+
+            <span class="vertSpacer"> </span>
+
+            <!-- Schedule -->
+            <a class="btn btn-xs" ga-on="click" ga-event-category="Schedule" ga-event-action="create" href="/control-panel/schedules/create?url=https://webhook.site/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e" title="[Upgrade Required] Create a Schedule with this URL" data-toggle="tooltip" data-placement="bottom">
+                Schedule</a>
+
+            <span class="vertSpacer"> </span>
+
+            <!-- Export -->
+            <a href="" class="btn btn-xs" ga-on="click" ga-event-category="Export" ga-event-action="set" ng-click="csvExport()" title="[Upgrade Required] Export all requests to a CSV file" data-toggle="tooltip" data-placement="bottom">
+                CSV Export</a>
+
+            <span class="vertSpacer"> </span>
+
+            <!-- Actions -->
+
+            <a href="" class="openModal btn btn-xs" data-modal="#actionsModal" ng-click="getActions(token)" ga-on="click" ga-event-category="CustomActions" ga-event-action="settings" title="[Upgrade Required] Run custom actions on each request" data-toggle="tooltip" data-placement="bottom">
+                <i class="bi-gear-fill"></i>
+                Custom Actions</a>
+            &nbsp;
+            <a ng-click="executeActions(token, currentRequest)" id="btnExecuteActions" class="btn btn-xs" ga-on="click" ga-event-category="CustomActions" ga-event-action="exec-now" title="[Upgrade Required] Execute all Custom Actions on this request" data-toggle="tooltip" data-placement="bottom">
+                Run Now</a>
+
+            <span class="vertSpacer"> </span>
+
+            <!-- Redirection -->
+
+            <a href="" class="openModal btn btn-xs" data-modal="#redirectModal" ga-on="click" ga-event-category="AutoRedirect" ga-event-action="settings">
+                <i class="bi bi-arrow-up-right-square-fill"></i> XHR Redirect</a>
+            &nbsp;
+            <a ng-click="xhrRedirectExecute(currentRequest)" class="btn btn-xs disabled" ng-class="xhrRedirect.url ? '' : 'disabled'" ga-on="click" ga-event-category="AutoRedirect" ga-event-action="redir-now">Redirect
+                Now</a>
+
+
+            <span class="vertSpacer"> </span>
+
+            <span class="dropdown">
+                <a href="" data-toggle="dropdown" aria-haspopup="true" id="optionsDropdown" class="btn btn-xs dropdown-toggle" title="Toggle ordering">More <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="optionsDropdown">
+                    <li><a ng-click="resetUnread()">Mark all as read</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li>
+                        <a ng-click="hideDetails = !hideDetails">
+                            <!-- ngIf: hideDetails --> Hide Details</a></li>
+                    <li>
+                        <a ng-click="autoNavEnable = !autoNavEnable">
+                            <!-- ngIf: autoNavEnable --> Auto Navigate</a></li>
+                    <li>
+                        <a ng-click="hideDontSave = !hideDontSave">
+                            <!-- ngIf: hideDontSave --> Hide "Don't Save" Requests</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a style="color:#bc1233" ng-click="deleteAllRequests(token.uuid)">Delete all requests...</a></li>
+                    <li><a style="color:#bc1233" ng-click="deleteToken(token.uuid)">Delete URL...</a></li>
+                    <li><a style="color:#bc1233" ng-click="deleteSendRequestResponses(token.uuid, currentRequest.uuid)">
+                            Delete HTTP Request responses</a></li>
+                </ul>
+            </span>
+        </div>
+
+    </nav>
+
+    <!-- ngIf: token.uuid --><div class="container-fluid ng-scope" id="app" ng-if="token.uuid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar sidebar-top">
+                <div class="sidebar-header">
+
+                    <span id="request-count" class="ng-binding">
+                        Requests (0/100)
+                    </span>
+                    &nbsp;
+                    <button type="button" id="sorting-toggle" class="btn btn-default btn-xxs dropdown-toggle ng-binding" ng-click="toggleSorting()" title="Toggle ordering">Newest First
+                    </button>
+
+                </div>
+
+                <div class="sidebar-search">
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Search Query" ng-model="search" ng-change="updateSearch(search)" ng-model-options="{debounce: 1000}" class="ng-pristine ng-untouched ng-valid ng-empty">
+                    </div>
+                    <div class="search-help-container">
+                        <a ng-click="search = ''; updateSearch('')" ng-hide="search == ''" class="search-clear ng-hide" data-toggle="tooltip" title="Clear search">
+                            <i class="bi-x-circle-fill"></i></a>
+                        <a href="https://docs.webhook.site/api/requests.html#search-query-examples" target="_blank">
+                            <i class="bi-question-circle-fill"></i></a>
+                    </div>
+                </div>
+
+                <p ng-show="!hasRequests &amp;&amp; !search" class="small muted" id="waiting-for-request">
+                    <img src="/assets/images/pulse.svg" width="25" height="25">
+                    Waiting for first request
+                </p>
+
+                <p ng-show="!hasRequests &amp;&amp; search" class="small ng-hide">
+                    No results
+                </p>
+
+                <div>
+                    <ul class="nav nav-sidebar">
+                        <li ng-show="hasRequests
+                                        &amp;&amp; currentPage > 1
+                                        &amp;&amp; requests.total > requests.data.length
+                                        &amp;&amp; requests.current_page != 1
+                                        &amp;&amp; requests.to != requests.data.length" class="ng-hide">
+                            <a ng-click="getPreviousPage(token.uuid)" class="prevent-default">Previous Page</a>
+                        </li>
+                        <!-- ngRepeat: (key, request) in requests.data -->
+                        <li ng-show="hasRequests &amp;&amp; !requests.is_last_page" class="ng-hide">
+                            <a ng-click="getNextPage(token.uuid)" class="prevent-default">Next page</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-3 col-md-2 sidebar" style="margin-top: 10px; height: 40px; bottom: 0px; top: auto; padding: 10px 0 0 0">
+                <div class="text-center ng-hide" ng-show="hasRequests">
+                    <a class="btn btn-xs btn-link disabled" id="controlsFirst" ng-click="goToFirstPage()" ng-class="{'disabled': requests.from <= requests.per_page || total <= requests.per_page}" title="Go to first page">
+                        First</a>
+                    <a class="btn btn-xs btn-link disabled" id="controlsPrev" ng-class="hasRequests &amp;&amp; requests.data.indexOf(currentRequest) <= requests.data.length &amp;&amp; requests.data.indexOf(currentRequest) !== 0 ? '' : 'disabled'" ng-click="goToPreviousRequest()" title="Go to previous page">
+                        ← Prev</a>
+                    <a class="btn btn-xs btn-link disabled" id="controlsNext" ng-class="requests.data.indexOf(currentRequest) !== requests.data.length-1 ? '' : 'disabled'" ng-click="goToNextRequest()" title="Go to next page">
+                        Next →</a>
+                    <a class="btn btn-xs btn-link disabled" id="controlsLast" ng-class="{'disabled': requests.is_last_page || requests.total <= requests.to }" ng-click="goToLastPage()" title="Go to last page">
+                        Last</a>
+
+                </div>
+            </div>
+            <div id="request" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <div id="rate-limit-warning" class="alert alert-warning ng-hide" ng-show="!token.premium &amp;&amp; hasRequests &amp;&amp; requests.total >= appConfig.MaxRequests">
+                    <p><strong>Upgrade to a Webhook.site account to unlock unlimited requests</strong></p>
+                    <p class="ng-binding">This URL received the maximum of 100 requests and can't accept more
+                        requests, emails or DNSHooks.
+
+                        New requests sent to this URL will return HTTP status code 410 Gone or 429 Too Many Requests and
+                        won't be logged. Also note that it is against our terms of service to use Webhook.site for any
+                        kind of load testing or benchmarking. <br>
+                        <a style="margin-top:10px" class="btn btn-primary" href="/register?token_id=6395ab7a-aba2-45fc-9e02-2e20c4c06c1e">
+                            <i class="bi-arrow-up-square-fill"></i>
+                            Upgrade Now</a>
+                    </p>
+                </div>
+
+                <div class="alert alert-warning ng-hide" ng-show="!token.premium &amp;&amp; user.team.subscribed">
+                    <i class="bi-info-circle"></i>
+                    This URL is not associated with your account and doesn't have upgraded features enabled.
+                     <a ng-click="upgrade()" class="pull-right">
+                        <i class="bi-plus-circle-fill"></i> Add to account</a>
+
+                </div>
+
+                <div>
+                    <div class="container-fluid">
+                        <div class="row tutorial-container" ng-show="!hasRequests">
+                            <div class="col-md-6">
+                                <div class="tutorial">
+                                    <h4>Your unique URL</h4>
+                                    <p>
+                                        <code ng-click="copyUrlToClipboard();" onclick="$(this).fadeOut(100).fadeIn(100);" title="Copy to clipboard" data-toggle="tooltip" class="ng-binding">https://webhook.site/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e</code>
+                                        <a class="btn btn-xs btn-link" href="https://webhook.site/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e" target="_blank">
+                                            <i class="bi-box-arrow-up-right"></i> Open in new tab</a>
+                                        <a class="btn btn-xs btn-link" href="https://docs.webhook.site/api/examples.html" target="_blank">
+                                            <i class="bi-box-arrow-up-right"></i> Examples</a>
+                                    </p>
+                                </div>
+                                <div class="tutorial">
+                                    <h4>
+                                        Your unique email address
+                                    </h4>
+                                    <p>
+                                        <code ng-click="copyEmailToClipboard()" onclick="$(this).fadeOut(100).fadeIn(100);" title="Copy to clipboard" data-toggle="tooltip" class="ng-binding">6395ab7a-aba2-45fc-9e02-2e20c4c06c1e@emailhook.site</code>
+
+                                        <a class="btn btn-xs btn-link" href="mailto:6395ab7a-aba2-45fc-9e02-2e20c4c06c1e@emailhook.site" target="_blank">
+                                            <span class="bi-envelope"></span> Open in mail client</a>
+                                    </p>
+                                </div>
+                                <div class="tutorial" style="zoom: 80%">
+                                    <h4>
+                                        Your unique DNS name
+                                    </h4>
+                                    <p>
+                                        <code ng-click="copy(getDnshook())" onclick="$(this).fadeOut(100).fadeIn(100);" title="Copy to clipboard" data-toggle="tooltip" class="ng-binding">*.6395ab7a-aba2-45fc-9e02-2e20c4c06c1e.dnshook.site</code>
+                                        <a class="btn btn-xs btn-link" href="https://docs.webhook.site/dnshook.html" target="_blank">
+                                            <i class="bi-box-arrow-up-right"></i> About DNSHook</a>
+                                    </p>
+                                </div>
+                                <div class="tutorial" style="zoom: 80%">
+                                    <h4>
+                                        Forward to localhost with Webhook.site CLI
+                                    </h4>
+                                    <p>
+                                        <code ng-click="copyForwardToClipboard();" onclick="$(this).fadeOut(100).fadeIn(100);" title="Copy to clipboard" class="console-command ng-binding" data-toggle="tooltip">whcli forward --token=6395ab7a-aba2-45fc-9e02-2e20c4c06c1e</code>
+
+                                        <a class="btn btn-xs btn-link" href="https://docs.webhook.site/cli.html#installation" ga-on="click" ga-event-category="EmailCopy" ga-event-action="copy-welcome">
+                                            <span class="bi-box-arrow-up-right"></span> Install whcli</a>
+                                    </p>
+                                </div>
+
+                                <p class="github-button-container">
+                                    <a class="github-button" href="https://github.com/fredsted/webhook.site" data-icon="octicon-star" data-show-count="true" aria-label="Star fredsted/webhook.site on GitHub">Star on GitHub</a>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>What is Webhook.site?</h4>
+                                <p><strong>Webhook.site</strong> generates free, unique URLs and e-mail addresses
+                                    and lets you see everything that’s sent there instantly.</p>
+
+                                <p>When you
+                                    <a ng-click="upgrade()">upgrade to a Webhook.site account</a>, limitations are removed and
+                                    more features are included:</p>
+
+                                <ul class="tutorial-list">
+                                    <li>Create advanced workflows that run on incoming requests, emails and DNSHooks with
+                                        <a href="https://docs.webhook.site/custom-actions.html">Custom Actions</a>
+                                        <ul>
+                                            <li>Transform data with JSONPath, Regex</li>
+                                            <li>Forward data to other endpoints and APIs</li>
+                                            <li>Run scripts with JavaScript and WebhookScript</li>
+                                            <li>Built-in integrations: Google Sheets, Excel, Slack, Dropbox, SFTP, HTTP, Email,
+                                                push notifications, <a href="https://docs.webhook.site/custom-actions/action-types.html">and more</a></li>
+                                            <li>Support for databases: MySQL, Postgres</li>
+                                        </ul>
+                                    </li>
+                                    <li>URLs never expire and can be managed in Control Panel or via API</li>
+                                    <li>History of up to 10.000 requests and emails per URL</li>
+                                    <li>Data is protected in your account</li>
+                                    <li>Create Web cronjobs and uptime monitors using <a href="https://docs.webhook.site/schedules.html">Schedules</a></li>
+                                </ul>
+
+                                <p><a class="btn btn-primary" ng-click="upgrade()">
+                                        <span class="bi-arrow-up-square-fill"></span> Upgrade Now – from $7.5/month</a>
+                                </p>
+                                <p class="tutorial-links">
+                                    <a href="/register?token_id=6395ab7a-aba2-45fc-9e02-2e20c4c06c1e#features" ng-click="upgrade()">Read more about benefits</a>
+                                    <a href="https://docs.webhook.site">About Us</a>
+                                    <a href="https://docs.webhook.site">Documentation</a>
+                                    <a href="https://docs.webhook.site/faq.html">FAQ</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row muted" id="requestDetails" ng-show="!hideDetails" ng-class="{'muted': !hasRequests}">
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2">
+                                            Request Details
+                                            <span class="pull-right">
+                                                <a class="btn btn-link btn-xxs" href="https://webhook.site/#!/view/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e?query=uuid:" ga-event-category="Permalink" ga-event-action="" ga-on="click">
+                                                    Permalink</a>
+                                                <a class="btn btn-link btn-xxs" target="_blank" href="https://webhook.site/token/6395ab7a-aba2-45fc-9e02-2e20c4c06c1e/request//raw" ga-event-category="RawContent" ga-event-action="click" ga-on="click">
+                                                    Raw content</a>
+                                                <!-- ngIf: currentRequest.type === 'web' -->
+                                                <a class="btn btn-link btn-xxs btn-link-danger hidden-lg" ng-click="deleteRequest(currentRequest, requests.data.indexOf(currentRequest))" ga-event-category="HeadersBar" ga-event-action="deleteRequest" ga-on="click">Delete</a>
+                                            </span>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- ngIf: currentRequest.type === 'web' -->
+                                    <!-- ngIf: currentRequest.type === 'dns' || (currentRequest.type === 'web' && (!currentRequest.user_agent || currentRequest.user_agent.indexOf('Webhook.site/') == -1)) -->
+                                    <!-- ngIf: currentRequest.type === 'email' -->
+                                    <tr>
+                                        <td>Date</td>
+                                        <td id="req-date" title=" UTC">
+                                            <span ng-show="hasRequests" class="ng-binding ng-hide">15.06.2024 14:16:42 (kilka sekund temu)</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Size</td>
+                                        <td id="req-date" title=" bytes" class="ng-binding">
+                                            0 bytes
+                                        </td>
+                                    </tr>
+                                    <!-- ngIf: currentRequest.time -->
+                                    <tr>
+                                        <td width="15%">ID</td>
+                                        <td id="req-date" class="ng-binding"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <!-- ngIf: currentRequest.type === 'email' -->
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2">Headers</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- ngRepeat: (headerName, values) in currentRequest.headers track by headerName -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row muted" id="requestData" ng-show="!hideDetails &amp;&amp; currentRequest.type !== 'email'" ng-class="{'muted': !hasRequests}">
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2">Query strings</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-show="!currentRequest.query">
+                                        <td><span class="small">(empty)</span></td>
+                                    </tr>
+                                    <!-- ngRepeat: (name, value) in currentRequest.query -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2">Form values</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-show="!currentRequest.request">
+                                        <td><span class="small">(empty)</span></td>
+                                    </tr>
+                                    <!-- ngRepeat: (name, value) in currentRequest.request -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row ng-hide" id="requestFiles" ng-hide="currentRequest.files | isEmpty">
+                            <div class="col-sm-12">
+                                <table class="table table-borderless table-striped table-align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2">Files</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- ngRepeat: (fileId, fileProps) in currentRequest.files -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row muted" ng-class="{'muted': !hasRequests}">
+                            <div class="col-md-12">
+                                <!-- No content -->
+                                <p id="noContent" ng-show="!hasRequests || currentRequest.content == ''">
+                                    No content</p>
+
+                                <!-- Text content (Email only) -->
+                                <p class="pull-right small ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content">
+                                    <label class="inline" title="Toggles word-wrap">
+                                        <input type="checkbox" ng-model="wordWrapEnable" ga-on="click" ga-event-category="WordWrap" ga-event-action="toggle" class="ng-pristine ng-untouched ng-valid ng-not-empty">
+                                        Word-Wrap</label>
+                                     <a ng-click="copy(currentRequest.text_content)">Copy</a>
+                                </p>
+                                <p class="header strong ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content">
+                                    Text Content</p>
+                                <pre class="req-content ng-hide wordwrapDisable" btf-markdown="currentRequest.text_content" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content" ng-class="{'wordwrapDisable': wordWrapEnable}"></pre>
+                                <p class="pull-right small ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.html_content">
+                                    <label class="inline" title="Toggles word-wrap">
+                                        <input type="checkbox" ng-model="wordWrapEnable" ga-on="click" ga-event-category="WordWrap" ga-event-action="toggle" class="ng-pristine ng-untouched ng-valid ng-not-empty">
+                                        Word-Wrap</label>
+                                     <a ng-click="copy(currentRequest.html_content)">Copy</a>
+                                </p>
+                                <p class="header strong ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.html_content">
+                                    HTML Content</p>
+                                <pre class="req-content ng-binding ng-hide wordwrapDisable" ng-bind="currentRequest.html_content" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.html_content" ng-class="{'wordwrapDisable': wordWrapEnable}"></pre>
+
+                                <!-- Content (Email+Web) -->
+                                <div ng-show="hasRequests &amp;&amp; (currentRequest.content != '' || currentRequest.email_truncated)" class="ng-hide">
+                                    <div class="pull-right small">
+                                        <label class="inline ng-hide" title="Automatically applies easy to read JSON formatting on valid requests" ng-show="currentRequest.type === 'web'">
+                                            <input type="checkbox" ng-model="formatJsonEnable" ga-on="click" ga-event-category="JSONFormat" ga-event-action="toggle" class="ng-pristine ng-untouched ng-valid ng-not-empty">
+                                            Format JSON </label>
+
+                                        <label class="inline" title="Toggles word-wrap">
+                                            <input type="checkbox" ng-model="wordWrapEnable" ga-on="click" ga-event-category="WordWrap" ga-event-action="toggle" class="ng-pristine ng-untouched ng-valid ng-not-empty">
+                                            Word-Wrap</label>
+                                         <a ng-click="copy(currentRequest.content)">Copy</a>
+                                    </div>
+                                    <p class="header strong">Raw Content</p>
+                                    <!-- ngIf: currentRequest.email_truncated -->
+                                    <div class="req-content-container">
+                                        <!-- ngIf: !currentRequest.email_truncated --><pre class="req-content ng-binding ng-scope wordwrapDisable" ng-if="!currentRequest.email_truncated" ng-class="{'wordwrapDisable': wordWrapEnable}" ng-bind="formatJsonEnable ? formatContentJson(currentRequest.content) : currentRequest.content"></pre><!-- end ngIf: !currentRequest.email_truncated -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ngIf: hasActionOutput() -->
+
+                        <!-- ngRepeat: (id, outputs) in currentRequest.custom_action_output -->
+
+                        <!-- ngIf: redirectResponses[currentRequest.uuid].data.length > 0 -->
+
+                        <!-- ngRepeat: (id, response) in redirectResponses[currentRequest.uuid].data -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- end ngIf: token.uuid -->
+
+    <!-- ngInclude: 'https://cdn.webhook.site/subviews/modals/redirectModal.html?1718368178' --><div class="modal fade ng-scope" tabindex="-1" role="dialog" id="redirectModal" ng-include="'https://cdn.webhook.site/subviews/modals/redirectModal.html?1718368178'"><div class="modal-dialog ng-scope" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Configure XHR Redirect</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal ng-pristine ng-valid" id="redirectForm">
+                <fieldset>
+                    <div class="form-group">
+                        <div class="container-fluid">
+                            <p>XHR Redirect runs in your browser (and not in the Webhook.site cloud, like
+                                our <a href="https://docs.webhook.site/custom-actions.html">Custom Actions</a> feature),
+                                and allows you to forward incoming requests to e.g. a local development environment as
+                                long as the Webhook.site browser window is open.</p>
+                            <p>Since XHR is used, there can be issues with <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">Cross-Domain Requests</a>,
+                                and your browser can require CORS headers to be present in the target.
+                            Using <a href="https://docs.webhook.site/cli.html">Webhook.site CLI</a> instead
+                            of XHR to do forwarding will remediate CORS problems.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="xhr_enable">Enable XHR Redirect</label>
+                        <div class="col-md-4">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="checkbox" style="margin-top: 10px; height: 20px" name="enable" ng-model="xhrRedirect.enable" id="xhr_enable">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="redirectUrl">Target</label>
+                        <div class="col-md-7">
+                            <input id="redirectUrl" ng-model="xhrRedirect.url" placeholder="http://localhost" class="form-control input-md ng-pristine ng-untouched ng-valid ng-empty">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="redirectContentType">Content Type</label>
+                        <div class="col-md-7">
+                            <input id="redirectContentType" ng-model="xhrRedirect.contentType" class="form-control input-md ng-pristine ng-untouched ng-valid ng-empty">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="redirectHeaders">Redirect Headers</label>
+                        <div class="col-md-7">
+                            <input id="redirectHeaders" ng-model="xhrRedirect.headers" placeholder="e.g. x-token,referer" class="form-control input-md ng-pristine ng-untouched ng-valid ng-empty">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="redirectUrl">HTTP Method</label>
+                        <div class="col-md-5">
+                            <select class="form-control input-md ng-pristine ng-untouched ng-valid ng-empty" ng-model="xhrRedirect.method">
+                                <option value="" selected="selected">Default (use request method)</option>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                                <option value="PATCH">PATCH</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" ng-click="saveSettings()" data-dismiss="modal">Close
+            </button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div>
+
+    <!-- ngInclude: 'https://cdn.webhook.site/subviews/modals/editUrlModal.html?1718368178' --><div class="modal fade ng-scope" tabindex="-1" role="dialog" id="editUrlModal" ng-include="'https://cdn.webhook.site/subviews/modals/editUrlModal.html?1718368178'"><div class="modal-dialog ng-scope" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Edit URL</h4>
+        </div>
+        <div class="modal-body">
+            <div id="rate-limit-warning" class="alert alert-warning ng-hide" ng-show="token === null">
+                <p>This URL could not be found. It might have been automatically deleted.<br>
+                    Please create a new URL.</p>
+            </div>
+            <form class="form-horizontal ng-pristine ng-valid ng-valid-min ng-valid-max" id="editTokenForm">
+                <fieldset>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_default_status">Status code</label>
+                        <div class="col-md-3">
+                            <input id="edit_token_default_status" name="default_status" type="text" placeholder="200" class="form-control input-md ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="token.default_status">
+
+                        </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_default_content_type">Content type</label>
+                        <div class="col-md-4">
+                            <input id="edit_token_default_content_type" name="default_content_type" type="text" placeholder="text/plain" class="form-control input-md ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="token.default_content_type">
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_default_content">Content
+                            <span class="muted" title="Takes variables" data-toggle="tooltip">ⓥ</span></label>
+                        <div class="col-md-7">
+                            <textarea class="form-control monospace ng-pristine ng-untouched ng-valid ng-not-empty" id="edit_token_default_content" name="default_content" rows="5" ng-model="token.default_content"></textarea>
+                            <!-- ngInclude: 'subviews/components/requestVariablesDropup.html' --><div style="margin-top:5px;" ng-show="user.team.subscribed" ng-include="'subviews/components/requestVariablesDropup.html'" class="ng-scope ng-hide"><!-- Request Variables dropup -->
+
+<div class="btn-group pull-left dropup requestVariables ng-scope">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="getBaseVariables()">
+        Variables <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu scrollable-menu">
+        <!-- ngRepeat: (variableName, value) in actionForm.variables track by variableName -->
+
+        <!-- ngRepeat: (variableName, value) in actionForm.baseVariables track by variableName -->
+    </ul>
+</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_timeout">Timeout
+                            <i class="bi-info-circle" data-toggle="tooltip" title="For testing timeouts only. When timeout is greater than zero, the URL is rate limited"></i></label>
+                        <div class="col-md-3">
+                            <input id="edit_token_timeout" name="timeout" type="number" max="30" min="0" placeholder="0" value="0" class="form-control input-md ng-pristine ng-untouched ng-valid ng-valid-min ng-valid-max ng-not-empty" ng-model="token.timeout">
+                        </div>
+                    </div>
+
+                    <!-- Expiry -->
+                    <div class="form-group ng-hide" ng-show="token.premium">
+                        <label class="col-md-4 control-label" for="edit_token_expiry">Seconds to expiry
+                            <i data-toggle="tooltip" title="When set, the URL is automatically deleted in the amount of seconds specified" class="bi-info-circle"></i></label>
+                        <div class="col-md-3">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" name="expiry" id="edit_token_expiry" ng-model="token.expiry">
+                        </div>
+                        <div class="col-md-5" style="padding-top: 5px">
+                            <button class="btn btn-link btn-sm" type="button" ng-class="{'strong': token.expiry == 86400}" ng-click="token.expiry = 86400">1 day</button>
+                            <button class="btn btn-link btn-sm" type="button" ng-class="{'strong': token.expiry == 604800}" ng-click="token.expiry = 604800">1 week</button>
+                            <button class="btn btn-link btn-sm strong" type="button" ng-class="{'strong': token.expiry == null}" ng-click="token.expiry = null">never expire</button>
+                        </div>
+                    </div>
+
+                    <!-- Request limit -->
+                    <div class="form-group ng-hide" ng-show="token.premium">
+                        <label class="col-md-4 control-label" for="edit_token_request_limit">
+                            Request limit
+                            <i data-toggle="tooltip" title="The maximum amount of requests or email this URL will keep stored" class="bi-info-circle"></i>
+                        </label>
+                        <div class="col-md-3">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty ng-valid-min ng-valid-max" type="number" min="0" max="10000" name="request_limit" id="edit_token_request_limit" ng-model="token.request_limit">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_cors">Add CORS headers</label>
+                        <div class="col-md-4">
+                                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="checkbox" style="margin-top: 10px; height: 20px" name="cors" ng-model="token.cors" id="edit_token_cors">
+                        </div>
+                    </div>
+
+                    <div class="form-group ng-hide" ng-show="token.premium">
+                        <label class="col-md-4 control-label" for="edit_token_actions">Enable Custom Actions</label>
+                        <div class="col-md-4">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="checkbox" style="margin-top: 10px; height: 20px" name="actions" ng-model="token.actions" id="edit_token_actions">
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" ng-click="editToken(token.uuid)" ga-on="click" ga-event-category="Request" ga-event-action="create">
+                Save
+            </button>
+        </div>
+
+
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog --></div>
+
+    <!-- ngInclude: 'https://cdn.webhook.site/subviews/modals/newUrlModal.html?1718368178' --><div class="modal fade ng-scope" tabindex="-1" role="dialog" id="newUrlModal" ng-include="'https://cdn.webhook.site/subviews/modals/newUrlModal.html?1718368178'"><div class="modal-dialog ng-scope" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Create New URL</h4>
+        </div>
+        <form class="form-horizontal ng-pristine ng-valid ng-valid-min ng-valid-max" id="createTokenForm" ng-submit="getCustomToken()">
+            <div class="modal-body">
+                <fieldset>
+                    <!-- Text input-->
+                    <div class="form-group ng-hide" ng-show="user.team.subscribed">
+                        <label class="col-md-4 control-label" for="alias">Alias</label>
+                        <div class="col-md-4">
+                            <input autofocus="" class="form-control input-md" id="alias" name="alias" placeholder="" type="text">
+                        </div>
+                    </div>
+
+                    <!-- Expiry -->
+                    <div class="form-group ng-hide" ng-show="user.team.subscribed">
+                        <label class="col-md-4 control-label" for="edit_token_expiry">Seconds to expiry
+                            <i class="bi-info-circle" data-toggle="tooltip" title="When set, the URL is automatically deleted in the amount of seconds specified"></i></label>
+                        <div class="col-md-3">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" id="edit_token_expiry" name="expiry" ng-model="newToken.expiry">
+                        </div>
+                        <div class="col-md-5" style="padding-top: 5px">
+                            <button class="btn btn-link btn-sm" ng-class="{'strong': newToken.expiry == 86400}" ng-click="newToken.expiry = 86400" type="button">1 day
+                            </button>
+                            <button class="btn btn-link btn-sm" ng-class="{'strong': newToken.expiry == 604800}" ng-click="newToken.expiry = 604800" type="button">1 week
+                            </button>
+                            <button class="btn btn-link btn-sm strong" ng-class="{'strong': newToken.expiry == null}" ng-click="newToken.expiry = null" type="button">never expire
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Request limit -->
+                    <div class="form-group ng-hide" ng-show="user.team.subscribed">
+                        <label class="col-md-4 control-label" for="edit_token_request_limit">
+                            Request limit
+                            <i data-toggle="tooltip" title="The maximum amount of requests or email this URL will keep stored" class="bi-info-circle"></i>
+                        </label>
+                        <div class="col-md-3">
+                            <input class="form-control ng-pristine ng-untouched ng-valid ng-empty ng-valid-min ng-valid-max" type="number" min="0" max="10000" name="request_limit" id="edit_token_request_limit" ng-model="newToken.request_limit">
+                        </div>
+                    </div>
+
+                    <p>Customize how the URL will respond. You can also use the Modify Response
+                        <a href="https://docs.webhook.site/custom-actions.html">Custom Action</a> to change the response
+                        dynamically.</p>
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_default_status">Status code</label>
+                        <div class="col-md-3">
+                            <input class="form-control input-md" id="edit_token_default_status" name="default_status" placeholder="200" type="text">
+
+                        </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_default_content_type">Content type</label>
+                        <div class="col-md-4">
+                            <input class="form-control input-md" id="edit_token_default_content_type" name="default_content_type" placeholder="text/plain" type="text">
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="default_content">Content
+                            <span class="muted" data-toggle="tooltip" title="Takes variables">ⓥ</span></label>
+                        <div class="col-md-7">
+                                    <textarea class="form-control monospace" ga-event-action="edit-body" ga-event-category="Request" ga-on="click" id="default_content" name="default_content" rows="5"></textarea>
+                            <!-- ngInclude: 'subviews/components/requestVariablesDropup.html' --><div ng-include="'subviews/components/requestVariablesDropup.html'" ng-show="user.team.subscribed" style="margin-top:5px;" class="ng-scope ng-hide"><!-- Request Variables dropup -->
+
+<div class="btn-group pull-left dropup requestVariables ng-scope">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="getBaseVariables()">
+        Variables <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu scrollable-menu">
+        <!-- ngRepeat: (variableName, value) in actionForm.variables track by variableName -->
+
+        <!-- ngRepeat: (variableName, value) in actionForm.baseVariables track by variableName -->
+    </ul>
+</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="edit_token_timeout">Timeout
+                            <i class="bi-info-circle" data-toggle="tooltip" title="For testing timeouts only. When timeout is greater than zero, the URL is rate limited"></i>
+                        </label>
+                        <div class="col-md-3">
+                            <input class="form-control input-md" id="edit_token_timeout" max="30" min="0" name="timeout" placeholder="0" type="number" value="0">
+                        </div>
+                    </div>
+
+                </fieldset>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" ga-event-action="create" ga-event-category="Request" ga-on="click" type="submit">
+                    Create
+                </button>
+            </div>
+        </form>
+
+
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div>
+
+    <!-- ngInclude: 'https://cdn.webhook.site/subviews/modals/serverRedirectModal.html?1718368178' --><div class="modal fade ng-scope" tabindex="-1" role="dialog" id="serverRedirectModal" ng-include="'https://cdn.webhook.site/subviews/modals/serverRedirectModal.html?1718368178'"><div class="modal-dialog ng-scope" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Configure Server-Side Redirects</h4>
+        </div>
+        <div class="modal-body">
+            <p>On an incoming request, or with a click, you can redirect requests to another endpoint.
+                Server redirects happen server-side, not in your browser, so redirects happen even when the browser window is closed.</p>
+
+            <table class="table table-borderless" id="redirectsTable" style="margin-bottom: 0">
+                <tbody><!-- ngRepeat: redirect in redirects.data -->
+                <tr>
+                    <td class="col-md-10">
+                        <input id="serverRedirectUrl" name="serverRedirectUrl" type="text" ng-model="serverRedirectUrl" placeholder="https://example.com/webhook" class="form-control input-sm ng-pristine ng-untouched ng-valid ng-empty" ng-keyup="$event.keyCode == 13 &amp;&amp; addRedirect(token.uuid, serverRedirectUrl)">
+                    </td>
+                    <td class="col-md-2">
+                        <button class="btn btn-block btn-sm btn-primary" ng-click="addRedirect(token.uuid, serverRedirectUrl)">Add</button>
+                    </td>
+                </tr>
+            </tbody></table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog --></div>
+
+    <!-- ngInclude: 'https://cdn.webhook.site/subviews/modals/actionsModal.html?1718368178' --><div class="modal modal-draggable fade right ng-scope" tabindex="-1" role="dialog" id="actionsModal" ng-include="'https://cdn.webhook.site/subviews/modals/actionsModal.html?1718368178'"><div class="modal-dialog ng-scope" role="document">
+    <div class="modal-content">
+        <div class="modal-header modal-draggable-handle">
+            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                <span aria-hidden="true">×</span></button>
+            <div class="pull-right" style="margin-right: 17px; margin-top: 2px;"><span class="small">
+                <a href="https://docs.webhook.site/custom-actions.html" target="_blank">Custom Actions Help</a></span>
+            </div>
+            <h4 class="modal-title">Custom Actions</h4>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <!-- List -->
+                    <ul class="actionsList actionMode-select nav" dnd-list="actions">
+                        <!-- ngRepeat: action in actions -->
+                    </ul>
+
+                    <!-- Editor -->
+                    <div class="col-xs-9 col-xs-push-3 actionMode-select" id="actionEditor">
+                        <div ng-show="actionForm.mode === 'select'">
+                            <!-- Editor/Create (toggled) -->
+                            <div class="actionHeader">
+                                <strong>Create new Custom Action</strong>
+                                <span class="pull-right text-muted small">
+                                    Need an action not on this list?
+                                    <a href="https://support.webhook.site/open.php?topicId=13" target="_blank">
+                                        Request a new action type
+                                    </a>
+                                </span>
+                            </div>
+
+                            <div id="actionSelectorList">
+                                <!-- ngIf: user.email && !token.premium -->
+
+                                <!-- ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon --><i class="glyphicon glyphicon-text-size" ng-if="actionType.glyphicon"></i><!-- end ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon -->
+                                        Text
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Auto JSON
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Extract JSONPath
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Extract Regex
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Extract XPath
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Replace Text
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Split Text
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Map Text
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon --><i class="glyphicon glyphicon-globe" ng-if="actionType.glyphicon"></i><!-- end ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon -->
+                                        Network
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        HTTP Request
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Email
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Email (SMTP)
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Run SSH Command
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        FTP(S) Upload
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        SFTP Upload
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Database Query
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon --><i class="glyphicon glyphicon-edit" ng-if="actionType.glyphicon"></i><!-- end ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon -->
+                                        Behavior
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Include Template
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Don't Save
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Log
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Modify Response
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Rate Limit
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Stop
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Basic Auth
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon --><i class="glyphicon glyphicon-cog" ng-if="actionType.glyphicon"></i><!-- end ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon -->
+                                        Logic
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Conditions
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        JavaScript
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        WebhookScript
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Set Variable
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Store Global Variable
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon --><i class="glyphicon glyphicon-picture" ng-if="actionType.glyphicon"></i><!-- end ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon -->
+                                        Images
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Resize Image
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="google_sheets" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/google_sheets.png" src="/assets/images/actions/google_sheets.png"><!-- end ngIf: actionType.icon -->
+                                        Google Sheets
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Add Row
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Update Row
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Get Values
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="microsoft" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/microsoft.png" src="/assets/images/actions/microsoft.png"><!-- end ngIf: actionType.icon -->
+                                        Microsoft Excel
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Add Rows
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Get Values
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="microsoft" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/microsoft.png" src="/assets/images/actions/microsoft.png"><!-- end ngIf: actionType.icon -->
+                                        Microsoft OneDrive
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Upload File
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Download File
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="aws_s3" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/aws_s3.png" src="/assets/images/actions/aws_s3.png"><!-- end ngIf: actionType.icon -->
+                                        Amazon Web Services S3
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Create Bucket
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Create Object
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Delete Object
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Get Object
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="aws_cf" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/aws_cf.png" src="/assets/images/actions/aws_cf.png"><!-- end ngIf: actionType.icon -->
+                                        AWS CloudFront
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Create Invalidation
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="discord" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/discord.png" src="/assets/images/actions/discord.png"><!-- end ngIf: actionType.icon -->
+                                        Discord
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Message
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="slack" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/slack.png" src="/assets/images/actions/slack.png"><!-- end ngIf: actionType.icon -->
+                                        Slack
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Message
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="dropbox" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/dropbox.png" src="/assets/images/actions/dropbox.png"><!-- end ngIf: actionType.icon -->
+                                        Dropbox
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Create Folder
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Download
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Upload
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Delete
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Get Link
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="x" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/x.png" src="/assets/images/actions/x.png"><!-- end ngIf: actionType.icon -->
+                                        X/Twitter
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Post Tweet
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="pushed" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/pushed.png" src="/assets/images/actions/pushed.png"><!-- end ngIf: actionType.icon -->
+                                        Pushed
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Push Notification
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="ntfy" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/ntfy.png" src="/assets/images/actions/ntfy.png"><!-- end ngIf: actionType.icon -->
+                                        ntfy.sh
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Send Push Notification
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes --><div class="actionType ng-scope" ng-repeat="(categoryName, actionType) in actionTypes">
+                                    <h4 class="actionCategoryHeader ng-binding">
+                                        <!-- ngIf: actionType.glyphicon -->
+                                        <!-- ngIf: actionType.icon --><img alt="rabbitmq" class="actionIcon ng-scope" ng-if="actionType.icon" ng-src="/assets/images/actions/rabbitmq.png" src="/assets/images/actions/rabbitmq.png"><!-- end ngIf: actionType.icon -->
+                                        RabbitMQ
+                                    </h4>
+                                    <!-- ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Get Message
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions --><button class="btn btn-default actionSelectorBtn ng-binding ng-scope" ga-event-action="chooseActionType-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="selectActionType(actionType); actionForm.mode = 'create'" ng-repeat="(actionType, actionName) in actionType.actions" style="margin-right: 10px">
+                                        Publish Message
+                                    </button><!-- end ngRepeat: (actionType, actionName) in actionType.actions -->
+                                </div><!-- end ngRepeat: (categoryName, actionType) in actionTypes -->
+                            </div>
+                        </div>
+
+                        <!-- Editor/Edit (Toggled) -->
+                        <div ng-show="actionForm.mode === 'edit' || actionForm.mode === 'create'" class="ng-hide">
+                            <div class="actionHeader">
+                                <p>
+                                    <a ng-click="clearActionEditor()">← Back</a>  
+
+                                    <span class="strong ng-binding ng-hide" ng-show="actionForm.mode === 'edit'" title="Action ID ">
+                                        Editing Action #
+                                    </span>
+
+                                    <span class="strong ng-hide" ng-show="actionForm.mode === 'create'">
+                                        Creating Action
+                                    </span>
+
+                                    <span class="strong inline-edit ng-binding" ng-click="editActionName()" ng-show="!actionForm.editingName">
+                                        </span>
+
+                                    <input autocomplete="off" class="input inline actionName ng-pristine ng-untouched ng-valid ng-empty ng-hide" id="actionName" ng-blur="actionForm.editingName = false;" ng-change="actionEditorForm.$setDirty()" ng-keyup="$event.keyCode == 13 &amp;&amp; (actionForm.editingName = false)" ng-model="actionForm.editing.name" ng-show="actionForm.editingName" type="text">
+                                    <span ng-show="!actionForm.editingName &amp;&amp; actionForm.editing.name" class="ng-binding ng-hide">
+                                        ()
+                                    </span>
+                                </p>
+                            </div>
+
+                            <!-- Editor/Form -->
+                            <form id="actionEditorForm" name="actionEditorForm" class="ng-pristine ng-valid ng-valid-min ng-valid-max ng-valid-minlength">
+                                <!-- Editor/Form/From URL -->
+                                <!-- ngInclude: '/subviews/components/actions/' + actionForm.type + '.html' --><div id="actionEditorFormTemplate" ng-include="'/subviews/components/actions/' + actionForm.type + '.html'" class="ng-scope"><div class="form-group ng-scope">
+    <label for="extractJsonPathSource">Source
+        <span class="muted" title="Takes variables" data-toggle="tooltip">ⓥ</span>
+    </label>
+    <textarea class="form-control monospace ng-pristine ng-untouched ng-valid ng-empty ng-valid-minlength" id="extractJsonPathSource" ng-model="actionForm.editors.jsonPath.source" placeholder="$request.content$" minlength="1"></textarea>
+</div>
+<div class="form-group ng-scope">
+    <label for="extractJsonPathJsonPath">JSONPath
+        <span class="required" title="Required">*</span></label>
+    <span class="monospace pull-right actionExtractPreview ng-binding invalid" title="" ng-class="{'invalid': !jsonPathPreviewMatch}"></span>
+    <input id="extractJsonPathJsonPath" class="form-control monospace ng-pristine ng-untouched ng-valid ng-empty" ng-model="actionForm.editors.jsonPath.jsonpath" ng-change="updateJsonPathPreview()" aria-describedby="extractJsonPathJsonPathHelp" placeholder=".store.books[1].author" autocomplete="off">
+    <span class="small text-muted extractJsonPathJsonPathHelp">
+                                        Get part of the JSON content with JSONPath and store the first result in the
+                                        variable. If there are multiple results, they are comma separated.
+                                        <a href="https://docs.webhook.site/custom-actions/action-types.html#jsonpath-examples" target="_blank">
+                                            JSONPath examples.</a>
+                                    </span>
+</div>
+<div class="form-group ng-scope">
+    <label for="extractJsonPathDefault">Default Value
+        <span class="muted" title="Takes variables" data-toggle="tooltip">ⓥ</span></label>
+    <input id="extractJsonPathDefault" class="form-control monospace ng-pristine ng-untouched ng-valid ng-empty" ng-model="actionForm.editors.jsonPath.default" aria-describedby="extractJsonPathDefaultHelp" autocomplete="off">
+    <span class="small text-muted extractJsonPathDefaultHelp">
+                                        If the value can't be found, the variable will be set to this instead.
+                                    </span>
+</div>
+<div class="row ng-scope">
+    <div class="col-xs-6">
+        <div class="form-group">
+            <label for="extractJsonPathVariable">Variable Name
+                <span class="required" title="Required">*</span></label>
+            <div class="input-group">
+                <div class="input-group-addon">$</div>
+                <input type="text" class="form-control monospace ng-pristine ng-untouched ng-valid ng-empty ng-valid-minlength" id="extractJsonPathVariable" ng-model="actionForm.editors.jsonPath.variable_name" minlength="1">
+                <div class="input-group-addon">$</div>
+            </div>
+            <span class="small text-muted extractJsonPathVariableHelp">The variable can be
+                                        used in any action after this one (which makes the action order important.)</span>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="form-group" style="padding-top: 17px;">
+            <label title="When checked, actions running after this one is repeated for each item found" class="textbox-inline" style="font-weight: bold">
+                <input type="checkbox" ng-model="actionForm.editors.jsonPath.repeat" class="ng-pristine ng-untouched ng-valid ng-empty">
+                Repeat
+            </label>
+            <p class="small text-muted extractJsonPathRepeatHelp">
+                When checked, actions after this are repeated for each item in the result. <a href="https://docs.webhook.site/custom-actions.html#repeating-actions" target="_blank">More info</a>
+            </p>
+        </div>
+    </div>
+</div></div>
+
+                                <div id="actionEditorFormGlobalSettings">
+                                    <!-- Global Settings -->
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <!-- Condition -->
+                                            <!-- ngIf: actionForm.conditionExcludeActions.indexOf(actionForm.type) == -1 --><div class="form-group ng-scope" ng-if="actionForm.conditionExcludeActions.indexOf(actionForm.type) == -1">
+                                                <label for="onlyWhenConditionId" style="font-weight: bold">
+                                                    Only run when condition passes
+                                                </label>
+
+                                                <select class="form-control ng-pristine ng-untouched ng-valid ng-empty" id="onlyWhenConditionId" ng-model="actionForm.editing.condition">
+                                                    <option value="" selected="selected">Always run</option>
+                                                    <!-- ngRepeat: conditionAction in actions | filter: {type:'conditions', type:'condition'} -->
+                                                </select>
+                                            </div><!-- end ngIf: actionForm.conditionExcludeActions.indexOf(actionForm.type) == -1 -->
+                                        </div>
+                                        <div class="col-sm-6 form-inline text-right">
+                                            <!-- ngIf: actionForm.queueExcludeActions.indexOf(actionForm.type) == -1 --><div class="form-group ng-scope" ng-if="actionForm.queueExcludeActions.indexOf(actionForm.type) == -1" style="padding-top: 20px; padding-right: 20px">
+                                                <label class="checkbox-inline" style="font-weight: bold">
+                                                    <input ng-model="actionForm.editing.queue" style="margin-top:8px" type="checkbox" class="ng-pristine ng-untouched ng-valid ng-empty">Queue &nbsp;
+
+                                                    <input class="form-control ng-pristine ng-untouched ng-valid ng-not-empty ng-valid-min ng-valid-max" max="86400" min="0" ng-disabled="!actionForm.editing.queue" ng-model="actionForm.editing.delay" style="width: 60px; padding: 1px 4px" type="number" value="0" disabled="disabled"> sec
+
+                                                    <a href="https://docs.webhook.site/custom-actions.html#queued-actions" target="_blank">
+                                                        <i class="glyphicon-info-sign glyphicon" data-toggle="tooltip" title="Runs action as background job, waiting the specified amount of seconds to execute it."></i>
+                                                    </a>
+                                                </label>
+                                            </div><!-- end ngIf: actionForm.queueExcludeActions.indexOf(actionForm.type) == -1 -->
+                                            <div class="form-group" style="padding-top: 16px;">
+                                                <label class="checkbox-inline" style="font-weight: bold" title="When checked, the action is skipped and prevented from running">
+                                                    <input ng-model="actionForm.editing.disabled" type="checkbox" class="ng-pristine ng-untouched ng-valid ng-empty">
+                                                    Disable
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Action Output (Test) -->
+                                    <div class="row row-no-gutters">
+                                        <div class="col-xs-12">
+                                            <div class="customActionOutput">
+                                                <details id="customActionOutputLogs" open="open">
+                                                    <summary>Outputs</summary>
+
+                                                    <!-- ngRepeat: (id, outputs) in actionForm.testResults.output -->
+                                                </details>
+
+                                                <details id="customActionOutputResponse">
+                                                    <summary>URL Response</summary>
+                                                    <table class="table table-condensed table-borderless table-striped">
+                                                        <tbody><tr>
+                                                            <td>Status</td>
+                                                            <td>
+                                                                <pre class="ng-binding"></pre>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Content</td>
+                                                            <td style="word-break: break-word">
+                                                                <pre class="ng-binding"></pre>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Headers</td>
+                                                            <td style="word-break: break-word">
+                                                                <pre class="ng-binding"></pre>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody></table>
+                                                </details>
+
+                                                <details id="customActionOutputVariables">
+                                                    <summary class="ng-binding">Variables Defined (0)</summary>
+                                                    <table class="table table-condensed table-borderless table-striped">
+                                                        <tbody><!-- ngRepeat: (key, value) in actionForm.testResults.variables -->
+                                                    </tbody></table>
+                                                </details>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div id="editorActions">
+                                <!-- Editor/Save+Update -->
+                                <div class="form-group" style="margin-bottom: 0">
+
+                                    <div class="btn-group dropup">
+                                        <button class="btn btn-info ng-binding" id="btnTestAction" ng-click="testAction(token, actionForm.type)" title="Test flow with modifications" type="button">Test
+                                            
+                                        </button>
+                                        <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" type="button">
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a ng-click="setTestMode('all')">
+                                                <!-- ngIf: testMode == 'all' --><i class="glyphicon glyphicon-ok ng-scope" ng-if="testMode == 'all'"></i><!-- end ngIf: testMode == 'all' --> All Actions</a></li>
+                                            <li><a ng-click="setTestMode('until')">
+                                                <!-- ngIf: testMode == 'until' --> Until Here</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <button class="btn btn-success pull-right ng-hide" ga-event-action="createAction-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="createAction(token, actionForm.type, actionEditorForm)" ng-show="actionForm.mode === 'create'" type="submit">
+                                        Create Action
+                                        <span class="dirty-indicator"> *</span>
+                                    </button>
+
+                                    <button class="btn btn-success pull-right ng-hide" ga-event-action="saveAction-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="updateAction(token, actionForm.editing.uuid, actionForm.type, actionEditorForm)" ng-show="actionForm.mode === 'edit'" type="submit">
+                                        Save Action
+                                        <span class="dirty-indicator"> *</span>
+                                    </button>
+
+                                    <button class="btn btn-default pull-right" id="btnCancel" ng-click="clearActionEditor()" style="margin-right: 10px" title="Cancel creating or editing this action">
+                                        Cancel
+                                    </button>
+
+                                    <button class="btn btn-danger pull-right ng-hide" ga-event-action="deleteAction-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="deleteAction(token, actionForm.editing)" ng-show="actionForm.mode === 'edit'" style="margin-right: 10px" title="Delete action">Delete Action
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ngInclude: 'subviews/components/templateEditor.html' --><div ng-include="'subviews/components/templateEditor.html'" ng-show="actionForm.mode === 'template'" class="ng-scope ng-hide"><div class="actionHeader ng-scope">
+    <a ng-click="clearActionEditor()">← Back</a>  
+
+    <span class="strong">Creating New Template</span>
+</div>
+
+
+<form id="templateEditorForm" name="templateEditorForm" class="ng-pristine ng-valid ng-scope">
+    <div style="flex: fit-content">
+        <p class="alert alert-grey">
+            <i class="bi-info-circle"></i>
+            Templates are created from existing actions and can be used with the
+            <i>Include Template</i> action.
+        </p>
+
+        <div class="row">
+            <div class="form-group col-xs-6">
+                <label for="templateName">Template Name</label>
+                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" id="templateName" ng-model="templateForm.name" autofocus="" type="text">
+            </div>
+            <div class="form-group col-xs-6">
+                <label for="templateActionId">Select existing template to overwrite</label>
+                <select class="form-control ng-pristine ng-untouched ng-valid ng-not-empty" id="templateActionId" ng-model="templateForm" ng-disabled="!templates || templates.length == 0" disabled="disabled"><option value="? object:197 ?" selected="selected"></option>
+                    <!-- ngRepeat: template in templates -->
+                </select>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+            <label>Include the following actions</label>
+        </div>
+
+        <div class="form-group">
+            <p>
+                <button class="btn btn-xs btn-default" ng-click="templateSelectAll()">Select All</button>&nbsp;
+                <button class="btn btn-xs btn-default" ng-click="templateForm.actions = []">Select None</button>
+            </p>
+            <!-- ngRepeat: action in actions -->
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+            <label>Predefined Variables</label>
+            <span class="help-block">
+                Predefined template variables are available to all actions included in the template,
+                as well as any action coming after the template.
+            </span>
+        </div>
+
+        <!-- ngRepeat: (fieldIdx, field) in templateForm.variables -->
+        <div class="form-group">
+            <button class="btn btn-xs btn-default" ng-click="templateForm.variables.push({'name': '', 'value': ''})">
+                <i class="glyphicon glyphicon-plus"></i> Add
+            </button>
+            <button class="btn btn-xs btn-default btn-link-danger pull-right ng-hide" ng-click="templateForm.variables.pop()" ng-show="templateForm.variables.length > 0">
+                <i class="glyphicon glyphicon-minus"></i> Remove
+            </button>
+        </div>
+    </div>
+    <div class="form-group" style="margin-bottom: 15px">
+        <button class="btn btn-success pull-right" ga-event-action="createTemplate" ga-event-category="CustomActions" ga-on="click" ng-click="createTemplate(templateEditorForm)" ng-hide="templateForm.id" type="submit">
+            Create Template
+            <span class="dirty-indicator"> *</span>
+        </button>
+
+        <button class="btn btn-success pull-right ng-hide" ga-event-action="saveAction-extract_jsonpath" ga-event-category="CustomActions" ga-on="click" ng-click="updateTemplate(templateForm, templateEditorForm)" ng-show="templateForm.id" type="submit">
+            Replace Template
+            <span class="dirty-indicator"> *</span>
+        </button>
+
+        <button class="btn btn-default pull-right" ng-click="clearActionEditor()" style="margin-right: 10px" title="Cancel creating or editing this template">
+            Cancel
+        </button>
+    </div>
+</form></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-3" style="text-align:left">
+                    <!-- data-container due to https://stackoverflow.com/a/24478894/1210797 -->
+                    <button class="btn btn-default disabled" data-container="body" data-toggle="tooltip" ga-event-action="moveActionUp" ga-event-category="CustomActions" ga-on="click" ng-class="{'disabled': actionForm.mode !== 'edit'}" ng-click="moveAction(token, actionForm.editing, 'up')" title="Move action up" type="button">
+                        <i class="glyphicon glyphicon-arrow-up"></i>
+                    </button>
+                    <button class="btn btn-default disabled" data-container="body" data-toggle="tooltip" ga-event-action="moveActionDown" ga-event-category="CustomActions" ga-on="click" ng-class="{'disabled': actionForm.mode !== 'edit'}" ng-click="moveAction(token, actionForm.editing, 'down')" title="Move action down" type="button">
+                        <i class="glyphicon glyphicon-arrow-down"></i>
+                    </button>
+                        </div>
+                <div class="col-xs-9">
+                    <!-- ngInclude: 'subviews/components/requestVariablesDropup.html' --><div ng-include="'subviews/components/requestVariablesDropup.html'" class="ng-scope"><!-- Request Variables dropup -->
+
+<div class="btn-group pull-left dropup requestVariables ng-scope">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="getBaseVariables()">
+        Variables <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu scrollable-menu">
+        <!-- ngRepeat: (variableName, value) in actionForm.variables track by variableName -->
+
+        <!-- ngRepeat: (variableName, value) in actionForm.baseVariables track by variableName -->
+    </ul>
+</div></div>
+
+                    <div class="pull-left" style="margin-left: 20px">
+                        <!-- Create Template -->
+                        <button class="btn btn-default" ga-event-action="create-template" ga-event-category="CustomActions" ga-on="click" ng-click="actionForm.mode = 'template'; getTemplates()">
+                            <i class="bi-files"></i> Create Template
+                        </button>
+
+                        <!-- Import -->
+                        <label class="btn btn-default" ga-event-action="export" ga-event-category="CustomActions" ga-on="click" ng-init="initActionImport()">
+                            Import... <input hidden="" id="import-actions" type="file">
+                        </label>
+
+                        <!-- Export -->
+                        <button class="btn btn-default" ga-event-action="export" ga-event-category="CustomActions" ga-on="click" ng-click="exportActions()" type="button">
+                            Export...
+                        </button>
+                    </div>
+
+                    <!-- Close button -->
+                    <button class="btn btn-default" data-dismiss="modal" ga-event-action="close" ga-event-category="CustomActions" ga-on="click" type="button">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /.modal-content -->
+<!-- /.modal-dialog -->
+</div>
+
+    <script type="application/javascript" class="ng-scope">
+        window.ga = window.ga || function () {
+            (ga.q = ga.q || []).push(arguments)
+        };
+        ga.l = +new Date;
+        ga('create', 'UA-5230636-9', 'auto');
+        ga('require', 'eventTracker');
+        ga('require', 'outboundLinkTracker');
+        ga('require', 'urlChangeTracker');
+        ga('require', 'pageVisibilityTracker');
+        ga('send', 'pageview');
+    </script>
+    <script async="" src="https://www.google-analytics.com/analytics.js" class="ng-scope"></script>
+    <script async="" src="https://cdn.webhook.site/assets/scripts/libs/autotrack.js" class="ng-scope"></script>
+</div>
+
+
+</body></html>

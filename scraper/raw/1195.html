@@ -1,0 +1,388 @@
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-2N91E44ECD&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script src="/cdn-cgi/apps/head/Qceaeoga9a1C8wThDYgOaL8O9P0.js"></script><link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+<link href="./assets/css/custom.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
+<link rel="stylesheet" type="text/css" href="./theme/pygments/vim.min.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/fontawesome.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/brands.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/solid.css">
+<script src="./assets/js/custom.js" type="text/javascript"></script>
+<link href="https://exploit.ph/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="eXploit Atom">
+<link href="https://exploit.ph/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="eXploit RSS">
+<link rel="shortcut icon" href="https://exploit.ph/favicon.ico" type="image/x-icon">
+<link rel="icon" href="https://exploit.ph/favicon.ico" type="image/x-icon">
+
+<meta name="theme-color" content="#0300a5">
+
+<meta name="msapplication-navbutton-color" content="#0300a5">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="msapplication-TileColor" content="#0300a5">
+<meta name="author" content="0xe7">
+<meta name="description" content="Using DES to hijack AD accounts">
+<meta name="keywords" content="active directory, infrastructure, windows, kerberos">
+<meta property="og:site_name" content="eXploit">
+<meta property="og:title" content="DES Is Useful... Sometimes">
+<meta property="og:description" content="Using DES to hijack AD accounts">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="./des-is-useful.html">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2023-08-08 23:39:26+01:00">
+<meta property="article:modified_time" content="">
+<meta property="article:author" content="./author/0xe7.html">
+<meta property="article:section" content="Active Directory">
+<meta property="article:tag" content="active directory">
+<meta property="article:tag" content="infrastructure">
+<meta property="article:tag" content="windows">
+<meta property="article:tag" content="kerberos">
+<meta property="og:image" content="https://exploit.ph/assets/images/profile_standard.jpg">
+<title>eXploit – DES Is Useful... Sometimes</title>
+<script type="text/javascript">
+    setcolours();
+  </script>
+</head>
+<body onload="setlogotext()">
+<aside>
+<div>
+<img id="logo" src="https://exploit.ph/assets/images/profile_standard.jpg" alt="Darkseid" title="Darkseid" onmouseover="if (!window.__cfRLUnblockHandlers) return false; rollover(this)" onmouseout="if (!window.__cfRLUnblockHandlers) return false; mouseaway(this)" onclick="if (!window.__cfRLUnblockHandlers) return false; flipcolours()">
+<a href=".">
+<h1><p>Something pVVn3|) this way comes.</p></h1>
+</a>
+<nav>
+<ul class="list">
+<li><a href="./category/active-directory.html">Active Directory</a> (13)</li>
+<li><a href="./category/linux-kernel-hacking.html">Linux Kernel Hacking</a> (4)</li>
+<li><a href="./category/mobile-hacking.html">Mobile Hacking</a> (1)</li>
+<li><a href="./category/reverse-engineering.html">Reverse Engineering</a> (5)</li>
+<li><a href="./category/web-hacking.html">Web Hacking</a> (8)</li>
+<li><a href="./category/x86-32-linux.html">x86-32 Linux</a> (7)</li>
+</ul>
+</nav>
+<nav>
+<h2><p>Recent</p></h2>
+<ul class="list">
+<li><a href="./des-is-useful.html">DES Is Useful... Sometimes</a></li>
+<li><a href="./external-trusts-are-evil.html">External Trusts Are Evil</a></li>
+<li><a href="./defending-the-three-headed-relay.html">Defending the Three Headed Relay</a></li>
+<li><a href="./more-samaccountname-impersonation.html">More sAMAccountName Impersonation</a></li>
+<li><a href="./cve-2021-42287-cve-2021-42278-weaponisation.html">CVE-2021-42287/CVE-2021-42278 Weaponisation</a></li>
+</ul>
+</nav>
+<nav>
+<ul class="list">
+<li><a target="_blank" href="feeds/rss.xml">RSS</a></li>
+<li><a target="_blank" href="foods/atom.xml">Atom</a></li>
+</ul>
+</nav>
+<ul class="social">
+<li>
+<a class="sc-twitter" href="https://twitter.com/exploitph" target="_blank">
+<i class="fab fa-twitter">
+</i>
+</a></li>
+<li>
+<a class="sc-github" href="https://github.com/0xe7" target="_blank">
+<i class="fab fa-github">
+</i>
+</a></li>
+</ul>
+</div>
+</aside>
+<main>
+<nav>
+<a href=".">Home</a>
+<a href="/archives.html">Archives</a>
+<a href="/categories.html">Categories</a>
+<a href="/tags.html">Tags</a>
+<a href="https://exploit.ph/feeds/all.atom.xml">Atom</a>
+<a href="https://exploit.ph/feeds/all.rss.xml">RSS</a>
+</nav>
+<article class="single">
+<header>
+<h1 id="des-is-useful">DES Is Useful... Sometimes</h1>
+<p>
+Posted on Tue 08 August 2023 in <a href="./category/active-directory.html">Active Directory</a>
+</p>
+</header>
+<div>
+<p>Data Encryption Standard (DES) is a symmetric-key block cypher algorithm created in the 1970’s and was historically used within Active Directory (AD) environments to secure data. Most notably, DES was used as an encryption type for Kerberos tickets, although on modern environments it is disabled by default. <a href="https://twitter.com/SteveSyfuhs/status/1621231567984115715" target="_blank">This tweet</a> by <a href="https://twitter.com/SteveSyfuhs" target="_blank">Steve Syfuhs</a> mentions that DES is uninteresting and “off by default” but that got me thinking, what is involved in re-enabling it?</p>
+<p>In this research, I’ll describe exactly how DES can be re-enabled and when it is enabled, how to use DES to takeover any AD account that isn’t krbtgt or a trust account.</p>
+<h2>Domain Controller Configuration</h2>
+<p>The main configuration required for DES to be enabled for Kerberos on a domain is at the domain controller’s level. The following GPO setting can be used to configure which encryption algorithms are supported by the DC’s, when it is applied to DC’s:</p>
+<p>Computer Configuration\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Configure encryption types allowed for Kerberos</p>
+<p></p><center><img src="/assets/images/des-is-useful/01-gpo-setting.png"></center>
+<center>Figure 1: Kerberos Encryption Types GPO Setting</center><p></p>
+<p>Ultimately this sets the following registry key:</p>
+<p>HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\parameters\SupportedEncryptionTypes</p>
+<p></p><center><img src="/assets/images/des-is-useful/02-registry-key.png"></center>
+<center>Figure 2: Kerberos Encryption Types Registry Setting</center><p></p>
+<p>This is a bitfield where 2 represents DES-CBC-MD5. This means that the GPO setting does not need to be set for DES to be supported, this registry key only requires the bit that represent ‘2’ to be set on 1 domain controller on the domain.</p>
+<p>The best way I’ve found to test this without the ability to query the registry for each DC is to request a TGT with a DES session key. I have <a href="https://github.com/GhostPack/Rubeus/pull/166" target="_blank">modified Rubeus</a>, which now includes the <strong>/suppenctype</strong> argument to <strong>asktgt</strong>, to make it easy to request TGT’s this way:</p>
+<p></p><center><img src="/assets/images/des-is-useful/03-des-session-key.png"></center>
+<center>Figure 3: Requesting a TGT with a DES session key</center><p></p>
+<p>Even though the TGT is encrypted with the krbtgt AES256 key, the session key is DES-CBC-MD5. It is important to note that this is possible to perform with any account without requiring any changes to the account. As shown below, there is no indication that the account supports DES in any way:</p>
+<p></p><center><img src="/assets/images/des-is-useful/04-supported-etypes.png"></center>
+<center>Figure 4: Account Supported Encryption Types and UAC</center><p></p>
+<p>If the DC does not support DES-CBC-MD5, a KDC_ERR_ETYPE_NOTSUPP error is returned:</p>
+<p></p><center><img src="/assets/images/des-is-useful/05-tgt-des-fail.png"></center>
+<center>Figure 5: DES Unsupported</center><p></p>
+<h2>Cracking DES Tickets (Kerberoasting)</h2>
+<p>After understanding how DES could be enabled and how to tell if it was enabled, the next step was to understand exactly how to exploit this configuration.</p>
+<p>The simplest example is when a service account is already configured for DES, this means has an SPN (service account) and has the useraccountcontrol (UAC) setting USE_DES_KEY_ONLY set:</p>
+<p></p><center><img src="/assets/images/des-is-useful/06-des-service-account.png"></center>
+<center>Figure 6: Service account configured for DES</center><p></p>
+<p>This makes it possible to request a service ticket (ST) for the service user des that is encrypted using DES:</p>
+<p></p><center><img src="/assets/images/des-is-useful/07-des-st.png"></center>
+<center>Figure 7: Request DES encrypted service ticket</center><p></p>
+<p>While the “KeyType” shown here is the session key type, which can be different to the encryption type of the ticket, the following wireshark output shows that the ticket is in fact encrypted using DES:</p>
+<p></p><center><img src="/assets/images/des-is-useful/08-wireshark-tgs-rep.png"></center>
+<center>Figure 8: DES encrypted service ticket</center><p></p>
+<p>Now the question was how can this be cracked? And more importantly, can the key be brute forced rather than cracking back to the plain text password? The reason this second question is more important is because if this is possible it would mean that any key can be recovered, even that of machine accounts.</p>
+<p>To help figure out how to do this, I asked my friend <a href="https://twitter.com/m3g9tr0n" target="_blank">Spiros Fraganastasis</a> for help and he asked <a href="https://twitter.com/chick3nman512" target="_blank">Sam Croley</a>. Sam realised that if we knew the first block (8 bytes) of plain text, we could form a hash that would be crackable using hashcat’s mode 14000.</p>
+<p>To form the hash, we need the initialization vector (IV), first block of cypher and first block of plain text. The IV is stored as the first 8 bytes of the cypher (after the checksum), the first block of cypher is the following 8 bytes after the IV. So, the only thing left to determine was the first block of plain text.</p>
+<p>Dumping the decrypted enc-part for several tickets at first showed the same first block, but after more testing it was clear that this was changing a little:</p>
+<p></p><center><img src="/assets/images/des-is-useful/09-decrypted-enc-part.png"></center>
+<center>Figure 9: Decrypted enc-part</center><p></p>
+<p>Looking at this in an Asn.1 viewer it’s clear that the first 4 bytes are the header for the outer most tag, which contains the length of the data inside it (essentially the full length of the decrypted enc-part minus the length of the header (4 bytes)):</p>
+<p></p><center><img src="/assets/images/des-is-useful/10-asn1-first-element.png"></center>
+<center>Figure 10: Application Asn.1 Tag</center><p></p>
+<p>Similarly, the next 4 bytes is the header for a Sequence tag which contains the rest of the actual data and contains a length which is 4 bytes less than the previous length (length of the header less):</p>
+<p></p><center><img src="/assets/images/des-is-useful/11-asn1-second-element.png"></center>
+<center>Figure 11: Sequence Asn.1 Tag</center><p></p>
+<p>At first, I thought I could predict these values from having only the cypher, this is because the length of the plain text is always 24 bytes less than the full length of the cypher. The problem with this is after some testing, the full length of the plain text often differed from the full length of the actual data. This is because with DES the data is padded to ensure 8 byte blocks, so the plain text often had some junk padding at the end, which couldn’t be determined just from the cypher.</p>
+<p>What I needed was a way to know with as close to 100% certainty what this first block is. After looking at the plain text again, I realised there are 3 sections which can vary in length:</p>
+<p></p><center><img src="/assets/images/des-is-useful/12-full-enc-part.png"></center>
+<center>Figure 12: Full enc-part Asn.1</center><p></p>
+<p>These sections, from top to bottom, are the session key, client username (cname) and the PAC.</p>
+<p>The session key type is determined, in large part, by the supported etypes supplied within the req-body of the request (controlled by the user requesting the ticket), the client username is determined by the TGT used to request the ticket. All that is left is the PAC, most of which is determined by the client user attributes within the AD database, the only exception is the server checksum, whose length is determined by the encryption type of the ticket (AES results in a 12 byte checksum, DES/RC4 results in a 16 byte checksum).</p>
+<p>With all of this in mind, I realised it was possible to request a user-to-user (U2U) ticket which would match all of these requirements and result in a ticket that I could decrypt to get the first block of plain text. The session key as previously mentioned is determined by the supported etypes within the req-body of the request. The client user will be the user within the ticket granting ticket (TGT) which will be the same for the U2U request as for the service ticket request, meaning the cname along with most of the PAC will be the same (providing nothing changes for that user within AD between when the U2U ticket is requested and the DES encrypted ST is requested). And the U2U ticket encryption type (and ultimately the server checksum length within the PAC) is determined by the TGT session key, controllable when requesting the TGT.</p>
+<p>After <a href="https://github.com/GhostPack/Rubeus/pull/166" target="_blank">modifying Rubeus</a> to return the first block of plain text when a ticket is decrypted within the DisplayTicket function, which is run when requesting a U2U ticket by default with Rubeus, we can see the plain text within the output:</p>
+<p></p><center><img src="/assets/images/des-is-useful/13-u2u.png"></center>
+<center>Figure 13: Request U2U ticket to get plain text of first block</center><p></p>
+<p>With knowledge of the plain text, it was now possible to form a crackable hash to brute force the DES key. This is done as follows:</p>
+<p>CYPHER:(PLAINTEXT XOR IV)</p>
+<p>So, imagine we have the following:</p>
+<ul>
+<li>IV: D98C3338A9CB3626</li>
+<li>CYPHER: 6C25DDEE294588FD</li>
+<li>PLAINTEXT: 638203F8308203F4</li>
+</ul>
+<p>We XOR the PLAINTEXT and IV, resulting in: BA0E30C0994935D2, and we end up with the following hash:</p>
+<p>6C25DDEE294588FD:BA0E30C0994935D2</p>
+<p>I’ve <a href="https://github.com/GhostPack/Rubeus/pull/166" target="_blank">automated this</a> into Rubeus’ describe command with the newly implemented /desplaintext argument, supplying the plain text we received from the U2U request along with the ST we requested earlier, we get back a crackable hash:</p>
+<p></p><center><img src="/assets/images/des-is-useful/14-describe.png"></center>
+<center>Figure 14: Rubeus describe returns crackable DES hash</center><p></p>
+<p>Using this hash, the DES key used for encryption can be brute forced using the following hashcat command:</p>
+<p>hashcat -a 3 -m 14000 A2CCBE7DA8A76607:94D29CF55C02153B -1 charsets/DES_full.charset --hex-charset ?1?1?1?1?1?1?1?1</p>
+<p></p><center><img src="/assets/images/des-is-useful/15-hashcat-cracked.png"></center>
+<center>Figure 15: Crack DES key</center><p></p>
+<p>It’s worth noting 2 things here:</p>
+<ol>
+<li>For the DES key cracking in this post, I’ve put the first byte in manually to reduce the cracking time length, this is because I do not have access to a powerful cracking rig to demonstrate in the post.</li>
+<li>Due to DES having a parity bit at the end of each byte, there are 16 possible usable keys, the cracking will stop when it finds the first usable key, which may not be exactly the same as the key within the AD database but will work none-the-less.</li>
+</ol>
+<p>This key can then be used to request a TGT as the service user:</p>
+<p></p><center><img src="/assets/images/des-is-useful/16-request-tgt-des-key.png"></center>
+<center>Figure 16: Request TGT using DES</center><p></p>
+<p>For the sake of completion, it should be clear that with write access to an account it would be possible to perform targeted DES Kerberoasting of the account (user or computer, due to brute forcing of the key) similar to <a href="https://twitter.com/harmj0y" target="_blank">Will Schroeder</a>’s <a href="https://blog.harmj0y.net/activedirectory/targeted-kerberoasting/" target="_blank">targeted Kerberoasting</a> with the addition of modifying the accounts UAC bit USE_DES_KEY_ONLY to allow for retrieving the DES encrypted ST as well as authenticating using the DES key, of course this bit can be removed in between these actions to cause as little disruption as possible.</p>
+<p>It is also worth noting that once the TGT has been retrieved, the USE_DES_KEY_ONLY UAC bit can be switched off:</p>
+<p></p><center><img src="/assets/images/des-is-useful/17-disabled-des-on-user.png"></center>
+<center>Figure 17: USE_DES_KEY_ONLY disabled</center><p></p>
+<p>Even with the USE_DES_KEY_ONLY bit off, the TGT retrieved using the DES key is still usable for its lifetime:</p>
+<p></p><center><img src="/assets/images/des-is-useful/18-use-des-retrieved-tgt.png"></center>
+<center>Figure 18: Use TGT retrieved using DES key</center><p></p>
+<p>This means the USE_DES_KEY_ONLY bit can be on for a minimum amount of time for during a targeted account hijack to make risk of detection as low as possible.</p>
+<h2>Destroying DCs</h2>
+<p>As this method of Kerberoasting allows for the recovery of any account key due to a full address space brute forcing being possible, there are 3 types of accounts for which DES encrypted ST’s cannot be retrieved, even with the USE_DES_KEY_ONLY UAC bit set. These are the krbtgt account, trust accounts (INTERDOMAIN_TRUST_ACCOUNT) and DC accounts (SERVER_TRUST_ACCOUNT).</p>
+<p>For science, I decided to see what could be done when write access to a DC is possible, partly because this is a semi-common situation where unprivileged users are joining the servers to the domain before a domain administrator (DA) promotes it to a DC, leaving the unprivileged user as the CREATOR OWNER.</p>
+<p><strong>I do not advise performing this attack on a live environment</strong> as the potential to cause disruption to the infrastructure is real, but it is, however, an interesting attack path.</p>
+<p>So, in this example, the user one has GenericWrite over the DC DC2:</p>
+<p></p><center><img src="/assets/images/des-is-useful/19-user-write-dc2.png"></center>
+<center>Figure 19: GenericWrite permission</center><p></p>
+<p>While GenericWrite was chosen for ease of demonstration, this will also all work with CREATOR OWNER.</p>
+<p>For this to be a useful attack path, it is assumed all the admin accounts are protected from delegation, as shown below:</p>
+<p></p><center><img src="/assets/images/des-is-useful/20-administrator-uac.png"></center>
+<center>Figure 20: Administrator marked as “Sensitive and cannot be delegated”</center><p></p>
+<p>If this was not the case, it would be possible to use <a href="https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html" target="_blank">Resource-Based Constrained Delegation (RBCD) to escalate</a>. It is also assumed that PKINIT is not configured, otherwise <a href="https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping-for-takeover-8ee1a53566ab" target="_blank">shadow credentials could be used to escalate</a>.</p>
+<p>Initially the DC2 accounts UAC value is usual for a DC:</p>
+<p></p><center><img src="/assets/images/des-is-useful/21-dc2-uac.png"></center>
+<center>Figure 21: DC2 UAC value</center><p></p>
+<p>Enabling the USE_DES_KEY_ONLY UAC bit:</p>
+<p></p><center><img src="/assets/images/des-is-useful/22-dc2-configure-des.png"></center>
+<center>Figure 22: Enable DES for DC2</center><p></p>
+<p>It can be demonstrated that a DES encrypted ST cannot be requested:</p>
+<p></p><center><img src="/assets/images/des-is-useful/23-tgsreq-no-supp-etype.png"></center>
+<center>Figure 23: ETYPE_NOTSUPP error</center><p></p>
+<p>So, to exploit this SERVER_TRUST_ACCOUNT (8192) needs to be changed to WORKSTATION_TRUST_ACCOUNT (4096), to do this the UAC field can be XOR’d with 12288:</p>
+<p></p><center><img src="/assets/images/des-is-useful/24-dc2-downgrade.png"></center>
+Figure 24: Downgrade DC from SERVER_WORKSTATION_ACCOUNT to WORKSTATION_TRUST_ACCOUNT<p></p>
+<p>Now that the DC2 account has been downgraded to a normal workstation account, it is possible to request a DES encrypted ST:</p>
+<p></p><center><img src="/assets/images/des-is-useful/25-dc2-des-st.png"></center>
+<center>Figure 25: Request DES encrypted ST for DC account</center><p></p>
+<p>Request a U2U ticket to get the valid plain text of the first block (as described previously):</p>
+<p></p><center><img src="/assets/images/des-is-useful/26-user-u2u.png"></center>
+<center>Figure 26: Request U2U ticket to get plain text of first block</center><p></p>
+<p>Use Rubeus’ describe, with the /desplaintext to get the crackable DES hash:</p>
+<p></p><center><img src="/assets/images/des-is-useful/27-describe.png"></center>
+<center>Figure 27: Rubeus describe returns crackable DES hash</center><p></p>
+<p>As with the user hash in the previous example, this hash can be used to brute force the DES key for the DC2 account using the following hashcat command:</p>
+<p>hashcat -a 3 -m 14000 31812F50B7AC7122:41299994A5D5ADB3 -1 charsets/DES_full.charset --hex-charset ?1?1?1?1?1?1?1?1</p>
+<p></p><center><img src="/assets/images/des-is-useful/28-hashcat-crack.png"></center>
+<center>Figure 28: Brute forcing DES key</center><p></p>
+<p>Using this DES key, a TGT can be requested for the DC2 account:</p>
+<p></p><center><img src="/assets/images/des-is-useful/29-request-dc2-tgt.png"></center>
+<center>Figure 29: Request TGT for DC2 account</center><p></p>
+<p>Now a TGT has been retrieved, DES needs to be disabled again:</p>
+<p></p><center><img src="/assets/images/des-is-useful/30-disable-des.png"></center>
+<center>Figure 30: Disable DES on the DC2 account</center><p></p>
+<p>The DC2 account also needs to be escalated back to a SERVER_TRUST_ACCOUNT, unfortunately while this level of access grants the ability to downgrade from SERVER_TRUST_ACCOUNT to WORKSTATION_TRUST_ACCOUNT, it does not allow for the reverse:</p>
+<p></p><center><img src="/assets/images/des-is-useful/31-escalate-dc2-fail.png"></center>
+<center>Figure 31: Fail to escalate DC2 account</center><p></p>
+<p>Escalation within the domain is required to escalate the DC2 account back to a SERVER_TRUST_ACCOUNT. This can be done by requesting a S4U2self ticket for DC2 as an administrative user (Administrator in this case):</p>
+<p></p><center><img src="/assets/images/des-is-useful/32-s4u2self.png"></center>
+<center>Figure 32: S4U2self ticket for Administrator to DC2</center><p></p>
+<p>This ticket can be used with <a href="https://github.com/fortra/impacket" target="_blank">impacket</a> to DCsync the AES key for the Administrator from DC2:</p>
+<p></p><center><img src="/assets/images/des-is-useful/33-convert-dcsync.png"></center>
+<center>Figure 33: DCsync Administrator AES key</center><p></p>
+<p>This key can be used to request a TGT as the Administrator user:</p>
+<p></p><center><img src="/assets/images/des-is-useful/34-request-admin-tgt.png"></center>
+<center>Figure 34: Request Administrator TGT</center><p></p>
+<p>Finally, the DC2 account can be escalated back to a SERVER_TRUST_ACCOUNT:</p>
+<p></p><center><img src="/assets/images/des-is-useful/35-recover-dc2.png"></center>
+<center>Figure 35: Escalate DC2 account</center><p></p>
+<p>Again, I’d like to reiterate, I do not advise performing this attack path on a live environment. There is a LOT of room for real disruption.</p>
+<h2>DES In The Middle (TGT Session Roasting)</h2>
+<p>Anyone that was paying attention earlier and understood <a href="https://www.semperis.com/blog/new-attack-paths-as-requested-sts/" target="_blank">my previous research on AS-REQ ST’s</a> may realise that there is another potential abuse here. In my previous post, in the section called “Proof of concept: RoastInTheMiddle” I demonstrate that it is possible to capture, modify and replay AS-REQ’s. In the section “Domain Controller Configuration” above, I showed that it is possible to request a TGT with a DES session key providing the DC supports DES and without changing the account in any way to support DES. This is done by only including the DES-CBC-MD5 etype within the req-body inside the AS-REQ.</p>
+<p>This means if a valid AS-REQ with pre authentication can be captured, it could be modified to only include the DES-CBC-MD5 etype, replayed to a DC supporting DES which will result in a TGT with a DES session key being returned. All that is required to use this TGT is the session key. As the key used to encrypt the pre authentication data is unknown, it is not possible to decrypt the enc-part of the AS-REP to retrieve the session key and use the TGT immediately, it is possible however to request an ST that is encrypted with the TGT session key, using U2U. This is done by providing a TGT for an account for which credentials have been obtained and providing the TGT with a DES session key as the additional ticket. This will result in a ST encrypted with the DES session key but for the user of the account for which credentials have been obtained.</p>
+<p>For example, User1’s credentials are known.</p>
+<ol>
+<li>Request a valid TGT for User1.</li>
+<li>Send U2U with User1’s TGT as both authentication and additional tickets to extract known plain text of first block.</li>
+<li>Man-in-the-Middle (MitM) is performed.</li>
+<li>AS-REQ for Computer1 is captured.</li>
+<li>AS-REQ modified to only include the DES-CBC-MD5 etype.</li>
+<li>Forward AS-REQ to a DC that supports DES.</li>
+<li>Extract TGT for Computer1 from AS-REP.</li>
+<li>Send U2U with User1’s TGT as the authentication ticket and Computer1’s TGT as the additional ticket to get an ST encrypted with Computer1’s TGT’s session key.</li>
+<li>Create a DES hash from U2U ST encrypted with Computer1’s TGT’s session key.</li>
+<li>Create KERB_CRED from Computer1’s TGT and known information, missing the session key.</li>
+<li>Crack the DES hash back to the TGT session key.</li>
+<li>Insert the TGT session key into the KERB_CRED.</li>
+<li>Use the TGT to authenticate as Computer1.</li>
+</ol>
+<p>I modified my <a href="https://github.com/0xe7/RoastInTheMiddle" target="_blank">RoastInTheMiddle</a> tool to perform steps 2-10 automatically:</p>
+<p></p><center><img src="/assets/images/des-is-useful/36-sessionroast-ritm.png"></center>
+<center>Figure 36: RoastInTheMiddle session roasting</center><p></p>
+<p>RoastInTheMiddle performs an ARP poison MitM of 192.168.74.13 and takes a TGT using the /tgt argument, this can be a valid TGT for any account. What it does next is shown in the following wireshark output:</p>
+<p></p><center><img src="/assets/images/des-is-useful/37-wireshark.png"></center>
+<center>Figure 37: RoastInTheMiddle wireshark output</center><p></p>
+<p>So here, the first 2 (TGS-REQ/TGS-REP) is the initial U2U using the TGT passed in as the /tgt argument to retrieve the plaintext (displayed in the output with the line “Got usable known plain text:”).</p>
+<p>The next 4 is a genuine authentication of the DSP computer account, normally Windows sends an AS-REQ without pre authentication first, this is to retrieve the correct salt for the key. These are passed along to the DC (192.168.74.11) as usual to avoid interrupting the authentication, but the AS-REQ that contains pre authentication is stored (this is shown in the output on the line that says “Got AS-REQ for user dsp$@DES.LAB to service krbtgt/DES.LAB”).</p>
+<p>The last AS-REQ/AS-REP is the modified AS-REQ, containing only the DES-CBC-MD5 etype, being sent to a DC (192.168.74.12) and the TGT being sent back.</p>
+<p>Lastly the U2U request is sent using the TGT passed in as the /tgt argument as the authentication ticket and the TGT retrieved in the previous step as the additional ticket is sent which results in the DC (192.168.74.12) sending back an ST encrypted with the session key of the DSP computer accounts TGT.</p>
+<p>In the RoastInTheMiddle output above, the DES hash for the TGT session key is printed along with the KERB_CRED containing the DSP computer accounts TGT without the session key (making it currently unusable).</p>
+<p>The next step is cracking the DES hash of the TGT session key, it is important however that this key is cracked within the lifetime of the TGT (by default 10 hours), otherwise the TGT will be unusable anyway, the following hashcat command was used for this:</p>
+<p>hashcat -a 3 -m 14000 EF746FE49C358B28:DF4C43FC01762CA3 -1 charsets/DES_full.charset --hex-charset ?1?1?1?1?1?1?1?1</p>
+<p></p><center><img src="/assets/images/des-is-useful/38-hc-cracked.png"></center>
+<center>Figure 38: TGT session key recovered</center><p></p>
+<p>Now the session key needs to be inserted into the KERB_CRED output by RoastInTheMiddle earlier, for this I <a href="https://github.com/GhostPack/Rubeus/pull/166" target="_blank">added a kirbi command</a> to Rubeus, this command can eventually be used to manipulate KERB_CRED’s further but for now it just supports modifying/inserting a session key with the /sessionkey and /sessionetype arguments:</p>
+<p></p><center><img src="/assets/images/des-is-useful/39-insert-session-key.png"></center>
+<center>Figure 39: Insert session key into KERB_CRED</center><p></p>
+<p>Lastly, this TGT can now be used to authenticate as the DSP machine account and retrieve ST’s:</p>
+<p></p><center><img src="/assets/images/des-is-useful/40-use-tgt.png"></center>
+<center>Figure 40: Use TGT to request ST</center><p></p>
+<h2>DES AS-REP Roasting</h2>
+<p>Some of you may be asking “what about AS-REP Roasting?” and after essentially writing this whole post, that was the same question that I asked myself. If “AS-REP Roasting” is new to you, check out Will’s <a href="https://blog.harmj0y.net/activedirectory/roasting-as-reps/" target="_blank">post</a> on the topic, as I won’t be going over all of the details here.</p>
+<p>The first step was to see if a TGT could be requested without pre authentication using the DES key:</p>
+<p></p><center><img src="/assets/images/des-is-useful/41-des-tgt-without-preauth.png"></center>
+<center>Figure 41: Request TGT without preauth using DES key</center><p></p>
+<p>The last thing needed is to know the first block of plain text of the enc-part within the AS-REP, the decrypted enc-part is shown below, with the first block highlighted:</p>
+<p></p><center><img src="/assets/images/des-is-useful/42-enc-part-hex.png"></center>
+<center>Figure 42: Decrypted AS-REP enc-part</center><p></p>
+<p>The first block this time consists of the first 3 tag headers:</p>
+<p></p><center><img src="/assets/images/des-is-useful/43-enc-part-asn1.png"></center>
+<center>Figure 43: First 3 Asn.1 Tags</center><p></p>
+<p>Let’s look first at the third tag here (CONTEXT SPECIFIC) which is the last 2 bytes of the plain text (A0 13):</p>
+<p></p><center><img src="/assets/images/des-is-useful/44-content-element.png"></center>
+<center>Figure 44: Context Specific Tag</center><p></p>
+<p>Here it’s clear that A0 is the tag number for CONTEXT SPECIFIC and 13 (or 19 in decimal) is the length. This tag contains only the session key, which will always be DES-CBC-MD5, so the length will always be the same. This means the last 2 bytes of plain text will always be A0 13.</p>
+<p>The first 3 bytes of plain text (79 81 CF) is the APPLICATION tag:</p>
+<p></p><center><img src="/assets/images/des-is-useful/45-application-element.png"></center>
+<center>Figure 45: Application Tag</center><p></p>
+<p>Here CF is the length of 207 which is the whole enc-part of the AS-REQ. Lastly, there is the next 3 bytes (30 81 CC), which is the SEQUENCE tag:</p>
+<p></p><center><img src="/assets/images/des-is-useful/46-sequence-element.png"></center>
+<center>Figure 46: Sequence Tag</center><p></p>
+<p>Here the length (CC or 204) is the length in the APPLICATION tag (207) minus 3 (the length of the tag header).
+So, the only problem with being able to predict the plain text for the first block of the enc-part of an AS-REP is the ability to predict the length of the APPLICATION tag. To see how this may be possible, let’s look at the whole enc-part:</p>
+<p></p><center><img src="/assets/images/des-is-useful/47-enc-part-asn1.png"></center>
+<center>Figure 47: AS-REP enc-part</center><p></p>
+<p>Looking at the Asn.1 above, it’s clear that the only elements that will vary in length is the srealm and realm within the sname, everything else should remain a fixed length. With this in mind, it should be relatively easy to calculate the correct length.</p>
+<p>The domain name used in this example is “des.lab” which is 7 characters, this means the domain name takes up 14 bytes of the enc-part. The APPLICATION tag is 207 bytes, so:</p>
+<p>207 – 14 = 193 bytes</p>
+<p>To request a TGT without pre authentication, the domain name has to be known, so by doing the following, the proper length of the APPLICATION tag can be calculated:</p>
+<p>193 + (length of domain name * 2)</p>
+<p>Then to get the length of the SEQUENCE tag, just minus 3.</p>
+<p>Using this method, I <a href="https://github.com/GhostPack/Rubeus/pull/166" target="_blank">modified Rubeus</a>’ asreproast command to support roasting DES enabled accounts when /aes isn’t passed:</p>
+<p></p><center><img src="/assets/images/des-is-useful/48-asreproast.png"></center>
+<center>Figure 48: AS-REP Roasting using LDAP</center><p></p>
+<p>It is also possible to manually specify the account, rather than searching LDAP and requires including the /des switch:</p>
+<p></p><center><img src="/assets/images/des-is-useful/49-asreproast-no-ldap.png"></center>
+<center>Figure 49: AS-REP Roast without LDAP</center><p></p>
+<p>It’s worth noting here that /format:hashcat is required because john the ripper doesn’t support cracking this type of hash. Using the following hashcat command, it is possible to crack this hash back to the account long term DES key:</p>
+<p>hashcat -a 3 -m 14000 3DE9FBEA34F9851B:5B1E49C5BD8A76DF -1 charsets/DES_full.charset --hex-charset ?1?1?1?1?1?1?1?1</p>
+<p></p><center><img src="/assets/images/des-is-useful/50-hashcat-cracked.png"></center>
+<center>Figure 50: DES key cracked</center><p></p>
+<p>This key can then be used to request a usable TGT:</p>
+<p></p><center><img src="/assets/images/des-is-useful/51-request-tgt.png"></center>
+<center>Figure 51: Request TGT</center><p></p>
+<h2>Remediation/Detection</h2>
+<p>The best option to avoid these issues is to ensure that all DC’s have DES disabled in the relevant registry key:</p>
+<p>HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\parameters\SupportedEncryptionTypes</p>
+<p>The bit that represents ‘2’ has to be off. If this is the case, no DES attacks are possible on the domain.</p>
+<p>Windows events can also be used to detect attacks that take advantage of DES encryption. The 4769 event can detect Kerberoast attacks that request DES ST’s:</p>
+<p></p><center><img src="/assets/images/des-is-useful/52-des-st-4769.png"></center>
+<center>Figure 52: 4769 requesting DES ticket</center><p></p>
+<p>The 4768 event can be used to detect both the TGT session roasting MitM as well as the AS-REP roasting attacks:</p>
+<p></p><center><img src="/assets/images/des-is-useful/53-tgt-session-key-4768.png"></center>
+<center>Figure 53: 4768 requesting DES encryption</center><p></p>
+<h2>Conclusion</h2>
+<p>While DES is disabled by default in AD, it is still very easy to enable and when enabled puts the whole AD infrastructure at much higher risk. It should, therefore, be of utmost importance for sysadmins to ensure that DES is fully disabled on all DCs, as only a single DC supporting DES is all that is required to enable all of these attacks.</p>
+</div>
+<div class="tag-cloud">
+<p>
+<a href="./tag/active-directory.html">active directory</a>
+<a href="./tag/infrastructure.html">infrastructure</a>
+<a href="./tag/windows.html">windows</a>
+<a href="./tag/kerberos.html">kerberos</a>
+</p>
+</div>
+</article>
+<footer>
+<p>
+© 2021 - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+<img alt="Creative Commons License" title="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" width="80" height="15">
+</a>
+</p> </footer>
+</main>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " eXploit ",
+  "url" : ".",
+  "image": "https://exploit.ph/assets/images/profile_standard.jpg",
+  "description": "Something pVVn3|) this way comes."
+}
+</script>
+
+</body></html>

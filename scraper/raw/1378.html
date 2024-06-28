@@ -1,0 +1,1089 @@
+<html lang="en" class="js supports csstransforms3d details no-ios" style=""><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://github.com/ConsenSys/smart-contract-best-practices/known_attacks/">
+      
+      
+        <meta name="author" content="ConsenSys">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.languages" content="">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      
+        <link rel="shortcut icon" href="../images/favicon.ico">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.12.1">
+    
+    
+      
+        <title>Known Attacks - Ethereum Smart Contract Best Practices</title>
+      
+    
+    
+      <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-04ea671600.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="https://assets.readthedocs.org/static/css/badge_only.css">
+    
+      <link rel="stylesheet" href="https://assets.readthedocs.org/static/css/readthedocs-doc-embed.css">
+    
+    
+  <script src="https://www.googletagmanager.com/gtag/js?id=UA-17997319-1" type="text/javascript" async=""></script><script type="text/javascript" src="/_/static/vendor/jquery.js"></script><script src="https://media.ethicalads.io/media/client/beta/ethicalads.min.js" type="text/javascript" async="" id="ethicaladsjs"></script><style>[data-ea-publisher].loaded,[data-ea-type].loaded{font-size:14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-weight:normal;font-style:normal;letter-spacing:0px;vertical-align:baseline;line-height:1.3em}[data-ea-publisher].loaded a,[data-ea-type].loaded a{text-decoration:none}[data-ea-publisher].loaded .ea-pixel,[data-ea-type].loaded .ea-pixel{display:none}[data-ea-publisher].loaded .ea-content,[data-ea-type].loaded .ea-content{margin:1em 1em .5em 1em;padding:1em;background:rgba(0,0,0,.03);color:#505050}[data-ea-publisher].loaded .ea-content a:link,[data-ea-type].loaded .ea-content a:link{color:#505050}[data-ea-publisher].loaded .ea-content a:visited,[data-ea-type].loaded .ea-content a:visited{color:#505050}[data-ea-publisher].loaded .ea-content a:hover,[data-ea-type].loaded .ea-content a:hover{color:#373737}[data-ea-publisher].loaded .ea-content a:active,[data-ea-type].loaded .ea-content a:active{color:#373737}[data-ea-publisher].loaded .ea-content a strong,[data-ea-publisher].loaded .ea-content a b,[data-ea-type].loaded .ea-content a strong,[data-ea-type].loaded .ea-content a b{color:#088cdb}[data-ea-publisher].loaded .ea-callout a:link,[data-ea-type].loaded .ea-callout a:link{color:#6a6a6a}[data-ea-publisher].loaded .ea-callout a:visited,[data-ea-type].loaded .ea-callout a:visited{color:#6a6a6a}[data-ea-publisher].loaded .ea-callout a:hover,[data-ea-type].loaded .ea-callout a:hover{color:#505050}[data-ea-publisher].loaded .ea-callout a:active,[data-ea-type].loaded .ea-callout a:active{color:#505050}[data-ea-publisher].loaded .ea-callout a strong,[data-ea-publisher].loaded .ea-callout a b,[data-ea-type].loaded .ea-callout a strong,[data-ea-type].loaded .ea-callout a b{color:#088cdb}[data-ea-publisher].loaded .ea-callout a,[data-ea-type].loaded .ea-callout a{font-size:.8em}[data-ea-publisher].loaded.dark .ea-content,[data-ea-type].loaded.dark .ea-content{background:rgba(255,255,255,.05);color:#dcdcdc}[data-ea-publisher].loaded.dark .ea-content a:link,[data-ea-type].loaded.dark .ea-content a:link{color:#dcdcdc}[data-ea-publisher].loaded.dark .ea-content a:visited,[data-ea-type].loaded.dark .ea-content a:visited{color:#dcdcdc}[data-ea-publisher].loaded.dark .ea-content a:hover,[data-ea-type].loaded.dark .ea-content a:hover{color:#f6f6f6}[data-ea-publisher].loaded.dark .ea-content a:active,[data-ea-type].loaded.dark .ea-content a:active{color:#f6f6f6}[data-ea-publisher].loaded.dark .ea-content a strong,[data-ea-publisher].loaded.dark .ea-content a b,[data-ea-type].loaded.dark .ea-content a strong,[data-ea-type].loaded.dark .ea-content a b{color:#50baf9}[data-ea-publisher].loaded.dark .ea-callout a:link,[data-ea-type].loaded.dark .ea-callout a:link{color:#c3c3c3}[data-ea-publisher].loaded.dark .ea-callout a:visited,[data-ea-type].loaded.dark .ea-callout a:visited{color:#c3c3c3}[data-ea-publisher].loaded.dark .ea-callout a:hover,[data-ea-type].loaded.dark .ea-callout a:hover{color:#dcdcdc}[data-ea-publisher].loaded.dark .ea-callout a:active,[data-ea-type].loaded.dark .ea-callout a:active{color:#dcdcdc}[data-ea-publisher].loaded.dark .ea-callout a strong,[data-ea-publisher].loaded.dark .ea-callout a b,[data-ea-type].loaded.dark .ea-callout a strong,[data-ea-type].loaded.dark .ea-callout a b{color:#50baf9}@media(prefers-color-scheme: dark){[data-ea-publisher].loaded.adaptive .ea-content,[data-ea-type].loaded.adaptive .ea-content{background:rgba(255,255,255,.05);color:#dcdcdc}[data-ea-publisher].loaded.adaptive .ea-content a:link,[data-ea-type].loaded.adaptive .ea-content a:link{color:#dcdcdc}[data-ea-publisher].loaded.adaptive .ea-content a:visited,[data-ea-type].loaded.adaptive .ea-content a:visited{color:#dcdcdc}[data-ea-publisher].loaded.adaptive .ea-content a:hover,[data-ea-type].loaded.adaptive .ea-content a:hover{color:#f6f6f6}[data-ea-publisher].loaded.adaptive .ea-content a:active,[data-ea-type].loaded.adaptive .ea-content a:active{color:#f6f6f6}[data-ea-publisher].loaded.adaptive .ea-content a strong,[data-ea-publisher].loaded.adaptive .ea-content a b,[data-ea-type].loaded.adaptive .ea-content a strong,[data-ea-type].loaded.adaptive .ea-content a b{color:#50baf9}[data-ea-publisher].loaded.adaptive .ea-callout a:link,[data-ea-type].loaded.adaptive .ea-callout a:link{color:#c3c3c3}[data-ea-publisher].loaded.adaptive .ea-callout a:visited,[data-ea-type].loaded.adaptive .ea-callout a:visited{color:#c3c3c3}[data-ea-publisher].loaded.adaptive .ea-callout a:hover,[data-ea-type].loaded.adaptive .ea-callout a:hover{color:#dcdcdc}[data-ea-publisher].loaded.adaptive .ea-callout a:active,[data-ea-type].loaded.adaptive .ea-callout a:active{color:#dcdcdc}[data-ea-publisher].loaded.adaptive .ea-callout a strong,[data-ea-publisher].loaded.adaptive .ea-callout a b,[data-ea-type].loaded.adaptive .ea-callout a strong,[data-ea-type].loaded.adaptive .ea-callout a b{color:#50baf9}}[data-ea-publisher].loaded .ea-content,[data-ea-type].loaded .ea-content{border:0px;border-radius:3px;box-shadow:0px 2px 3px rgba(0,0,0,.15)}[data-ea-publisher].loaded.raised .ea-content,[data-ea-type].loaded.raised .ea-content{border:0px;border-radius:3px;box-shadow:0px 2px 3px rgba(0,0,0,.15)}[data-ea-publisher].loaded.bordered .ea-content,[data-ea-type].loaded.bordered .ea-content{border:1px solid rgba(0,0,0,.04);border-radius:3px;box-shadow:none}[data-ea-publisher].loaded.bordered.dark .ea-content,[data-ea-type].loaded.bordered.dark .ea-content{border:1px solid rgba(255,255,255,.07)}@media(prefers-color-scheme: dark){[data-ea-publisher].loaded.bordered.adaptive .ea-content,[data-ea-type].loaded.bordered.adaptive .ea-content{border:1px solid rgba(255,255,255,.07)}}[data-ea-publisher].loaded.flat .ea-content,[data-ea-type].loaded.flat .ea-content{border:0px;border-radius:3px;box-shadow:none}[data-ea-type=image].loaded,[data-ea-publisher]:not([data-ea-type]).loaded,.ea-type-image{display:inline-block}[data-ea-type=image].loaded .ea-content,[data-ea-publisher]:not([data-ea-type]).loaded .ea-content,.ea-type-image .ea-content{max-width:180px;overflow:auto;text-align:center}[data-ea-type=image].loaded .ea-content>a>img,[data-ea-publisher]:not([data-ea-type]).loaded .ea-content>a>img,.ea-type-image .ea-content>a>img{width:120px;height:90px;display:inline-block}[data-ea-type=image].loaded .ea-content>.ea-text,[data-ea-publisher]:not([data-ea-type]).loaded .ea-content>.ea-text,.ea-type-image .ea-content>.ea-text{margin-top:1em;font-size:1em;text-align:center}[data-ea-type=image].loaded .ea-callout,[data-ea-publisher]:not([data-ea-type]).loaded .ea-callout,.ea-type-image .ea-callout{max-width:180px;margin:0em 1em 1em 1em;padding-left:1em;padding-right:1em;font-style:italic;text-align:right}[data-ea-type=image].loaded.horizontal .ea-content,[data-ea-publisher]:not([data-ea-type]).loaded.horizontal .ea-content,.ea-type-image.horizontal .ea-content{max-width:320px}[data-ea-type=image].loaded.horizontal .ea-content>a>img,[data-ea-publisher]:not([data-ea-type]).loaded.horizontal .ea-content>a>img,.ea-type-image.horizontal .ea-content>a>img{float:left;margin-right:1em}[data-ea-type=image].loaded.horizontal .ea-content .ea-text,[data-ea-publisher]:not([data-ea-type]).loaded.horizontal .ea-content .ea-text,.ea-type-image.horizontal .ea-content .ea-text{margin-top:0em;text-align:left;overflow:auto}[data-ea-type=image].loaded.horizontal .ea-callout,[data-ea-publisher]:not([data-ea-type]).loaded.horizontal .ea-callout,.ea-type-image.horizontal .ea-callout{max-width:320px;text-align:right}[data-ea-type=text].loaded,.ea-type-text{font-size:14px}[data-ea-type=text].loaded .ea-content,.ea-type-text .ea-content{text-align:left}[data-ea-type=text].loaded .ea-callout,.ea-type-text .ea-callout{margin:.5em 1em 1em 1em;padding-left:1em;padding-right:1em;text-align:right;font-style:italic}[data-ea-style=stickybox].loaded{position:fixed;bottom:20px;right:20px;z-index:100}[data-ea-style=stickybox].loaded .ea-type-image .ea-stickybox-hide{cursor:pointer;position:absolute;top:.75em;right:.75em;background-color:#fefefe;border:1px solid #088cdb;border-radius:50%;color:#088cdb;font-size:1em;text-align:center;height:1.5em;width:1.5em;line-height:1.4}@media(max-width: 1300px){[data-ea-style=stickybox].loaded{position:static;bottom:0;right:0;margin:auto;text-align:center}[data-ea-style=stickybox].loaded .ea-stickybox-hide{display:none}}@media(min-width: 1301px){[data-ea-style=stickybox].loaded .ea-type-image .ea-content{background:#dcdcdc}[data-ea-style=stickybox].loaded.dark .ea-type-image .ea-content{background:#505050}}@media(min-width: 1301px)and (prefers-color-scheme: dark){[data-ea-style=stickybox].loaded.adaptive .ea-type-image .ea-content{background:#505050}}[data-ea-style=fixedfooter].loaded{position:fixed;bottom:0;left:0;z-index:200;width:100%;max-width:100%}[data-ea-style=fixedfooter].loaded .ea-type-text{width:100%;max-width:100%;display:flex;z-index:200;background:#dcdcdc}[data-ea-style=fixedfooter].loaded .ea-type-text .ea-content{border:0px;border-radius:3px;box-shadow:none}[data-ea-style=fixedfooter].loaded .ea-type-text .ea-content{background-color:inherit;max-width:100%;margin:0;padding:1em;flex:auto}[data-ea-style=fixedfooter].loaded .ea-type-text .ea-callout{max-width:100%;margin:0;padding:1em;flex:initial}@media(max-width: 576px){[data-ea-style=fixedfooter].loaded .ea-type-text .ea-callout{display:none}}[data-ea-style=fixedfooter].loaded .ea-type-text .ea-fixedfooter-hide{cursor:pointer;color:#505050;padding:1em;flex:initial;margin:auto 0}[data-ea-style=fixedfooter].loaded .ea-type-text .ea-fixedfooter-hide span{padding:.25em;font-size:.8em;font-weight:bold;border:.15em solid #505050;border-radius:.5em;white-space:nowrap}[data-ea-style=fixedfooter].loaded.dark .ea-type-text{background:#505050}[data-ea-style=fixedfooter].loaded.dark .ea-type-text .ea-fixedfooter-hide span{color:#dcdcdc;border-color:#dcdcdc}@media(prefers-color-scheme: dark){[data-ea-style=fixedfooter].loaded.adaptive .ea-type-text{background:#505050}[data-ea-style=fixedfooter].loaded.adaptive .ea-type-text .ea-fixedfooter-hide span{color:#dcdcdc;border-color:#dcdcdc}}</style></head>
+  
+  
+  
+  
+    <body data-md-state="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"></path></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header" data-md-state="shadow">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://github.com/ConsenSys/smart-contract-best-practices" title="Ethereum Smart Contract Best Practices" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon md-icon--home"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
+              
+            
+            Known Attacks
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required="" placeholder="Search" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset"></button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix="">
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/ConsenSys/smart-contract-best-practices" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" style="height: 606px;">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </span>
+    Ethereum Smart Contract Best Practices
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/ConsenSys/smart-contract-best-practices" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../general_philosophy/" title="General Philosophy" class="md-nav__link">
+      General Philosophy
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../recommendations/" title="Recommendations for Smart Contract Security in Solidity" class="md-nav__link">
+      Recommendations for Smart Contract Security in Solidity
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Known Attacks
+      </label>
+    
+    <a href="./" title="Known Attacks" class="md-nav__link md-nav__link--active">
+      Known Attacks
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#race-conditions42" title="Race Conditions*" class="md-nav__link">
+    Race Conditions*
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reentrancy" title="Reentrancy" class="md-nav__link">
+    Reentrancy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-function-race-conditions" title="Cross-function Race Conditions" class="md-nav__link">
+    Cross-function Race Conditions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pitfalls-in-race-condition-solutions" title="Pitfalls in Race Condition Solutions" class="md-nav__link">
+    Pitfalls in Race Condition Solutions
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-ordering-dependence-tod-front-running" title="Transaction-Ordering Dependence (TOD) / Front Running" class="md-nav__link">
+    Transaction-Ordering Dependence (TOD) / Front Running
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timestamp-dependence" title="Timestamp Dependence" class="md-nav__link">
+    Timestamp Dependence
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integer-overflow-and-underflow" title="Integer Overflow and Underflow" class="md-nav__link">
+    Integer Overflow and Underflow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dos-with-unexpected-revert" title="DoS with (Unexpected) revert" class="md-nav__link">
+    DoS with (Unexpected) revert
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dos-with-block-gas-limit" title="DoS with Block Gas Limit" class="md-nav__link">
+    DoS with Block Gas Limit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forcibly-sending-ether-to-a-contract" title="Forcibly Sending Ether to a Contract" class="md-nav__link">
+    Forcibly Sending Ether to a Contract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecatedhistorical-attacks" title="Deprecated/historical attacks" class="md-nav__link">
+    Deprecated/historical attacks
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#call-depth-attack-deprecated" title="Call Depth Attack (deprecated)" class="md-nav__link">
+    Call Depth Attack (deprecated)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../software_engineering/" title="Software Engineering Techniques" class="md-nav__link">
+      Software Engineering Techniques
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../documentation_procedures/" title="Documentation and Procedures" class="md-nav__link">
+      Documentation and Procedures
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../security_tools/" title="Security Tools" class="md-nav__link">
+      Security Tools
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../security_notifications/" title="Security Notifications" class="md-nav__link">
+      Security Notifications
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../future_improvements/" title="Future improvements" class="md-nav__link">
+      Future improvements
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../bibliography/" title="Smart Contract Security Bibliography" class="md-nav__link">
+      Smart Contract Security Bibliography
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-11" type="checkbox" id="nav-11">
+    
+    <label class="md-nav__link" for="nav-11">
+      About
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-11">
+        About
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix="">
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../about/reviewers/" title="Reviewers" class="md-nav__link">
+      Reviewers
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../about/license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../about/contributing/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" style="height: 606px;">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#race-conditions42" title="Race Conditions*" class="md-nav__link">
+    Race Conditions*
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reentrancy" title="Reentrancy" class="md-nav__link">
+    Reentrancy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-function-race-conditions" title="Cross-function Race Conditions" class="md-nav__link">
+    Cross-function Race Conditions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pitfalls-in-race-condition-solutions" title="Pitfalls in Race Condition Solutions" class="md-nav__link">
+    Pitfalls in Race Condition Solutions
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-ordering-dependence-tod-front-running" title="Transaction-Ordering Dependence (TOD) / Front Running" class="md-nav__link">
+    Transaction-Ordering Dependence (TOD) / Front Running
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timestamp-dependence" title="Timestamp Dependence" class="md-nav__link">
+    Timestamp Dependence
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integer-overflow-and-underflow" title="Integer Overflow and Underflow" class="md-nav__link">
+    Integer Overflow and Underflow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dos-with-unexpected-revert" title="DoS with (Unexpected) revert" class="md-nav__link">
+    DoS with (Unexpected) revert
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dos-with-block-gas-limit" title="DoS with Block Gas Limit" class="md-nav__link">
+    DoS with Block Gas Limit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forcibly-sending-ether-to-a-contract" title="Forcibly Sending Ether to a Contract" class="md-nav__link">
+    Forcibly Sending Ether to a Contract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecatedhistorical-attacks" title="Deprecated/historical attacks" class="md-nav__link">
+    Deprecated/historical attacks
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#call-depth-attack-deprecated" title="Call Depth Attack (deprecated)" class="md-nav__link">
+    Call Depth Attack (deprecated)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/ConsenSys/smart-contract-best-practices/edit/master/docs/known_attacks.md" title="Edit this page" class="md-icon md-content__icon"></a>
+                
+                
+                  <h1>Known Attacks</h1>
+                
+                <p>The following is a list of known attacks which you should be aware of, and defend against when writing smart contracts.</p>
+<h2 id="race-conditions42">Race Conditions<sup><a href="#footnote-race-condition-terminology">*</a></sup><a class="headerlink" href="#race-conditions42" title="Permanent link">¶</a></h2>
+<p>One of the major dangers of calling external contracts is that they can take over the control flow, and make changes to your data that the calling function wasn't expecting. This class of bug can take many forms, and both of the major bugs that led to the DAO's collapse were bugs of this sort.</p>
+<h3 id="reentrancy">Reentrancy<a class="headerlink" href="#reentrancy" title="Permanent link">¶</a></h3>
+<p>The first version of this bug to be noticed involved functions that could be called repeatedly, before the first invocation of the function was finished. This may cause the different invocations of the function to interact in destructive ways.</p>
+<div class="highlight" id="__code_0"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_0 pre, #__code_0 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// INSECURE</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">userBalances</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">withdrawBalance</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">amountToWithdraw</span> <span class="o">=</span> <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">];</span>
+    <span class="n">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">amountToWithdraw</span><span class="p">)());</span> <span class="c1">// At this point, the caller's code is executed, and can call withdrawBalance again</span>
+    <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Since the user's balance is not set to 0 until the very end of the function, the second (and later) invocations will still succeed, and will withdraw the balance over and over again. A very similar bug was one of the vulnerabilities in the DAO attack.</p>
+<p>In the example given, the best way to avoid the problem is to <a href="https://github.com/ConsenSys/smart-contract-best-practices#send-vs-call-value">use <code>send()</code> instead of <code>call.value()()</code></a>. This will prevent any external code from being executed.</p>
+<p>However, if you can't remove the external call, the next simplest way to prevent this attack is to make sure you don't call an external function until you've done all the internal work you need to do:</p>
+<div class="highlight" id="__code_1"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_1 pre, #__code_1 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">userBalances</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">withdrawBalance</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">amountToWithdraw</span> <span class="o">=</span> <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">];</span>
+    <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">amountToWithdraw</span><span class="p">)());</span> <span class="c1">// The user's balance is already 0, so future invocations won't withdraw anything</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Note that if you had another function which called <code>withdrawBalance()</code>, it would be potentially subject to the same attack, so you must treat any function which calls an untrusted contract as itself untrusted. See below for further discussion of potential solutions.</p>
+<h3 id="cross-function-race-conditions">Cross-function Race Conditions<a class="headerlink" href="#cross-function-race-conditions" title="Permanent link">¶</a></h3>
+<p>An attacker may also be able to do a similar attack using two different functions that share the same state.</p>
+<div class="highlight" id="__code_2"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_2 pre, #__code_2 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// INSECURE</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">userBalances</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">transfer</span><span class="p">(</span><span class="kt">address</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">amount</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">amount</span><span class="p">)</span> <span class="p">{</span>
+       <span class="n">userBalances</span><span class="p">[</span><span class="n">to</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span><span class="p">;</span>
+       <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">amount</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="n">withdrawBalance</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">amountToWithdraw</span> <span class="o">=</span> <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">];</span>
+    <span class="n">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">amountToWithdraw</span><span class="p">)());</span> <span class="c1">// At this point, the caller's code is executed, and can call transfer()</span>
+    <span class="n">userBalances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>In this case, the attacker calls <code>transfer()</code> when their code is executed on the external call in <code>withdrawBalance</code>. Since their balance has not yet been set to 0, they are able to transfer the tokens even though they already received the withdrawal. This vulnerability was also used in the DAO attack.</p>
+<p>The same solutions will work, with the same caveats. Also note that in this example, both functions were part of the same contract. However, the same bug can occur across multiple contracts, if those contracts share state.</p>
+<h3 id="pitfalls-in-race-condition-solutions">Pitfalls in Race Condition Solutions<a class="headerlink" href="#pitfalls-in-race-condition-solutions" title="Permanent link">¶</a></h3>
+<p>Since race conditions can occur across multiple functions, and even multiple contracts, any solution aimed at preventing reentry will not be sufficient.</p>
+<p>Instead, we have recommended finishing all internal work first, and only then calling the external function. This rule, if followed carefully, will allow you to avoid race conditions. However, you need to not only avoid calling external functions too soon, but also avoid calling functions which call external functions. For example, the following is insecure:</p>
+<div class="highlight" id="__code_3"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_3 pre, #__code_3 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// INSECURE</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">userBalances</span><span class="p">;</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">)</span> <span class="kr">private</span> <span class="n">claimedBonus</span><span class="p">;</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">rewardsForA</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">withdraw</span><span class="p">(</span><span class="kt">address</span> <span class="n">recipient</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">amountToWithdraw</span> <span class="o">=</span> <span class="n">userBalances</span><span class="p">[</span><span class="n">recipient</span><span class="p">];</span>
+    <span class="n">rewardsForA</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">recipient</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">amountToWithdraw</span><span class="p">)());</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="n">getFirstWithdrawalBonus</span><span class="p">(</span><span class="kt">address</span> <span class="n">recipient</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="n">require</span><span class="p">(</span><span class="o">!</span><span class="n">claimedBonus</span><span class="p">[</span><span class="n">recipient</span><span class="p">]);</span> <span class="c1">// Each recipient should only be able to claim the bonus once</span>
+
+    <span class="n">rewardsForA</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">100</span><span class="p">;</span>
+    <span class="n">withdraw</span><span class="p">(</span><span class="n">recipient</span><span class="p">);</span> <span class="c1">// At this point, the caller will be able to execute getFirstWithdrawalBonus again.</span>
+    <span class="n">claimedBonus</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Even though <code>getFirstWithdrawalBonus()</code> doesn't directly call an external contract, the call in <code>withdraw()</code> is enough to make it vulnerable to a race condition. You therefore need to treat <code>withdraw()</code> as if it were also untrusted.</p>
+<div class="highlight" id="__code_4"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_4 pre, #__code_4 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">userBalances</span><span class="p">;</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">)</span> <span class="kr">private</span> <span class="n">claimedBonus</span><span class="p">;</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">rewardsForA</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">untrustedWithdraw</span><span class="p">(</span><span class="kt">address</span> <span class="n">recipient</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">amountToWithdraw</span> <span class="o">=</span> <span class="n">userBalances</span><span class="p">[</span><span class="n">recipient</span><span class="p">];</span>
+    <span class="n">rewardsForA</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">recipient</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">amountToWithdraw</span><span class="p">)());</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="n">untrustedGetFirstWithdrawalBonus</span><span class="p">(</span><span class="kt">address</span> <span class="n">recipient</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="n">require</span><span class="p">(</span><span class="o">!</span><span class="n">claimedBonus</span><span class="p">[</span><span class="n">recipient</span><span class="p">]);</span> <span class="c1">// Each recipient should only be able to claim the bonus once</span>
+
+    <span class="n">claimedBonus</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="n">rewardsForA</span><span class="p">[</span><span class="n">recipient</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">100</span><span class="p">;</span>
+    <span class="n">untrustedWithdraw</span><span class="p">(</span><span class="n">recipient</span><span class="p">);</span> <span class="c1">// claimedBonus has been set to true, so reentry is impossible</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>In addition to the fix making reentry impossible, <a href="https://github.com/ConsenSys/smart-contract-best-practices#mark-untrusted-contracts">untrusted functions have been marked.</a> This same pattern repeats at every level: since <code>untrustedGetFirstWithdrawalBonus()</code> calls <code>untrustedWithdraw()</code>, which calls an external contract, you must also treat <code>untrustedGetFirstWithdrawalBonus()</code> as insecure.</p>
+<p>Another solution often suggested is a <a href="https://en.wikipedia.org/wiki/Mutual_exclusion">mutex</a>. This allows you to "lock" some state so it can only be changed by the owner of the lock. A simple example might look like this:</p>
+<div class="highlight" id="__code_5"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_5 pre, #__code_5 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// Note: This is a rudimentary example, and mutexes are particularly useful where there is substantial logic and/or shared state</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">private</span> <span class="n">balances</span><span class="p">;</span>
+<span class="kt">bool</span> <span class="kr">private</span> <span class="n">lockBalances</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">deposit</span><span class="p">()</span> <span class="kr">payable</span> <span class="kr">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">require</span><span class="p">(</span><span class="o">!</span><span class="n">lockBalances</span><span class="p">);</span>
+    <span class="n">lockBalances</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+    <span class="n">lockBalances</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="n">withdraw</span><span class="p">(</span><span class="kt">uint</span> <span class="n">amount</span><span class="p">)</span> <span class="kr">payable</span> <span class="kr">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">require</span><span class="p">(</span><span class="o">!</span><span class="n">lockBalances</span> <span class="o">&amp;&amp;</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">amount</span><span class="p">);</span>
+    <span class="n">lockBalances</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">.</span><span class="nb">call</span><span class="p">(</span><span class="n">amount</span><span class="p">)())</span> <span class="p">{</span> <span class="c1">// Normally insecure, but the mutex saves it</span>
+      <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">amount</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">lockBalances</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>If the user tries to call <code>withdraw()</code> again before the first call finishes, the lock will prevent it from having any effect. This can be an effective pattern, but it gets tricky when you have multiple contracts that need to cooperate. The following is insecure:</p>
+<div class="highlight" id="__code_6"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_6 pre, #__code_6 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// INSECURE</span>
+<span class="kd">contract</span> <span class="n">StateHolder</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="kr">private</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">address</span> <span class="kr">private</span> <span class="n">lockHolder</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="n">getLock</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">require</span><span class="p">(</span><span class="n">lockHolder</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="n">lockHolder</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="n">releaseLock</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">lockHolder</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="n">set</span><span class="p">(</span><span class="kt">uint</span> <span class="n">newState</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span> <span class="o">==</span> <span class="n">lockHolder</span><span class="p">);</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">newState</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>An attacker can call <code>getLock()</code>, and then never call <code>releaseLock()</code>. If they do this, then the contract will be locked forever, and no further changes will be able to be made. If you use mutexes to protect against race conditions, you will need to carefully ensure that there are no ways for a lock to be claimed and never released. (There are other potential dangers when programming with mutexes, such as deadlocks and livelocks. You should consult the large amount of literature already written on mutexes, if you decide to go this route.)</p>
+<p><a name="footnote-race-condition-terminology"></a></p>
+<div style="font-size: 80%; display: inline;">* Some may object to the use of the term <i>race condition</i> since Ethereum does not currently have true parallelism. However, there is still the fundamental feature of logically distinct processes contending for resources, and the same sorts of pitfalls and potential solutions apply.</div>
+
+<h2 id="transaction-ordering-dependence-tod-front-running">Transaction-Ordering Dependence (TOD) / Front Running<a class="headerlink" href="#transaction-ordering-dependence-tod-front-running" title="Permanent link">¶</a></h2>
+<p>Above were examples of race conditions involving the attacker executing malicious code <em>within a single transaction</em>. The following are a different type of race condition inherent to Blockchains: the fact that <em>the order of transactions themselves</em> (within a block) is easily subject to manipulation.</p>
+<p>Since a transaction is in the mempool for a short while, one can know what actions will occur, before it is included in a block. This can be troublesome for things like decentralized markets, where a transaction to buy some tokens can be seen, and a market order implemented before the other transaction gets included. Protecting against this is difficult, as it would come down to the specific contract itself. For example, in markets, it would be better to implement batch auctions (this also protects against high frequency trading concerns). Another way to use a pre-commit scheme (“I’m going to submit the details later”).</p>
+<h2 id="timestamp-dependence">Timestamp Dependence<a class="headerlink" href="#timestamp-dependence" title="Permanent link">¶</a></h2>
+<p>Be aware that the timestamp of the block can be manipulated by the miner, and all direct and indirect uses of the timestamp should be considered. <em>Block numbers</em> and <em>average block time</em> can be used to estimate time, but this is not future proof as block times may change (such as the changes expected during Casper).</p>
+<div class="highlight" id="__code_7"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_7 pre, #__code_7 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kt">uint</span> <span class="n">someVariable</span> <span class="o">=</span> <span class="nb">now</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">now</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// the now can be manipulated by the miner</span>
+
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">((</span><span class="n">someVariable</span> <span class="o">-</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// someVariable can be manipulated by the miner</span>
+
+<span class="p">}</span>
+</pre></div>
+
+<h2 id="integer-overflow-and-underflow">Integer Overflow and Underflow<a class="headerlink" href="#integer-overflow-and-underflow" title="Permanent link">¶</a></h2>
+<p>Be aware there are around <a href="https://github.com/ethereum/solidity/issues/796#issuecomment-253578925">20 cases for overflow and underflow</a>.</p>
+<p>Consider a simple token transfer:</p>
+<div class="highlight" id="__code_8"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_8 pre, #__code_8 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="kr">public</span> <span class="n">balanceOf</span><span class="p">;</span>
+
+<span class="c1">// INSECURE</span>
+<span class="kd">function</span> <span class="n">transfer</span><span class="p">(</span><span class="kt">address</span> <span class="n">_to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* Check if sender has balance */</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">balanceOf</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">_value</span><span class="p">);</span>
+    <span class="cm">/* Add and subtract new balances */</span>
+    <span class="n">balanceOf</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">_value</span><span class="p">;</span>
+    <span class="n">balanceOf</span><span class="p">[</span><span class="n">_to</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// SECURE</span>
+<span class="kd">function</span> <span class="n">transfer</span><span class="p">(</span><span class="kt">address</span> <span class="n">_to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* Check if sender has balance and for overflows */</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">balanceOf</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">_value</span> <span class="o">&amp;&amp;</span> <span class="n">balanceOf</span><span class="p">[</span><span class="n">_to</span><span class="p">]</span> <span class="o">+</span> <span class="n">_value</span> <span class="o">&gt;=</span> <span class="n">balanceOf</span><span class="p">[</span><span class="n">_to</span><span class="p">]);</span>
+
+    <span class="cm">/* Add and subtract new balances */</span>
+    <span class="n">balanceOf</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">_value</span><span class="p">;</span>
+    <span class="n">balanceOf</span><span class="p">[</span><span class="n">_to</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_value</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>If a balance reaches the maximum uint value (2^256) it will circle back to zero. This checks for that condition. This may or may not be relevant, depending on the implementation. Think about whether or not the uint value has an opportunity to approach such a large number. Think about how the uint variable changes state, and who has authority to make such changes. If any user can call functions which update the uint value, it's more vulnerable to attack. If only an admin has access to change the variable's state, you might be safe. If a user can increment by only 1 at a time, you are probably also safe because there is no feasible way to reach this limit.</p>
+<p>The same is true for underflow. If a uint is made to be less than zero, it will cause an underflow and get set to its maximum value.</p>
+<p>Be careful with the smaller data-types like uint8, uint16, uint24...etc: they can even more easily hit their maximum value.</p>
+<p>Be aware there are around <a href="https://github.com/ethereum/solidity/issues/796#issuecomment-253578925">20 cases for overflow and underflow</a>.</p>
+<p><a name="dos-with-unexpected-revert"></a></p>
+<h2 id="dos-with-unexpected-revert">DoS with (Unexpected) revert<a class="headerlink" href="#dos-with-unexpected-revert" title="Permanent link">¶</a></h2>
+<p>Consider a simple auction contract:</p>
+<div class="highlight" id="__code_9"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_9 pre, #__code_9 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="c1">// INSECURE</span>
+<span class="kd">contract</span> <span class="n">Auction</span> <span class="p">{</span>
+    <span class="kt">address</span> <span class="n">currentLeader</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="n">highestBid</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="n">bid</span><span class="p">()</span> <span class="kr">payable</span> <span class="p">{</span>
+        <span class="n">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="n">highestBid</span><span class="p">);</span>
+
+        <span class="n">require</span><span class="p">(</span><span class="n">currentLeader</span><span class="p">.</span><span class="nb">send</span><span class="p">(</span><span class="n">highestBid</span><span class="p">));</span> <span class="c1">// Refund the old leader, if it fails then revert</span>
+
+        <span class="n">currentLeader</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+        <span class="n">highestBid</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>When it tries to refund the old leader, it reverts if the refund fails. This means that a malicious bidder can become the leader while making sure that any refunds to their address will <em>always</em> fail. In this way, they can prevent anyone else from calling the <code>bid()</code> function, and stay the leader forever. A recommendation is to set up a <a href="https://github.com/ConsenSys/smart-contract-best-practices/#favor-pull-over-push-payments">pull payment system</a> instead, as described earlier.</p>
+<p>Another example is when a contract may iterate through an array to pay users (e.g., supporters in a crowdfunding contract). It's common to want to make sure that each payment succeeds. If not, one should revert. The issue is that if one call fails, you are reverting the whole payout system, meaning the loop will never complete. No one gets paid because one address is forcing an error.</p>
+<div class="highlight" id="__code_10"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_10 pre, #__code_10 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kt">address</span><span class="p">[]</span> <span class="kr">private</span> <span class="n">refundAddresses</span><span class="p">;</span>
+<span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint</span><span class="p">)</span> <span class="kr">public</span> <span class="n">refunds</span><span class="p">;</span>
+
+<span class="c1">// bad</span>
+<span class="kd">function</span> <span class="n">refundAll</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kt">uint</span> <span class="n">x</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">refundAddresses</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// arbitrary length iteration based on how many addresses participated</span>
+        <span class="n">require</span><span class="p">(</span><span class="n">refundAddresses</span><span class="p">[</span><span class="n">x</span><span class="p">].</span><span class="nb">send</span><span class="p">(</span><span class="n">refunds</span><span class="p">[</span><span class="n">refundAddresses</span><span class="p">[</span><span class="n">x</span><span class="p">]]))</span> <span class="c1">// doubly bad, now a single failure on send will hold up all funds</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Again, the recommended solution is to <a href="#favor-pull-over-push-payments">favor pull over push payments</a>.</p>
+<h2 id="dos-with-block-gas-limit">DoS with Block Gas Limit<a class="headerlink" href="#dos-with-block-gas-limit" title="Permanent link">¶</a></h2>
+<p>You may have noticed another problem with the previous example: by paying out to everyone at once, you risk running into the block gas limit. Each Ethereum block can process a certain maximum amount of computation. If you try to go over that, your transaction will fail.</p>
+<p>This can lead to problems even in the absence of an intentional attack. However, it's especially bad if an attacker can manipulate the amount of gas needed. In the case of the previous example, the attacker could add a bunch of addresses, each of which needs to get a very small refund. The gas cost of refunding each of the attacker's addresses could, therefore, end up being more than the gas limit, blocking the refund transaction from happening at all.</p>
+<p>This is another reason to <a href="#favor-pull-over-push-payments">favor pull over push payments</a>.</p>
+<p>If you absolutely must loop over an array of unknown size, then you should plan for it to potentially take multiple blocks, and therefore require multiple transactions. You will need to keep track of how far you've gone, and be able to resume from that point, as in the following example:</p>
+<div class="highlight" id="__code_11"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_11 pre, #__code_11 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kd">struct</span> <span class="n">Payee</span> <span class="p">{</span>
+    <span class="kt">address</span> <span class="n">addr</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">Payee</span><span class="p">[]</span> <span class="n">payees</span><span class="p">;</span>
+<span class="kt">uint256</span> <span class="n">nextPayeeIndex</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="n">payOut</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">uint256</span> <span class="n">i</span> <span class="o">=</span> <span class="n">nextPayeeIndex</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">payees</span><span class="p">.</span><span class="n">length</span> <span class="o">&amp;&amp;</span> <span class="nb">msg</span><span class="p">.</span><span class="n">gas</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">payees</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">addr</span><span class="p">.</span><span class="nb">send</span><span class="p">(</span><span class="n">payees</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">value</span><span class="p">);</span>
+      <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">nextPayeeIndex</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>You will need to make sure that nothing bad will happen if other transactions are processed while waiting for the next iteration of the <code>payOut()</code> function. So only use this pattern if absolutely necessary.</p>
+<h2 id="forcibly-sending-ether-to-a-contract">Forcibly Sending Ether to a Contract<a class="headerlink" href="#forcibly-sending-ether-to-a-contract" title="Permanent link">¶</a></h2>
+<p>It is possible to forcibly send Ether to a contract without triggering its fallback function. This is an important consideration when placing important logic in the fallback function or making calculations based on a contract's balance. Take the following example:</p>
+<div class="highlight" id="__code_12"><button class="md-clipboard" title="Copy to clipboard" data-clipboard-target="#__code_12 pre, #__code_12 code"><span class="md-clipboard__message"></span></button><pre><span></span><span class="kd">contract</span> <span class="n">Vulnerable</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="p">()</span> <span class="kr">payable</span> <span class="p">{</span>
+        <span class="n">revert</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="n">somethingBad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">require</span><span class="p">(</span><span class="nb">this</span><span class="p">.</span><span class="nb">balance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="c1">// Do something bad</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Contract logic seems to disallow payments to the contract and therefore disallow "something bad" from happening. However, a few methods exist for forcibly sending ether to the contract and therefore making its balance greater than zero. </p>
+<p>The <code>selfdestruct</code> contract method allows a user to specify a beneficiary to send any excess ether. <code>selfdestruct</code> <a href="https://solidity.readthedocs.io/en/develop/security-considerations.html#sending-and-receiving-ether">does not trigger a contract's fallback function</a>. </p>
+<p>It is also possible to <a href="https://github.com/Arachnid/uscc/tree/master/submissions-2017/ricmoo">precompute</a> a contract's address and send Ether to that address before deploying the contract.</p>
+<p>Contract developers should be aware that Ether can be forcibly sent to a contract and should design contract logic accordingly. Generally, assume that it is not possible to restrict sources of funding to your contract. </p>
+<h2 id="deprecatedhistorical-attacks">Deprecated/historical attacks<a class="headerlink" href="#deprecatedhistorical-attacks" title="Permanent link">¶</a></h2>
+<p>These are attacks which are no longer possible due to changes in the protocol or improvements to solidity. They are recorded here for posterity and awareness. </p>
+<h3 id="call-depth-attack-deprecated">Call Depth Attack (deprecated)<a class="headerlink" href="#call-depth-attack-deprecated" title="Permanent link">¶</a></h3>
+<p>As of the <a href="https://github.com/ethereum/EIPs/issues/150">EIP 150</a> hardfork, call depth attacks are no longer relevant<sup><a href="http://ethereum.stackexchange.com/questions/9398/how-does-eip-150-change-the-call-depth-attack">*</a></sup> (all gas would be consumed well before reaching the 1024 call depth limit).</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../recommendations/" title="Recommendations for Smart Contract Security in Solidity" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Recommendations for Smart Contract Security in Solidity
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../software_engineering/" title="Software Engineering Techniques" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Software Engineering Techniques
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-946997f430.js"></script>
+      
+      
+      <script>app.initialize({version:"0.16.3",url:{base:".."}})</script>
+      
+        <script src="../readthedocs-data.js"></script>
+      
+        <script src="https://assets.readthedocs.org/static/core/js/readthedocs-doc-embed.js"></script>
+      
+        <script src="https://assets.readthedocs.org/static/javascript/readthedocs-analytics.js"></script>
+      
+    
+    
+      
+    
+  
+<!-- Inserted RTD Footer -->
+
+<div class="injected">
+
+  
+  <div class="rst-versions rst-badge" data-toggle="rst-versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book">&nbsp;</span>
+      v: latest
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+
+      
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+        <dd class="rtd-current-item">
+          <a href="https://ethereum-contract-security-techniques-and-tips.readthedocs.io/en/latest/">latest</a>
+        </dd>
+        
+      </dl>
+      
+      
+
+      
+      
+      
+
+      
+      <dl>
+        
+        <!-- These are kept as relative links for internal installs that are http -->
+        <dt>On Read the Docs</dt>
+        <dd>
+          <a href="//readthedocs.org/projects/ethereum-contract-security-techniques-and-tips/">Project Home</a>
+        </dd>
+        <dd>
+          <a href="//readthedocs.org/projects/ethereum-contract-security-techniques-and-tips/builds/">Builds</a>
+        </dd>
+        <dd>
+          <a href="//readthedocs.org/projects/ethereum-contract-security-techniques-and-tips/downloads/">Downloads</a>
+        </dd>
+      </dl>
+      
+
+      
+
+      
+      <dl>
+        <dt>On GitHub</dt>
+        <dd>
+          <a href="https://github.com/maurelian/smart-contract-best-practices/blob/master/docs/">View</a>
+        </dd>
+        
+        <dd>
+          <a href="https://github.com/maurelian/smart-contract-best-practices/edit/master/docs/">Edit</a>
+        </dd>
+        
+      </dl>
+      
+      
+
+      
+      <dl>
+        <dt>Search</dt>
+        <dd>
+          <div style="padding: 6px;">
+            
+            <form id="flyout-search-form" class="wy-form" target="_blank" action="//readthedocs.org/projects/ethereum-contract-security-techniques-and-tips/search/" method="get">
+              <input type="text" name="q" aria-label="Search docs" placeholder="Search docs">
+              </form>
+          </div>
+        </dd>
+      </dl>
+      
+
+      <hr>
+
+      
+        <small>
+          <span>Hosted by <a href="https://readthedocs.org">Read the Docs</a></span>
+          <span> · </span>
+          <a href="https://docs.readthedocs.io/page/privacy-policy.html">Privacy Policy</a>
+        </small>
+      
+
+      
+    </div>
+  </div>
+  
+
+</div>
+</body></html>

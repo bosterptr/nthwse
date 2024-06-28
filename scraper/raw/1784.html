@@ -1,0 +1,800 @@
+<html lang="en" class="wf-ubuntu-n4-active wf-active"><head>
+  <meta charset="UTF-8">
+  <title>abatchy's blog | Port forwarding: A practical hands-on guide </title>
+  <meta name="theme-color" content="#222222">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js" type="text/javascript" async=""></script><script type="text/javascript" async="" src="https://ssl.google-analytics.com/ga.js"></script><script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/toc.js"></script>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/theme.css" rel="stylesheet">
+  <link href="/css/syntax.css" rel="stylesheet">
+  <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/x-icon" href="/images/personal/favicon.ico">
+  <!-- Place this tag in your head or just before your close body tag. -->
+  <script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@abatchy17">
+  <meta name="twitter:creator" content="@abatchy17">
+    
+    <meta name="twitter:title" content="Port forwarding: A practical hands-on guide">
+    
+    <meta name="twitter:url" content="http://abatchy17.github.io/2017/01/port-forwarding-practical-hands-on-guide">
+    
+    <meta name="twitter:description" content="">
+    
+  <meta name="twitter:image:src" content="http://www.abatchy.com/images/personal/abatchy.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu&amp;subset=latin" media="all"><script type="text/javascript" async="" src="//abatchy17-github-io.disqus.com/embed.js"></script><script async="" id="dsq_recs_scr" src="https://abatchy17-github-io.disqus.com/recommendations.js"></script><script charset="utf-8" src="https://platform.twitter.com/js/button.856debeac157d9669cf51e73a08fbc93.js"></script></head>
+
+<body>
+
+  
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-105787720-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+  
+
+
+ <script type="text/javascript">
+  WebFontConfig = {
+    google: {
+      families: ['Ubuntu::latin']
+    }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">abatchy's blog</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/">home</a></li>
+          <li><a href="/tutorials">tutorials</a></li>
+          <li><a href="/projects">projects</a></li>
+          <li><a href="/archive">archive</a></li>
+          <li><a href="/about">about</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <div class="wrapper">
+      <div class="content">
+        <div class="container container-center">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="article">
+                <div class="well">
+                    <div class="post-time">
+                      Thursday, January 12, 2017
+                    </div>
+                  <div class="post-meta">
+                    <ul>
+                      
+                        <li><a href="/tag/Networking">Networking</a></li>
+                      
+                    </ul>
+                  </div>
+                  <h1><a href="/2017/01/port-forwarding-practical-hands-on-guide">Port forwarding: A practical hands-on guide</a></h1>
+                  <div class="post-content">
+                    <div id="toc" class="toc"></div>
+                    <ol>
+  <li><a href="#1-introduction">Introduction</a></li>
+  <li><a href="#2-requirements">Requirements</a></li>
+  <li><a href="#3-assumptions">Assumptions</a></li>
+  <li><a href="#4-setup-before-port-forwarding">Setup Before Port Forwarding</a>
+    <ul>
+      <li><a href="#41-setting-up-apache-server">Setting up Apache server</a></li>
+      <li><a href="#42-configuring-iptables">Configuring iptables</a></li>
+    </ul>
+  </li>
+  <li><a href="#5-setup-after-port-forwarding">Setup After Port Forwarding</a>
+    <ul>
+      <li><a href="#51-dataflow">Dataflow</a></li>
+      <li><a href="#52-rinetd-on-proxy-machine">Rinetd on proxy machine</a></li>
+    </ul>
+  </li>
+  <li><a href="#6-did-it-work">Did it work?</a></li>
+  <li><a href="#7-no-love-for-windows">No love for Windows?</a></li>
+</ol>
+
+<h2 id="1-introduction">1. Introduction</h2>
+
+<p>During my preparation for the PWK/OSCP course (starting late January), I had a hard time understanding how port forwarding/tunneling works. Most guides I found were too theoretical for my taste, this guide will allow you to mimic a strict corporate firewall and how to bypass it.</p>
+
+<p>So what is port forwarding? It’s a technique that allows you to redirect traffic from one port to another port/IP. What the hell does that mean?</p>
+
+<p>Imagine the following scenario:</p>
+
+<p>Your corp firewall only allows outbound connections to web servers running on standard ports (port 80 for HTTP / port 443 for HTTPS). Your favorite security news website for some reason is run on port 8000. Given the strict corp firewall you won’t be able to browse the site any more.</p>
+
+<p><a href="http://i.imgur.com/WaYeE8F.png"><img src="http://i.imgur.com/WaYeE8F.png" alt=""></a></p>
+
+<p>You decide to use your knowledge of port forwarding to still be able to browse your favorite site. We’ll be using <a href="http://www.lenzg.net/rinetd/rinetd.html">rinetd</a> as TCP forwarder.</p>
+
+<hr>
+
+<h2 id="2-requirements">2. Requirements</h2>
+
+<p>To follow this guide you’ll need the following:</p>
+
+<ul>
+  <li>Host machine capable of running 2 Linux VMs.</li>
+  <li>LAN network.</li>
+  <li>Some patience.</li>
+</ul>
+
+<hr>
+
+<h2 id="3-assumptions">3. Assumptions</h2>
+
+<p>All machines are on the same network for simplicity, thus no router<br>
+configuration is needed.</p>
+
+<center>
+<table border="3"><tbody>
+<tr>     <th>Machine</th>     <th>IP</th> </tr>
+<tr>     <td>abatchy-work</td>     <td>192.168.20.130</td> </tr>
+<tr>     <td>abatchy-proxy</td>     <td>192.168.20.131</td> </tr>
+<tr>     <td>abatchy-http</td>     <td>192.168.20.132</td> </tr>
+</tbody></table>
+</center>
+
+<ul>
+  <li>
+    <p><strong>192.168.20.130</strong>: Work machine, ideally it’s behind a NAT and firewalled. For simplicity it’s in the same LAN and iptables is used instead.</p>
+  </li>
+  <li>
+    <p><strong>192.168.20.131</strong>: Home machine, used as proxy to forward inbound traffic on port 80 to 192.168.20.132 on port 8000.</p>
+  </li>
+  <li>
+    <p><strong>192.168.20.132:</strong> Web server running your favorite site on non-standard port 8000, inaccessible directly from your work machine because of firewall.</p>
+  </li>
+</ul>
+
+<hr>
+
+<h2 id="4-setup-before-port-forwarding">4. Setup Before Port Forwarding</h2>
+
+<p>We’ll be configuring the following setup:</p>
+
+<p><a href="http://i.imgur.com/wKZcLPV.jpg"><img src="http://i.imgur.com/wKZcLPV.jpg" alt=""></a></p>
+
+<h4 id="41-setting-up-apache-server">4.1 Setting up Apache server</h4>
+
+<p>We’ll start by setting up our Apache server on 192.168.20.132 (Web server)</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">// Install Apache server
+</span><span class="gp">abatchy@abatchy-http:~$</span> <span class="nb">sudo </span>apt-get install apache2
+<span class="go">
+// Change default port Apache is listening on to 8000
+</span><span class="gp">abatchy@abatchy-http:~$</span> <span class="nb">sudo </span>nano /etc/apache2/ports.conf
+<span class="go">// Change virtual host from
+</span><span class="gp">// &lt;VirtualHost *:80&gt;</span>
+<span class="go">// to
+</span><span class="gp">// &lt;VirtualHost *:8000&gt;</span>
+<span class="gp">abatchy@abatchy-http:~$</span> <span class="nb">sudo </span>nano /etc/apache2/sites-enabled/000-default
+<span class="go">
+// Restart Apache server
+</span><span class="gp">abatchy@abatchy-http:~$</span> <span class="nb">sudo </span>service restart apache2
+</code></pre></div></div>
+
+<p>Now let’s verify it’s working as expected.</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">//sudo is needed since netstat won't show processes not owned by abatchy
+</span><span class="gp">abatchy@abatchy-http:~$</span> <span class="nb">sudo </span>netstat <span class="nt">-antp</span> | <span class="nb">grep </span>apache2
+<span class="go">
+tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN      4523/apache2
+</span></code></pre></div></div>
+
+<h4 id="42-configuring-iptables">4.2 Configuring iptables</h4>
+
+<p>Next, we’ll configure iptables on <code class="highlighter-rouge">192.168.20.130</code> (work machine) to drop any<br>
+outgoing traffic except for ones using TCP port 80 and 443.</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">// Verify that there are no rules defined yet
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">sudo </span>iptables <span class="nt">-L</span>
+<span class="go">[sudo] password for abatchy:
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+
+// Block all traffic
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">sudo </span>iptables <span class="nt">-I</span> OUTPUT <span class="nt">-j</span> DROP
+<span class="go">
+// Allow outbound traffic on port 80
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">sudo </span>iptables <span class="nt">-I</span> OUTPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 80 <span class="nt">-j</span> ACCEPT
+<span class="go">
+// Allow outbound traffic on port 443
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">sudo </span>iptables <span class="nt">-I</span> OUTPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 443 <span class="nt">-j</span> ACCEPT
+<span class="go">
+// View current rules defined
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">sudo </span>iptables <span class="nt">-L</span>
+<span class="go">
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+**ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:https
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:http**
+DROP       all  --  anywhere             anywhere
+</span></code></pre></div></div>
+
+<p>Notice the order the rules were applied. <code class="highlighter-rouge">-I</code> was used to put the rules on top of the chain, thus overriding the “block all traffic” rule. One more thing is that you can’t make DNS requests / resolve URLs since UDP port 53 is included in the rule.</p>
+
+<p>Next, let’s ensure that the current rules work properly.</p>
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">abatchy@abatchy-work:~$</span> wget http://192.168.20.132:8000
+<span class="go">--2017-01-12 03:01:24--  http://192.168.20.132:8000/
+Connecting to 192.168.20.132:8000... ^C
+</span></code></pre></div></div>
+
+<p>As expected, we’re not able to connect to <code class="highlighter-rouge">http://192.168.20.132:8000</code>. In case you want to see logs of the dropped packets check <a href="http://www.thegeekstuff.com/2012/08/iptables-log-packets/?utm_source=feedburner">this</a>.</p>
+
+<hr>
+
+<h2 id="5-setup-after-port-forwarding">5. Setup After Port Forwarding</h2>
+
+<h4 id="51-data-flow">5.1 Data flow</h4>
+
+<p><a href="http://i.imgur.com/6AVblX5.jpg"><img src="http://i.imgur.com/6AVblX5.jpg" alt=""></a></p>
+
+<p><strong>(1)</strong> Outgoing traffic to <code class="highlighter-rouge">192.168.20.131:80</code> which our firewall will let through to our switch.<br>
+<strong>(2)</strong> On our proxy machine, we will have <code class="highlighter-rouge">rinetd</code> listening on port 80.</p>
+
+<p><a href="http://i.imgur.com/bnmdfJ7.jpg"><img src="http://i.imgur.com/bnmdfJ7.jpg" alt=""></a></p>
+
+<p><strong>(3) and (4)</strong> Traffic is forwarded by <code class="highlighter-rouge">rinetd</code> to our webserver, listening on <code class="highlighter-rouge">192.168.20.132:8000</code>.<br>
+<strong>(5) and (6)</strong> Web server replies back to our proxy machine.<br>
+<strong>(7)</strong> Proxy replies back to our work machine, traffic still flowing as it’s on port 80.</p>
+
+<h4 id="52-rinetd-on-proxy-machine">5.2 Rinetd on proxy machine</h4>
+
+<p>Rinetd is a very light-weight, simple-to-use TCP forwarder, we will set it up so it redirects incoming traffic on port 80 to <code class="highlighter-rouge">192.168.20.132:8000</code> (our web server).</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">// Install rinetd
+</span><span class="gp">abatchy@abatchy-proxy:/home$</span> <span class="nb">sudo </span>apt-get install rinetd
+<span class="go">
+// Add the following rule below the comment
+</span><span class="gp">abatchy@abatchy-proxy:/home$</span> <span class="nb">sudo </span>nano /etc/rinetd.conf
+<span class="gp">#</span> bindadress    bindport  connectaddress  connectport
+<span class="go">192.168.20.131  80      192.168.20.132  8000
+
+// Restart the service
+</span><span class="gp">abatchy@abatchy-proxy:/home$</span> <span class="nb">sudo </span>service rinetd restart
+</code></pre></div></div>
+
+<hr>
+
+<h2 id="6-did-it-work">6. Did it work?</h2>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">abatchy@abatchy-work:~$</span> wget http://192.168.20.131:80
+<span class="go">--2017-01-12 19:56:35--  http://192.168.20.131/
+Connecting to 192.168.20.131:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 20 [text/html]
+Saving to: ‘index.html’
+
+</span><span class="gp">100%[======================================&gt;</span><span class="o">]</span> 20          <span class="nt">--</span>.-K/s   <span class="k">in </span>0s
+<span class="go">
+2017-01-12 19:56:35 (6.33 MB/s) - ‘index.html’ saved [20/20]
+
+</span><span class="gp">abatchy@abatchy-work:~$</span> <span class="nb">cat </span>index.html
+<span class="go">Super cool website!
+</span></code></pre></div></div>
+
+<p>It worked! A wireshark capture below on the proxy shows the traffic flow.</p>
+
+<p><a href="http://i.imgur.com/q5IJ378.png"><img src="http://i.imgur.com/q5IJ378.png" alt=""></a></p>
+
+<p><strong>2266-2268:</strong> Three way handshake between Work and Proxy:80.<br>
+<strong>2269-2270:</strong> GET request and ACK.<br>
+<strong>2271-2273:</strong> Three way handshake between Proxy and WebServer:8000.<br>
+<strong>2274-2275:</strong> GET request and ACK<br>
+<strong>2276-2277:</strong> WebServer responds and Proxy acknowledges.<br>
+<strong>2278-2279:</strong> Proxy forwards received packet back to Work.<br>
+<strong>2280-2285:</strong> Work terminates connection with Proxy and Proxy terminates connection with WebServer.</p>
+
+<hr>
+
+<h2 id="7-no-love-for-windows">7. No love for Windows?</h2>
+
+<p>Rinetd supports Windows and is pretty straight-forward as on Linux as well. Binary can be found <a href="https://www.boutell.com/rinetd/">here</a>.</p>
+
+<p>Assuming rinetd is installed in: <code class="highlighter-rouge">C:\rinetd</code>, just add the same rule to <code class="highlighter-rouge">rinetd.conf</code>:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>192.168.20.131  80      192.168.20.132  8000
+</code></pre></div></div>
+
+<p>Then run rinetd:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">C:\rinetd&gt;</span>rinetd.exe <span class="nt">-c</span> rinetd.conf
+</code></pre></div></div>
+
+<p>And done.</p>
+
+<hr>
+
+<p>Hopefully this guide sheds some light on port forwarding and more advanced traffic manipulation.</p>
+
+                    
+
+<div class="share-bar">
+  <ul class="share-buttons">
+    
+    <li class="share-facebook">
+      <a href="https://www.facebook.com/sharer/sharer.php?u=http://abatchy17.github.io/2017/01/port-forwarding-practical-hands-on-guide" target="_blank" title="Share on Facebook">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-square-o fa-stack-2x"></i>
+          <i class="fa fa-facebook fa-stack-1x"></i>
+        </span>
+      </a>
+    </li>
+    
+
+    
+    <li class="share-twitter">
+      <a href="https://twitter.com/intent/tweet?url=http://abatchy17.github.io/2017/01/port-forwarding-practical-hands-on-guide&amp;text=Port forwarding: A practical hands-on guide" target="_blank" title="Tweet">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-square-o fa-stack-2x"></i>
+          <i class="fa fa-twitter fa-stack-1x"></i>
+        </span>
+      </a>
+    </li>
+    
+
+    
+    <li class="share-google-plus">
+      <a href="https://plus.google.com/share?url=http://abatchy17.github.io/2017/01/port-forwarding-practical-hands-on-guide" target="_blank" title="Share on Google Plus">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-square-o fa-stack-2x"></i>
+          <i class="fa fa-google-plus fa-stack-1x"></i>
+        </span>
+      </a>
+    </li>
+    
+
+    
+    <li class="share-linkedin">
+      <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http://abatchy17.github.io/2017/01/port-forwarding-practical-hands-on-guide&amp;title=Port forwarding: A practical hands-on guide&amp;summary=&amp;source=" target="_blank" title="Share on LinkedIn">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-circle-thin fa-stack-2x"></i>
+          <i class="fa fa-linkedin fa-stack-1x"></i>
+        </span>
+      </a>
+    </li>
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+                  </div>
+                  
+                  <div id="disqus_recommendations" style="margin-bottom: 12px;"><iframe id="dsq-app1402" name="dsq-app1402" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" style="width: 100% !important; border: medium !important; overflow: hidden !important; height: 0px !important; display: inline !important; box-sizing: border-box !important;" width="100%" src="https://disqus.com/recommendations/?base=default&amp;f=abatchy17-github-io&amp;t_i=%2F2017%2F01%2Fport-forwarding-practical-hands-on-guide&amp;t_u=https%3A%2F%2Fwww.abatchy.com%2F2017%2F01%2Fport-forwarding-practical-hands-on-guide&amp;t_d=Port%20forwarding%3A%20A%20practical%20hands-on%20guide&amp;t_t=Port%20forwarding%3A%20A%20practical%20hands-on%20guide#version=72409fc2a6c70500eaebf97c61907099" horizontalscrolling="no" verticalscrolling="no"></iframe></div><div id="disqus_thread"><iframe id="dsq-app7316" name="dsq-app7316" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" style="width: 1px !important; min-width: 100% !important; border: medium !important; overflow: hidden !important; height: 0px !important;" width="100%" src="https://disqus.com/embed/comments/?base=default&amp;f=abatchy17-github-io&amp;t_i=%2F2017%2F01%2Fport-forwarding-practical-hands-on-guide&amp;t_u=https%3A%2F%2Fwww.abatchy.com%2F2017%2F01%2Fport-forwarding-practical-hands-on-guide&amp;t_d=Port%20forwarding%3A%20A%20practical%20hands-on%20guide&amp;t_t=Port%20forwarding%3A%20A%20practical%20hands-on%20guide&amp;s_o=default#version=e065c38d8d710d0212e992dcc1c69682" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 hidden-xs">
+              <div class="sidebar">
+    <img src="/images/personal/abatchy.jpg" width="150px" alt="This is an alpacha looking llama">
+</div>
+
+
+<div class="sidebar button">
+    <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" class="twitter-follow-button twitter-follow-button-rendered" style="position: absolute; visibility: hidden; width: 0px; height: 0px;" title="Twitter Follow Button" src="https://platform.twitter.com/widgets/follow_button.2f70fb173b9000da126c79afe2098f02.en.html#dnt=false&amp;id=twitter-widget-0&amp;lang=en&amp;screen_name=abatchy17&amp;show_count=false&amp;show_screen_name=true&amp;size=l&amp;time=1718453634122"></iframe><a href="https://twitter.com/abatchy17" class="twitter-follow-button" data-size="large" data-show-count="false" data-twitter-extracted-i171845363188815732="true">Follow @abatchy</a><script async="async" src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+
+
+
+<div class="sidebar button">
+    <span></span>
+</div>
+
+
+
+
+
+
+
+<div class="sidebar">
+  <h2>Categories</h2>
+  <ul class="sideBarTags">
+    
+    
+    <li>
+      <a href="/tag/.Net Reversing" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>.Net Reversing</span></a></li>
+    
+    <li>
+      <a href="/tag/Backdooring" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>Backdooring</span></a></li>
+    
+    <li>
+      <a href="/tag/DefCamp CTF Qualifications 2017" data-toggle="tooltip" data-placement="right" title="" data-original-title="2">
+        <span>DefCamp CTF Qualifications 2017</span></a></li>
+    
+    <li>
+      <a href="/tag/Exploit Development" data-toggle="tooltip" data-placement="right" title="" data-original-title="14">
+        <span>Exploit Development</span></a></li>
+    
+    <li>
+      <a href="/tag/Kernel Exploitation" data-toggle="tooltip" data-placement="right" title="" data-original-title="7">
+        <span>Kernel Exploitation</span></a></li>
+    
+    <li>
+      <a href="/tag/Kioptrix series" data-toggle="tooltip" data-placement="right" title="" data-original-title="5">
+        <span>Kioptrix series</span></a></li>
+    
+    <li>
+      <a href="/tag/Networking" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>Networking</span></a></li>
+    
+    <li>
+      <a href="/tag/OSCE Prep" data-toggle="tooltip" data-placement="right" title="" data-original-title="14">
+        <span>OSCE Prep</span></a></li>
+    
+    <li>
+      <a href="/tag/OSCP Prep" data-toggle="tooltip" data-placement="right" title="" data-original-title="5">
+        <span>OSCP Prep</span></a></li>
+    
+    <li>
+      <a href="/tag/OverTheWire - Bandit" data-toggle="tooltip" data-placement="right" title="" data-original-title="5">
+        <span>OverTheWire - Bandit</span></a></li>
+    
+    <li>
+      <a href="/tag/OverTheWire - Leviathan" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>OverTheWire - Leviathan</span></a></li>
+    
+    <li>
+      <a href="/tag/OverTheWire - Natas" data-toggle="tooltip" data-placement="right" title="" data-original-title="7">
+        <span>OverTheWire - Natas</span></a></li>
+    
+    <li>
+      <a href="/tag/Powershell" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>Powershell</span></a></li>
+    
+    <li>
+      <a href="/tag/Programming" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>Programming</span></a></li>
+    
+    <li>
+      <a href="/tag/Pwnable.kr" data-toggle="tooltip" data-placement="right" title="" data-original-title="2">
+        <span>Pwnable.kr</span></a></li>
+    
+    <li>
+      <a href="/tag/SLAE" data-toggle="tooltip" data-placement="right" title="" data-original-title="10">
+        <span>SLAE</span></a></li>
+    
+    <li>
+      <a href="/tag/Shellcoding" data-toggle="tooltip" data-placement="right" title="" data-original-title="11">
+        <span>Shellcoding</span></a></li>
+    
+    <li>
+      <a href="/tag/Vulnhub Walkthrough" data-toggle="tooltip" data-placement="right" title="" data-original-title="12">
+        <span>Vulnhub Walkthrough</span></a></li>
+    
+    <li>
+      <a href="/tag/boot2root" data-toggle="tooltip" data-placement="right" title="" data-original-title="1">
+        <span>boot2root</span></a></li>
+    
+    <li>
+      <a href="/tag/rant" data-toggle="tooltip" data-placement="right" title="" data-original-title="5">
+        <span>rant</span></a></li>
+    
+  </ul>
+</div>
+
+
+
+<div class="sidebar">
+		<h2>Blog Archive</h2>  
+		
+        
+          <h4>February 2019</h4>
+            <ul>
+              
+                <li><a href="/2019/02/tips-on-creating-vulnerable-vms">Tips on designing boot2root challenges</a></li>
+              
+            </ul>
+        
+          <h4>January 2018</h4>
+            <ul>
+              
+                <li><a href="/2018/01/kernel-exploitation-7">[Kernel Exploitation] 7: Arbitrary Overwrite (Win7 x86)</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-6">[Kernel Exploitation] 6: NULL pointer dereference</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-5">[Kernel Exploitation] 5: Integer Overflow</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-4">[Kernel Exploitation] 4: Stack Buffer Overflow (SMEP Bypass)</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-3">[Kernel Exploitation] 3: Stack Buffer Overflow (Windows 7 x86/x64)</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-2">[Kernel Exploitation] 2: Payloads</a></li>
+              
+                <li><a href="/2018/01/kernel-exploitation-1">[Kernel Exploitation] 1: Setting up the environment</a></li>
+              
+            </ul>
+        
+          <h4>October 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/10/defcamp-dotnot">[DefCamp CTF Qualification 2017] Don't net, kids! (Revexp 400)</a></li>
+              
+                <li><a href="/2017/10/defcamp-buggy-bot">[DefCamp CTF Qualification 2017] Buggy Bot (Misc 400)</a></li>
+              
+            </ul>
+        
+          <h4>September 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/09/pwnable-kr.flag">[Pwnable.kr] Toddler's Bottle: flag</a></li>
+              
+                <li><a href="/2017/09/pwnable-kr-fd">[Pwnable.kr] Toddler's Bottle: fd, collision, bof</a></li>
+              
+                <li><a href="/2017/09/overthewire-leviathan">OverTheWire: Leviathan Walkthrough</a></li>
+              
+            </ul>
+        
+          <h4>August 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/08/rant-is-this-blog-dead.html">[Rant] Is this blog dead?</a></li>
+              
+            </ul>
+        
+          <h4>June 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/06/exploit-dev-101-bypassing-aslr-on.html">Exploit Dev 101: Bypassing ASLR on Windows</a></li>
+              
+            </ul>
+        
+          <h4>May 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/05/jumping-to-shellcode.html">Exploit Dev 101: Jumping to Shellcode</a></li>
+              
+                <li><a href="/2017/05/introduction-to-manual-backdooring_24.html">Introduction to Manual Backdooring</a></li>
+              
+                <li><a href="/2017/05/linuxx86-disable-aslr-shellcode-71-bytes">Linux/x86 - Disable ASLR Shellcode (71 bytes)</a></li>
+              
+                <li><a href="/2017/05/analyzing-metasploit">Analyzing Metasploit linux/x86/shell_bind_tcp_random_port module using Libemu</a></li>
+              
+                <li><a href="/2017/05/analyzing-metasploit-linuxx86exec">Analyzing Metasploit linux/x86/exec module using Ndisasm</a></li>
+              
+                <li><a href="/2017/05/linuxx86-code-polymorphism-examples"> Linux/x86 - Code Polymorphism examples </a></li>
+              
+                <li><a href="/2017/05/dissecting-metasploit-linuxx86adduser">Analyzing Metasploit linux/x86/adduser module using GDB</a></li>
+              
+                <li><a href="/2017/05/tcp-reverse-shell-in-assembly-null">Analyzing Metasploit linux/x86/adduser module using GDB</a></li>
+              
+                <li><a href="/2017/05/rot-n-shellcode-encoder-linux-x86">ROT-N Shellcode Encoder/Generator (Linux x86)</a></li>
+              
+                <li><a href="/2017/05/skapes-egg-hunter-null-freelinux-x86"> Skape's Egg Hunter (null-free/Linux x86) </a></li>
+              
+                <li><a href="/2017/05/tcp-bind-shell-in-assembly-null">TCP Bind Shell in Assembly (null-free/Linux x86)</a></li>
+              
+            </ul>
+        
+          <h4>April 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/04/shellcode-reduction-tips-x86"> Shellcode reduction tips (x86) </a></li>
+              
+            </ul>
+        
+          <h4>March 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/03/21ltr-scene-1-walkthrough-vulnhub">LTR Scene 1 Walthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2017/03/moria-boot2root-vm"> Moria v1.1: A Boot2Root VM</a></li>
+              
+                <li><a href="/2017/03/osce-study-plan">OSCE Study Plan</a></li>
+              
+                <li><a href="/2017/03/powershell-download-file-one-liners"> Powershell Download File One-Liners</a></li>
+              
+                <li><a href="/2017/03/how-to-prepare-for-pwkoscp-noob">How to prepare for PWK/OSCP, a noob-friendly guide </a></li>
+              
+            </ul>
+        
+          <h4>February 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/02/oscp-like-vulnhub-vms">OSCP-like Vulnhub VMs</a></li>
+              
+                <li><a href="/2017/02/oscp-day-30">OSCP: Day 30</a></li>
+              
+                <li><a href="/2017/02/mr-robot-1-walkthrough-vulnhub">Mr Robot Walkthrough (Vulnhub)</a></li>
+              
+            </ul>
+        
+          <h4>January 2017</h4>
+            <ul>
+              
+                <li><a href="/2017/01/oscp-day-6">OSCP: Day 6</a></li>
+              
+                <li><a href="/2017/01/oscp-day-1">OSCP: Day 1</a></li>
+              
+                <li><a href="/2017/01/port-forwarding-practical-hands-on-guide">Port forwarding: A practical hands-on guide</a></li>
+              
+                <li><a href="/2017/01/kioptrix-2014-5-walkthrough-vulnhub">Kioptrix 2014 (#5) Walkthrough</a></li>
+              
+                <li><a href="/2017/01/wallabys-nightmare-walkthrough-vulnhub">Wallaby's Nightmare Walkthrough (Vulnhub)</a></li>
+              
+            </ul>
+        
+          <h4>December 2016</h4>
+            <ul>
+              
+                <li><a href="/2016/12/kioptrix-level-13-4-walkthrough-vulnhub">Kiopritx 1.3 (#4) Walkthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/12/kioptrix-3-walkthrough-vulnhub">Kioptrix 3 Walkthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/12/kioptrix-2-walkthrough-vulnhub">Kioptrix 2 Walkthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/12/natas-level-17">OverTheWire: Natas 17</a></li>
+              
+            </ul>
+        
+          <h4>November 2016</h4>
+            <ul>
+              
+                <li><a href="/2016/11/natas-level-16">OverTheWire: Natas 16</a></li>
+              
+                <li><a href="/2016/11/natas-level-14-and-15">OverTheWire: Natas 14 and 15</a></li>
+              
+                <li><a href="/2016/11/kioptrix-1-walkthrough-vulnhub">Kioptrix 1 Walkthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/11/pwnlab-init-walkthrough-vulnhub">PwnLab: init Walkthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/11/natas-level-12">OverTheWire: Natas 12</a></li>
+              
+                <li><a href="/2016/11/natas-level-11">OverTheWire: Natas 11</a></li>
+              
+            </ul>
+        
+          <h4>October 2016</h4>
+            <ul>
+              
+                <li><a href="/2016/10/walkthrough-vulnix-vulnhub-vm">Vulnix Walthrough (Vulnhub)</a></li>
+              
+                <li><a href="/2016/10/natas-level-6-level-10">OverTheWire: Natas 6-10</a></li>
+              
+                <li><a href="/2016/10/natas-level-0-level-5">OverTheWire: Natas 0-5</a></li>
+              
+                <li><a href="/2016/10/overthewire-bandit-21-24">OverTheWire: Bandit 21-26</a></li>
+              
+                <li><a href="/2016/10/overthewire-bandit-16-20">OverTheWire: Bandit 16-20</a></li>
+              
+                <li><a href="/2016/10/overthewire-bandit-11-15">OverTheWire: Bandit 11-15</a></li>
+              
+                <li><a href="/2016/10/overthewire-bandit-6-10">OverTheWire: Bandit 6-10</a></li>
+              
+                <li><a href="/2016/10/overthewire-bandit-0-5">OverTheWire: Bandit 0-5</a></li>
+              
+                <li><a href="/2016/10/introduction">Introduction</a></li>
+              
+            </ul>
+        
+</div>
+
+
+
+            </div>
+          </div>
+        </div>
+        
+<!-- Add Disqus comments. -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'abatchy17-github-io'; // required: replace example with your forum shortname
+  var disqus_identifier = "/2017/01/port-forwarding-practical-hands-on-guide";
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+      </div>
+          <footer class="footer-distributed">
+      <div class="container">
+        <div class="footer">
+          <p>Mohamed Shahat © 2019</p>
+          <ul class="social-media">
+
+  
+    <li>
+      <a title="abatchy17 on Twitter" href="https://twitter.com/abatchy17" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+    </li>
+  
+  
+  
+    <li>
+      <a title="abatchy17 on Github" href="https://github.com/abatchy17/abatchy17.github.io" target="_blank"><i class="fa fa-github fa-2x"></i></a>
+    </li>
+  
+
+  
+
+  
+    <li>
+      <a title="shahat on LinkedIn" href="https://www.linkedin.com/in/shahat" target="_blank"><i class="fa fa-linkedin fa-2x"></i></a>
+    </li>
+  
+
+  
+
+  
+
+  
+
+</ul>
+
+        </div>
+      </div>
+    </footer>
+
+    </div>
+  
+
+<iframe scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/widget_iframe.2f70fb173b9000da126c79afe2098f02.html?origin=https%3A%2F%2Fwww.abatchy.com" title="Twitter settings iframe" style="display: none;"></iframe><iframe style="display: none;"></iframe><iframe style="display: none;"></iframe></body></html>

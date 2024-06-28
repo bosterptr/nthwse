@@ -1,0 +1,1608 @@
+<html lang="en" class="wf-opensans-n4-active wf-opensans-i4-active wf-opensans-n7-active wf-opensans-i7-active wf-opensans-n6-active wf-active"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attacking Azure, Azure AD, and Introducing PowerZure | hausec</title>
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://hausec.com/xmlrpc.php">
+
+<script src="https://s0.wp.com/wp-content/plugins/custom-fonts/js/webfont.js" type="text/javascript" async=""></script><script type="text/javascript">
+  WebFontConfig = {"google":{"families":["Open+Sans:600:latin,latin-ext","Open+Sans:r,i,b,bi:latin,latin-ext"]},"api_url":"https:\/\/fonts-api.wp.com\/css"};
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = 'https://s0.wp.com/wp-content/plugins/custom-fonts/js/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+	})();
+</script><style id="jetpack-custom-fonts-css">.wf-active body, .wf-active button, .wf-active input, .wf-active select, .wf-active textarea{font-family:"Open Sans",sans-serif}.wf-active blockquote{font-family:"Open Sans",sans-serif}.wf-active #infinite-handle span, .wf-active .button, .wf-active button, .wf-active input[type="button"], .wf-active input[type="reset"], .wf-active input[type="submit"]{font-family:"Open Sans",sans-serif}.wf-active .main-navigation a{font-family:"Open Sans",sans-serif}.wf-active .post-navigation .nav-next a, .wf-active .post-navigation .nav-previous a{font-family:"Open Sans",sans-serif}.wf-active .post-navigation .meta-nav{font-family:"Open Sans",sans-serif}.wf-active .comment-cite{font-family:"Open Sans",sans-serif}.wf-active .comment-edit-link, .wf-active .comment-time{font-family:"Open Sans",sans-serif}.wf-active .comment-reply-title small a{font-family:"Open Sans",sans-serif}.wf-active .comment-notes, .wf-active .logged-in-as{font-family:"Open Sans",sans-serif}.wf-active .gallery-caption, .wf-active .wp-caption-text{font-family:"Open Sans",sans-serif}.wf-active .site-footer{font-family:"Open Sans",sans-serif}.wf-active .entry-date{font-family:"Open Sans",sans-serif}.wf-active .taxonomy-description{font-family:"Open Sans",sans-serif}.wf-active .meta-list{font-family:"Open Sans",sans-serif}.wf-active .entry-content{font-family:"Open Sans",sans-serif}.wf-active h1, .wf-active h2, .wf-active h3, .wf-active h4, .wf-active h5, .wf-active h6{font-family:"Open Sans",sans-serif;font-weight:600;font-style:normal}.wf-active h1{font-style:normal;font-weight:600}.wf-active h2{font-style:normal;font-weight:600}.wf-active h3{font-style:normal;font-weight:600}.wf-active h4{font-style:normal;font-weight:600}.wf-active h5{font-style:normal;font-weight:600}.wf-active h6{font-style:normal;font-weight:600}.wf-active .widget-area .widget-title, .wf-active .widget-area .widgettitle{font-weight:600;font-style:normal}.wf-active .widget-area .featured-post h3{font-style:normal;font-weight:600}.wf-active .comment-title, .wf-active .comment-reply-title{font-style:normal;font-weight:600}@media screen and ( min-width: 841px ) and ( max-width:980px ){.wf-active .comment-title, .wf-active .comment-reply-title{font-style:normal;font-weight:600}}@media screen and ( max-width: 840px ){.wf-active .comment-title{font-style:normal;font-weight:600}}@media screen and ( max-width: 840px ){.wf-active .comment-reply-title{font-style:normal;font-weight:600}}@media screen and ( max-width: 840px ){.wf-active .comment-content{font-style:normal;font-weight:600}}.wf-active .site-title{font-family:"Open Sans",sans-serif;font-weight:600;font-style:normal}@media screen and ( max-width: 840px ){.wf-active .site-title{font-style:normal;font-weight:600}}.wf-active .site-description{font-family:"Open Sans",sans-serif;font-weight:600;font-style:normal}@media screen and (min-width: 841px) and (max-width:980px){.wf-active .entry-title{font-style:normal;font-weight:600}}@media screen and (max-width: 840px){.wf-active .entry-title{font-style:normal;font-weight:600}}.wf-active .entry-title{font-family:"Open Sans",sans-serif;font-weight:600;font-style:normal}.wf-active .page-title{font-style:normal;font-weight:600}@media screen and ( max-width: 840px ){.wf-active .page-title{font-style:normal;font-weight:600}}.wf-active .author-description{font-style:normal;font-weight:600}@media screen and ( max-width: 840px ){.wf-active .author-description{font-style:normal;font-weight:600}}.wf-active .author-description h2{font-style:normal;font-weight:600}@media screen and ( max-width: 840px ){.wf-active .author-description h2{font-style:normal;font-weight:600}}</style>
+<meta name="robots" content="max-image-preview:large">
+<meta name="google-site-verification" content="dovhNDY_1N20SC-HsZRRdAZg9wNzbnjLMI8Ipl-1ZZo">
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=2653'
+					+ '&is_singular=1';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9oYXVzZWMuY29t"
+		+ "&wpcomid=111347649"
+		+ "&time=1718024581";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel="dns-prefetch" href="//s0.wp.com">
+<link rel="dns-prefetch" href="//widgets.wp.com">
+<link rel="alternate" type="application/rss+xml" title="hausec » Feed" href="https://hausec.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="hausec » Comments Feed" href="https://hausec.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="hausec » Attacking Azure, Azure AD, and Introducing&nbsp;PowerZure Comments Feed" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/feed/">
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s0.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1710334132i&ver=6.6-alpha-58314"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-1" href="https://s0.wp.com/wp-content/mu-plugins/likes/jetpack-likes.css?m=1717404074i&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-emoji-styles-inline-css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-2-1" href="https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/block-library/style.css?m=1716578158i&amp;cssminify=yes" type="text/css" media="all">
+<style id="wp-block-library-inline-css">
+.has-text-align-justify {
+	text-align:justify;
+}
+.wp-block-cover__image-background.has-parallax {
+	background-size: cover;
+}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-4-1" href="https://s0.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&amp;cssminify=yes" type="text/css" media="all">
+<style id="jetpack-sharing-buttons-style-inline-css">
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-6-1" href="https://s0.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&amp;cssminify=yes" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-8-1" href="https://s0.wp.com/_static/??/wp-content/mu-plugins/core-compat/wp-mediaelement.css,/wp-content/mu-plugins/wpcom-bbpress-premium-themes.css?m=1432920480j&amp;cssminify=yes" type="text/css" media="all">
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-10-1" href="https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.css?m=1709133875i&amp;cssminify=yes" type="text/css" media="all">
+<link rel="stylesheet" id="verbum-gutenberg-css-css" href="https://widgets.wp.com/verbum-block-editor/block-editor.css?ver=1717067639" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-12-1" href="https://s0.wp.com/wp-content/themes/pub/editor/style.css?m=1496887359i&amp;cssminify=yes" type="text/css" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="screen-css-13-1" href="https://s0.wp.com/wp-content/themes/pub/editor/inc/fontawesome/font-awesome.css?m=1404778013i&amp;cssminify=yes" type="text/css" media="screen">
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-14-1" href="https://s0.wp.com/_static/??-eJx9jEEOwjAMBD9EcHtoxQXxljQ1wcWJo9pRxe8JEof20tuOtDOwFRckG2YDe2FChVInwJlMVqAcQO3D6LYSJF2D6gV2RqqucI2UFRa04sP7z6A1Q5K5cgtuNEc0BZVAnh01+whn3YjiWII3knwA92RP65m64sQS24zQXjv8SY9078fb0PdDN3bLF39gYiE=&amp;cssminify=yes" type="text/css" media="all">
+<link crossorigin="anonymous" rel="stylesheet" id="print-css-15-1" href="https://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&amp;cssminify=yes" type="text/css" media="print">
+<style id="jetpack-global-styles-frontend-style-inline-css">
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin="anonymous" rel="stylesheet" id="all-css-18-1" href="https://s0.wp.com/_static/??-eJyNjcsKQjEMBX/ImlsQry7ET5GahrbXNCmmRfx7H7gRN+7OwGEGbs2hSifpUIdrPFIRg4V6C3j5MNgQqBoHk4HlcKUYYry/Z5G0RrMV/C06FUEwxRLYsSa1L/iR9Uz1mc0bSKznwK/DsR787Kd5P/ntbnkAuNBIYA==&amp;cssminify=yes" type="text/css" media="all">
+<link rel="stylesheet" href="https://fonts-api.wp.com/css?family=Open+Sans:600%7COpen+Sans:r,i,b,bi&amp;subset=latin,latin-ext,latin,latin-ext" media="all"><script type="text/javascript" id="media-video-jwt-bridge-js-extra">
+/* <![CDATA[ */
+var videopressAjax = {"ajaxUrl":"https:\/\/hausecurity.wordpress.com\/wp-admin\/admin-ajax.php","bridgeUrl":"\/wp-content\/mu-plugins\/jetpack-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-videopress\/build\/lib\/token-bridge.js","post_id":"2653"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"111347649","postID":"2653","siteURL":"https:\/\/hausec.com","xhrURL":"https:\/\/hausec.com\/wp-admin\/admin-ajax.php","nonce":"fd399fd407","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/p7xcBP-GN","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/read\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar"}};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJyFjcEOwiAQRH9IuuqhsQfjpxgoa7MUFoSl2r+3Jq3Rk6fJzLzJwCOpPrIgC7gCIRryqGrBrIclU8S32Liyg18ue1Epx+e8dcS9rxbLu3T3inlepQnEfyEVaMha8Bve3kJVydeBeNmgJN2Pq4dSeYuuE7KNGXSVGLQI9R94IosxZSwFTCVvwZMBiSOyMpnsgMvhJZwPbdd1p/bY7t0LZvZnHQ=="></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	window.addEventListener( 'DOMContentLoaded', function() {
+		rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+	} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://hausecurity.wordpress.com/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress.com">
+<link rel="canonical" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/">
+<link rel="shortlink" href="https://wp.me/p7xcBP-GN">
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fhausec.com%2F2020%2F01%2F31%2Fattacking-azure-azure-ad-and-introducing-powerzure%2F&amp;for=wpcom-auto-discovery"><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fhausec.com%2F2020%2F01%2F31%2Fattacking-azure-azure-ad-and-introducing-powerzure%2F&amp;for=wpcom-auto-discovery">
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Attacking Azure, Azure AD, and Introducing PowerZure">
+<meta property="og:url" content="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/">
+<meta property="og:description" content="Over the past decade, Azure’s presence in businesses has grown significantly as new features and support were added to Azure. The purpose of this article is to cover three main points: Explain the …">
+<meta property="article:published_time" content="2020-02-01T02:27:14+00:00">
+<meta property="article:modified_time" content="2020-07-09T14:20:12+00:00">
+<meta property="og:site_name" content="hausec">
+<meta property="og:image" content="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png?w=1200">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="707">
+<meta property="og:image:alt" content="">
+<meta property="og:locale" content="en_US">
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom">
+<meta name="twitter:text:title" content="Attacking Azure, Azure AD, and Introducing&nbsp;PowerZure">
+<meta name="twitter:image" content="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png?w=640">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="search" type="application/opensearchdescription+xml" href="https://hausec.com/osd.xml" title="hausec">
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com">
+<meta name="theme-color" content="#f7f7f7">
+<meta name="application-name" content="hausec"><meta name="msapplication-window" content="width=device-width;height=device-height"><meta name="msapplication-tooltip" content="Professional Cloud Puncher"><meta name="description" content="Over the past decade, Azure’s presence in businesses has grown significantly as new features and support were added to Azure. The purpose of this article is to cover three main points: Explain the components of Azure and how they fit into a modern IT environment. Explain how certain things within Azure can be leveraged from…">
+<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #f7f7f7; }
+</style>
+	<style type="text/css" id="custom-colors-css">body { color: #404040;}
+button { color: #404040;}
+input { color: #404040;}
+select { color: #404040;}
+textarea { color: #404040;}
+input[type="button"], input[type="reset"], input[type="submit"] { color: #404040;}
+.entry-date { color: #404040;}
+.meta-list { color: #404040;}
+.meta-nav, .post-navigation .meta-nav { color: #404040;}
+.wp-caption-text, .gallery-caption { color: #404040;}
+.contact-form.commentsblock label span { color: #404040;}
+.widget-area .widget-title, .widget-area .widgettitle { color: #404040;}
+body { background-color: #f7f7f7;}
+.site-header, .page-header, .comments-area, .page .comments-area, .site-footer .site-info { background-color: #EAEAEA;}
+.toggle-bar { background: #DDDDDD;}
+.toggle-bar a { background-color: #DDDDDD;}
+.toggle-bar a.current { background-color: #EAEAEA;}
+table tr:nth-child(even) { background: #F2F2F2;}
+.widget_recent_comments table tr:nth-child(even) { background: #EAEAEA;}
+.widget-area .featured-post, .widget-area .widget, .post, .meta-list li:first-child, .meta-list li, .post-navigation, .comment-list > li, .comment-list .children li:first-child { border-color: #DDDDDD;}
+.post-navigation .nav-next a:hover, .post-navigation .nav-previous a:hover { border-color: #DDDDDD;}
+#infinite-handle span, button, .button, input[type="button"], input[type="reset"], input[type="submit"] { background: #EAEAEA;}
+#infinite-handle span:hover, button:hover, .button:hover, input[type="button"]:hover, input[type="reset"]:hover, input[type="submit"]:hover { background: #DDDDDD;}
+.toggle-bar a { color: #07327C;}
+.toggle-bar a:hover, .toggle-bar a.current { color: #07327c;}
+.site-title a { color: #07327C;}
+.site-title a:hover { color: #07327c;}
+.site-description { color: #07327C;}
+.main-navigation a, .site-info a { color: #07327C;}
+.main-navigation a:hover, .site-info a:hover { color: #07327c;}
+.main-navigation .sub-menu li a:before, .main-navigation .children li a:before { color: #07327C;}
+.main-navigation a:hover, .main-navigation .current_page_item a, .main-navigation .current-menu-item a { color: #07327c;}
+.entry-title a { color: #07327C;}
+.entry-title a:hover { color: #07327c;}
+.entry-content a { color: #07327C;}
+.entry-content a:hover, .entry-content a:active { color: #07327c;}
+.entry-footer a { color: #07327C;}
+.entry-footer a:hover, .entry-footer a:active { color: #07327c;}
+.widget-area a { color: #07327C;}
+.widget-area a:hover, .widget-area a:active { color: #07327c;}
+.widget-area .featured-post h3 a { color: #07327C;}
+.widget-area .featured-post h3 a:hover, .widget-area .featured-post h3 a:active { color: #07327c;}
+.post-navigation .nav-next a, .post-navigation .nav-previous a { color: #07327C;}
+.post-navigation .nav-next a:hover, .post-navigation .nav-previous a:hover, .post-navigation .nav-next a:active, .post-navigation .nav-previous a:active { color: #07327c;}
+.comments-area a { color: #07327C;}
+.comments-area a:hover, .comments-area a:active { color: #07327c;}
+.meta-list a { color: #07327C;}
+.meta-list a:hover { color: #07327c;}
+.entry-date a, .entry-date a time { color: #07327C;}
+.entry-date a:hover, .entry-date a:active, .entry-date a time:hover, .entry-date a time:active { color: #07327c;}
+#infinite-handle span { color: #07327C;}
+#infinite-handle span:hover { color: #07327c;}
+</style>
+<link rel="icon" href="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=32" sizes="32x32">
+<link rel="icon" href="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=192" sizes="192x192">
+<link rel="apple-touch-icon" href="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=180">
+<meta name="msapplication-TileImage" content="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=270">
+			<link rel="stylesheet" id="custom-css-css" type="text/css" href="https://s0.wp.com/?custom-css=1&amp;csblog=7xcBP&amp;cscache=6&amp;csrev=26">
+			<!-- Your Google Analytics Plugin is missing the tracking ID -->
+<link rel="stylesheet" id="gravatar-card-css" href="https://0.gravatar.com/js/hovercards/hovercards.min.css?ver=20242481ae853d32fb498c357385d15c97d96f68e9e5013db38b7dc99e4f39cb3b061e"><link href="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115" type="text/css" rel="stylesheet"></head>
+
+<body class="post-template-default single single-post postid-2653 single-format-standard custom-background wp-custom-logo customizer-styles-applied jetpack-reblog-enabled has-site-logo custom-colors">
+
+<div id="page" class="hfeed site container">
+
+	<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+	<header id="masthead" class="site-header" role="banner">
+		<!-- Tab navigation -->
+		<ul class="toggle-bar" role="tablist">
+			<!-- Main navigation -->
+			<li id="panel-1" class="current" role="presentation">
+				<a href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true" class="current nav-toggle" data-tab="tab-1"><i class="fa fa-bars"></i><span class="screen-reader-text">View menu</span></a>
+			</li>
+
+			<!-- Featured Posts navigation -->
+			
+			<!-- Sidebar widgets navigation -->
+			<li id="panel-3" role="presentation">
+				<a href="#tab-3" role="tab" aria-controls="tab-3" aria-selected="false" class="folder-toggle" data-tab="tab-3"><i class="fa fa-folder"></i><i class="fa fa-folder-open"></i><span class="screen-reader-text">View sidebar</span></a>
+			</li>
+		</ul>
+
+		<div id="tabs" class="toggle-tabs">
+			<div class="site-header-inside">
+				<!-- Logo, description and main navigation -->
+				<div id="tab-1" class="tab-content current animated fadeIn" role="tabpanel" aria-labelledby="panel-1" aria-hidden="false">
+					<div class="site-branding">
+						<!-- Get the site branding -->
+						<a href="https://hausec.com/" class="site-logo-link" rel="home" itemprop="url"><img width="800" height="600" src="https://hausec.com/wp-content/uploads/2021/03/powerzurelogonobackground-1.png?w=800" class="site-logo attachment-editor-logo" alt="" decoding="async" data-size="editor-logo" itemprop="logo" data-attachment-id="3090" data-permalink="https://hausec.com/powerzurelogonobackground-2/" data-orig-file="https://hausec.com/wp-content/uploads/2021/03/powerzurelogonobackground-1.png" data-orig-size="800,600" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="PowerZureLogoNoBackground" data-image-description="" data-image-caption="" data-medium-file="https://hausec.com/wp-content/uploads/2021/03/powerzurelogonobackground-1.png?w=720" data-large-file="https://hausec.com/wp-content/uploads/2021/03/powerzurelogonobackground-1.png?w=730"></a>						<h1 class="site-title"><a href="https://hausec.com/" rel="home">hausec</a></h1>
+						<h2 class="site-description">Professional Cloud Puncher</h2>
+					</div>
+
+					<nav id="site-navigation" class="main-navigation" role="navigation">
+						<div class="menu-main-menu-container"><ul id="menu-main-menu" class="menu"><li id="menu-item-3125" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-3125"><a href="https://hausec.com/">Articles</a></li>
+<li id="menu-item-3223" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3223"><a href="https://hausec.com/azure/">Azure Penetration Testing</a></li>
+<li id="menu-item-3226" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3226"><a href="https://hausec.com/cheatsheets/">Cheatsheets</a></li>
+<li id="menu-item-3105" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3105"><a href="https://hausec.com/domain-penetration-testing/">Domain Penetration Testing</a></li>
+<li id="menu-item-3106" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-3106"><a href="https://hausec.com/penetration-testing-tutorials-write-ups/">Penetration Testing Tutorials &amp; Write-Ups</a>
+<ul class="sub-menu">
+	<li id="menu-item-3111" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3111"><a href="https://hausec.com/vulnhub-write-ups/">Vulnhub Write-ups</a></li>
+	<li id="menu-item-3112" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3112"><a href="https://hausec.com/web-pentesting-write-ups/">Web Pentesting Write-Ups</a></li>
+</ul>
+</li>
+<li id="menu-item-3113" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3113"><a href="https://hausec.com/other-tutorials/">Other Tutorials</a></li>
+<li id="menu-item-3110" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3110"><a href="https://hausec.com/about/">About</a></li>
+</ul></div>					</nav><!-- #site-navigation -->
+
+											<div class="social-links"><ul id="menu-social-navigation" class="menu"><li id="menu-item-8" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-8"><a href="https://twitter.com/haus3c"><span class="screen-reader-text">Twitter</span></a></li>
+<li id="menu-item-2083" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2083"><a href="https://github.com/hausec"><span class="screen-reader-text">Github</span></a></li>
+</ul></div>									</div><!-- #tab-1 -->
+
+				<!-- Featured Posts template (template-featured-posts.php) -->
+				
+				<!-- Sidebar widgets -->
+				<div id="tab-3" class="tab-content animated fadeIn" role="tabpanel" aria-labelledby="panel-3" aria-hidden="true">
+						<div id="secondary" class="widget-area" role="complementary">
+		
+			<aside id="search" class="widget widget_search">
+				<form role="search" method="get" class="search-form" action="https://hausec.com/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search …" value="" name="s">
+				</label>
+				<input type="submit" class="search-submit" value="Search">
+			</form>			</aside>
+
+			<aside id="archives" class="widget">
+				<h2 class="widget-title">Archives</h2>
+				<ul>
+						<li><a href="https://hausec.com/2022/05/">May 2022</a></li>
+	<li><a href="https://hausec.com/2021/12/">December 2021</a></li>
+	<li><a href="https://hausec.com/2021/10/">October 2021</a></li>
+	<li><a href="https://hausec.com/2021/07/">July 2021</a></li>
+	<li><a href="https://hausec.com/2021/03/">March 2021</a></li>
+	<li><a href="https://hausec.com/2020/11/">November 2020</a></li>
+	<li><a href="https://hausec.com/2020/10/">October 2020</a></li>
+	<li><a href="https://hausec.com/2020/03/">March 2020</a></li>
+	<li><a href="https://hausec.com/2020/01/">January 2020</a></li>
+	<li><a href="https://hausec.com/2019/09/">September 2019</a></li>
+	<li><a href="https://hausec.com/2019/08/">August 2019</a></li>
+	<li><a href="https://hausec.com/2019/04/">April 2019</a></li>
+	<li><a href="https://hausec.com/2019/03/">March 2019</a></li>
+	<li><a href="https://hausec.com/2018/10/">October 2018</a></li>
+	<li><a href="https://hausec.com/2018/08/">August 2018</a></li>
+	<li><a href="https://hausec.com/2018/04/">April 2018</a></li>
+	<li><a href="https://hausec.com/2017/11/">November 2017</a></li>
+	<li><a href="https://hausec.com/2017/10/">October 2017</a></li>
+	<li><a href="https://hausec.com/2017/09/">September 2017</a></li>
+	<li><a href="https://hausec.com/2016/10/">October 2016</a></li>
+				</ul>
+			</aside>
+
+			<aside id="meta" class="widget">
+				<h2 class="widget-title">Meta</h2>
+				<ul>
+					<li><a href="https://wordpress.com/start?ref=wplogin">Register</a></li>					<li><a href="https://hausecurity.wordpress.com/wp-login.php">Log in</a></li>
+									</ul>
+			</aside>
+			</div><!-- #secondary -->
+				</div><!-- #tab-3 -->
+			</div><!-- .site-header-inside -->
+		</div><!-- #tabs -->
+	</header><!-- #masthead -->
+
+	<div id="content" class="site-content animated-faster fadeIn">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		
+			
+<article id="post-2653" class="post post-2653 type-post status-publish format-standard has-post-thumbnail hentry category-infosec mentions-haus3c">
+	<!-- Grab the featured image -->
+			<div class="featured-image">
+			<img width="1200" height="707" src="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png?w=1200" class="attachment-large-image size-large-image wp-post-image" alt="" decoding="async" data-attachment-id="2856" data-permalink="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/whitebackground-2/" data-orig-file="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png" data-orig-size="4074,2400" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="whitebackground" data-image-description="" data-image-caption="" data-medium-file="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png?w=720" data-large-file="https://hausec.com/wp-content/uploads/2020/01/whitebackground-1.png?w=730">		</div>
+	
+	<header class="entry-header">
+		<div class="entry-date">
+			<span class="posted-on"><a href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/" rel="bookmark"><time class="entry-date published" datetime="2020-01-31T21:27:14-05:00">January 31, 2020</time><time class="updated" datetime="2020-07-09T09:20:12-05:00">July 9, 2020</time></a></span><span class="byline"> <span class="by">by</span> <span class="author vcard"><a class="url fn n" href="https://hausec.com/author/haus3c/">Hausec</a></span></span>		</div><!-- .entry-meta -->
+
+		<h1 class="entry-title">Attacking Azure, Azure AD, and Introducing&nbsp;PowerZure</h1>	</header><!-- .entry-header -->
+
+	
+<div class="entry-meta">
+	<ul class="meta-list">
+							<li class="meta-cat"><a href="https://hausec.com/category/infosec/" rel="category tag">Infosec</a></li>
+								<li class="meta-comment">
+			<span class="comments-link"><a href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comments">12 Comments</a></span>
+		</li>
+					</ul>
+</div>
+	<div class="entry-content">
+		<p class="graf graf--p">Over the past decade, Azure’s presence in businesses has grown significantly as new features and support were added to Azure. The purpose of this article is to cover three main points:</p>
+<ol class="postList">
+<li class="graf graf--li">Explain the components of Azure and how they fit into a modern IT environment.</li>
+<li class="graf graf--li">Explain how certain things within Azure can be leveraged from an offensive perspective.</li>
+<li class="graf graf--li">Introduce the PowerZure project and explain how it helps offensive operations against Azure.<br>
+<a class="markup--anchor markup--li-anchor" href="https://github.com/hausec/PowerZure" target="_blank" rel="noopener">https://github.com/hausec/PowerZure</a></li>
+</ol>
+<h3 class="graf graf--h3">Background</h3>
+<p class="graf graf--p">Azure was released in 2010 as “Windows Azure” and was renamed “Microsoft Azure” in 2014 to imply that Azure covers more than just Windows products, as well as the major addition of Azure Resource Manager (Azure RM) and Azure Active Directory (Azure AD). It started as Platforms as a Service (PaaS) to spin up Virtual Machines (VMs), Storage, WebApps, and SQL Databases but has now evolved into Infrastructure as a Service (IaaS), as well as Software as a Service (SaaS), offering over 600 services.</p>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*Zd4nDSg6Tvh3MSfs" width="800" height="450" data-width="1200" data-height="675"><p class="wp-caption-text">Enter a Figure 1: Overview of Azure’s offerings.caption</p></div>
+</figure>
+<p class="graf graf--p">Current implementations of Azure often involve using several components shown above, which will be highlighted.</p>
+<h3 class="graf graf--h3">Components</h3>
+<p class="graf graf--p">Azure’s architecture is complicated as there are several components. There are a few components that are essential to understand as they are commonly used within businesses.</p>
+<h4 class="graf graf--h4">Enterprise</h4>
+<p class="graf graf--p">This represents the Azure global account. It’s the unique identity that the business owns and allows access to subscriptions, tenants, and services.</p>
+<h4 class="graf graf--h4">Tenant</h4>
+<p class="graf graf--p">Tenants are instances of Azure for the Enterprise. An Enterprise can have multiple tenants. This is often seen in companies that are geographically separated or subsidiaries. Access to one tenant in an enterprise does <em class="markup--em markup--p-em">not </em>give access to another tenant. An analogy is that tenants are similar to Forests in Active Directory, where trusts can be established (within Azure AD), but that is not default and must be configured.</p>
+<h4 class="graf graf--h4">Subscriptions</h4>
+<p class="graf graf--p">Subscriptions are how you gain access to Azure services (Azure itself, Azure AD, Storage, etc). Subscriptions are often broken out into uses for the businesses, e.g. a subscription for production web apps, another subscription for development web apps, etc.</p>
+<h4 class="graf graf--h4">Resources</h4>
+<p class="graf graf--p">Resources are the specific application, such as SQL servers, SQL DBs, virtual networks, run-books, accounts, etc.</p>
+<h4 class="graf graf--h4">Resource Groups</h4>
+<p class="graf graf--p">Resource groups are the containers that house the resources. Business will often have multiple resource groups depending on their usage of the resource.</p>
+<h4 class="graf graf--h4">Runbooks</h4>
+<p class="graf graf--p">Runbooks are part of the Azure Automation service and support scripting languages PowerShell and Python (2.7). These allow for automation of operations within Azure, e.g. start-up of multiple virtual machines at once. There are possible attack vectors within Runbooks that are covered later.</p>
+<h4 class="graf graf--h4">Azure Active Directory</h4>
+<p class="graf graf--p">Azure Active Directory (Azure AD) is directory services in the cloud. There are many differences between it and on-premise AD, which is also covered later.</p>
+<h4 class="graf graf--h4">Azure AD&nbsp;Connect</h4>
+<p class="graf graf--p">Azure AD connect is the tools that actually connects on-premise with Azure AD. It has features such as hash synchronization and federation (between Tenants) to link to on-premise AD.</p>
+<h4 class="graf graf--h4">Service Principal</h4>
+<p class="graf graf--p">An Azure service principal is a security identity used by user-created apps, services, and automation tools to access specific Azure resources. Think of it as a ‘user identity’ (login and password or certificate) with a specific role, and tightly controlled permissions to access your resources. It only needs to be able to do specific things, unlike a general user identity. It improves security if you only grant it the minimum permissions level needed to perform its management tasks. For example, an organization can assign its deployment scripts to run authenticated as a service principal.</p>
+<h3 class="graf graf--h3">Architecture</h3>
+<p class="graf graf--p">A visualization of Azure’s architecture is shown below</p>
+<p><img data-attachment-id="2857" data-permalink="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/picture1/" data-orig-file="https://hausec.com/wp-content/uploads/2020/01/picture1.png" data-orig-size="879,537" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Picture1" data-image-description="" data-image-caption="" data-medium-file="https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=720" data-large-file="https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=730" class=" size-full wp-image-2857 aligncenter" src="https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=730" alt="Picture1" srcset="https://hausec.com/wp-content/uploads/2020/01/picture1.png 879w, https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=150&amp;h=92 150w, https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=720&amp;h=440 720w, https://hausec.com/wp-content/uploads/2020/01/picture1.png?w=768&amp;h=469 768w" sizes="(max-width: 879px) 100vw, 879px"></p>
+<figure class="graf graf--figure"></figure>
+<h3 class="graf graf--h3">AzureAD</h3>
+<p class="graf graf--p">Azure AD is&nbsp;<em class="mx">not</em>&nbsp;a replacement for on-premise AD, nor is it the same as Azure (i.e. AzureAD vs. Azure). AzureAD is a management platform for AD from the cloud (reset passwords, create users, add users to groups, etc.) and used as the authentication piece into Azure as a whole (as well as O365). This still introduces several interesting attack paths that may also effect on-premise AD.</p>
+<figure class="graf graf--figure">
+<p></p><div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*caN0uAtEtXmkz6Gn" width="800" height="353" data-width="800" data-height="353"><p class="wp-caption-text">Figure 3:<a class="markup--anchor markup--figure-anchor" href="https://troopers.de/downloads/troopers19/TROOPERS19_AD_Im_in_your_cloud.pdf" target="_blank" rel="noopener">Comparison of differences between AAD and OnPrem</a></p></div><figcaption class="imageCaption"></figcaption></figure>
+<p class="graf graf--p">There are three primary ways of integrating on-premise Active Directory to Azure AD, Password Hash Synchronization (PHS), Pass Through Authentication (PTA), and Federated Services (ADFS). PHS and PTA both have potential attack vectors associated with them.</p>
+<h4 class="graf graf--h4">Password Hash Synchronization</h4>
+<p class="graf graf--p">With Password Hash Synchronization (PHS), the passwords from on-premise AD are actually sent to the cloud, similar to how domain controllers synchronize passwords between each other via replication. This is done from a service account that is created with the installation of AD Connect.</p>
+<figure class="graf graf--figure">
+<div style="width: 576px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*qJLgbUTpiZijj7Ro" width="566" height="398" data-width="566" data-height="398"><p class="wp-caption-text">Figure 4:<a class="markup--anchor markup--figure-anchor" href="https://docs.microsoft.com/en-us/azure/active-directory/hybrid/whatis-phs" target="_blank" rel="noopener"> https://docs.microsoft.com/en-us/azure/active-directory/hybrid/whatis-phs</a></p></div>
+</figure>
+<p class="graf graf--p">This introduces a unique attack path where if the synchronization account is compromised, it has enough privileges that it potentially could lead to the compromise of the on-premise AD forest, as that account is granted replication rights which are needed for <a class="markup--anchor markup--p-anchor" href="https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/dump-password-hashes-from-domain-controller-with-dcsync" target="_blank" rel="noopener">DCSync</a>. Realistically, the sync account password should not be known and thus will not be logged in anywhere, however <a class="markup--anchor markup--p-anchor" href="https://twitter.com/_dirkjan" target="_blank" rel="noopener">Dirk-jan</a>, during his Troopers 2019<a class="markup--anchor markup--p-anchor" href="https://www.youtube.com/watch?v=JEIR5oGCwdg" target="_blank" rel="noopener"> presentation</a>, discovered how to reverse the account’s password from the SQL DB and made a script that would do the hard work.</p>
+<h4 class="graf graf--h4">Pass Through Authentication</h4>
+<p class="graf graf--p">Pass through authentication keeps the passwords on-premise but also allows the users to have a single password for Azure and on-premise. For example, when a user logins to Outlook on the web, they enter their credentials into the web portal (Azure AD), which Azure then uses PKI to encrypt the credentials and sends them to an agent on-premise. The agent decrypts the credentials and validates it against the DC, which returns a status back to the agent, which is then relayed back to Azure AD.</p>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*2C0dFGe4ZJWnbd3j" width="800" height="382" data-width="800" data-height="382"><p class="wp-caption-text">Figure 5:<a class="markup--anchor markup--figure-anchor" href="https://docs.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-pta" target="_blank" rel="noopener"> https://docs.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-pta</a></p></div>
+</figure>
+<p class="graf graf--p">It’s possible to perform DLL injection into the PTA agent and intercept authentication requests, which include credentials in clear-text. <a class="markup--anchor markup--p-anchor" href="https://twitter.com/_xpn_" target="_blank" rel="noopener">@_xpn_</a> has written an excellent<a class="markup--anchor markup--p-anchor" href="https://blog.xpnsec.com/azuread-connect-for-redteam/" target="_blank" rel="noopener"> blog post</a> on doing this.</p>
+<h4 class="graf graf--h4">Active Directory Federated Services&nbsp;(ADFS)</h4>
+<figure class="graf graf--figure">
+<div style="width: 602px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*S9i2xZHlnAFWtPEJ" width="592" height="398" data-width="592" data-height="398"><p class="wp-caption-text">Figure 6: <a class="markup--anchor markup--figure-anchor" href="https://docs.microsoft.com/en-us/azure/active-directory/hybrid/whatis-fed" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/azure/active-directory/hybrid/whatis-fed</a></p></div>
+</figure>
+<p class="graf graf--p">Azure AD can connect back to on-premise via ADFS. With ADFS, Azure AD is set as a trusted agent for federation and allows login with on-premise credentials.</p>
+<h3 class="graf graf--h3">Access Control</h3>
+<h4 class="graf graf--h4">Policies</h4>
+<p class="graf graf--p">Policies in Azure do not do the actual controlling of access, they are meant to enforce different rules and effects for resources. For example, with policy, you can restrict certain sizes of a VM in your subscription, or make sure the Administrators group in a VM doesn’t have too many members. Policies are broken into two parts — the policies themselves, and policy definitions. An example is shown below.</p>
+<figure class="graf graf--figure">
+<div style="width: 770px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*JwNW8WuWWU7NgeLF" width="760" height="498" data-width="760" data-height="498"><p class="wp-caption-text">Figure 7: Policy Assignment page in Azure.</p></div>
+</figure>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*TrSGwmvhVgkV8Zl3" width="800" height="269" data-width="800" data-height="269"><p class="wp-caption-text">Figure 8: Choosing a specific policy to assign within Azure.</p></div>
+</figure>
+<p class="graf graf--p">Policies contain multiple definitions, where definitions are what does the auditing/action. Thus, you can create a definition and apply it to multiple policies.</p>
+<h4 class="graf graf--h4">Role Based Access Control (RBAC) and&nbsp;Roles</h4>
+<p id="d2f8" class="kv kw bj kx b ky kz la lb lc ld le lf lg lh li lj lk ll lm ln hh cx">Azure offers a more granular control to security with RBAC, in the form of Roles. It differs from Policies by focusing on user actions at different scopes. You might be added to the Contributor role for a resource group, allowing you to make changes to that resource group. RBAC in Azure allows for custom roles, however many businesses rely on the built-in roles. The list of roles and their access can be found&nbsp;<a class="bx dm mb mc md me" href="https://docs.microsoft.com/en-us/azure/automation/automation-role-based-access-control" target="_blank" rel="noopener">here</a>. To confuse you more, there’s a difference between Azure roles (referred to as Azure RBAC) and AzureAD roles. The primary difference, is that AzureAD roles only affect AzureAD and do not have any influence over resources within Azure. With this being said, the exclusion to that is the Global Administrator role, which has the option (literally a toggle switch in the Azure Portal) to also give themselves (Global Administrator) ownership of all resources within Azure itself.</p>
+<p id="cc38" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln hh cx">For the purpose of this this article, only the following roles within Azure RBAC will be discussed:</p>
+<ul class="">
+<li id="a1dd" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln nk lu lv cx">Owner</li>
+<li id="17c5" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">Contributor</li>
+<li id="be2f" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">Reader</li>
+</ul>
+<p class="graf graf--p">The reason being is there are far too many roles to go in depth on all of them, with also the additional option of custom roles. Within the Azure portal, you can read a resource’s security settings, such as which roles can access or make changes to that resource. This can be viewed in the Identity Access &amp; Management (IAM) tab in the Azure portal if you prefer not to use the CLI.</p>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*5zJtsWRN_1FkYvn2" width="800" height="310" data-width="800" data-height="310"><p class="wp-caption-text">Figure 9: Checking a user’s role in IAM within Azure.</p></div>
+</figure>
+<p class="graf graf--p">Resources can have their own specific access control list (ACL), so you can add a user to only be able to view that specific resource. It’s important to note that roles/permissions are inheritance-based, meaning if a user is in the Contributor role for the resource group, they will effectively have Contributor access to every resource within the resource group. Even if they are only assigned to the reader role for a resource within that resource group, since they have Contributor access to the whole group they will be a Contributor to that resource.</p>
+<h3 class="graf graf--h3">Attacking Azure and Introducing PowerZure</h3>
+<p class="graf graf--p">With several components in Azure, there are several different avenues for attacks within the platform. These attack vectors leverage misconfigurations or design flaws, some of which are listed here. The major question that needs to be addressed, is what is the goal of testing an Azure instance? This will depend on the engagement and scope of work, so there’s multiple answers to that, however in this article the purpose is to demonstrate the implications of certain roles and resources within Azure and how those can be abused both from a privilege escalation standpoint and an overall data extraction standpoint to possibly achieve that goal.</p>
+<p class="graf graf--p">After interacting with Azure via CLI and the az module, I realize there is a great opportunity to script out many of the tasks an attacker would do within Azure. As a result, I’ve created PowerZure, a PowerShell project that’s purpose is to make interacting with Azure a bit easier, as well as adding offensive capability.</p>
+<h3 class="graf graf--h3">PowerZure</h3>
+<p id="e673" class="kv kw bj kx b ky kz la lb lc ld le lf lg lh li lj lk ll lm ln hh cx"><a class="bx dm mb mc md me" href="https://github.com/hausec/PowerZure" target="_blank" rel="noopener">PowerZure</a>&nbsp;leverages three PowerShell modules for Azure:</p>
+<ul class="">
+<li id="a2bf" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln nk lu lv cx">Azure CLI</li>
+<li id="5c56" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">Azure PowerShell</li>
+<li id="c587" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">AzureAD PowerShell</li>
+</ul>
+<p id="26ba" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln hh cx">Each module does things the other cannot, hence the need for all three. However, PowerZure mostly relies on the Azure CLI module.</p>
+<p id="6237" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln hh cx">PowerZure has several functions available and they are broken out in reference to their purpose:</p>
+<ul class="">
+<li id="05d2" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln nk lu lv cx">Operational — Functions that will cause an operation within Azure</li>
+<li id="7fc7" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">Information Gathering — Functions that gather information on resources in Azure</li>
+<li id="5fe8" class="kv kw bj kx b ky lw la lb lx ld le ly lg lh lz lj lk ma lm ln nk lu lv cx">Data Exfiltration — Functions that will exfiltrate data</li>
+</ul>
+<p id="9447" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln hh cx">For the sake of length and time, not all functions will be covered, but it is necessary to explain the purpose of some and the details around what is happening under the hood.</p>
+<h4 class="graf graf--h4">Startup</h4>
+<p class="graf graf--p">Since PowerZure requires the az module, After importing PowerZure <code class="markup--code markup--p-code">ipmo&nbsp;.\PowerZure</code>, it will download the modules if not already present.</p>
+<p id="ef82" class="kv kw bj kx b ky kz la lb lc ld le lf lg lh li lj lk ll lm ln hh cx">For a full coverage of PowerZure, check out the documents on readthedocs.io</p>
+<p id="f6a6" class="kv kw bj kx b ky lo la lb lp ld le lq lg lh lr lj lk ls lm ln hh cx"><a class="bx dm mb mc md me" href="https://powerzure.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener">https://powerzure.readthedocs.io/en/latest/index.html</a></p>
+<p class="graf graf--p">It then requires sign in before usage of the functions. There’s three types of logins for Azure:</p>
+<ol class="postList">
+<li class="graf graf--li"><strong class="markup--strong markup--li-strong">Interactive</strong>. Simply type az login and you will be directed to a login page. If using MFA, you must login via Interactive mode.</li>
+<li class="graf graf--li"><strong class="markup--strong markup--li-strong">Cached token</strong>. Tokens for Azure are cached in</li>
+</ol>
+<p class="graf graf--p"><code class="markup--code markup--p-code">C:\Users\[Name]\.Azure\accessTokens.json</code></p>
+<p class="graf graf--p">So after you login once, the token is cached. This allow shows the possibility that an access token can be stolen and re-used.</p>
+<p class="graf graf--p">3. <strong class="markup--strong markup--p-strong">Pass in credentials</strong>. You can login (if MFA is not enabled and you’re using a non-personal account) via <code class="markup--code markup--p-code">az login -u User -p Password</code></p>
+<p class="graf graf--p">Once logged in, PowerZure will display your username, the subscriptions you have access to, your roles, and your Azure AD group memberships. Knowledge of what Role the user has is key to figuring out what you can do operationally and what functions you can use within PowerZure. PowerZure’s help menu specifically lists out which roles are needed to run the function. This is purely in reference to the built-in roles, as custom roles are unpredictable. To view the help menu, the command is <code class="markup--code markup--p-code">PowerZure -h</code></p>
+<figure class="graf graf--figure">
+<div style="width: 732px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*GHniN9KHMioCdUW5" width="722" height="394" data-width="722" data-height="394"><p class="wp-caption-text">Figure 10: PowerZure’s help menu</p></div>
+</figure>
+<p class="graf graf--p">In addition, each function can be used with Get-Help to get information or syntax.</p>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://hausec.com/wp-content/uploads/2020/01/32f89-1oj2v6kerwscxiprigdwhaq.png?w=800&amp;h=97" width="800" height="97" data-width="1307" data-height="160"><p class="wp-caption-text">Function 11: Get-Help displays the syntax for a function</p></div>
+</figure>
+<p class="graf graf--p">Before further operation of PowerZure, a default subscription must be set if there are multiple subscriptions so the script will know which to operate against. A subscription can be set via</p>
+<p class="graf graf--p"><code class="markup--code markup--p-code">Set-Subscription -Id [idgoeshere]</code></p>
+<p class="graf graf--p">The subscription IDs are printed once you login to Azure with PowerZure. If only one subscription is present, this can be ignored.</p>
+<h4 class="graf graf--h4">Role Abuse</h4>
+<p class="graf graf--p">Each of the Global roles (Administrator, Owner, Contributor, Reader) will be broken down into what can be accomplished, why it’s necessary to accomplish, and how PowerZure helps.</p>
+<p class="graf graf--p"><strong class="markup--strong markup--p-strong">Reader</strong></p>
+<p class="graf graf--p">The Global Reader role has read-only access for components in Azure (Subscriptions, Policies, Resources, etc.) This by itself can grant an attacker useful information. For example, if the attacker compromises an account with Reader privileges, they can read Runbooks. Runbooks fall under the “Automation Accounts” resource. An example is shown below</p>
+<figure class="graf graf--figure">
+<div style="width: 810px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*4xqdC2t2Dh89Twv5" width="800" height="176" data-width="800" data-height="176"><p class="wp-caption-text">Figure 10: Viewing a Runbook with the ‘Reader’ role. Notice ‘Edit’ and ‘Start’ are grayed out.</p></div>
+</figure>
+<p class="graf graf--p">This can be useful to see if there’s any hard-coded credentials within those Runbooks.</p>
+<p class="graf graf--p">As a Reader, you can also read several other resource’s details to search for hard-coded credentials or other potentially interesting information, including:</p>
+<ul class="postList">
+<li class="graf graf--li">Logic apps</li>
+<li class="graf graf--li">Deployment Templates</li>
+<li class="graf graf--li">Virtual Networks (Potentially useful to view new targets/address spaces)</li>
+<li class="graf graf--li">Export Templates on Virtual Machines</li>
+<li class="graf graf--li">Connection Strings in Azure SQL</li>
+<li class="graf graf--li">Configurations on several other resources/applications</li>
+</ul>
+<p class="graf graf--p">PowerZure can be leveraged to do a lot of enumeration as a Reader. For example, gathering all users, groups, roles, etc. Runbooks can also be read. In PowerZure, Runbooks can be listed via Get-Runbooks</p>
+<figure class="graf graf--figure">
+<div style="width: 351px" class="wp-caption aligncenter"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*5sfu3krCvm85vpKM" width="341" height="224" data-width="341" data-height="224"><p class="wp-caption-text">Figure 12: Listing Runbooks in PowerZure</p></div>
+</figure>
+<p class="graf graf--p">From here, the Runbooks can be obtained with Get-RunbookContent</p>
+<figure class="graf graf--figure">
+<div style="width: 576px" class="wp-caption alignnone"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*r3PjxZbPucJ3BLVl" width="566" height="80" data-width="566" data-height="80"><p class="wp-caption-text">Figure 13: Displaying the contents of a Runbook</p></div>
+</figure>
+<p class="graf graf--p">Readers have access to all of the functions listed under ‘Information Gathering’, which can be found<a class="markup--anchor markup--p-anchor" href="https://github.com/hausec/PowerZure" target="_blank" rel="noopener"> here</a>.</p>
+<p class="graf graf--p"><strong class="markup--strong markup--p-strong">Contributor</strong></p>
+<p class="graf graf--p">Contributor role allows you to actually edit resources and services within Azure, instead of just reading properties. Several attack vectors are present from the Contributor role that can be exploited with PowerZure.</p>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Execute-Command</code> will execute a supplied command on a targeted VM. As Contributor, these commands are executed as SYSTEM.</li>
+</ul>
+<figure class="graf graf--figure">
+<div style="width: 650px" class="wp-caption aligncenter"><img class="graf-image" src="https://cdn-images-1.medium.com/max/800/0*hXfcSoWJKFm1xH8o" width="640" height="138" data-width="640" data-height="138"><p class="wp-caption-text">Figure 14: Executing ‘whoami’ on a Win10 VM shows commands are ran as SYSTEM by default</p></div>
+</figure>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Execute-MSBuild</code> is a function that will take in a MSBuild payload and execute it. By default, Windows VMs deployed with Azure’s templates will have&nbsp;.NET 4.0 installed.</li>
+</ul>
+<figure class="graf graf--figure graf--iframe">
+<div class="aspectRatioPlaceholder is-locked">
+<div class="aspectRatioPlaceholder-fill">
+<iframe title="VideoPress Video Player" aria-label="VideoPress Video Player" width="626.683" height="260.1163684931507" src="https://video.wordpress.com/embed/zkYiYryN?hd=0&amp;autoPlay=0&amp;permalink=1&amp;loop=0&amp;preloadContent=metadata&amp;muted=0&amp;playsinline=0&amp;controls=1&amp;cover=1" frameborder="0" allowfullscreen="" allow="clipboard-write"></iframe><script src="https://v0.wordpress.com/js/next/videopress-iframe.js?m=1674852142"></script>
+</div>
+<div></div>
+</div><figcaption class="imageCaption"></figcaption></figure>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Execute-Program</code> will upload and execute any file that is supplied. It works by identifying a storage container, uploads the supplied file through <code class="markup--code markup--li-code">Get-AzVMCustomScriptExtension</code>&nbsp;, then executes that program via <code class="markup--code markup--li-code">az vm run invoke</code>. This entire process does take time (~2 mins) unfortunately, due to the dynamic location of where the file is uploaded to on the VM.</li>
+<li class="graf graf--li"><code class="markup--code markup--li-code">Get-AllKeyVaultContents</code> will automatically go through a Key Vault, check for access, and print the results of any secrets, keys, or certificates. By default, Key Vaults only allow access to their owners, however if a user has Global Contributor, they can edit the access policies on the Key Vault and give themselves access. PowerZure does this automatically.</li>
+</ul>
+<figure class="graf graf--figure">
+<div style="width: 660px" class="wp-caption alignnone"><img class="graf-image" src="https://hausec.com/wp-content/uploads/2020/01/fb63f-1vpbkz3a8xu2jbk3fud8z1a.png?w=650&amp;h=443" width="650" height="443" data-width="650" data-height="443"><p class="wp-caption-text">Figure 16: Revealing the secrets in a Key Vault</p></div>
+</figure>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Get-AllAppSecrets</code> will return all passwords or certificate credentials for any Application that has them stored.</li>
+<li class="graf graf--li"><code class="markup--code markup--li-code">Get-AllSecrets</code> is a catch-all; it will run return all Key Vault secrets/keys/credentials, App Secrets, and Automation Account Run-as credentials.</li>
+</ul>
+<p class="graf graf--p">Contributors also can download disks from virtual machines.</p>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Get-AvailableVMDisks</code> will list the available disks that are downloadable. This can then give the information needed for</li>
+<li class="graf graf--li"><code class="markup--code markup--li-code">Get-VMDisk</code> which will generate a URL to download that disk. A fair warning, though, disks can be massive in size.</li>
+</ul>
+<p class="graf graf--p"><strong class="markup--strong markup--p-strong">Owner</strong></p>
+<p class="graf graf--p">Owners can do everything a Contributor can do, but they have one additional feature: They can also give permission to a resource they own. This is particularly useful as an attacker because it provides many opportunities to create a backdoor into a resource. For example, if an Owner controls a Virtual Machine resource, they can explicitly grant any user Owner status over that Virtual Machine. In PowerZure, this is accomplished via the <code class="markup--code markup--p-code">Set-Role</code> function. In addition, existing roles can be checked via <code class="markup--code markup--p-code">Get-RolesUser </code>function.</p>
+<pre class="graf graf--pre">Set-Role -Role Contributor -User test@contoso.com -Resource Win10VMTest</pre>
+<figure class="graf graf--figure">
+<div style="width: 655px" class="wp-caption alignnone"><img class="graf-image" src="https://hausec.com/wp-content/uploads/2020/01/a3dee-1bqkrhxqvmmuefsbna8ntfq.png?w=645&amp;h=264" width="645" height="264" data-width="645" data-height="264"><p class="wp-caption-text">Figure 17: Adding a user to the Owner role for a VM resource.</p></div>
+</figure>
+<p class="graf graf--p"><strong class="markup--strong markup--p-strong">Administrator</strong></p>
+<p class="graf graf--p">Administrators over a subscription have the ability to do everything an Owner can, plus create additional users and groups within Azure AD. They also have the ability to assign roles for the subscription. PowerZure has the ability to utilize an Administrator account to create a backdoor with a Runbook.</p>
+<ul class="postList">
+<li class="graf graf--li"><code class="markup--code markup--li-code">Create-Backdoor</code>&nbsp;, when executed, will create a Runbook. Inside the Runbook is instructions to create a new user and assign them to the Owner role, then generate a Webhook which will output a URI. This URI can then be passed into Execute-Backdoor.</li>
+<li class="graf graf--li"><code class="markup--code markup--li-code">Execute-Backdoor</code> will execute the Runbook. An attacker will create a backdoor in case the current account that is in use has it’s password changed. With Administrator role needed to create a user, a new co-administrator should be made as well to achieve this in the Runbook, in case credentials to the user in the Administrator role are changed.</li>
+</ul>
+<h3 class="graf graf--h3">Use Case</h3>
+<p class="graf graf--p">So what is the point of PowerZure if you can accomplish all of this via the Azure Portal online? While true, PowerZure was written to help automate and script many of the tedious tasks that are endured when enumerating Azure through the Portal, e.g. listing all users of every group. The use case of the tool is situational. One example, is if a penetration tester or red-teamer compromises a computer and realizes the user has logged into Azure CLI before (not unusual for System Admins) and they have an accessToken in their&nbsp;.Azure file. The tester could then take that token and impersonate the user in Azure, where they now have Contributor access to several different VMs. In addition, operations within the portal do not always return the full details of the job. With <code class="markup--code markup--p-code">az</code> returning the raw JSON, PowerZure abstracts the JSON to give relevant details, or in some cases, displays the raw output.</p>
+<h3 class="graf graf--h3">Final Thoughts</h3>
+<p class="graf graf--p">Azure usage has increased dramatically in the past few years and AzureAD is becoming more popular to use. My opinion is that it is not a replacement for on-premise AD at this time, however I do foresee Microsoft adding more functionality to AzureAD to allow businesses to interact more with on-premise. This blog post was meant to establish a base layer of knowledge on the platform and establish some common misconfigurations that can be exploited with PowerZure.</p>
+<p class="graf graf--p">The one thing this article did allude to was the detections around said tactics. The detection capabilities within Azure are heavily gate-kept behind Azure’s services and the default detection capabilities leave much to be desired, often requiring work-arounds. As a result, this requires more detail that I believe would be best detailed in a follow up article. Said article will follow this one in regards to detections within Azure.</p>
+<p class="graf graf--p">— <a href="https://hausecurity.wordpress.com/mentions/haus3c/" class="__p2-hovercard mention" data-type="fragment-mention" data-username="haus3c"><span class="mentions-prefix">@</span>haus3c</a></p>
+<h3 class="graf graf--h3">Sources</h3>
+<ol class="postList">
+<li class="graf graf--li">PowerZure Project <a class="markup--anchor markup--li-anchor" href="https://github.com/hausec/PowerZure" target="_blank" rel="noopener">https://github.com/hausec/PowerZure</a></li>
+<li class="graf graf--li">NetSPI and<a class="markup--anchor markup--li-anchor" href="https://twitter.com/kfosaaen" target="_blank" rel="noopener"> Karl Fosaaen</a></li>
+</ol>
+<ul class="postList">
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://notpayloads.blob.core.windows.net/slides/Azure-PrivEsc-DerbyCon9.pdf" target="_blank" rel="noopener">https://notpayloads.blob.core.windows.net/slides/Azure-PrivEsc-DerbyCon9.pdf</a></li>
+</ul>
+<p class="graf graf--p">2. FoxIT and<a class="markup--anchor markup--p-anchor" href="https://twitter.com/_dirkjan" target="_blank" rel="noopener"> Dirk-Jan</a></p>
+<ul class="postList">
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/" target="_blank" rel="noopener">https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/</a></li>
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://dirkjanm.io/assets/raw/Im%20in%20your%20cloud%20bluehat-v1.0.pdf" target="_blank" rel="noopener">https://dirkjanm.io/assets/raw/Im%20in%20your%20cloud%20bluehat-v1.0.pdf</a></li>
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://media.defcon.org/DEF%20CON%2027/DEF%20CON%2027%20presentations/DEFCON-27-Dirk-jan-Mollema-Im-in-your-cloud-pwning-your-azure-environment.pdf" target="_blank" rel="noopener">https://media.defcon.org/DEF%20CON%2027/DEF%20CON%2027%20presentations/DEFCON-27-Dirk-jan-Mollema-Im-in-your-cloud-pwning-your-azure-environment.pdf</a></li>
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://troopers.de/downloads/troopers19/TROOPERS19_AD_Im_in_your_cloud.pdf" target="_blank" rel="noopener">https://troopers.de/downloads/troopers19/TROOPERS19_AD_Im_in_your_cloud.pdf</a></li>
+</ul>
+<p class="graf graf--p">3. Trimarc and Metcalf</p>
+<ul class="postList">
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://adsecurity.org/?p=4179" target="_blank" rel="noopener">https://adsecurity.org/?p=4179</a></li>
+</ul>
+<p class="graf graf--p">4. XPN’s blog</p>
+<ul class="postList">
+<li class="graf graf--li"><a class="markup--anchor markup--li-anchor" href="https://blog.xpnsec.com/azuread-connect-for-redteam/" target="_blank" rel="noopener">https://blog.xpnsec.com/azuread-connect-for-redteam/</a></li>
+</ul>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul data-sharing-events-added="true"><li class="share-twitter"><a rel="nofollow noopener noreferrer" data-shared="sharing-twitter-2653" class="share-twitter sd-button share-icon" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/?share=twitter&amp;nb=1" target="_blank" title="Click to share on Twitter"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer" data-shared="sharing-facebook-2653" class="share-facebook sd-button share-icon" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/?share=facebook&amp;nb=1" target="_blank" title="Click to share on Facebook"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-111347649-2653-6666f985ec265" data-src="//widgets.wp.com/likes/index.html?ver=20240610#blog_id=111347649&amp;post_id=2653&amp;origin=hausecurity.wordpress.com&amp;obj_id=111347649-2653-6666f985ec265&amp;domain=hausec.com" data-name="like-post-frame-111347649-2653-6666f985ec265" data-title="Like or Reblog"><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div></div>			</div><!-- .entry-content -->
+
+</article><!-- #post-## -->
+
+				<nav class="navigation post-navigation" role="navigation">
+		<h1 class="screen-reader-text">Post navigation</h1>
+		<div class="nav-links">
+			<div class="nav-previous"><a href="https://hausec.com/2019/09/09/bloodhound-cypher-cheatsheet/" rel="prev"><span class="meta-nav">← Previous Post</span> BloodHound Cypher Cheatsheet</a></div><div class="nav-next"><a href="https://hausec.com/2020/03/10/kerberosity-killed-the-domain-an-offensive-kerberos-overview/" rel="next"><span class="meta-nav">Next Post →</span> Kerberosity Killed the Domain: An Offensive Kerberos&nbsp;Overview</a></div>		</div><!-- .nav-links -->
+	</nav><!-- .navigation -->
+	
+			
+<div id="comments" class="comments-area">
+
+	
+			<h3 class="comments-title">
+			12 Comments		</h3>
+
+		
+		<ol class="comment-list">
+			<li class="comment even thread-even depth-1 clear" id="li-comment-1568">
+
+	<article class="comment-block" id="comment-1568">
+
+		<img alt="" src="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=77&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=102&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=153&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">Caveman</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1568">September 23, 2020 at 8:40 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>❤ Thanks! I ended up just adding the free subscription for now since the AzureAD stuff is pretty familiar / tooled up. The Runbook portion of PowerZure has been great. Far easier than trying to navigate the portal to review them. Nice work on the tool!</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-haus3c bypostauthor odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1563">
+
+	<article class="comment-block" id="comment-1563">
+
+		<img alt="" src="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=77&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=102&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=153&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite"><a href="http://hausec.com" class="url" rel="ugc">Hausec</a></cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1563">September 21, 2020 at 11:58 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>Yes, basically what is happening is when you import PowerZure it automatically checks for your active subscription and other details, but since there is no subscription it’s giving that error. PowerZure should be imported, so AzureAD functions should still work though. </p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1 clear" id="li-comment-1562">
+
+	<article class="comment-block" id="comment-1562">
+
+		<img alt="" src="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=77&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=102&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=153&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">Caveman</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1562">September 21, 2020 at 11:29 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>The tenant is on a Microsoft 365 developer subscription. However, when I check subscriptions in the portal it’s not showing active subscriptions. Will just signing up for Pay as you go or free trial alleviate these RBAC issues?</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-haus3c bypostauthor odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1559">
+
+	<article class="comment-block" id="comment-1559">
+
+		<img alt="" src="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=77&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=102&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=153&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite"><a href="http://hausec.com" class="url" rel="ugc">Hausec</a></cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1559">September 21, 2020 at 7:40 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>Does your tenant contain a subscription?</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1 clear" id="li-comment-1555">
+
+	<article class="comment-block" id="comment-1555">
+
+		<img alt="" src="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G" srcset="https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=51&amp;d=identicon&amp;r=G 1x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=77&amp;d=identicon&amp;r=G 1.5x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=102&amp;d=identicon&amp;r=G 2x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=153&amp;d=identicon&amp;r=G 3x, https://0.gravatar.com/avatar/f286daa1d9bf73003d862e172f3859b8291e34ce64ac15c3ab1ece3998337d07?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">Caveman</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1555">September 20, 2020 at 5:20 pm</a>			</footer>
+
+			<div class="comment-content">
+				<p>@Hausec just curious what is happening here when I try to use PowerZure. I logged in via Connect-AzAccount from the az powershell module to log into my Azure account. I then try to run PowerZure and get the following output. I logged into Azure with the account I’m using and it’s showing that I have Azure RBAC roles set and the account I am testing with is the Global Administrator for AzureAD. Any help would be appreciated since I’d love to give this tool a go. </p>
+<p>You are logged into Azure PowerShell<br>
+Get-AzRoleAssignment : Object reference not set to an instance of an object.<br>
+At C:\TEMP\PowerZure-master\PowerZure.ps1:158 char:24<br>
++ …              $rbacroles = Get-AzRoleAssignment -ObjectId $userid *&gt;&amp;1<br>
++                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
+    + CategoryInfo          : CloseError: (:) [Get-AzRoleAssignment], NullReferenceException<br>
+    + FullyQualifiedErrorId : Microsoft.Azure.Commands.Resources.GetAzureRoleAssignmentCommand</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1417">
+
+	<article class="comment-block" id="comment-1417">
+
+		<img alt="" src="https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=51&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=51&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=77&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=102&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=153&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">Shepherd</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1417">August 1, 2020 at 10:17 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>Got it, that for the explainer</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-haus3c bypostauthor even thread-even depth-1 clear" id="li-comment-1415">
+
+	<article class="comment-block" id="comment-1415">
+
+		<img alt="" src="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=77&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=102&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=153&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite"><a href="http://hausec.com" class="url" rel="ugc">Hausec</a></cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1415">August 1, 2020 at 8:51 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>PowerZure has functions for both Azure and Azure AD, but it tends to be more Azure focused. The link between the two is that Azure AD is the authentication piece for Azure and Office 365, but Azure AD has a completely different set of roles than Azure resources. For example, the ‘Global Administrator’ account in Azure AD only exists in Azure AD and allows you to create users (among everything else). There is no role in Azure RM that allows you to create users, because that is handled by Azure AD. On the other side, the ‘Owner’ role in Azure RM allows a user to edit the permissions of a resource, resource group, or subscription. So when I have the Owner role on a VM, for example, I can edit the permissions of the VM and allow accounts (which exist in Azure AD) to access the VM. Does that make sense?</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1414">
+
+	<article class="comment-block" id="comment-1414">
+
+		<img alt="" src="https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=51&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=51&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=77&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=102&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=153&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/1f24d6b3af0e899e2cd5d17e6a18b4f5d5b21fe864379621884db2aed6a85bcf?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">Shepherd</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1414">August 1, 2020 at 4:54 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>To jump in on the discussion. Based on what I’ve read and correct me if I’m wrong, PowerZure focuses on Azure resources (Azure RM) and Dirk-Jan on Azure AD. However at this stage I fail to comprehend, what the link is between these two (if there is one). </p>
+<p>Eg as shown a contributor can run commands on assets and most likely use net user commands. On the other hand an owner can add accounts to RBAC roles. So are these two accounts then AzureAD accounts? How does azure handle local accounts for VM’s?</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-haus3c bypostauthor even thread-even depth-1 clear" id="li-comment-1412">
+
+	<article class="comment-block" id="comment-1412">
+
+		<img alt="" src="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=77&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=102&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=153&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite"><a href="http://hausec.com" class="url" rel="ugc">Hausec</a></cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1412">July 31, 2020 at 9:49 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>The service principal is actually partly managed through the application, e.g. if you go to the portal and add a secret to the application, that just creates a password for the service principal. Get-AllAppSecrets is actually kind of useless and is being removed soon because Microsoft abstracts the actual secret from the output. All it tells you is the “name” of the secret instead of the secret itself. </p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1411">
+
+	<article class="comment-block" id="comment-1411">
+
+		<img alt="" src="https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=51&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=51&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=77&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=102&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=153&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/43617254359fd5eac484e0697eec6a41e542cb1499414df73ee404b69cf95f4f?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">TheEagerPadawan</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1411">July 31, 2020 at 9:47 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>I assume that based on the blog article, an application is considered to be an asset.<br>
+Since PowerZure has the Get-AllAppSecrets function. </p>
+<p>So while you wouldn’t be able to interact with the application principal itself,<br>
+you can still with the application? </p>
+<p>The plot tickens …</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-haus3c bypostauthor even thread-even depth-1 clear" id="li-comment-1410">
+
+	<article class="comment-block" id="comment-1410">
+
+		<img alt="" src="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G" srcset="https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=51&amp;d=identicon&amp;r=G 1x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=77&amp;d=identicon&amp;r=G 1.5x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=102&amp;d=identicon&amp;r=G 2x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=153&amp;d=identicon&amp;r=G 3x, https://2.gravatar.com/avatar/823d60848bf370cbcfab1515661f42bcbaf26a24e3062cf8e363daae0a660dd8?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite"><a href="http://hausec.com" class="url" rel="ugc">Hausec</a></cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1410">July 31, 2020 at 8:56 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>Hi,<br>
+Good question. The roles mentioned in this article are Azure RBAC roles (as you mentioned). The roles Dirk-Jan is talking about are for Azure AD. Azure AD has a separate role system from Azure resources. Service Principals are part of Applications, which exist in AzureAD, so if you’re an Application Administrator in AzureAD, you can controller Applications in AzureAD, but that role has no effect in Azure resources because Azure resources uses Azure RBAC. Does that make sense?</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1 clear" id="li-comment-1409">
+
+	<article class="comment-block" id="comment-1409">
+
+		<img alt="" src="https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=51&amp;d=identicon&amp;r=G" srcset="https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=51&amp;d=identicon&amp;r=G 1x, https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=77&amp;d=identicon&amp;r=G 1.5x, https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=102&amp;d=identicon&amp;r=G 2x, https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=153&amp;d=identicon&amp;r=G 3x, https://1.gravatar.com/avatar/a382c0f9435224d1d5658b5463689c5594aaca0dd51c640e9984d42267257ee2?s=204&amp;d=identicon&amp;r=G 4x" class="avatar avatar-51 wp-hovercard-attachment grav-hashed grav-hijack" height="51" width="51" loading="lazy" decoding="async">
+		<div class="comment-wrap">
+			<footer class="comment-info">
+				<cite class="comment-cite">TheEagerPadawan</cite>				<a class="comment-time" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comment-1409">July 31, 2020 at 8:12 am</a>			</footer>
+
+			<div class="comment-content">
+				<p>Hi </p>
+<p>i’m currently just getting my feet wet with Azure (AAD) pentesting. So far i’ve read you article and watched some of the talks you link to. I’m slight confused in regards to what the link/difference is between RBAC roles mentioned in this blog article (reader,contributor,owner) and the application permissions (service principals) that Dirk-Jan Mollema talks about</p>
+				<p class="reply">
+									</p>
+			</div>
+
+					</div>
+	</article>
+</li><!-- #comment-## -->
+		</ol><!-- .comment-list -->
+
+		
+	
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a comment</h3><form action="https://hausec.com/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate="">
+
+
+<div id="comment-form__verbum" class="transparent"></div><div class="verbum-form-meta"><input type="hidden" name="comment_post_ID" value="2653" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+
+			<input type="hidden" name="highlander_comment_nonce" id="highlander_comment_nonce" value="6f26d5bd13">
+			<input type="hidden" name="verbum_show_subscription_modal" value=""></div><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="047f558762"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="1718453267338"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+
+	</div><!-- #content -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+			<a href="https://wordpress.com/?ref=footer_custom_svg" title="Create a website or blog at WordPress.com" rel="nofollow"><svg style="fill: currentColor; position: relative; top: 1px;" width="14px" height="15px" viewBox="0 0 14 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-labelledby="title" role="img">
+				<desc id="title">Create a website or blog at WordPress.com</desc>
+				<path d="M12.5225848,4.97949746 C13.0138466,5.87586309 13.2934037,6.90452431 13.2934037,7.99874074 C13.2934037,10.3205803 12.0351007,12.3476807 10.1640538,13.4385638 L12.0862862,7.88081544 C12.4453251,6.98296834 12.5648813,6.26504621 12.5648813,5.62667922 C12.5648813,5.39497674 12.549622,5.17994084 12.5225848,4.97949746 L12.5225848,4.97949746 Z M7.86730089,5.04801561 C8.24619178,5.02808979 8.58760099,4.98823815 8.58760099,4.98823815 C8.9267139,4.94809022 8.88671369,4.44972248 8.54745263,4.46957423 C8.54745263,4.46957423 7.52803983,4.54957381 6.86996227,4.54957381 C6.25158863,4.54957381 5.21247202,4.46957423 5.21247202,4.46957423 C4.87306282,4.44972248 4.83328483,4.96816418 5.17254589,4.98823815 C5.17254589,4.98823815 5.49358462,5.02808979 5.83269753,5.04801561 L6.81314716,7.73459399 L5.43565839,11.8651647 L3.14394256,5.04801561 C3.52312975,5.02808979 3.86416859,4.98823815 3.86416859,4.98823815 C4.20305928,4.94809022 4.16305906,4.44972248 3.82394616,4.46957423 C3.82394616,4.46957423 2.80475558,4.54957381 2.14660395,4.54957381 C2.02852925,4.54957381 1.88934333,4.54668493 1.74156477,4.54194422 C2.86690406,2.83350881 4.80113651,1.70529256 6.99996296,1.70529256 C8.638342,1.70529256 10.1302017,2.33173369 11.2498373,3.35765419 C11.222726,3.35602457 11.1962815,3.35261718 11.1683554,3.35261718 C10.5501299,3.35261718 10.1114609,3.89113285 10.1114609,4.46957423 C10.1114609,4.98823815 10.4107217,5.42705065 10.7296864,5.94564049 C10.969021,6.36482346 11.248578,6.90326506 11.248578,7.68133501 C11.248578,8.21992476 11.0413918,8.84503256 10.7696866,9.71584277 L10.1417574,11.8132391 L7.86730089,5.04801561 Z M6.99996296,14.2927074 C6.38218192,14.2927074 5.78595654,14.2021153 5.22195356,14.0362644 L7.11048207,8.54925635 L9.04486267,13.8491542 C9.05760348,13.8802652 9.07323319,13.9089317 9.08989995,13.9358945 C8.43574834,14.1661896 7.73285573,14.2927074 6.99996296,14.2927074 L6.99996296,14.2927074 Z M0.706448182,7.99874074 C0.706448182,7.08630113 0.902152921,6.22015756 1.25141403,5.43749503 L4.25357806,13.6627848 C2.15393732,12.6427902 0.706448182,10.4898387 0.706448182,7.99874074 L0.706448182,7.99874074 Z M6.99996296,0.999 C3.14016476,0.999 0,4.13905746 0,7.99874074 C0,11.8585722 3.14016476,14.999 6.99996296,14.999 C10.8596871,14.999 14,11.8585722 14,7.99874074 C14,4.13905746 10.8596871,0.999 6.99996296,0.999 L6.99996296,0.999 Z" id="wordpress-logo-simplified-cmyk" stroke="none" fill="“currentColor”" fill-rule="evenodd"></path>
+			</svg></a>
+			
+					</div><!-- .site-info -->
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<!--  -->
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20242481ae853d32fb498c357385d15c97d96f68e9e5013db38b7dc99e4f39cb3b061e" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i"></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile': 'Edit your profile',
+							'View profile': 'View profile',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.': 'Sorry, we are unable to load this Gravatar profile. Please check your internet connection.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-e9fd61f9c79c0dbace2a36af18e8c373">
+	</div>
+	<div class="grofile-hash-map-45abc65208ff4a8f0d3c5f0abafcf167">
+	</div>
+	<div class="grofile-hash-map-50d2376e11729bf5e1429cbdd8965cb9">
+	</div>
+	<div class="grofile-hash-map-bfc2aafa84f785f6b596cfad0fa02224">
+	</div>
+	<div class="grofile-hash-map-663a2d963cbd438b4a5e9f249b715a6d">
+	</div>
+	</div>
+	<div id="actionbar" class="actnbr-pub-editor actnbr-has-follow">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-comment" href="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/#comments">
+							<svg class="gridicon gridicons-comment" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M12 16l-5 5v-5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2h-7z"></path></g></svg>							<span>Comment						</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-reblog" href="">
+							<svg class="gridicon gridicons-reblog" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.086 9.914L20 7.828V18c0 1.105-.895 2-2 2h-7v-2h7V7.828l-2.086 2.086L14.5 8.5 19 4l4.5 4.5-1.414 1.414zM6 16.172V6h7V4H6c-1.105 0-2 .895-2 2v10.172l-2.086-2.086L.5 15.5 5 20l4.5-4.5-1.414-1.414L6 16.172z"></path></g></svg><span>Reblog</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://hausec.com">
+				<img alt="" src="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=50" srcset="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=50 1x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=75 1.5x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=100 2x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=150 3x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=200 4x" class="avatar avatar-50" height="50" width="50">				hausec			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 111 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address">
+										</div>
+										<input type="hidden" name="action" value="subscribe">
+										<input type="hidden" name="blog_id" value="111347649">
+										<input type="hidden" name="source" value="https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/">
+										<input type="hidden" name="sub-type" value="actionbar-follow">
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="54a1d6508f">										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fhausec.com%252F2020%252F01%252F31%252Fattacking-azure-azure-ad-and-introducing-powerzure%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+									<li class="actnbr-btn actnbr-hidden no-display" onclick="javascript:__tcfapi( 'showUi' );">
+						<a class="actnbr-action actnbr-actn-privacy" href="#">
+							<svg class="gridicon gridicons-info-outline" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M13 9h-2V7h2v2zm0 2h-2v6h2v-6zm-1-7c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8m0-2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path></g></svg>							<span>Privacy						</span>
+						</a>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"></path></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+									<li class="actnbr-sitename">
+			<a href="https://hausec.com">
+				<img alt="" src="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=50" srcset="https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=50 1x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=75 1.5x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=100 2x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=150 3x, https://hausec.com/wp-content/uploads/2019/04/cropped-cropped-untitled-2-2.png?w=200 4x" class="avatar avatar-50" height="50" width="50">				hausec			</a>
+		</li>
+								<li class="actnbr-folded-customize">
+								<a href="https://hausecurity.wordpress.com/wp-admin/customize.php?url=https%3A%2F%2Fhausecurity.wordpress.com%2F2020%2F01%2F31%2Fattacking-azure-azure-ad-and-introducing-powerzure%2F">
+									<svg class="gridicon gridicons-customize" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M2 6c0-1.505.78-3.08 2-4 0 .845.69 2 2 2 1.657 0 3 1.343 3 3 0 .386-.08.752-.212 1.09.74.594 1.476 1.19 2.19 1.81L8.9 11.98c-.62-.716-1.214-1.454-1.807-2.192C6.753 9.92 6.387 10 6 10c-2.21 0-4-1.79-4-4zm12.152 6.848l1.34-1.34c.607.304 1.283.492 2.008.492 2.485 0 4.5-2.015 4.5-4.5 0-.725-.188-1.4-.493-2.007L18 9l-2-2 3.507-3.507C18.9 3.188 18.225 3 17.5 3 15.015 3 13 5.015 13 7.5c0 .725.188 1.4.493 2.007L3 20l2 2 6.848-6.848c1.885 1.928 3.874 3.753 5.977 5.45l1.425 1.148 1.5-1.5-1.15-1.425c-1.695-2.103-3.52-4.092-5.448-5.977z"></path></g></svg>									<span>Customize</span>
+								</a>
+							</li>
+																<li class="actnbr-folded-follow">
+												<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z" fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+										</li>
+																	<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+									<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fhausec.com%252F2020%252F01%252F31%252Fattacking-azure-azure-ad-and-introducing-powerzure%252F">Log in</a></li>
+																	<li class="actnbr-shortlink"><a href="https://wp.me/p7xcBP-GN">Copy shortlink</a></li>
+																	<li class="flb-report">
+										<a href="https://wordpress.com/abuse/?report_url=https://hausec.com/2020/01/31/attacking-azure-azure-ad-and-introducing-powerzure/" target="_blank" rel="noopener noreferrer">
+											Report this content										</a>
+									</li>
+																	<li class="actnbr-reader">
+										<a href="https://wordpress.com/read/blogs/111347649/posts/2653">
+											View post in Reader										</a>
+									</li>
+																	<li class="actnbr-subs">
+										<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+									</li>
+																		<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+															</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20240115";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+			<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading">&nbsp;</span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div class="jp-carousel-wrap swiper-container jp-carousel-swiper-container jp-carousel-transitions" itemscope="" itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"></path>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"></rect>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"></path>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"></path>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Loading Comments...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner">&nbsp;</span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Write a Comment...</label>
+												<textarea name="comment" class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea" id="jp-carousel-comment-form-comment-field" placeholder="Write a Comment..."></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Email</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Name</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field">
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Website</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field">
+															</fieldset>
+																											</div>
+													<input type="submit" name="submit" class="jp-carousel-comment-form-button" id="jp-carousel-comment-form-button-submit" value="Post Comment">
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"></path>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"></rect>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+		
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/hausec.com\/2020\/01\/31\/attacking-azure-azure-ad-and-introducing-powerzure\/":2653};
+	</script>
+				<link crossorigin="anonymous" rel="stylesheet" id="all-css-0-2" href="https://s0.wp.com/_static/??-eJydjEEKgCAQAD+UrR6KLtFbTJfQdJXWxe9HUB/oOMMw0KtyhRpSgyyqJjkCMURs1brzZWAhyMVLQgZnryKMCbiHipfahXzC0TEP8H/2NZ94fltezbxMxkx61vEGx+U/hQ==&amp;cssminify=yes" type="text/css" media="all">
+<script type="text/javascript" id="jetpack-carousel-js-extra">
+/* <![CDATA[ */
+var jetpackSwiperLibraryPath = {"url":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-plugin\/sun\/_inc\/build\/carousel\/swiper-bundle.min.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https:\/\/hausec.com\/wp-admin\/admin-ajax.php","nonce":"3ee1a561d8","display_exif":"0","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","download_original":"View full size <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","copyright":"Copyright","comment_registration":"0","require_name_email":"0","login_url":"https:\/\/hausecurity.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fhausec.com%2F2020%2F01%2F31%2Fattacking-azure-azure-ad-and-introducing-powerzure%2F","blog_id":"111347649","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"],"stats_query_args":"blog=111347649&v=wpcom&tz=-5&user_id=0&subd=hausecurity","is_public":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="verbum-settings-js-before">
+/* <![CDATA[ */
+window.VerbumComments = {"Log in or provide your name and email to leave a reply.":"Log in or provide your name and email to leave a reply.","Log in or provide your name and email to leave a comment.":"Log in or provide your name and email to leave a comment.","Receive web and mobile notifications for posts on this site.":"Receive web and mobile notifications for posts on this site.","Name":"Name","Email (address never made public)":"Email (address never made public)","Website (optional)":"Website (optional)","Leave a reply. (log in optional)":"Leave a reply. (log in optional)","Leave a comment. (log in optional)":"Leave a comment. (log in optional)","Log in to leave a reply.":"Log in to leave a reply.","Log in to leave a comment.":"Log in to leave a comment.","Logged in via %s":"Logged in via %s","Log out":"Log out","Email":"Email","(Address never made public)":"(Address never made public)","Instantly":"Instantly","Daily":"Daily","Reply":"Reply","Comment":"Comment","WordPress":"WordPress","Weekly":"Weekly","Notify me of new posts":"Notify me of new posts","Email me new posts":"Email me new posts","Email me new comments":"Email me new comments","Cancel":"Cancel","Write a comment...":"Write a comment...","Write a reply...":"Write a reply...","Website":"Website","Optional":"Optional","We'll keep you in the loop!":"We'll keep you in the loop!","Loading your comment...":"Loading your comment...","Discover more from":"Discover more from hausec","Subscribe now to keep reading and get access to the full archive.":"Subscribe now to keep reading and get access to the full archive.","Continue reading":"Continue reading","Never miss a beat!":"Never miss a beat!","Interested in getting blog post updates? Simply click the button below to stay in the loop!":"Interested in getting blog post updates? Simply click the button below to stay in the loop!","Enter your email address":"Enter your email address","Subscribe":"Subscribe","Comment sent successfully":"Comment sent successfully","Save my name, email, and website in this browser for the next time I comment.":"Save my name, email, and website in this browser for the next time I comment.","siteId":111347649,"postId":2653,"mustLogIn":false,"requireNameEmail":false,"commentRegistration":false,"connectURL":"https:\/\/hausecurity.wordpress.com\/public.api\/connect\/?action=request&domain=hausec.com","logoutURL":"https:\/\/hausecurity.wordpress.com\/wp-login.php?action=logout&_wpnonce=dccb1eb64a","homeURL":"https:\/\/hausec.com\/","subscribeToBlog":true,"subscribeToComment":true,"isJetpackCommentsLoggedIn":false,"jetpackUsername":"","jetpackUserId":0,"jetpackSignature":"","jetpackAvatar":"https:\/\/0.gravatar.com\/avatar\/?s=96&amp;d=identicon&amp;r=G","enableBlocks":true,"enableSubscriptionModal":true,"currentLocale":"en","isJetpackComments":false,"allowedBlocks":["core\/paragraph","core\/list","core\/code","core\/list-item","core\/quote","core\/image","core\/embed","core\/quote","core\/code"],"embedNonce":"ca6b258fbf","verbumBundleUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/vendor\/automattic\/jetpack-mu-wpcom\/src\/features\/verbum-comments\/dist\/index.js","isRTL":false,"vbeCacheBuster":1717067639}
+/* ]]> */
+</script>
+<script crossorigin="anonymous" type="text/javascript" src="https://s0.wp.com/_static/??-eJydkNFuwyAMRX9oxKkWKU/TPmUi4DQOYBiGdf37oTaZNnWqqj1hLte+PsApKRO5IBcIVSVfj8QCnhwKvFesuGi2HnO3yhP8bV6xJG2catIpmRi2B5DK8IFsYwZdSwy6FDI3bpBsYKrkbTPnqYYWEUKLENAi2A57Zh3IKB+1vV2kLBjarqlOgJZKC1sFxFFSntipOZoqaqbPh/qu1QOsPxDfiHcAo3Osgv7btgtdIL4zVTuSgEU9d/113C7M+WK2d3r3iO03f1//TSKLzmi1tedLSXzcEF7Dy2E8jEM/9OOwfgGT69fe"></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<iframe src="https://widgets.wp.com/likes/master.html?ver=20240610#ver=20240610&amp;origin=https://hausec.com" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars" class="wpl-new-layout" role="dialog" aria-hidden="true" tabindex="-1">
+		<div class="likes-text">
+			<span>%d</span>		</div>
+		<ul class="wpl-avatars sd-like-gravatars"></ul>
+	</div>
+
+		<script src="//stats.wp.com/w.js?67" defer=""></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'111347649','blog_tz':'-5','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'111347649','v':'wpcom','tz':'-5','user_id':'0','post':'2653','subd':'hausecurity'}]);
+		_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsd0xoLz9RQkM2K298TXY9bERQMXc2MjhEaVZfb2wwakRoSj0mUkp1THptM1NdbkV1WjZIcU9mVWQmPUIvMlN6Jk8wW3NYVEJ3dWZOWExuWD8rZDJXa3Vab0dbbixITFNGejUsOTlyMnxjWlEmVGFfdmh+cCtJZWs9LnE5U0xdP110Ti9md112VzglWl9vQTUmLiwmTnJWVkNud2YrekZbaWswZG84SX5EKzM0JllLMENOb3hza35sR1tUQVs/L0JTRnFdPUlGcjNFU2tiM0kyaGxDMmxpXWJJW0EmQUgrfDlJWk58OCZwfltaJm8rV0NmVzVBJk5YMElvXUZkYVgud358Z0FEV0x3OFl4M0lwTUJoc1JrWDNjMHxHTHRuLytJQkQ='}]);
+_stq.push([ 'clickTrackerInit', '111347649', '2653' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+<script type="disabled" id="wp-enqueue-dynamic-script:wp-i18n:after:1">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+</script>
+
+<script>
+(function() {
+	'use strict';
+
+	const fetches = {};
+	const promises = {};
+	const urls = {
+		'wp-polyfill': 'https://s0.wp.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?m=1710866488i&ver=3.15.0',
+		'wp-hooks': 'https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/hooks/index.min.js?m=1716578158i&ver=3aee234ea7807d8d70bc',
+		'wp-i18n': 'https://s0.wp.com/wp-content/plugins/gutenberg-core/v18.4.1/build/i18n/index.min.js?m=1716578158i&ver=5baa98e4345eccc97e24',
+		'verbum': 'https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.js?m=1715879380i&minify=false&ver=3e346647ec4ff2cd65bd'
+	};
+	const loaders = {
+		'verbum': () => {
+			fetchExternalScript('wp-polyfill');
+			fetchExternalScript('wp-hooks');
+			fetchExternalScript('wp-i18n');
+			fetchExternalScript('verbum');
+			promises['wp-polyfill'] = promises['wp-polyfill'] || loadWPScript('wp-polyfill');
+			promises['wp-hooks'] = promises['wp-hooks'] || promises['wp-polyfill'].then( () => loadWPScript('wp-hooks') );
+			promises['wp-i18n'] = promises['wp-i18n'] || Promise.all( [ promises['wp-hooks'], promises['wp-polyfill'],  ] ).then( () => loadWPScript('wp-i18n') );
+			promises['verbum'] = promises['verbum'] || promises['wp-i18n'].then( () => loadWPScript('verbum') );
+			return promises['verbum'];
+		},
+		
+	};
+	const scriptExtras = {
+		'wp-i18n': { translations: 0, before: 0, after: 1 },
+		
+	};
+
+	window.WP_Enqueue_Dynamic_Script = {
+		loadScript: (handle) => {
+			if (!loaders[handle]) {
+				console.error('WP_Enqueue_Dynamic_Script: unregistered script `' + handle + '`.');
+			}
+			return loaders[handle]();
+		}
+	};
+
+	function fetchExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		fetches[handle] = fetches[handle] || fetch(urls[handle], { mode: 'no-cors' });
+		return fetches[handle];
+	}
+
+	function runExtraScript(handle, type, index) {
+		const id = 'wp-enqueue-dynamic-script:' + handle + ':' + type + ':' + (index + 1);
+		const template = document.getElementById(id);
+		if (!template) {
+			return Promise.reject();
+		}
+
+		const script = document.createElement( 'script' );
+		script.innerHTML = template.innerHTML;
+		document.body.appendChild( script );
+		return Promise.resolve();
+	}
+
+	function loadExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		return fetches[handle].then(() => {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.onload = () => resolve();
+				script.onerror = (e) => reject(e);
+				script.src = urls[handle];
+				document.body.appendChild(script);
+			});
+		});
+	}
+
+	function loadExtra(handle, pos) {
+		const count = (scriptExtras[handle] && scriptExtras[handle][pos]) || 0;
+		let promise = Promise.resolve();
+
+		for (let i = 0; i < count; i++) {
+			promise = promise.then(() => runExtraScript(handle, pos, i));
+		}
+
+		return promise;
+	}
+
+	function loadWPScript(handle) {
+		// Core loads scripts in this order. See: https://github.com/WordPress/WordPress/blob/a59eb9d39c4fcba834b70c9e8dfd64feeec10ba6/wp-includes/class-wp-scripts.php#L428.
+		return loadExtra(handle, 'translations')
+			.then(() => loadExtra(handle, 'before'))
+			.then(() => loadExternalScript(handle))
+			.then(() => loadExtra(handle, 'after'));
+	}
+} )();
+</script>
+
+
+
+<iframe style="display: none;" scrolling="no" id="wpcom_remote_login_key" src="https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=key&amp;origin=aHR0cHM6Ly9oYXVzZWMuY29t&amp;wpcomid=111347649&amp;time=1718024581"></iframe><script src="https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20231122" defer=""></script></body></html>

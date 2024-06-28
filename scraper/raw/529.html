@@ -1,0 +1,909 @@
+<html class="has-navbar-fixed-top" lang="en"><head><style>
+    .utterances {
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .utterances-frame {
+      color-scheme: light;
+      position: absolute;
+      left: 0;
+      right: 0;
+      width: 1px;
+      min-width: 100%;
+      max-width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+    <meta charset="utf-8">
+<title>iframe and window.open magic - Huli's blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+            
+<link href="https://blog.huli.tw/2022/04/07/iframe-and-window-open/" rel="alternate" hreflang="zh-TW">
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://blog.huli.tw/2022/04/07/en/iframe-and-window-open/">
+    
+
+
+
+
+
+    <meta name="description" content="If you want to generate a new window on a webpage, there are probably only two options: one is to embed resources on the same page using tags such as iframe, embed, and object, and the other is to use">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iframe and window.open magic">
+<meta property="og:url" content="https://blog.huli.tw/2022/04/07/en/iframe-and-window-open/index.html">
+<meta property="og:site_name" content="Huli's blog">
+<meta property="og:description" content="If you want to generate a new window on a webpage, there are probably only two options: one is to embed resources on the same page using tags such as iframe, embed, and object, and the other is to use">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog.huli.tw/img/iframe-and-window-open/cover-en.png">
+<meta property="article:published_time" content="2022-04-07T13:02:57.000Z">
+<meta property="article:modified_time" content="2024-05-21T12:02:28.347Z">
+<meta property="article:author" content="Huli">
+<meta property="article:tag" content="Front-end">
+<meta property="article:tag" content="Security">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.huli.tw/img/iframe-and-window-open/cover-en.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="iframe and window.open magic" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/lidemy_logo.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/en">
+                
+                    
+                    Huli's blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/en/archives">Archive</a>
+            
+            <a class="navbar-item " href="/en/categories">Categories</a>
+            
+            <a class="navbar-item " href="/en/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    Table of Contents
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#basic-iframe">1&nbsp;&nbsp;<b>Basic iframe</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#iframes-srcdoc">2&nbsp;&nbsp;<b>iframe’s srcdoc</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#iframes-csp">3&nbsp;&nbsp;<b>iframe’s CSP</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#iframes-sandbox">4&nbsp;&nbsp;<b>iframe’s sandbox</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#flags-related-to-redirection">4.1&nbsp;&nbsp;Flags related to redirection</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#flags-related-to-functions">4.2&nbsp;&nbsp;Flags related to functions</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#flags-related-to-pop-up-windows">4.3&nbsp;&nbsp;Flags related to pop-up windows</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#allow-same-origin">4.4&nbsp;&nbsp;allow-same-origin</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#summary-of-iframes">5&nbsp;&nbsp;<b>Summary of iframes</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#windowopen">6&nbsp;&nbsp;<b>window.open</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#generating-named-windows-and-obtaining-window-references">6.1&nbsp;&nbsp;Generating named windows and obtaining window references</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#utilizing-windowname">6.2&nbsp;&nbsp;Utilizing window.name</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#detecting-when-a-new-window-has-finished-loading">6.3&nbsp;&nbsp;Detecting when a new window has finished loading</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#detecting-whether-a-window-with-a-certain-name-exists">6.4&nbsp;&nbsp;Detecting whether a window with a certain name exists</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#conclusion">7&nbsp;&nbsp;<b>Conclusion</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/aszx87410">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"></path>
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+               <a class="navbar-item" href="/2022/04/07/iframe-and-window-open/">中文</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet="" class="self-notice">
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="https://forms.gle/SjJZ4cnNs6NnjXQG8" target="_blank">feedback form</a>
+      </div>
+      
+    <article class="article content gallery" itemscope="" itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            iframe and window.open magic
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2022-04-07T13:02:57.000Z" itemprop="datePublished">7 April 2022</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Security/">Security</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet="" class="column is-narrow">(Translated by ChatGPT)
+        
+    </spen></div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>If you want to generate a new window on a webpage, there are probably only two options: one is to embed resources on the same page using tags such as <code>iframe</code>, <code>embed</code>, and <code>object</code>, and the other is to use <code>window.open</code> to open a new window.</p>
+<p>As a front-end developer, I believe that everyone is familiar with these. You may have used <code>iframe</code> to embed third-party web pages or widgets, or used <code>window.open</code> to open a new window and communicate with the original window through <code>window.opener</code>.</p>
+<p>However, from a security perspective, there are many interesting things about iframes, which often appear in the real world or in CTF competitions. Therefore, I want to record some of the features I learned recently through this article.</p>
+<span id="more"></span>
+
+<h2><span id="basic-iframe">Basic iframe</span></h2><p>Let’s take a look at the basic use of iframes. You can use the <code>&lt;iframe&gt;</code> tag to bring other people’s web pages into your own:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>But if you think about it carefully, if your web page can be embedded by anyone, there may be a risk of clickjacking.</p>
+<p>Therefore, if you don’t want your web page to be embedded or want to set only specific origins that can be embedded, you can use <code>Content-Security-Policy</code> and <code>X-Frame-Options</code>. I have mentioned these in <a href="https://blog.huli.tw/2021/09/26/en/what-is-clickjacking/">What is Clickjacking</a>, so I won’t go into detail here.</p>
+<p>Some websites that allow posting or commenting usually open up a certain degree of HTML elements and do not completely block them. For example, at least harmless elements such as bold (<code>&lt;b&gt;</code>) and italic (<code>&lt;i&gt;</code>) will be opened, and some websites will also support the iframe tag to support functions such as YouTube players.</p>
+<p>Better websites will restrict you to only enter the ID of the YouTube video and concatenate the YouTube prefix on the front end to ensure that the src loaded by the iframe comes from YouTube. Some websites may want to embed too many sites and want to provide users with more freedom, so they can allow users to customize the content of the iframe src and put whatever they want.</p>
+<p>What are the risks if the attacker can control the iframe src?</p>
+<p>The first and most easily thought of risk is that you can directly embed a phishing website in it. For example, write a page for logging in again or receiving prizes, and someone may actually enter their account password and submit the form.</p>
+<p>However, the impact of this is limited, and it involves a bit of social engineering. In fact, there is a simpler and more violent way, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>javascript:alert(1)<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Yes, the src of the iframe can be in the format of <code>javascript:</code> at the beginning, and JavaScript code can be executed directly to achieve XSS. By the way, the action of <code>&lt;form&gt;</code> and the href of <code>&lt;a&gt;</code> can also be placed. I mentioned this in <a href="https://blog.huli.tw/2021/10/25/en/learn-frontend-from-security-pov/">Discovering My Lack of Front-end Knowledge through Cybersecurity</a>.</p>
+<p>Moreover, the things in HTML attributes can be encoded, and there are three ways to encode them, using the <code>&amp;</code> character as an example:</p>
+<ol>
+<li>Encode with names, such as <code>&amp;amp;</code> (not every character is supported, there is a list here: <a target="_blank" rel="noopener" href="https://dev.w3.org/html5/html-author/charref">https://dev.w3.org/html5/html-author/charref</a>)</li>
+<li>Encode with decimal, such as <code>&amp;#38;</code></li>
+<li>Encode with hexadecimal, such as <code>&amp;#x26;</code></li>
+</ol>
+<p>So every character in <code>javascript:alert(1)</code> can be freely replaced with these encodings, for example:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token entity" title="j">&amp;#x6a;</span><span class="token entity" title="A">&amp;#65;</span>vAScrIpt<span class="token entity named-entity" title=":">&amp;colon;</span>alert<span class="token entity named-entity" title="(">&amp;lpar;</span>1<span class="token entity named-entity" title=")">&amp;rpar;</span><span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>(If you want to play with encoding and decoding, you can go to this website: <a target="_blank" rel="noopener" href="https://mothereff.in/html-entities">https://mothereff.in/html-entities</a>)</p>
+<p>In addition to <code>javascript:</code>, you can also use <code>data:</code> to load any web page:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>data:text/html,&lt;h1&gt;hello&lt;/h1&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>You can also specify base64 encoding:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>data:text/html;base64,PGgxPmhlbGxvPC9oMT4=<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>However, the above two methods are not very useful because if the src uses data URI, the origin will become <code>"null"</code>, which is different from the original page and cannot access the data on the page.</p>
+<p>So as the defending party, what can we do? We can restrict the beginning to be <code>http://</code> or <code>https://</code>, which can block unexpected schemes.</p>
+<p>However, if only this is done, there is another potential risk, which is open redirect. The embedded page can use <code>top.location = "https://huli.tw"</code> to redirect the top-level page to anywhere.</p>
+<p>Usually, cross-origin operations are prohibited, and errors will be thrown when accessing properties on the window:</p>
+<blockquote>
+<p>Uncaught DOMException: Blocked a frame with origin “null” from accessing a cross-origin frame.</p>
+</blockquote>
+<p>But there are a few exceptions, which can be found in the HTML spec’s <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/browsers.html#crossoriginproperties-(-o-)">7.2.3.1 CrossOriginProperties ( O )</a>:</p>
+<blockquote>
+<p>If O is a Location object, then return « { [[Property]]: “href”, [[NeedsGet]]: false, [[NeedsSet]]: true }, { [[Property]]: “replace” } ».</p>
+<p>A JavaScript property name P is a cross-origin accessible window property name if it is “window”, “self”, “location”, “close”, “closed”, “focus”, “blur”, “frames”, “length”, “top”, “opener”, “parent”, “postMessage”, or an array index property name.</p>
+</blockquote>
+<p>Some are callable functions, such as <code>focus</code>, <code>blur</code>, and <code>postMessage</code>, which can be called across origins, and <code>postMessage</code> is also the primary way to pass information between windows across origins.</p>
+<p>Most of the others are readable properties, such as <code>closes</code>, <code>frames</code>, <code>length</code>, <code>top</code>, <code>opener</code>, and <code>parent</code>.</p>
+<p>The few writable properties are <code>location.href</code>, which can be used to redirect the webpage to another location using <code>location.href = 'https://huli.tw'</code> as long as you can access the window.</p>
+<p>By the way, there is another way to execute JavaScript through the location + javascript protocol, like this: <code>location.href = 'javascript:alert(1)'</code>, which I mentioned in <a href="https://blog.huli.tw/2021/09/26/en/what-is-open-redirect/">What is Open Redirect</a> .</p>
+<p>At this point, you may wonder if the iframe src + data URI mentioned earlier can bypass the null origin restriction and perform XSS on the parent window using this method? Like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>data:text/html,&lt;script&gt;top.location.href = 'javascript:alert(1)'&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>The answer is no, the browser will give you this error:</p>
+<blockquote>
+<p>Unsafe attempt to initiate navigation for frame with URL ‘file://poc.html’ from frame with URL ‘data:text/html,&lt;script&gt;top.location.href = ‘javascript:alert(1)’‘. The frame attempting navigation must be same-origin with the target if navigating to a javascript: url</p>
+</blockquote>
+<p>If you want to jump to a URL starting with javascript:, it must be same-origin to allow you to jump.</p>
+<h2><span id="iframes-srcdoc">iframe’s srcdoc</span></h2><p>In addition to the commonly used src attribute, there is another attribute called srcdoc, which contains the content of the iframe. It is similar to src + data URI:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;h1&gt;hello&lt;/h1&gt;&lt;script&gt;alert(top.document.body)&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>But there is a decisive difference, that is, the window generated by iframe + srcdoc will inherit the origin of the upper layer, which is different from the null origin of data URI. That is to say, the above code can access the upper layer’s DOM elements because they are same origin.</p>
+<p>In addition, srcdoc is not affected by the <code>frame-src</code> of CSP. Just like iframe’s src, if it is <code>javascript:</code>, it is controlled by <code>script-src</code> instead of <code>frame-src</code>. For details, please refer to <a target="_blank" rel="noopener" href="https://csplite.com/csp/test188/">Test of CSP: iframe srcdoc=’…’ is not governed by frame-src</a>.</p>
+<p>Also, because srcdoc is an HTML attribute, the content is the same as mentioned before, it can be an encoded result, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token entity named-entity" title="<">&amp;lt;</span>script<span class="token entity named-entity" title=">">&amp;gt;</span>alert(1)<span class="token entity named-entity" title="<">&amp;lt;</span>/script<span class="token entity named-entity" title=">">&amp;gt;</span><span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Therefore, if the attribute of iframe srcdoc is controllable, even if the content has been escaped, it is useless and will still be parsed back to the original symbol for execution.</p>
+<h2><span id="iframes-csp">iframe’s CSP</span></h2><p>There is a csp attribute on the iframe, which can specify the CSP rules for the document loaded by the iframe, but not every browser supports it. Please refer to <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/csp">MDN: HTMLIFrameElement.csp</a>:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">csp</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src 'self'; script-src 'none';<span class="token punctuation">"</span></span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;alert(1)&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>After adding the csp attribute, the content of the iframe will be affected by it. For example, opening test.html directly will pop up an alert, but using csp to block inline scripts will pop up an error message violating CSP:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">// test.html
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+
+// csp.html
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">csp</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src 'self'; script-src 'none';<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>test.html<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<blockquote>
+<p>Refused to execute inline script because it violates the following Content Security Policy directive: “script-src ‘none’”. Either the ‘unsafe-inline’ keyword, a hash (‘sha256-bhHHL3z2vDgxUt0W3dWQOrprscmda2Y5pLsLg4GF+pI=’), or a nonce (‘nonce-…’) is required to enable inline execution.</p>
+</blockquote>
+<p>In a previous Intigriti XSS challenge, CSP was inserted to make the CSP stricter, and some scripts would not be executed, relying on this to bypass some restrictions.</p>
+<h2><span id="iframes-sandbox">iframe’s sandbox</span></h2><p>As mentioned earlier, when you use an iframe to embed other web pages, that web page can use <code>top.location = 'https://huli.tw'</code> to redirect the upper page to another place. The iframe has an attribute called sandbox, which can restrict various behaviors of the iframe and prevent it from doing some bad things. The basic usage is like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;alert(1)&lt;/script&gt;<span class="token punctuation">"</span></span> <span class="token attr-name">sandbox</span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<blockquote>
+<p>Blocked script execution in ‘about:srcdoc’ because the document’s frame is sandboxed and the ‘allow-scripts’ permission is not set.</p>
+</blockquote>
+<p>Once the sandbox attribute is added, it enters sandbox mode. There are two main differences with or without it.</p>
+<p>The first is that the origin of the loaded iframe becomes <code>null</code>.</p>
+<p>The second is that a lot of functions will be turned off, and these functions can be actively turned on. According to the latest <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element">spec</a>, there are a total of 13 flags, each representing a function:</p>
+<ol>
+<li>allow-downloads</li>
+<li>allow-forms</li>
+<li>allow-modals</li>
+<li>allow-orientation-lock</li>
+<li>allow-pointer-lock</li>
+<li>allow-popups</li>
+<li>allow-popups-to-escape-sandbox</li>
+<li>allow-presentation</li>
+<li>allow-same-origin</li>
+<li>allow-scripts</li>
+<li>allow-top-navigation</li>
+<li>allow-top-navigation-by-user-activation</li>
+<li>allow-top-navigation-to-custom-protocols</li>
+</ol>
+<p>Here, there are quite a few flags, and some of them are very similar. Let’s start with the most important one, <code>allow-scripts</code>. This flag is easy to understand. If it is not added, JavaScript cannot be executed, as seen in the error above. After adding this flag, JavaScript can be executed, but there are still limitations on the available functions.</p>
+<p>We can categorize the other flags into several types for better understanding.</p>
+<h3><span id="flags-related-to-redirection">Flags related to redirection</span></h3><p>The following three flags are related to redirection:</p>
+<ol>
+<li>allow-top-navigation</li>
+<li>allow-top-navigation-by-user-activation</li>
+<li>allow-top-navigation-to-custom-protocols</li>
+</ol>
+<p>If not added, the default is that the upper layer cannot be redirected:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;top.location='https://blog.huli.tw'&lt;/script&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-scripts<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Error:</p>
+<blockquote>
+<p>Unsafe attempt to initiate navigation for frame with URL ‘file:///test.html’ from frame with URL ‘about:srcdoc’. The frame attempting navigation of the top-level window is sandboxed, but the flag of ‘allow-top-navigation’ or ‘allow-top-navigation-by-user-activation’ is not set.</p>
+</blockquote>
+<p>To allow the iframe to redirect to the upper layer, simply add <code>allow-top-navigation</code>. However, if you don’t want the webpage to be automatically redirected without interaction, you can use the <code>allow-top-navigation-by-user-activation</code> flag:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;top.location='https://blog.huli.tw'&lt;/script&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-scripts allow-top-navigation-by-user-activation<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Error:</p>
+<blockquote>
+<p>The frame attempting navigation of the top-level window is sandboxed with the ‘allow-top-navigation-by-user-activation’ flag, but has no user activation (aka gesture). See <a target="_blank" rel="noopener" href="https://www.chromestatus.com/feature/5629582019395584">https://www.chromestatus.com/feature/5629582019395584</a>.</p>
+</blockquote>
+<p>With this flag, the user must have interaction (such as clicking a button to trigger an event) to redirect the webpage.</p>
+<p>As for the <code>allow-top-navigation-to-custom-protocols</code> flag, it is not supported by Chrome at the moment, so it cannot be demoed. The flags supported by Chrome 102 can be found here: <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromium/src.git/+/refs/tags/102.0.4961.1/third_party/blink/renderer/core/html/html_iframe_element_sandbox.cc#17">third_party/blink/renderer/core/html/html_iframe_element_sandbox.cc</a></p>
+<h3><span id="flags-related-to-functions">Flags related to functions</span></h3><ol>
+<li>allow-downloads</li>
+<li>allow-forms</li>
+<li>allow-orientation-lock</li>
+<li>allow-pointer-lock</li>
+<li>allow-presentation</li>
+</ol>
+<p>The above five flags are related to functions, and you can roughly tell what they are for from their names.</p>
+<p>For example, by default, forms cannot be submitted:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;form&gt;&lt;input name=a value=a&gt;&lt;input type=submit&gt;&lt;/form&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Error:</p>
+<blockquote>
+<p>Blocked form submission to ‘’ because the form’s frame is sandboxed and the ‘allow-forms’ permission is not set.</p>
+</blockquote>
+<p>You need to add the <code>allow-forms</code> flag before submitting the form. Other flags are similar, but we won’t go into detail here.</p>
+<h3><span id="flags-related-to-pop-up-windows">Flags related to pop-up windows</span></h3><ol>
+<li>allow-modals</li>
+<li>allow-popups</li>
+<li>allow-popups-to-escape-sandbox</li>
+</ol>
+<p><code>allow-modals</code> and <code>allow-popups</code> have similar names, but their definitions are quite different. The following functions are opened by <code>allow-modals</code>:</p>
+<ol>
+<li>window.alert</li>
+<li>window.confirm</li>
+<li>window.print</li>
+<li>window.prompt</li>
+<li>beforeunload event</li>
+</ol>
+<p>Here’s a simple example: <code>&lt;iframe srcdoc="&lt;script&gt;alert(1)&lt;/script&gt;" sandbox="allow-scripts"&gt;</code>, with the error message:</p>
+<blockquote>
+<p>Ignored call to ‘alert()’. The document is sandboxed, and the ‘allow-modals’ keyword is not set.</p>
+</blockquote>
+<p><code>allow-popups</code> is related to <code>window.open</code> and <code>target=_blank</code>. By default, you cannot open a new window:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;window.open()&lt;/script&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-scripts<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Error message:</p>
+<blockquote>
+<p>Blocked opening ‘’ in a new window because the request was made in a sandboxed frame whose ‘allow-popups’ permission is not set.</p>
+</blockquote>
+<p>You need to add <code>allow-popups</code> to use <code>window.open</code>.</p>
+<p>There’s also a magical feature here. I think the <a target="_blank" rel="noopener" href="https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html">old spec</a> explains it better:</p>
+<blockquote>
+<p>While the sandbox attribute is specified, the iframe element’s nested browsing context must have the flags given in the following list set. In addition, any browsing contexts nested within an iframe, either directly or indirectly, must have all the flags set on them as were set on the iframe’s Document’s browsing context when the iframe’s Document was created.</p>
+</blockquote>
+<p>The <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/origin.html#sandboxing">new spec</a> removes that section and puts it somewhere else, but the meaning is the same: the window opened by the sandboxed iframe inherits the sandbox properties!</p>
+<p>What does this mean?</p>
+<p>For example, if I have an <code>iframe.html</code> with only this content: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code>, and then I write this in another page <code>test.html</code>:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;window.open('iframe.html')&lt;/script&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-scripts allow-popups<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>You will find that the newly opened <code>iframe.html</code> page cannot execute <code>alert(1)</code> because it inherits the sandbox, and the sandbox does not have the <code>allow-modals</code> property.</p>
+<p>Another example: we can find a webpage that uses JS to render the page content on the internet, like this calculator: <a target="_blank" rel="noopener" href="https://ahfarmer.github.io/calculator/">https://ahfarmer.github.io/calculator/</a></p>
+<p>It works fine when opened directly, but if we open it with a sandboxed iframe:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;a href='https://ahfarmer.github.io/calculator/' target=_blank&gt;click me&lt;/a&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-popups<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>You will see that the screen turns black, and if you open DevTools, you will see the error:</p>
+<blockquote>
+<p>Blocked script execution in ‘<a target="_blank" rel="noopener" href="https://ahfarmer.github.io/calculator/">https://ahfarmer.github.io/calculator/</a>‘ because the document’s frame is sandboxed and the ‘allow-scripts’ permission is not set.</p>
+</blockquote>
+<p>This verifies what we said above, that windows opened from sandboxed iframes will inherit the sandbox properties. In addition, there’s another feature: do you remember that the origin in the sandbox becomes null? Because of inheritance, the origin of the page opened with <code>window.open</code> will also become null.</p>
+<p>What does this mean? It means that we can use a sandbox iframe + window.open to achieve:</p>
+<ol>
+<li>Disable certain functions of any page</li>
+<li>Let the origin of any page become null</li>
+</ol>
+<p>As mentioned earlier, two different windows can exchange messages through <code>postMessage</code>, and when listening for messages, <code>event.origin</code> is checked to confirm whether it is legal:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">window<span class="token punctuation">.</span><span class="token function-variable function">onmessage</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>origin <span class="token operator">!==</span> <span class="token string">'https://example.com'</span><span class="token punctuation">)</span> <span class="token keyword">return</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>However, some web pages will check like this:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">window<span class="token punctuation">.</span><span class="token function-variable function">onmessage</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>origin <span class="token operator">!==</span> window<span class="token punctuation">.</span>origin<span class="token punctuation">)</span> <span class="token keyword">return</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>At this point, we can use the technique mentioned above to bypass the check, open the page with a sandbox iframe, and make its origin become <code>"null"</code>. Then we can use the window of the sandbox iframe itself to postMessage, so that <code>event.origin</code> is also <code>"null"</code>, thereby making the condition true. However, although doing so can bypass the check, even if XSS is obtained later, the things that can be done are still limited because the origin is <code>"null"</code>, so localStorage and cookies cannot be accessed.</p>
+<p>There is a <a target="_blank" rel="noopener" href="https://github.com/terjanq/same-origin-xss">soXSS challenge</a> that uses this trick to solve it.</p>
+<p>If you don’t want the newly opened window to inherit the <code>sandbox</code> attribute, you can add <code>allow-popups-to-escape-sandbox</code>, so that the newly opened window will jump out of the sandbox:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;a href='https://ahfarmer.github.io/calculator/' target=_blank&gt;click me&lt;/a&gt;<span class="token punctuation">"</span></span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-popups allow-popups-to-escape-sandbox<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>There was a problem that occurred before, that is, since <code>allow-popups-to-escape-sandbox</code> can jump out of the sandbox, it can be combined with <code>javascript:</code> to execute code, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-modals allow-popups allow-popups-to-escape-sandbox<span class="token punctuation">"</span></span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;a target='_blank' href='javascript:window.opener.eval(`alert(location.href)`)'&gt;click me&lt;/a&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Details can be found in <a target="_blank" rel="noopener" href="https://bugs.chromium.org/p/chromium/issues/detail?id=1014371">Issue 1014371: Security: iframe sandbox can be worked around via javascript: links and window.opener</a> and <a target="_blank" rel="noopener" href="https://github.com/whatwg/html/pull/5083">Gate javascript: navigation on sandboxing flags. #5083</a> and the original <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromium/src.git/+/24134160cb7f395e2d82ddecdfe7ac0659c9477c">commit</a>.</p>
+<p>Finally, let me also mention another thing similar to <code>window.origin</code>: <code>location.origin</code>, which is purely determined by the location to determine the origin, which is different from <code>window.origin</code>. According to the <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#dom-origin-dev">specification</a>:</p>
+<blockquote>
+<p>Developers are strongly encouraged to use self.origin over location.origin. The former returns the origin of the environment, the latter of the URL of the environment. Imagine the following script executing in a document on <a target="_blank" rel="noopener" href="https://stargate.example/">https://stargate.example/</a>:</p>
+</blockquote>
+<p>Then an example is given below to illustrate that <code>window.origin</code> is more reliable than <code>location.origin</code>:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> frame <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">"iframe"</span><span class="token punctuation">)</span>
+frame<span class="token punctuation">.</span><span class="token function-variable function">onload</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">var</span> frameWin <span class="token operator">=</span> frame<span class="token punctuation">.</span>contentWindow
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>frameWin<span class="token punctuation">.</span>location<span class="token punctuation">.</span>origin<span class="token punctuation">)</span> <span class="token comment">// "null"</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>frameWin<span class="token punctuation">.</span>origin<span class="token punctuation">)</span> <span class="token comment">// "https://stargate.example"</span>
+<span class="token punctuation">}</span>
+document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>frame<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>But I think it still depends on the situation.</p>
+<h3><span id="allow-same-origin">allow-same-origin</span></h3><p>Finally, we come to the last flag of the sandbox. As mentioned earlier, once the sandbox is added, the origin will become <code>"null"</code>, and even if JavaScript can be executed, cookies or localStorage cannot be obtained, which is actually very limited.</p>
+<p>If you want to break through this limitation, you must add <code>allow-same-origin</code>. I used to be very confused about this flag and thought, “Does adding this flag make the iframe and parent window become the same origin?” But in my understanding, this flag is more like: “Keep the original origin”. Below is a direct quote from the specification’s precise description:</p>
+<blockquote>
+<p>The <code>allow-same-origin</code> keyword causes the content to be treated as being from its real origin instead of forcing it into a unique origin.</p>
+</blockquote>
+<p>Take the following paragraph as an example, assuming that the URL of this page is: <a target="_blank" rel="noopener" href="http://localhost:3000/">http://localhost:3000</a></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-same-origin allow-scripts allow-modals<span class="token punctuation">"</span></span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;alert(window.origin)&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>If <code>allow-same-origin</code> is not added, it will display <code>"null"</code>. However, if <code>allow-same-origin</code> is added, it will display <code>http://localhost:3000</code> as the original origin is preserved.</p>
+<p>In addition, the specification also specifically warns that if you embed a same-origin webpage in an iframe and set <code>allow-same-origin allow-scripts</code> in the sandbox, the webpage in the iframe can remove the sandbox by itself, making it the same as with or without the sandbox, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+  <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-same-origin allow-scripts<span class="token punctuation">"</span></span>
+  <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script&gt;top.document.querySelector('iframe').removeAttribute('sandbox');location.reload();alert(1)&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="summary-of-iframes">Summary of iframes</span></h2><p>I believe that for most developers, the following attributes should still be quite unfamiliar:</p>
+<ol>
+<li>srcdoc</li>
+<li>csp</li>
+<li>sandbox</li>
+</ol>
+<p>Only those who have used or dealt with related requirements may know about these things. For CTF, there are several features that I have seen or may be exploited:</p>
+<ol>
+<li>Put <code>javascript:</code> in src to directly perform XSS</li>
+<li>Add csp to the embedded page to block some function executions</li>
+<li>Use the feature of the <code>srcdoc</code> attribute to put in an already escaped string, which will be restored to its original content at this time</li>
+<li>Use the inheritance feature of <code>sandbox + window.open</code> to achieve “even if you cannot embed content with iframe, you can still change <code>window.origin</code>“</li>
+</ol>
+<h2><span id="windowopen">window.open</span></h2><p>After talking about iframes, let’s continue to look at the <code>window.open</code> method, which has three optional parameters: <code>window.open(url, name, features)</code>, and it will return the opened window, and you can postMessage to this new window:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> win <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://blog.huli.tw'</span><span class="token punctuation">,</span> <span class="token string">'huliblog'</span><span class="token punctuation">)</span>
+
+<span class="token comment">// need to wait for window to load</span>
+<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  win<span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token string">'*'</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The newly opened window can be accessed by <code>window.opener</code>. I mentioned this feature before in <a href="https://blog.huli.tw/2020/09/05/en/session-storage-and-html-spec-and-noopener/">Starting a spec journey from SessionStorage</a>.</p>
+<p>Then, the second parameter passed to <code>window.open</code> will be the name of this new window. For example, if I execute <code>console.log(window.name)</code> in the newly opened window, it will print <code>huliblog</code>.</p>
+<p>This <code>window.name</code> is actually a very interesting feature. Usually, when we open a new link, we will do this: <code>&lt;a href="https://example.com" target="_blank"&gt;open&lt;/a&gt;</code>, using <code>target=_blank</code> to open a new window. However, this target can also be a string, and this string will be the name of the new window, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span>
+  <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://example.com<span class="token punctuation">"</span></span>
+  <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>example<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+  open
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>If you open the console in this new window and log <code>window.name</code>, you will see the name we set, <code>example</code>.</p>
+<p>What if this named window already exists? Let’s try it out:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span> <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>blog<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>open link<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://example.org/'</span><span class="token punctuation">,</span><span class="token string">'blog'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">&gt;</span></span>open window<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Clicking on <code>&lt;a&gt;</code> will open a window named <code>blog</code> and redirect to my blog. Clicking the button will open a new window to another webpage, and the name is also <code>blog</code>. You can try clicking the link first and then the button, or vice versa.</p>
+<p>In any case, the result is similar. When opening a new window, it will first check if there is a window with the same name. If there is, it will not open a new one, but will directly use that one. Therefore, in the example above, if you click the button to open a blog window first, and then click the link, it will not open a new window, but will only redirect the original window to the URL in <code>href</code>.</p>
+<p>Apart from the target attribute of <code>&lt;a&gt;</code>, the target attribute of <code>&lt;form&gt;</code> can also specify the window name. The term used in the specification is “Valid browsing context name or keyword”, and the keywords are the four well-known ones: <code>_blank</code>, <code>_self</code>, <code>_parent</code>, or <code>_top</code>.</p>
+<p>According to the specification <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-names">7.1.5 Browsing context names</a>, any string with at least one character that does not start with a U+005F LOW LINE character is a valid browsing context name. (Names starting with an underscore are reserved for special keywords.)</p>
+<h3><span id="generating-named-windows-and-obtaining-window-references">Generating named windows and obtaining window references</span></h3><p>There are several ways to generate named windows:</p>
+<ol>
+<li><code>&lt;a target=""&gt;</code></li>
+<li><code>&lt;form target=""&gt;</code></li>
+<li><code>&lt;iframe name=""&gt;</code></li>
+<li><code>&lt;object name=""&gt;</code></li>
+<li><code>&lt;embed name=""&gt;</code></li>
+<li><code>window.open(url, name)</code></li>
+</ol>
+<p>For the last four, you can directly obtain the reference of the opened window, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>w1<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>object</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>w2<span class="token punctuation">"</span></span> <span class="token attr-name">data</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>object</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>embed</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>w3<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>embed</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">var</span> w4 <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://blog.huli.tw'</span><span class="token punctuation">)</span>
+  <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'w1'</span><span class="token punctuation">,</span> w1<span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'w2'</span><span class="token punctuation">,</span> w2<span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'w3'</span><span class="token punctuation">,</span> w3<span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'w4'</span><span class="token punctuation">,</span> w4<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">)</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>What about the first two? You can use the feature of <code>window.open</code> to obtain the window reference if the name already exists, like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>blog<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>open<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">&gt;</span></span>get blog window<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">function</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> blog <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://blog.huli.tw#abc'</span><span class="token punctuation">,</span> <span class="token string">'blog'</span><span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>blog<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>First, click “open” to open a new window, and then click the button. At this point, we use <code>window.open('https://blog.huli.tw#abc', 'blog')</code> to open a window with the same name. According to the specification:</p>
+<blockquote>
+<p>Opens a window to show url (defaults to “about:blank”), and returns it. target (defaults to “_blank”) gives the name of the new window. If a window already exists with that name, it is reused.</p>
+</blockquote>
+<p>Because there is a window with the same name, it will be reused. And we just added <code>#</code>, so it won’t redirect. Although the focus will jump to the newly opened window, we can obtain the reference of the window opened with <code>&lt;a target&gt;</code> by this method (there is another way that won’t jump, which is to give a non-existent scheme, like <code>xxxx://test</code>).</p>
+<p>In addition, this named window should only be useful in the same browsing context. In other words, if I open two web pages A.html and B.html, open a window named “blog” in A.html, and then execute <code>window.open('', 'blog')</code> in B.html, I will not get the blog window opened in A.html, but will open a new one because A and B are in different browsing contexts.</p>
+<p>But the situation is different when switching pages. It’s quite interesting. Suppose I’m now at <code>http://localhost:5555/A.html</code> and I’ve opened a window named “blog”, and then I navigate to <code>http://localhost:5555/B.html</code>:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">&gt;</span></span>run<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">function</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://blog.huli.tw'</span><span class="token punctuation">,</span> <span class="token string">'blog'</span><span class="token punctuation">)</span>
+    location <span class="token operator">=</span> <span class="token string">'http://localhost:5555/B.html'</span>
+  <span class="token punctuation">}</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Then I also open a window with the same name in B.html: <code>window.open('', 'blog')</code>. At this point, I will get the blog window opened in A.html, not a new one. Also, if I redirect from B.html to <code>https://blog.huli.tw</code>, and then execute <code>window.open('', 'blog')</code> in the console, I can still get the blog window opened in A.html.</p>
+<p>But if I redirect to <code>https://example.org</code>, a new tab will be opened and I won’t get the blog window. It seems that if the same page jumps to a page with the same origin as the opener or the opened window, it will be the same browsing context. This feature is quite interesting (it’s time to study browsing context).</p>
+<h3><span id="utilizing-windowname">Utilizing window.name</span></h3><p>Sometimes, XSS is limited by length, for example, if the username has an XSS vulnerability, but only 32 characters can be used, we would want our payload to be as short as possible. To achieve this, we need to use other information to bring in the actual code we want to execute to control the length.</p>
+<p>For example, you can put the code you want to execute after the <code>#</code> in the URL, and then write the payload as <code>eval(location.hash.slice(1))</code>.</p>
+<p><code>window.name</code> is a commonly used technique. We can set <code>window.name</code> on page A and then redirect to page B. At this point, the <code>window.name</code> of page B will be what we just set:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">name <span class="token operator">=</span> <span class="token string">'hello, world!'</span>
+location <span class="token operator">=</span> <span class="token string">'https://example.org'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>However, this trick only works on Chromium-based browsers (Chrome and Edge) because according to the specification, if the page being redirected to is not the same origin, the name should be cleared.</p>
+<p>Chromium has a bug related to this: <a target="_blank" rel="noopener" href="https://bugs.chromium.org/p/chromium/issues/detail?id=706350&amp;q=window.name&amp;can=2">Issue 706350: Clear browsing context name on cross site navigation or history traversal</a>, which has not been fixed since 2017. It was once fixed but caused other bugs, so it was reverted.</p>
+<p>Safari was the first to implement this, and in January 2021, FireFox also implemented it, making Chromium an outlier. There is a great webpage that shows the testing status of each browser: <a target="_blank" rel="noopener" href="https://wpt.fyi/results/html/browsers/windows/clear-window-name.https.html?label=master&amp;label=experimental&amp;aligned">https://wpt.fyi/results/html/browsers/windows/clear-window-name.https.html?label=master&amp;label=experimental&amp;aligned</a></p>
+<h3><span id="detecting-when-a-new-window-has-finished-loading">Detecting when a new window has finished loading</span></h3><p>An iframe has an <code>onload</code> event that can be used to determine when it has finished loading. However, when using <code>window.open</code> to open a new window, there is no event to listen to (unless it is the same origin), so you don’t know when it will finish loading.</p>
+<p>But it’s okay. If you open a cross-origin webpage, you can use the fact that accessing <code>window.origin</code> or other properties will cause an error to implement a simple polling mechanism:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> start <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> win <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'https://blog.huli.tw'</span><span class="token punctuation">)</span>
+<span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">function</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    win<span class="token punctuation">.</span>origin
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span>run<span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'loaded'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'ms'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>When the webpage has not finished loading, <code>win.origin</code> will be itself. It will only become the opened webpage after it has finished loading. Therefore, accessing <code>win.origin</code> after it has finished loading will cause an error due to cross-origin issues and be caught.</p>
+<h3><span id="detecting-whether-a-window-with-a-certain-name-exists">Detecting whether a window with a certain name exists</span></h3><p>Is there a way to detect whether a window with a certain name exists?</p>
+<p>As mentioned earlier, if a named window is opened and a window with the same name already exists, it will not open a new window but will redirect to the existing one. We can use this difference to detect whether a window with a certain name exists, and we can also use the iframe sandbox mentioned earlier to prevent opening new windows.</p>
+<p>The concept above is from <a target="_blank" rel="noopener" href="https://easterxss.terjanq.me/writeup.html#Dark-Arts-solution">Easter XSS by @terjanq</a>, with some slight modifications to the code, only targeting Chrome:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://blog.huli.tw<span class="token punctuation">"</span></span> <span class="token attr-name">target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>blog<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>click<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">&gt;</span></span>run<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span>
+    <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>f</span>
+    <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-top-navigation<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">function</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">var</span> w <span class="token operator">=</span> f<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'xxx://abcde'</span><span class="token punctuation">,</span> <span class="token string">'blog'</span><span class="token punctuation">)</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>w<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'blog window exists'</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'blog window not exists'</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="conclusion">Conclusion</span></h2><p>This article briefly describes some interesting features of iframes and windows, but some things are still not thoroughly researched, such as the related terms of browsing context and how to determine whether they are under the same browsing context. These will have to be absorbed slowly by reading the spec.</p>
+<p>References:</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox">https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/blog/products/data-analytics/iframe-sandbox-tutorial">https://cloud.google.com/blog/products/data-analytics/iframe-sandbox-tutorial</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html">https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/">https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/</a></li>
+<li><a target="_blank" rel="noopener" href="https://googlechrome.github.io/samples/allow-popups-to-escape-sandbox/">https://googlechrome.github.io/samples/allow-popups-to-escape-sandbox/</a></li>
+<li><a target="_blank" rel="noopener" href="https://xsleaks.dev/">https://xsleaks.dev/</a></li>
+</ol>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Front-end/">#Front-end</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Security/">#Security</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2022/04/10/en/picoctf-2022-writeup/">picoCTF 2022 Notes</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2022/04/06/en/erpnext-ssrf-and-xss-to-account-takeover/">SSRF and Account Takeover via XSS in ERPNext</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    <div class="utterances">
+    <iframe class="utterances-frame" title="Comments" scrolling="no" src="https://utteranc.es/utterances.html?src=https%3A%2F%2Futteranc.es%2Fclient.js&amp;repo=aszx87410%2Fhuli-blog&amp;issue-term=title&amp;theme=github-light&amp;crossorigin=anonymous&amp;async=&amp;url=https%3A%2F%2Fblog.huli.tw%2F2022%2F04%2F07%2Fen%2Fiframe-and-window-open%2F&amp;origin=https%3A%2F%2Fblog.huli.tw&amp;pathname=2022%2F04%2F07%2Fen%2Fiframe-and-window-open%2F&amp;title=iframe+and+window.open+magic+-+Huli%27s+blog&amp;description=If+you+want+to+generate+a+new+window+on+a+webpage%2C+there+are+probably+only+two+options%3A+one+is+to+embed+resources+on+the+same+page+using+tags+such+as+iframe%2C+embed%2C+and+object%2C+and+the+other+is+to+use&amp;og%3Atitle=iframe+and+window.open+magic&amp;session=" loading="lazy"></iframe>
+  </div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                © 2024 Huli&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>English</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2022/04/07/iframe-and-window-open/" class="dropdown-item">
+                    繁體中文
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+
+</body></html>

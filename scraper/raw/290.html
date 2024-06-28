@@ -1,0 +1,1113 @@
+<html lang="en-us"><head>
+    <meta charset="utf-8">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Working With Ghidra&amp;rsquo;s P-Code To Identify Vulnerable Function Calls</title>
+<meta name="author" content="Alexei Bulazel">
+
+
+
+
+<meta name="keywords" content="river loop, security, cybersecurity, penetration testing, zigbee, supply chain security, IoT Security, embedded security, secure design, nitf, hardware, sdlc">
+
+
+<meta name="description" content="Cybersecurity solutions for the whole lifecycle of IoT and embedded systems.">
+
+<meta name="generator" content="Hugo 0.98.0">
+
+
+<link href="//fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,500,700,800" rel="stylesheet" type="text/css">
+
+
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.11.2/css/all.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link href="/css/animate.css" rel="stylesheet">
+
+
+
+  <link href="/css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
+
+
+
+<link href="/css/custom.css?1660000085" rel="stylesheet">
+
+
+
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+
+
+<link rel="shortcut icon" href="https://riverloopsecurity.com/img/favicon.png">
+<link rel="apple-touch-icon" href="https://riverloopsecurity.com/img/apple-touch-icon.png">
+
+
+<link href="/css/owl.carousel.css" rel="stylesheet">
+<link href="/css/owl.theme.css" rel="stylesheet">
+
+
+<link rel="alternate" href="https://riverloopsecurity.com/index.xml" type="application/rss+xml" title="River Loop Security">
+
+
+
+
+
+
+
+
+<meta property="og:locale" content="en_us">
+<meta property="og:site_name" content="River Loop Security">
+<meta property="og:title" content="Working With Ghidra&amp;rsquo;s P-Code To Identify Vulnerable Function Calls">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://riverloopsecurity.com/blog/2019/05/pcode/">
+<meta property="og:description" content="Cybersecurity solutions for the whole lifecycle of IoT and embedded systems.">
+<meta property="og:image" content="https://riverloopsecurity.com/img/blog/ghidra.png">
+<meta property="og:image:type" content="image/png">
+
+
+
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="203">
+
+
+<meta property="og:updated_time" content="2019-05-11T20:00:00-0400">
+
+  
+  
+  <meta property="article:section" content="blog">
+  <meta property="article:tag" content="ghidra">
+  <meta property="article:tag" content="program analysis">
+  <meta property="article:tag" content="reverse engineering">
+  
+  
+  <meta property="article:published_time" content="2019-05-11T20:00:00-0400">
+  <meta property="article:modified_time" content="2019-05-11T20:00:00-0400">
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+
+<meta name="twitter:title" content="Working With Ghidra&amp;rsquo;s P-Code To Identify Vulnerable Function …">
+
+<meta name="twitter:image" content="https://riverloopsecurity.com/img/blog/ghidra.png">
+
+<meta name="twitter:description" content="Cybersecurity solutions for the whole lifecycle of IoT and embedded systems.">
+
+
+    
+  </head>
+
+  <body>
+
+    <div id="all">
+
+        
+<header>
+  <div id="top">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-5">
+          
+        </div>
+        <div class="col-xs-7">
+          <div class="social">
+            
+            <a href="mailto:team@riverloopsecurity.com" target="_blank" style="opacity: 1;"><i class="fas fa-2x fa-envelope"></i></a>
+            
+            <a href="https://twitter.com/riverloopsec" target="_blank" style="opacity: 1;"><i class="fab fa-2x fa-twitter"></i></a>
+            
+            <a href="https://github.com/riverloopsec" target="_blank" style="opacity: 1;"><i class="fab fa-2x fa-github"></i></a>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+        <header class="navbar-affixed-top affix-top" data-spy="affix" data-offset-top="62">
+    <div class="navbar navbar-default yamm " role="navigation" id="navbar">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand home" href="/">
+                    
+                      <img src="/img/logo.png" alt="Working With Ghidra's P-Code To Identify Vulnerable Function Calls logo" class="hidden-xs hidden-sm">
+                      <img src="/" alt="Working With Ghidra's P-Code To Identify Vulnerable Function Calls logo" class="visible-xs visible-sm">
+                    
+                    <span class="sr-only">Working With Ghidra's P-Code To Identify Vulnerable Function Calls - go to homepage</span>
+                </a>
+                <div class="navbar-buttons">
+                    <button type="button" class="navbar-toggle btn-template-main" data-toggle="collapse" data-target="#navigation">
+                      <span class="sr-only">Toggle Navigation</span>
+                        <i class="fas fa-align-justify"></i>
+                    </button>
+                </div>
+            </div>
+            
+
+            <div class="navbar-collapse collapse" id="navigation">
+                <ul class="nav navbar-nav navbar-right">
+                  
+
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/">Home</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/solutions/">Solutions</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/services/">Services</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/projects/">Research</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+                    
+                  
+
+                  
+
+                  
+                  <li class="dropdown active">
+                    <a href="/blog/">Blog</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/careers/">Careers</a>
+                  </li>
+                  
+                  
+                  
+                  
+
+                  
+
+                  
+
+                  
+
+                  
+                  <li class="dropdown ">
+                    <a href="/contact">Contact</a>
+                  </li>
+                  
+                  
+                </ul>
+            </div>
+            
+
+            <div class="collapse clearfix" id="search">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search">
+                        <span class="input-group-btn">
+                    <button type="submit" class="btn btn-template-main"><i class="fas fa-search"></i></button>
+                </span>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</header>
+
+
+
+
+        <div id="heading-breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Working With Ghidra's P-Code To Identify Vulnerable Function Calls</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <div id="content">
+            <div class="container">
+
+                <div class="row">
+
+                    
+
+                    <div class="col-md-9" id="blog-post">
+
+                        <p class="text-muted text-uppercase mb-small text-right">
+                            By Alexei Bulazel | 
+                            May 11, 2019
+                        </p>
+
+                        <div id="post-content">
+                          
+
+<p>This year at <a href="https://infiltratecon.com/" target="_blank">INFILTRATE 2019</a>, I got together with fellow <a href="https://rpis.ec/" target="_blank">RPISEC</a> alumnus and <a href="https://www.bostoncybernetics.org/" target="_blank">Boston Cybernetics Institute</a> co-founder <a href="https://twitter.com/0xJeremy" target="_blank">Jeremy Blackthorne</a> to present <a href="https://vimeo.com/335158460" target="_blank">“Three Heads Are Better Than One: Mastering NSA’s Ghidra Reverse Engineering Tool”</a>.
+<a href="https://vimeo.com/335158460#t=49m45s" target="_blank">Around 50 minutes into that presentation</a>, I presented a demo of a proof of concept script I built to trace out how inputs to <code>malloc</code> are derived.
+In this blog post, we’ll take a deeper look at that script.</p>
+
+<p>For those unfamiliar with the tool, <a href="https://ghidra-sre.org/" target="_blank">Ghidra</a> is an interactive reverse engineering tool developed by the US National Security Agency, comparable in functionality to tools such as <a href="https://binary.ninja" target="_blank">Binary Ninja</a> and <a href="https://www.hex-rays.com/" target="_blank">IDA Pro</a>. After years of development internally at NSA, <a href="https://github.com/NationalSecurityAgency/ghidra/" target="_blank">Ghidra was released open source</a> to the public in <a href="https://www.rsaconference.com/events/us19/agenda/sessions/16608-come-get-your-free-nsa-reverse-engineering-tool" target="_blank">March 2019 at RSA</a>.</p>
+
+<p>My script leverages Ghidra’s “p-code” intermediate representation to trace inputs to the <code>malloc</code> through functions and interprocedural calls.
+Calls to <code>malloc</code> are of obvious interest to vulnerability researchers looking for bugs in binary software - if a user-controlled input can somehow effect the size of parameter passed to the function, it may be possible for the user to pass in a argument triggering integer overflow during the calculation of allocation size, leading to memory corruption.</p>
+
+<blockquote>
+<p>If you want to follow along with the code, I’ve published it <a href="https://github.com/0xAlexei/INFILTRATE2019/tree/master/PCodeMallocDemo" target="_blank">on GitHub</a>.
+See discussion later in “Running The Script” for instructions on how to run it with your local copy of Ghidra.</p>
+</blockquote>
+
+<h2 id="inspiration">Inspiration</h2>
+
+<p>The inspiration this demo came from watching <a href="https://vimeo.com/215511922" target="_blank">Sophia d’Antoine, Peter LaFosse, and Rusty Wagner’s “Be A Binary Rockstar”</a> at INFILTRATE 2017, a presentation on Binary Ninja.
+During that presentation, fellow <a href="/blog/2018/12/supermicro-validation-1/" target="_blank">River Loop Security team member Sophia d’Antoine</a> demonstrated a <a href="https://github.com/trailofbits/binjascripts/blob/master/abstractanalysis/binja_memcpy.py" target="_blank">script to find calls to memcpy with unsafe arguments</a>, leveraging Binary Ninja’s intermediate language representations of assembly code.
+I figured I would create a Ghidra script to do similar, but when I found that it wouldn’t be as simple as just calling a function like <code>get_parameter_at</code>, I began digging into to Ghidra’s code and plugin examples published by NSA with Ghidra.
+I ended up with the proof of concept script discussed in this post.
+While this script might not be ready for real world 0day discovery, it should give you a sense of working with Ghidra’s scripting APIs, p-code intermediate representation, and built-in support for program analysis.</p>
+
+<h2 id="p-code">P-Code</h2>
+
+<p>P-code is Ghidra’s intermediate representation / intermediate language (IR/IL) for assembly language instructions.
+Ghidra “lifts” assembly instructions of various disparate architectures into p-code, allowing reverse engineers to more easily develop automated analyses that work with assembly code.</p>
+
+<p>P-code abstracts away the complexities of working with various CPU architectures - x86’s plethora of instructions and prefixes, MIPS’ delay slots, ARM’s conditional instructions, etc, and presents reverse engineers with a common, simplified instruction set to work with. P-code lifting is a one-to-many translation, a single assembly instruction may be lifted into one or more p-code instruction.</p>
+
+<p>For a simple example, see how an x86 <code>MOV</code> instruction translates into a single <code>COPY</code> p-code operation</p>
+<pre tabindex="0"><code>MOV   RAX,RSI
+	RAX = COPY RSI</code></pre>
+<p>In a more complex case, a <code>SHR</code> instruction expands out into 30 p-code operations.
+Note how calculations for x86 flags (<code>CF</code>, <code>OF</code>, <code>SF</code>, and <code>ZF</code>) are made explicit.</p>
+<pre tabindex="0"><code>SHR   RAX,0x3f
+	$Ub7c0:4 = INT_AND 63:4, 63:4
+	$Ub7d0:8 = COPY RAX
+	RAX = INT_RIGHT RAX, $Ub7c0
+	$U33e0:1 = INT_NOTEQUAL $Ub7c0, 0:4
+	$U33f0:4 = INT_SUB $Ub7c0, 1:4
+	$U3400:8 = INT_RIGHT $Ub7d0, $U33f0
+	$U3410:8 = INT_AND $U3400, 1:8
+	$U3430:1 = INT_NOTEQUAL $U3410, 0:8
+	$U3440:1 = BOOL_NEGATE $U33e0
+	$U3450:1 = INT_AND $U3440, CF
+	$U3460:1 = INT_AND $U33e0, $U3430
+	CF = INT_OR $U3450, $U3460
+	$U3490:1 = INT_EQUAL $Ub7c0, 1:4
+	$U34b0:1 = INT_SLESS $Ub7d0, 0:8
+	$U34c0:1 = BOOL_NEGATE $U3490
+	$U34d0:1 = INT_AND $U34c0, OF
+	$U34e0:1 = INT_AND $U3490, $U34b0
+	OF = INT_OR $U34d0, $U34e0
+	$U2e00:1 = INT_NOTEQUAL $Ub7c0, 0:4
+	$U2e20:1 = INT_SLESS RAX, 0:8
+	$U2e30:1 = BOOL_NEGATE $U2e00
+	$U2e40:1 = INT_AND $U2e30, SF
+	$U2e50:1 = INT_AND $U2e00, $U2e20
+	SF = INT_OR $U2e40, $U2e50
+	$U2e80:1 = INT_EQUAL RAX, 0:8
+	$U2e90:1 = BOOL_NEGATE $U2e00
+	$U2ea0:1 = INT_AND $U2e90, ZF
+	$U2eb0:1 = INT_AND $U2e00, $U2e80
+	ZF = INT_OR $U2ea0, $U2eb0</code></pre>
+<p>P-code itself is generated with SLEIGH, a processor specification language for Ghidra which provides the tool with both disassembly information (e.g., the sequence of bytes <code>89 d8</code> means <code>MOV EAX, EBX</code>), <em>and</em> semantic information (<code>MOV EAX, EBX</code> has the p-code semantics <code>EAX = COPY EBX</code>). After lifting up to raw p-code (i.e., the direct translation to p-code), additionally follow-on analysis may enhance the p-code, transforming it by adding additional metadata to instructions (e.g., the <code>CALL</code> p-code operation only has a call target address in raw p-code form, but may gain parameters associated with the function call after analysis), and adding additional analysis-derived instructions not present in raw p-code, such as <code>MULTIEQUAL</code>, representing a phi-node (more on that later), or <code>PTRSUB</code>, for pointer arithmetic producing a pointer to a subcomponent of a data type.</p>
+
+<p>During analysis the code is also lifted code into <a href="https://en.wikipedia.org/wiki/Static_single_assignment_form" target="_blank">single static assignment (SSA) form</a>, a representation wherein each variable is only assigned a value once.</p>
+
+<p>P-code operates over <code>varnodes</code> - quoting from the Ghidra documentation: “A varnode is a generalization of either a register or a memory location. It is represented by the formal triple: an address space, an offset into the space, and a size. Intuitively, a varnode is a contiguous sequence of bytes in some address space that can be treated as a single value. All manipulation of data by p-code operations occurs on varnodes.”</p>
+
+<p>For readers interested in learning more, Ghidra ships with p-code documentation at <code>docs/languages/html/pcoderef.html</code>.
+Additionally, someone has posted the Ghidra decompiler Doxygen docs (included in the decompiler’s source) at <a href="https://ghidra-decompiler-docs.netlify.com/index.html" target="_blank">https://ghidra-decompiler-docs.netlify.com/index.html</a>.</p>
+
+<h2 id="this-script">This Script</h2>
+
+<p>This script identifies inputs to <code>malloc()</code> by tracing backwards from the variable given to the function in order to figure out how that variable obtains its value, terminating in either a constant value or an external function call. Along the way, each function call that the value passes through is logged - either where it is returned by a function, or passed as an incoming parameter to a function call. The specific operations along the way that can constrain (e.g., checking equality or comparisons) or modify (e.g., arithmetic or bitwise operations) the values are not logged or processed currently for this proof of concept.</p>
+
+<p>Calls to <code>malloc</code> can go badly in a variety of ways, for example, <a href="https://openwall.info/wiki/_media/people/jvanegue/files/woot10.pdf" target="_blank">if an allocation size of zero is passed in</a>, or if an integer overflow occurs on the way to calculating the number of bytes to allocate. In general, we can expect that the chances of one of these types of bugs occuring is more likely if user input is able to somehow effect the value passed to <code>malloc</code>, e.g., if the user is able to specify a number of elements to allocate, and then that value is multiplied by <code>sizeof(element)</code>, there may be a chance of an integer overflow. If this script is able to determine that user input taken a few function calls before a call to <code>malloc</code> ends up passed to the function call, this code path may be worth auditing by a human vulnerability researcher.</p>
+
+<p>Understanding where allocations of static, non-user controlled sizes are used is also interesting, as exploit developers looking to turn discovered <a href="http://security.cs.rpi.edu/courses/binexp-spring2015/lectures/17/10_lecture.pdf" target="_blank">heap vulnerabilities</a> into exploits may need to manipulate heap layout with <a href="https://googleprojectzero.blogspot.com/2015/06/what-is-good-memory-corruption.html" target="_blank">“heap grooms”</a> relying on specific patterns of controlled allocations and deallocations.</p>
+
+<p>Note that while I’ve chosen to build this script around analysis of <code>malloc</code>, as it is a simple function that just takes a single integer argument, the same sort of analysis could be very easily adapted to look for other vulnerable function call patterns, such as <code>memcpy</code> with user controlled lengths or buffers on the stack, or  <code>system</code> or <code>exec</code>-family functions ingesting user input</p>
+
+<h2 id="running-the-script">Running The Script</h2>
+
+<p>I’ve published the script, a test binary and its source code, and the output I receive when running the script over the binary <a href="https://github.com/0xAlexei/INFILTRATE2019/tree/master/PCodeMallocDemo" target="_blank">on GitHub</a>.</p>
+
+<p>You can run the script by putting it in your Ghidra scripts directory (default <code>$USER_HOME/ghidra_scripts</code>), opening Ghidra’s Script Manager window, and then looking for it in a folder labeled “INFILTRATE”.
+The green arrow “Run Script” button at the top of the Script Manager window will then run the script, with output printed to the console.</p>
+
+<p>I’d also add that because the script simply prints output to the console, it can be run with Ghidra’s command line <a href="https://ghidra-sre.org/InstallationGuide.html#RunHeadless" target="_blank">“headless mode”</a> as well, to print its output to your command line terminal.</p>
+
+<h2 id="algorithm">Algorithm</h2>
+
+<p>The script begins by looking for every function that references <code>malloc</code>.
+Then, for each of these function, we look for each <code>CALL</code> p-code operation targeting <code>malloc</code> inside that function.
+Analysis then begins, looking at sole parameter to <code>malloc</code> (<code>size_t size</code>).
+This parameter is a <code>varnode</code>, a generalized representation of a value in the program.
+After Ghidra’s <a href="https://en.wikipedia.org/wiki/Data-flow_analysis" target="_blank">data-flow analysis</a> has run, we can use <code>varnode</code>’s <code>getDef()</code> method to retrieve the p-code operation which defines it - e.g., for statement <code>a = b + c</code>, if we asked for the operation defining <code>a</code>, we’d get <code>b + c</code>. From here, we can recursively trace backwards, asking what operations define <code>varnode</code>s <code>b</code> and <code>c</code> in that p-code expression, then what operations define their parents, and so on.</p>
+
+<p>Eventually, we might arrive on the discovery that one of these parents is a constant value, that a value is derived from a function call, or that a value comes from a parameter to the function.
+In the case that analysis determines that a constant is the ultimate origin value behind the value passed in to <code>malloc</code>, we can simply save the constant and terminate analysis of the particular code path under examination.
+Otherwise, we have to trace into called functions, and consider possible callsites for functions that call the current function under analysis.
+Along the way, for each function we traverse in a path to a terminal constant value or external function (where we cannot go any further), we save a node in our path to be printed out to the user at the end.</p>
+
+<h3 id="analyzing-inside-function-calls">Analyzing Inside Function Calls</h3>
+
+<p>The value passed to <code>malloc</code> may ultimately derive from a function call, e.g.:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> getNumber();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>malloc(x<span style="color:#f92672">+</span><span style="color:#ae81ff">5</span>);</span></span></code></pre></div>
+<p>In this case, we would analyze <code>getNumber</code>, finding each <code>RETURN</code> p-code operation in the function, and analyzing the “input1” varnode associated with it, which represents the value the function returns (on x86, this would be the value in <code>EAX</code> at time of function return). Note that similar to the association of function parameters with <code>CALL</code> p-code operations, return values are only associated with <code>RETURN</code> p-code operations <em>after</em> analysis, and are not present in raw p-code.</p>
+
+<p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getNumber</span>(){
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> number <span style="color:#f92672">=</span> atoi(<span style="color:#e6db74">"8"</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	number <span style="color:#f92672">=</span> number <span style="color:#f92672">+</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> number;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>In the above code snippet, our analysis would trace backwards from return, to addition, and finally to a call to <code>atoi</code>, so we could add <code>atoi</code> as a node in path determining the source of input to <code>malloc</code>. This analysis may be applied recursively until a terminating value of a constant or external function call is encountered.</p>
+
+<h3 id="phi-nodes">Phi Nodes</h3>
+
+<p>Discussing analysis of values returned by called functions gives us a opportunity to consider “phi nodes”. In the above example, there’s only a single path for how number can be defined, first <code>atoi</code>, then <code>+ 10</code>. But what if instead, we had:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getNumber</span>(){
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> number;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (rand() <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">100</span>){
+</span></span><span style="display:flex;"><span>		number <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>		number <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> number;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>Now, it’s not so clear what <code>number</code>’s definition is at time of function return - it could be 10 or 20. A “phi node” can be used to represent the point in the program at which, going forward, number will possess either value 10 or 20. Ghidra’s own analysis will insert a <code>MULTIEQUAL</code> operation (not present in the raw p-code) at the point where number is used, but could have either value 10 or 20 (you can imagine this operation as happening in between the closing brace of the <code>else</code> statement and before <code>return</code>). The <code>MULTIEQUAL</code> operation tells us that going forward, <code>number</code> can have one value out of a range of possible values defined in previous basic blocks (the <code>if</code> and <code>else</code> paths).</p>
+
+<p>Representing the function in single static assignment form, it can be better understood as:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getNumber</span>(){
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (rand() <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">100</span>){
+</span></span><span style="display:flex;"><span>		number1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>		number2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	number3 <span style="color:#f92672">=</span> MULTIEQUAL(number1, number2);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> number3;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p><code>number1</code> and <code>number2</code> represent SSA instantiations of <code>number</code>, and we’ve inserted <code>MULTIEQUAL</code> operation before the return, indicating that the return value (<code>number3</code>) will be one of these prior two values. <code>MULTIEQUAL</code> is not constrained to only taking two values, for example, if we had five values which <code>number</code> could take before return, we could have <code>number6 = MULTIEQUAL(number1, number2, number3, number4, number5);</code>.</p>
+
+<p>We can handle <code>MULTIEQUAL</code> p-code operations by noting that the next node we append to our path will be a phi input, and should be marked accordingly. When we print out paths at the end, inputs to the same phi will be marked accordingly so that end users know that each value is a possible input to the phi.</p>
+
+<h3 id="analyzing-parent-calls">Analyzing Parent Calls</h3>
+
+<p>In addition to analyzing functions <em>called</em> by our current function, our analysis must consider functions <em>calling</em> our current function, as values passed to <code>malloc</code> could be dependent on parameters to our function. For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">doMalloc</span>(<span style="color:#66d9ef">int</span> int1, <span style="color:#66d9ef">int</span> size){
+</span></span><span style="display:flex;"><span>	...
+</span></span><span style="display:flex;"><span>	malloc(size);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>doMalloc(<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">5</span>);
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>doMalloc(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">7</span>);</span></span></code></pre></div>
+<p>In cases like these, we will search for each location in the binary where our current function (<code>doMalloc</code>) is called, and analyze the parameter passed to the function which effects the value passed to our target function. In the above case, analysis would return that 5 and 7 are both possible values for <code>size</code> in a call to <code>doMalloc</code>.</p>
+
+<p>As our analysis simply considers each site in the binary where the current function we are analyzing is called, it can make mistakes in analysis, because it is not “<em>context sensitive</em>”. Analysis does not consider the specific context in which functions are called, which can lead to inaccuracies in cases that seem obvious. For example, if we have a function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">returnArg0</span>(<span style="color:#66d9ef">int</span> arg0){ 
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> arg0;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>And this function is called in several places:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> returnArg0(<span style="color:#ae81ff">9</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> y  <span style="color:#f92672">=</span> returnArg0(<span style="color:#ae81ff">7</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>printf(<span style="color:#e6db74">"%d"</span>, returnArg0(<span style="color:#ae81ff">8</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>malloc(returnArg0(<span style="color:#ae81ff">11</span>));</span></span></code></pre></div>
+<p>While to us it’s very obvious that the call to <code>malloc</code> will receive argument 11, our context-insensitive analysis considers every site in the program in which <code>returnArg0</code> is called, so it will return 9, 7, 8, and 11 all as possible values for the value at this call to <code>malloc</code></p>
+
+<p>As with analysis of called functions, analysis of calling functions may be applied recursively. Further, these analyses may be interwoven with one another, if for example, a function is invoked with parameter derived from a call into another function.</p>
+
+<h2 id="ghidra-resources">Ghidra Resources</h2>
+
+<p>I found Ghidra’s included plugins <a href="https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/Decompiler/ghidra_scripts/ShowConstantUse.java" target="_blank"><code>ShowConstantUse.java</code></a> and <a href="https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/Decompiler/ghidra_scripts/WindowsResourceReference.java" target="_blank"><code>WindowsResourceReference.java</code></a> very helpful when working with p-code and the Ghidra decompiler. I borrowed some code from these scripts when building this script, and consulted them extensively.</p>
+
+<h2 id="output">Output</h2>
+
+<p>The data we’re dealing with is probably best visualized with a graph of connected nodes. <a href="https://github.com/NationalSecurityAgency/ghidra/issues/174" target="_blank">Unfortunately, the publicly released version of Ghidra does not currently have the necessary external “GraphService” needed to work with graphs</a>, as can be observed by running Ghidra’s included scripts <a href="https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/Decompiler/ghidra_scripts/GraphAST.java" target="_blank"><code>GraphAST.java</code></a>, <a href="https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/Decompiler/ghidra_scripts/GraphASTAndFlow.java" target="_blank"><code>GraphASTAndFlow.java</code></a>, and <a href="https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/Decompiler/ghidra_scripts/GraphSelectedAST.java" target="_blank"><code>GraphSelectedAST.java</code></a> (a popup alert informs the user “GraphService not found: Please add a graph service provider to your tool”).</p>
+
+<p>Without a graph provider, I resorted to using ASCII depictions of flow to our “sink” function of <code>malloc</code>. Each line of output represents a node on the way to malloc. A series of lines before the node’s value represents how it is derived, with <code>-</code> representing a value coming from within a function (either because it returns a constant or calls an external function), <code>+</code> representing a value coming from a function parameter, and <code>Ø</code> being printed when a series of nodes are inputs to a phi-node. <code>C:</code> is used to denote a called “child” function call, <code>P:</code> for a calling “parent”, and <code>CONST:</code> for a terminal constant value.</p>
+
+<p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">return3</span>(){
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>malloc(return3());
+</span></span><span style="display:flex;"><span>...</span></span></code></pre></div>
+<p>Here, we have a call into return3 denoted by <code>-</code>, and then inside of that function, a terminal constant value of <code>3</code>.</p>
+<pre tabindex="0"><code>SINK: call to malloc in analyzefun @ 0x4008f6
+-C: return3
+--CONST: 3 (0x3)</code></pre>
+<p>In a more complex case:</p>
+<pre tabindex="0"><code>int returnmynumberplus5(int x){
+	return x+5;
+}
+...
+malloc(returnmynumberplus5(10) | 7);
+...
+
+
+SINK: call to malloc in analyzefun @ 0x40091a
+-C: returnmynumberplus5
+-+P: call analyzefun -&gt; returnmynumberplus5 @ 0x40090d - param #0
+-+-CONST: 10 (0xA)</code></pre>
+<p>Here we have a call into <code>returnmynumberplus5</code> denoted with <code>-</code>, then <code>-+</code> denoting that the return value for <code>returnmynumberplus5</code> is derived from a parameter passed to it by a calling “parent” function, and then finally <code>-+-</code> for the final constant value of 10 which was determined to be the ultimate terminating constant in this flow to the sink function.
+This is somewhat a contrived example, as the script considers all possible callsites for <code>returnmynumberplus5</code>, and would in fact list constants (or other values) passed to the function throughout the entire program, if there were other sites where it was invoked - an example of the script not being context sensitive.</p>
+
+<p>Finally, lets take a look at a case where a phi node is involved:</p>
+<pre tabindex="0"><code>int phidemo(){
+	int x = 0;
+	if (rand() &gt; 100){
+		x = 100;
+	}
+	else if (rand() &gt; 200){
+		x = 700;
+	}
+	return x;
+}
+
+...
+malloc(phidemo());
+...
+
+
+SINK: call to malloc in analyzefun @ 0x4008b0
+-C: phidemo
+--ØCONST: 100 (0x64)
+--ØCONST: 0 (0x0)
+--ØCONST: 700 (0x2bc)</code></pre>
+<p>In this case, we see that the call to <code>malloc</code> is the result of a call to <code>phidemo</code>. At the next level deeper, we print <code>-</code> followed by <code>Ø</code>, indicating the three constant values displayed are all phi node inputs, with only one used in returning from <code>phidemo</code>.</p>
+
+<h2 id="limitations-and-future-work">Limitations and Future Work</h2>
+
+<p>After all that discussion of what this script can do, we should address the various things that it cannot. This proof of concept script has a number of limitations, including:</p>
+
+<ul>
+<li>Transfers of control flow between functions not based on <code>CALL</code> p-code ops with explicitly resolved targets. This includes use of direct jumps to other functions, transfer through function pointers, or C++ vtables</li>
+<li>Handling pointers</li>
+<li>Recursive functions</li>
+<li>Programs using p-code operations that we do not support</li>
+<li>Context sensitive analysis</li>
+<li>and more…</li>
+</ul>
+
+<p>That said, implementing support for these other constructions should be possible and fairly easy. Beyond growing out more robust support for various program constructions, there are many of other directions this code could be taken in:</p>
+
+<ul>
+<li>Adding support for actually logging all operations along the way, e.g, letting the user know that the value parsed by <code>atoi()</code> is then multiplied by <code>8</code>, and compared against <code>0x100</code>, and then <code>2</code> is added - for example.</li>
+<li>Integrating an SMT solver to allow for more complex analyses of possible values</li>
+<li>Adding context sensitivity</li>
+<li>Modeling process address space</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I hope this blog post has been insightful in elucidating how Ghidra’s powerful scripting API, intermediate representation, and built-in data flow analysis can be leveraged together for program analysis.
+With this script, I’ve only scratched the surface of what is possible with Ghidra, I hope we’ll see more public research on what the tool can do.</p>
+
+<p>I know this script isn’t perfect, please do reach out if you find it useful or have suggestions for improvement.</p>
+
+<blockquote>
+<p>If you have questions about your reverse engineering and security analysis, consider <a href="/contact/" target="_blank">contacting our team</a> of experienced security experts to learn more about what you can do.
+<br>
+If you have questions or comments about Ghidra, p-code, training, or otherwise want to get in touch, you can email <a href="mailto:re-training@riverloopsecurity.com" target="_blank">re-training@riverloopsecurity.com</a>, or contact me directly via open DMs on Twitter at <a href="https://twitter.com/0xAlexei" target="_blank">https://twitter.com/0xAlexei</a>.</p>
+</blockquote>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+
+<p>Thank you to <a href="https://twitter.com/0xJeremy" target="_blank">Jeremy Blackthorne</a>, my collaborator in presenting on Ghidra - later this summer at REcon Montreal, Jeremy and I will be teaching a four day training on binary exploitation, where we’ll use Ghidra, sign up at: <a href="https://recon.cx/2019/montreal/training/trainingmodern.html" target="_blank">https://recon.cx/2019/montreal/training/trainingmodern.html</a>. Jeremy will also be teaching his own training on Ghidra in August at Ringzer0: <a href="https://ringzer0.training/reverse-engineering-with-ghidra.html" target="_blank">https://ringzer0.training/reverse-engineering-with-ghidra.html</a>, and you can find information about his company Boston Cybernetics Insitute’s other training offerings at <a href="https://www.bostoncyber.org/" target="_blank">https://www.bostoncyber.org/</a></p>
+
+<p>Rolf Rolles’ insights into program analysis, p-code, and Ghidra’s scripting interface were invaluable in working on this project.
+Thank you to the Vector 35 Binary Ninja crew for also elucidating some program analysis concepts during their excellent <a href="https://infiltratecon.com/training/" target="_blank">Binary Ninja training at INFILTRATE 2019</a> - also thanks to Sophia d’Antoine for her 2017 Binary Ninja memcpy example script.
+<a href="https://engineering.nyu.edu/faculty/brendan-dolan-gavitt" target="_blank">Dr. Brendan Dolan-Gavitt</a> shared some program analysis insights as well.</p>
+
+<p>Finally, thank you to all of the developers at NSA who actually created Ghidra. All of this work would not be possible without their creation of the tool. The example plugins published with Ghidra were also invaluable in understanding how to work with p-code.</p>
+
+                        </div>
+                        
+                        
+
+                    </div>
+                    
+
+                    
+
+                    
+
+                    <div class="col-md-3">
+
+                        
+                        
+
+<div class="panel panel-default sidebar-menu">
+
+    <div class="panel-heading">
+      <h3 class="panel-title">Search</h3>
+    </div>
+
+    <div class="panel-body">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" role="search">
+            <div class="input-group">
+                <input type="search" name="q" class="form-control" placeholder="Search">
+                <input type="hidden" name="sitesearch" value="https://riverloopsecurity.com/">
+                <span class="input-group-btn">
+                    <button type="submit" class="btn btn-template-main"><i class="fas fa-search"></i></button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="panel panel-default sidebar-menu">
+
+    <div class="panel-heading">
+        <h3 class="panel-title">Categories</h3>
+    </div>
+
+    <div class="panel-body">
+        <ul class="nav nav-pills nav-stacked">
+            
+            
+            <li>
+                <a href="/categories/blog">BLOG (40)</a>
+            </li>
+            
+            <li>
+                <a href="/categories/conference">CONFERENCE (3)</a>
+            </li>
+            
+            <li>
+                <a href="/categories/conferences">CONFERENCES (7)</a>
+            </li>
+            
+            <li>
+                <a href="/categories/conferencess">CONFERENCESS (1)</a>
+            </li>
+            
+            <li>
+                <a href="/categories/paper">PAPER (5)</a>
+            </li>
+            
+            <li>
+                <a href="/categories/projects">PROJECTS (5)</a>
+            </li>
+            
+        </ul>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+<div class="panel sidebar-menu">
+
+    <div class="panel-heading">
+        <h3 class="panel-title">Tags</h3>
+    </div>
+
+    <div class="panel-body">
+        <ul class="tag-cloud">
+            
+            
+            <li>
+                <a href="/tags/010-editor"><i class="fas fa-tags"></i> 010-editor</a>
+            </li>
+            
+            <li>
+                <a href="/tags/802.15.4"><i class="fas fa-tags"></i> 802.15.4</a>
+            </li>
+            
+            <li>
+                <a href="/tags/amazon"><i class="fas fa-tags"></i> amazon</a>
+            </li>
+            
+            <li>
+                <a href="/tags/apimote"><i class="fas fa-tags"></i> apimote</a>
+            </li>
+            
+            <li>
+                <a href="/tags/arm"><i class="fas fa-tags"></i> arm</a>
+            </li>
+            
+            <li>
+                <a href="/tags/beekeeperwids"><i class="fas fa-tags"></i> beekeeperwids</a>
+            </li>
+            
+            <li>
+                <a href="/tags/binary-analysis"><i class="fas fa-tags"></i> binary-analysis</a>
+            </li>
+            
+            <li>
+                <a href="/tags/circuit-design"><i class="fas fa-tags"></i> circuit-design</a>
+            </li>
+            
+            <li>
+                <a href="/tags/conferences"><i class="fas fa-tags"></i> conferences</a>
+            </li>
+            
+            <li>
+                <a href="/tags/cortex-m"><i class="fas fa-tags"></i> cortex-m</a>
+            </li>
+            
+            <li>
+                <a href="/tags/cve"><i class="fas fa-tags"></i> cve</a>
+            </li>
+            
+            <li>
+                <a href="/tags/darpa"><i class="fas fa-tags"></i> darpa</a>
+            </li>
+            
+            <li>
+                <a href="/tags/ecc"><i class="fas fa-tags"></i> ecc</a>
+            </li>
+            
+            <li>
+                <a href="/tags/echo"><i class="fas fa-tags"></i> echo</a>
+            </li>
+            
+            <li>
+                <a href="/tags/electronics"><i class="fas fa-tags"></i> electronics</a>
+            </li>
+            
+            <li>
+                <a href="/tags/emmc"><i class="fas fa-tags"></i> emmc</a>
+            </li>
+            
+            <li>
+                <a href="/tags/file-formats"><i class="fas fa-tags"></i> file-formats</a>
+            </li>
+            
+            <li>
+                <a href="/tags/fuzzing"><i class="fas fa-tags"></i> fuzzing</a>
+            </li>
+            
+            <li>
+                <a href="/tags/fuzzy-hashing"><i class="fas fa-tags"></i> fuzzy-hashing</a>
+            </li>
+            
+            <li>
+                <a href="/tags/ghidra"><i class="fas fa-tags"></i> ghidra</a>
+            </li>
+            
+            <li>
+                <a href="/tags/glitching"><i class="fas fa-tags"></i> glitching</a>
+            </li>
+            
+            <li>
+                <a href="/tags/goodfet"><i class="fas fa-tags"></i> goodfet</a>
+            </li>
+            
+            <li>
+                <a href="/tags/hardware"><i class="fas fa-tags"></i> hardware</a>
+            </li>
+            
+            <li>
+                <a href="/tags/hashashin"><i class="fas fa-tags"></i> hashashin</a>
+            </li>
+            
+            <li>
+                <a href="/tags/iot"><i class="fas fa-tags"></i> iot</a>
+            </li>
+            
+            <li>
+                <a href="/tags/jtag"><i class="fas fa-tags"></i> jtag</a>
+            </li>
+            
+            <li>
+                <a href="/tags/killerbee"><i class="fas fa-tags"></i> killerbee</a>
+            </li>
+            
+            <li>
+                <a href="/tags/lzma"><i class="fas fa-tags"></i> lzma</a>
+            </li>
+            
+            <li>
+                <a href="/tags/manufacturing"><i class="fas fa-tags"></i> manufacturing</a>
+            </li>
+            
+            <li>
+                <a href="/tags/mcu"><i class="fas fa-tags"></i> mcu</a>
+            </li>
+            
+            <li>
+                <a href="/tags/mmc"><i class="fas fa-tags"></i> mmc</a>
+            </li>
+            
+            <li>
+                <a href="/tags/msp430"><i class="fas fa-tags"></i> msp430</a>
+            </li>
+            
+            <li>
+                <a href="/tags/nand"><i class="fas fa-tags"></i> nand</a>
+            </li>
+            
+            <li>
+                <a href="/tags/nitf"><i class="fas fa-tags"></i> nitf</a>
+            </li>
+            
+            <li>
+                <a href="/tags/orthrus"><i class="fas fa-tags"></i> orthrus</a>
+            </li>
+            
+            <li>
+                <a href="/tags/pip"><i class="fas fa-tags"></i> pip</a>
+            </li>
+            
+            <li>
+                <a href="/tags/program-analysis"><i class="fas fa-tags"></i> program-analysis</a>
+            </li>
+            
+            <li>
+                <a href="/tags/regulation"><i class="fas fa-tags"></i> regulation</a>
+            </li>
+            
+            <li>
+                <a href="/tags/reverse-engineering"><i class="fas fa-tags"></i> reverse-engineering</a>
+            </li>
+            
+            <li>
+                <a href="/tags/rf4ce"><i class="fas fa-tags"></i> rf4ce</a>
+            </li>
+            
+            <li>
+                <a href="/tags/scapy"><i class="fas fa-tags"></i> scapy</a>
+            </li>
+            
+            <li>
+                <a href="/tags/sd"><i class="fas fa-tags"></i> sd</a>
+            </li>
+            
+            <li>
+                <a href="/tags/sdlc"><i class="fas fa-tags"></i> sdlc</a>
+            </li>
+            
+            <li>
+                <a href="/tags/secure-development"><i class="fas fa-tags"></i> secure-development</a>
+            </li>
+            
+            <li>
+                <a href="/tags/serial"><i class="fas fa-tags"></i> serial</a>
+            </li>
+            
+            <li>
+                <a href="/tags/spi"><i class="fas fa-tags"></i> spi</a>
+            </li>
+            
+            <li>
+                <a href="/tags/supply-chain"><i class="fas fa-tags"></i> supply-chain</a>
+            </li>
+            
+            <li>
+                <a href="/tags/texas-instruments"><i class="fas fa-tags"></i> texas-instruments</a>
+            </li>
+            
+            <li>
+                <a href="/tags/tplink"><i class="fas fa-tags"></i> tplink</a>
+            </li>
+            
+            <li>
+                <a href="/tags/tpm"><i class="fas fa-tags"></i> tpm</a>
+            </li>
+            
+            <li>
+                <a href="/tags/tumblerf"><i class="fas fa-tags"></i> tumblerf</a>
+            </li>
+            
+            <li>
+                <a href="/tags/uart"><i class="fas fa-tags"></i> uart</a>
+            </li>
+            
+            <li>
+                <a href="/tags/usb"><i class="fas fa-tags"></i> usb</a>
+            </li>
+            
+            <li>
+                <a href="/tags/zigbee"><i class="fas fa-tags"></i> zigbee</a>
+            </li>
+            
+            <li>
+                <a href="/tags/zwave"><i class="fas fa-tags"></i> zwave</a>
+            </li>
+            
+        </ul>
+    </div>
+
+</div>
+
+
+
+
+
+                        
+
+                    </div>
+                    
+
+                    
+
+                </div>
+                
+
+            </div>
+            
+        </div>
+        
+
+        <footer id="footer">
+    <div class="container">
+
+        
+        <div class="col-md-4 col-sm-6">
+            <h4>About us</h4>
+
+            <p>We specialize solving complex cybersecurity challenges in the IoT and embedded devices space. Through end-to-end security architecture and design, penetration testing, automated security solutions, and custom engineering, we help secure our complex connected world. We partner with companies in industries including telecommunications, consumer products, healthcare, and others. Our highly skilled technical team regularly speaks at leading industry conferences and publishes academic journal papers, along with maintaining several leading open-source security tools.</p>
+
+            <hr class="hidden-md hidden-lg hidden-sm">
+
+        </div>
+        
+        
+
+        <div class="col-md-4 col-sm-6">
+
+            
+            <h4>Recent posts</h4>
+
+            <div class="blog-entries">
+                
+                
+                <div class="item same-height-row clearfix">
+                    <div class="image same-height-always" style="height: 42.6px;">
+                        <a href="https://riverloopsecurity.com/blog/2022/08/small-scale-circuit-board-assembly/">
+                          
+                            <img src="/img/blog/small-scale-ckt-asm/paste-frame-labels.jpg" class="img-responsive" alt="Small Scale Circuit Board Assembly: A Working Guide">
+                          
+                        </a>
+                    </div>
+                    <div class="name same-height-always" style="height: 42.6px;">
+                        <h5><a href="https://riverloopsecurity.com/blog/2022/08/small-scale-circuit-board-assembly/">Small Scale Circuit Board Assembly: A Working Guide</a></h5>
+                    </div>
+                </div>
+                
+                
+                <div class="item same-height-row clearfix">
+                    <div class="image same-height-always" style="height: 18.8667px;">
+                        <a href="https://riverloopsecurity.com/blog/2021/09/introducing-flash-bash/">
+                          
+                            <img src="/img/blog/introducing-flash-bash/flashbash_git.png" class="img-responsive" alt="Introducing Flash BASH">
+                          
+                        </a>
+                    </div>
+                    <div class="name same-height-always" style="height: 18.8667px;">
+                        <h5><a href="https://riverloopsecurity.com/blog/2021/09/introducing-flash-bash/">Introducing Flash BASH</a></h5>
+                    </div>
+                </div>
+                
+                
+                <div class="item same-height-row clearfix">
+                    <div class="image same-height-always" style="height: 35.0333px;">
+                        <a href="https://riverloopsecurity.com/blog/2021/09/dji-go-updates/">
+                          
+                            <img src="/img/blog/dji_mimo/osmo-lego.jpg" class="img-responsive" alt="Security Questions Regarding the Recent DJI Go 4 App">
+                          
+                        </a>
+                    </div>
+                    <div class="name same-height-always" style="height: 35.0333px;">
+                        <h5><a href="https://riverloopsecurity.com/blog/2021/09/dji-go-updates/">Security Questions Regarding the Recent DJI Go 4 App</a></h5>
+                    </div>
+                </div>
+                
+            </div>
+
+            <hr class="hidden-md hidden-lg">
+            
+
+        </div>
+        
+
+        
+        <div class="col-md-4 col-sm-6">
+
+          <h4>Contact</h4>
+
+            <strong>River Loop Security LLC</strong>
+        <br>Washington, DC
+        <br>Houston, TX
+        <br>Boston, MA
+        <br>
+        <i>United States</i>
+            
+            <br>
+            <a href="/contact" class="btn btn-small btn-template-main">Contact Us</a>
+            
+
+            <hr class="hidden-md hidden-lg hidden-sm">
+
+        </div>
+        
+        
+
+    </div>
+    
+</footer>
+
+
+
+
+
+
+
+<div id="copyright">
+    <div class="container">
+        <div class="col-md-12">
+            
+            <p class="pull-left">Copyright © 2018-2022, River Loop Security LLC. All Rights Reserved.</p>
+            
+            <p class="pull-right" style="color:#444">
+              
+              
+              Template ported by <a href="https://github.com/devcows/hugo-universal-theme" style="color:#444">DevCows</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    </div>
+    
+
+    
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-DEZZ6LYCYW&amp;cx=c&amp;_slc=1"></script><script async="" src="https://www.google-analytics.com/analytics.js"></script><script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-3823792-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script src="//code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0/jquery.counterup.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-parallax/1.1.3/jquery-parallax.js"></script>
+
+
+<script src="/js/front.js"></script>
+
+
+<script src="/js/owl.carousel.min.js"></script>
+
+
+
+  
+
+</body></html>

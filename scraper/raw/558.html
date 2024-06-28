@@ -1,0 +1,861 @@
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Vulnerable By Design ~ VulnHub</title>
+<link rel="shortcut icon" href="/static/img/favicon.ico">
+<link rel="apple-touch-icon" href="/static/img/touch-icon-iphone.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/static/img/touch-icon-ipad.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/static/img/touch-icon-iphone-retina.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/static/img/touch-icon-ipad-retina.png">
+<link rel="stylesheet" type="text/css" href="//necolas.github.io/normalize.css/1.1.3/normalize.css">
+<meta name="theme-color" content="#337e97">
+<meta name="msapplication-navbutton-color" content="#337e97">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<link rel="stylesheet" type="text/css" href="/static/fonts/fonts.css">
+<link rel="alternate" type="application/atom+xml" title="Entries - Atom" href="https://www.vulnhub.com/feeds/added/atom/">
+<link rel="alternate" type="application/rss+xml" title="Entries - RSS" href="https://www.vulnhub.com/feeds/added/rss/">
+<link rel="alternate" type="application/atom+xml" title="Blog" href="https://blog.vulnhub.com/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="Torrents - Atom" href="https://www.vulnhub.com/feeds/torrent/atom/">
+<link rel="alternate" type="application/rss+xml" title="Torrents - RSS" href="https://www.vulnhub.com/feeds/torrent/rss/">
+<link rel="author" type="text/plain" href="https://www.vulnhub.com/humans.txt">
+<link rel="author" type="text/plain" href="https://www.vulnhub.com/robots.txt">
+<link rel="sitemap" type="application/xml" href="https://www.vulnhub.com/sitemap.xml">
+<meta property="og:image" content="https://www.vulnhub.com/static/img/logo.png">
+<link rel="stylesheet" type="text/css" href="/static/css/card.css">
+<meta name="description" xml:lang="en" lang="en" content="VulnHub provides materials allowing anyone to gain practical hands-on experience with digital security, computer applications and network administration tasks.">
+<meta name="keywords" content="vulnhub,vulnerable,design,digital,information,security,infosec,hacking,pentest,training,download,mirror,walkthrough,hint,spoiler,legal,free,materials,resources,learning,hands on,practical,crack,break,boot2root,vulnerable virtual machines,machine,vuln,exploit,community">
+</head>
+<body>
+<noscript>
+    <div class="text-center">
+      <h4>Javascript is required to give the best user experience.</h4>
+    </div>
+  </noscript>
+<div class="navbar navbar-expand-lg fixed-top">
+<div class="container ">
+<a class="navbar-brand" href="/">
+<img src="/static/img/logo.svg" class="d-inline-block align-top" alt="">
+</a>
+
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+<img src="/static/img/bars.svg" alt="bars">
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<nav class="d-flex w-100">
+<ul class="navbar-nav mr-auto left-nav">
+<li class="nav-item active">
+<a class="nav-link text-center" href="/">Virtual Machines</a>
+</li>
+<li class="nav-item dropdown ">
+<a class="nav-link text-center" href="/" id="help-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+<div class="dropdown-menu" aria-labelledby="help-dropdown">
+<a class="dropdown-item" href="/faq/">FAQ</a>
+<a class="dropdown-item" href="/difficulty/">Difficulty</a>
+<a class="dropdown-item" href="/lab/">Setting up a Lab</a>
+<a class="dropdown-item" href="/chat/">Chat</a>
+</div>
+</li>
+<li class="nav-item ">
+<a class="nav-link text-center" href="/resources/">Resources</a>
+</li>
+<li class="nav-item dropdown ">
+<a class="nav-link text-center" href="/" id="about-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About</a>
+<div class="dropdown-menu" aria-labelledby="about-dropdown">
+<a class="dropdown-item" href="/about/">About VulnHub</a>
+<a class="dropdown-item" href="/feeds/">Feeds</a>
+<a class="dropdown-item" href="/privacy/">Privacy Policy</a>
+</div>
+</li>
+</ul>
+<ul class="navbar-nav ml-auto right-nav">
+<li class="nav-item nav-btn nav-btn-orange align-self-center">
+<a class="nav-link" href="/submit/vm/">Submit Machine</a>
+</li>
+<li class="nav-item nav-btn nav-btn-white align-self-center">
+<a class="nav-link" href="/contact/">Contact Us</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="search-container">
+<div class="container search-area d-flex flex-wrap">
+<h5>Virtual Machines</h5>
+<form class="form-inline search-form" name="search-select" id="search-select" action="/" method="GET">
+<label for="search-query"><img src="/static/img/search.svg" alt="search icon"></label>
+<input class="form-control" type="text" name="q" id="search-query" placeholder="&nbsp;search by name or author" aria-label="Search">
+</form>
+<div>
+<a href="/single/" class="timeline-anchor">single</a>
+<a href="/series/" class="timeline-anchor">series</a>
+<a href="/" class="timeline-anchor">all</a>
+<a href="/timeline/" class="timeline-anchor" style="margin-left: 40px;">timeline</a>
+</div>
+</div>
+<div class="col-12 container content-container">
+<div class="d-flex flex-wrap pt-4 card-container">
+<div class="card">
+<a href="/entry/matrix-breakout-2-morpheus,757/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/0d02267ecb9bba68b69f3ecb2791e02dfa086e02.png)" title="Screenshot of Matrix-Breakout 2 Morpheus">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/matrix-breakout-2-morpheus,757/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>This is the second in the Matrix-Breakout series, subtitled Morpheus:1. It’s themed as a throwback to the first Matrix movie. You play Trinity, trying to investigate a computer on the Nebuchadnezzar that Cypher has locked everyone else out from, which holds the key to a mystery.</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/matrix-breakout-2-morpheus,757/">
+Matrix-Breakout: 2 Morpheus
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/matrix-breakout-2-morpheus,757/">
+11 Jul 2022
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/jay-beale,825/">
+Jay Beale
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/matrix-breakout-2-morpheus,757/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/matrix-breakout-2-morpheus,757/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/jay-beale,825/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/web-machine-n7,756/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/189741ad0b74f140b269bbcd420009180f478299.png)" title="Screenshot of Web Machine (N7)">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/web-machine-n7,756/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Difficulty: Medium</p>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/web-machine-n7,756/">
+Web Machine: (N7)
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/web-machine-n7,756/">
+3 Nov 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/duty-mastr,824/">
+Duty Mastr
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/web-machine-n7,756/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/web-machine-n7,756/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/duty-mastr,824/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/the-planets-earth,755/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/fc69e50746e25b794968142b83933087aa198ae9.png)" title="Screenshot of The Planets Earth">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/the-planets-earth,755/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Difficulty: Easy</p>
+<p>Earth is an easy box though you will likely find it more challenging than "Mercury" in this series and on the harder side of easy, depending on your experience. There are two flags on the box: a user and root flag which include an md5 hash. This has been tested on VirtualBox so may not work correctly on VMware. Any questions/issues or feedback please email me at: SirFlash at protonmail.com, though it may take a while for me to get back to you.</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/the-planets-earth,755/">
+The Planets: Earth
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/the-planets-earth,755/">
+2 Nov 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/sirflash,731/">
+SirFlash
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/the-planets-earth,755/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/the-planets-earth,755/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/sirflash,731/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/jangow-101,754/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/720cbfdda8850003a5fb0598052645cde69865b3.png)" title="Screenshot of Jangow 1.0.1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/jangow-101,754/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Difficulty: easy</p>
+<p>The secret to this box is enumeration! Inquiries jangow2021@gmail.com</p>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/jangow-101,754/">
+Jangow: 1.0.1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/jangow-101,754/">
+4 Nov 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/jangow,823/">
+Jangow
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/jangow-101,754/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/jangow-101,754/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/jangow,823/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/red-1,753/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/10ad3cd1be58e4babb37c9cf364248b4020e2c5f.png)" title="Screenshot of Red 1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/red-1,753/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Red has taken over your system, are you able to regain control?</p>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/red-1,753/">
+Red: 1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/red-1,753/">
+27 Oct 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/hadrian3689,822/">
+hadrian3689
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/red-1,753/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/red-1,753/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/hadrian3689,822/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/napping-101,752/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/47729d88519c65c8c33fa2a02dfeff7ae80075a5.png)" title="Screenshot of Napping 1.0.1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/napping-101,752/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Even Admins can fall asleep on the job</p>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/napping-101,752/">
+Napping: 1.0.1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/napping-101,752/">
+22 Oct 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/hadrian3689,822/">
+hadrian3689
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/napping-101,752/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/napping-101,752/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/hadrian3689,822/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/empire-breakout,751/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/54ee066305f3f780853ab7148a7c331d2da257f3.png)" title="Screenshot of Empire Breakout">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/empire-breakout,751/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Difficulty: Easy</p>
+<p>This box was created to be an Easy box, but it can be Medium if you get lost.</p>
+<p>For hints discord Server ( https://discord.gg/7asvAhCEhe )</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/empire-breakout,751/">
+Empire: Breakout
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/empire-breakout,751/">
+21 Oct 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/icex64-empire-cybersecurity,821/">
+icex64 &amp; Empire Cybersecurity
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/empire-breakout,751/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/empire-breakout,751/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/icex64-empire-cybersecurity,821/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/empire-lupinone,750/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/41588c09d4ad781b7bcaf25f82b099f3d6aa7a20.png)" title="Screenshot of Empire LupinOne">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/empire-lupinone,750/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Difficulty: Medium</p>
+<p>This box was created to be medium, but it can be hard if you get lost.</p>
+<p>CTF like box.
+You have to enumerate as much as you can.</p>
+<p>For hints discord Server ( https://discord.gg/7asvAhCEhe )</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/empire-lupinone,750/">
+Empire: LupinOne
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/empire-lupinone,750/">
+21 Oct 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/icex64-empire-cybersecurity,821/">
+icex64 &amp; Empire Cybersecurity
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/empire-lupinone,750/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/empire-lupinone,750/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/icex64-empire-cybersecurity,821/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/thales-1,749/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/b65636958f6a67052914363b7a4577f306f80f9b.png)" title="Screenshot of Thales 1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/thales-1,749/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Description : Open your eyes and change your perspective</p>
+<p>includes 2 flags:user.txt and root.txt.</p>
+<p>Telegram: @machineboy141 (for any hint)</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/thales-1,749/">
+Thales: 1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/thales-1,749/">
+16 Oct 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/machineboy,723/">
+MachineBoy
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/thales-1,749/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/thales-1,749/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/machineboy,723/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/ica-1,748/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/d63fa65d3d100a109adb7fa7a329bc9c5f1b3991.png)" title="Screenshot of ICA 1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/ica-1,748/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>According to information from our intelligence network, ICA is working on a secret project. We need to find out what the project is. Once you have the access information, send them to us. We will place a backdoor to access the system later. You just focus on what the project is. You will probably have to go through several layers of security. The Agency has full confidence that you will successfully complete this mission. Good Luck, Agent!</p>
+<p>Difficulty: Easy</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/ica-1,748/">
+ICA: 1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/ica-1,748/">
+25 Sep 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/onurturali,820/">
+onurturali
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/ica-1,748/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/ica-1,748/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/onurturali,820/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/digitalworldlocal-electrical,747/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/d84900be602d958f443b4fe3d951d4d2da4ed047.png)" title="Screenshot of digitalworld.local electrical">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/digitalworldlocal-electrical,747/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>Good Tech Inc. has realised its machines were vulnerable. They have decided to deploy a permanent VAPT machine within their network, where contractors can remotely access to perform the necessary vulnerability assessment scans.</p>
+<p>However, this has not been the most secure deployment. Can you root this machine?</p>
+<p>If you MUST have hints for this machine: ELECTRICAL is (#1): well-intentioned but horrible in execution, (#2): has multiple paths to privilege escalation, (#3): how you should not configure vendor configurations for VAPT work.</p>
+</div>
+<div class="pt-2">
+<div class="see-more-cta">more...</div>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/digitalworldlocal-electrical,747/">
+digitalworld.local: electrical
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/digitalworldlocal-electrical,747/">
+22 Sep 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/donavan,601/">
+Donavan
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/digitalworldlocal-electrical,747/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/digitalworldlocal-electrical,747/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/donavan,601/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<a href="/entry/noob-1,746/">
+<div class="card-img" style="--img: url(/media/img/entry/watermarked/09f523ad8c22ffa429a3525b3836c9015b593347.png)" title="Screenshot of Noob 1">
+</div>
+</a>
+<div class="card-body">
+<a href="/entry/noob-1,746/">
+<div class="card-teaser">
+<div class="teaser-text">
+<p>N/A</p>
+</div>
+</div>
+</a>
+<div class="card-summary-info d-flex">
+<div class="card-details d-flex flex-column justify-content-center w-100">
+<div class="card-title">
+<a href="/entry/noob-1,746/">
+Noob: 1
+</a>
+</div>
+<div class="card-by-line d-flex">
+<div class="card-date">
+<a href="/entry/noob-1,746/">
+22 Sep 2021
+</a>
+</div>
+&nbsp;by&nbsp;
+<div class="card-author">
+<a href="/author/vieh-group,819/">
+VIEH Group
+</a>
+</div>
+</div>
+</div>
+<div class="card-options-trigger d-flex justify-content-center">
+<img src="/static/img/ellipsis.svg" alt="ellipsis">
+<div class="card-options">
+<ul>
+<li class="card-option">
+<a href="/entry/noob-1,746/" class="card-option-link"> Details</a>
+</li>
+<li class="card-option">
+<a href="/entry/noob-1,746/#download" class="card-option-link">Download</a>
+</li>
+<li class="card-option">
+<a href="/author/vieh-group,819/" class="card-option-link">Author Profile</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination-area" aria-label="pagination-navigation">
+<ul class="pagination d-flex justify-content-center">
+<li class="page-item d-flex align-items-center active">
+<a href="?page=1" class="page-link"> 1</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=2" class="page-link"> 2</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=3" class="page-link"> 3</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=4" class="page-link"> 4</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=5" class="page-link"> 5</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=6" class="page-link"> 6</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=7" class="page-link"> 7</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=8" class="page-link"> 8</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=9" class="page-link"> 9</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=10" class="page-link"> 10</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=11" class="page-link"> 11</a>
+</li>
+<li class="page-item d-flex align-items-center ">
+<div class="pagination-divider">•</div>
+<a href="?page=12" class="page-link"> 12</a>
+</li>
+<li class="page-item d-flex">
+<a href="?page=2" class="page-link d-flex flex-column justify-content-center next-page-link" aria-label="Next">
+<span aria-hidden="true">▶</span>
+<span class="sr-only">Next</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="cookie-warning-container mt-5" style="display: block;">
+<div class="container cookie-warning-box d-flex justify-content-center align-items-center text-center">
+<div class="cookie-warning d-flex">
+<div class="warning-text">
+This website uses 'cookies' to give you the best, most relevant experience. Using this website means you're happy with this.
+You can find out more about the cookies used by clicking this
+<a href="/privacy/">link</a> (or by clicking the 'Privacy Policy' link at the top of any page).
+</div>
+<button type="button" class="btn btn-info" id="cookie-consent">OK</button>
+</div>
+</div>
+</div>
+<footer class="d-flex justify-content-center align-items-center mt-5">
+<div class="text-center">
+© VulnHub 2012-2024
+</div>
+</footer>
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-D52KYCRWVX&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/custom.js"></script>
+<script type="text/javascript" src="/static/js/cookieAlert.js"></script>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-37274599-1', 'vulnhub.com');
+    ga('send', 'pageview');
+  </script>
+
+
+</div></body></html>

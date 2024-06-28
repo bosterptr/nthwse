@@ -1,0 +1,289 @@
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/releases/TqxSU0dsOd2Q9IbI7CpFnJLD/recaptcha__pl.js" crossorigin="anonymous" integrity="sha384-EtuwsrUt4o3rjKbOIgbMlrdETicyC7YJiOMF4S2kRPR2c6EcUDPrB1OFkiSEO3IC"></script><script async="" type="application/ld+json" defer="">
+{
+  "@context" : "http://schema.org",
+  "@type" : "LocalBusiness",
+  "name" : "DorkSearch",
+  "email" : "support@DorkSearch.com",
+  "url" : "http://www.DorkSearch.com"
+}
+</script>
+
+
+
+  
+
+    <meta charset="utf-8">
+    <link rel="icon" href="static/img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#fff">
+    <title>DorkSearch - Speed up your Google Dorking</title>
+
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta http-equiv="Content-Language" content="EN">
+ 
+	<meta name="keywords" content="Google Dorking, OSINT, Google Hacking, Google Dorks, Dorking, ChatGPT"> 
+	<meta name="description" content="Automated Google Dorking with ChatGPT AI, speeding up for your searching, for free.">
+	 
+	<meta name="copyright" content="Copyright 2023 DorkSearch.com">
+	<meta name="robots" content="FOLLOW,INDEX">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link href="static/stylesheet.css?rand=141" rel="stylesheet">
+    <link href="static/ai.css?rand=926" rel="stylesheet">
+
+    <script async="" src="/cdn-cgi/bm/cv/669835187/api.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" href="/css/textstyle.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcUaS8kAAAAACrPz_mMmyj46t4pwrKSYcV8AyCv"></script>	
+	
+    <script>
+    $( function() {
+        $("#site").autocomplete({
+            source:"autocomplete.php",
+            minLength:2
+        });
+
+        $('input.form-check-input').on('change', function(evt) {
+            if($('input[name="categories"]:checked').length > 2) {
+                this.checked = false;
+                return false;
+            }
+            if (!$(this).is(':checked')) {
+                var category_id = $(this).val();
+                $('.table-div-'+category_id).remove();
+            } else {
+                $('.tables-loading').show();
+                var category_id = $(this).val();
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "ajax_category.php?rand=736",
+                    data: {
+                        category_id: category_id,
+                    },
+                    cache: false,
+                    success: function(data) {
+                        $('.tables-loading').hide();
+                        $('.table-divs').append(data.html).show();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr);
+                    }
+                });
+            }
+
+        });
+        $(document).on("click", "tr.table-data-row", function() {
+            var title = $(this).attr("data-title");
+            $('.ui-autocomplete-input').val(title).addClass('x');;
+        });
+        $(document).on("mouseenter", "tr.table-data-row", function() {
+            $(this).addClass('hover');
+        });
+        $(document).on("mouseleave", "tr.table-data-row", function() {
+            $(this).removeClass('hover');
+        });
+
+        $(document).on("click", "tr.table-builder-row", function() {
+            var title = $(this).attr("data-title");
+            $('.ui-autocomplete-input').val($('.ui-autocomplete-input').val() + title).addClass('x');
+        });
+        $(document).on("mouseenter", "tr.table-builder-row", function() {
+            $(this).addClass('hover');
+        });
+        $(document).on("mouseleave", "tr.table-builder-row", function() {
+            $(this).removeClass('hover');
+        });
+
+        $(document).on("keyup", ".table-search-input", function() {
+            var value = $(this).val().toLowerCase().trim();
+            var table_id = $(this).attr("data-table-id");
+            $("table.table-data-"+table_id+" tr").each(function (index) {
+                if (!index) return;
+                $(this).find("td").each(function () {
+                    var id = $(this).text().toLowerCase().trim();
+                    var not_found = (id.indexOf(value) == -1);
+                    $(this).closest('tr').toggle(!not_found);
+                    return not_found;
+                });
+            });
+        });
+        $(document).on("click", ".btn-link", function() {
+            if( $( window ).width()<480){
+                $('.top-right').toggle();
+            }
+        });
+        $(document).on("click", ".btn-link-advanced", function() {
+            $("#collapseTable").removeClass('show');
+        });
+        $(document).on("click", ".btn-link-table", function() {
+            $("#collapseExample").removeClass('show');
+        });
+
+        function tog(v){return v ? "addClass" : "removeClass";}
+        $(document).on("input", ".clearable", function(){
+            $(this)[tog(this.value)]("x");
+        }).on("mousemove", ".x", function( e ){
+            $(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]("onX");
+        }).on("touchstart click", ".onX", function( ev ){
+            ev.preventDefault();
+            $(this).removeClass("x onX").val("").change();
+        });
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute('6LcUaS8kAAAAACrPz_mMmyj46t4pwrKSYcV8AyCv', {
+                    action: 'submit'
+                }).then(function (token) {
+                    $('#g-recaptcha-response').val(token);
+                });
+            });
+            
+        $(document).on("click", "#submitmsg", function(e) {
+            e.preventDefault();
+
+    
+            var clientmsg = $("#usermsg").val();
+            var oldscrollHeight = $("#chatbox")[0].scrollHeight - 20;
+            var e = $('<div class="msgln"><b class="user-name-left">You</b> ' + clientmsg + '</span></div>');
+            $('#chatbox').append(e);
+            var chatbox = $("#chatbox").html();
+			var nscrollHeight = $("#chatbox")[0].scrollHeight - 20;
+            if(nscrollHeight > oldscrollHeight){
+                $("#chatbox").animate({ scrollTop: nscrollHeight }, 'normal');
+            }
+		    $("#chatbox").append('<div class="msgln msglnRight msgTyping"><b class="user-name">Dork AI</b> <img src="pageloader.gif" width="20" height="20" border="0"></div>');
+
+		    $.ajax({
+			    url: 'ajax_ai.php',
+			    type: "POST",
+                dataType: "json",
+			    data: {
+				    data : $("form#chatboxform").serialize()+'&chatbox='+chatbox
+			    },
+			    success: function(response) {
+				    $("#usermsg").val("");
+				    $(".msgTyping").remove();
+				    if (response.error == 0) {
+					    $("#chatbox").append(response.html);
+			            var nscrollHeight = $("#chatbox")[0].scrollHeight - 20;
+                        if(nscrollHeight > oldscrollHeight){
+                            $("#chatbox").animate({ scrollTop: nscrollHeight }, 'normal');
+                        }				
+
+				    } else {
+					    alert(response.html);
+				    }
+			    }
+		    });
+        });
+    } );
+    </script>
+    <style>
+.table-divs .table-data tbody tr {
+  border-bottom: 1px solid #ccc;
+}
+    </style>
+    </head>
+    <body>
+
+    <div class="top-right">
+		For educational purposes only.  Misuse of Google Dorking can be viewed as hacking in some countries.
+    </div>
+
+    <div class="wrapper">
+        <div class="content">
+            <div class="columns">
+                <div class="column left">
+                   <div class="tables-loading"><p>Loading....</p></div>
+                   <div class="table-divs">
+                    </div>
+                </div>
+                <div class="column center">
+
+                    <img class="mb-4" src="static/img/logo.png" alt="Logo" width="400" height="100">
+                    <form action="https://google.com/search" method="get" target="_blank">
+                        <div class="form-group"><label for="site"></label><input type="text" class="form-control clearable ui-autocomplete-input" id="site" name="q" placeholder="Search" autocomplete="off"></div>
+                        <button class="btn btn-primary" type="submit" onclick="search()">Search</button>
+			            <button class="btn btn-link btn-link-advanced" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Prebuilt</button>
+			            <button class="btn btn-link btn-link-table" type="button" data-toggle="collapse" data-target="#collapseTable" aria-expanded="false" aria-controls="collapseTable">Builder</button>
+						<button class="btn btn-link btn-link-guide" type="button" data-toggle="collapse" data-target="#collapseTableGuide" aria-expanded="false" aria-controls="collapseTableGuide">Tips</button>
+						<button class="btn btn-link btn-link-submit" type="button" data-toggle="collapse" data-target="#collapseTableSubmit" aria-expanded="false" aria-controls="collapseTableSubmit">Submit</button>
+						<a href="https://dorksearch.com/blog"><button class="btn btn-link btn-link-submit" type="button"> Blog</button></a>
+                        <div class="collapse" id="collapseExample">
+                            <div class="container">
+                            <div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-14" type="checkbox" value="14" id="inlineCheckbox14"><label class="form-check-label" for="inlineCheckbox14">Advisories and Vulnerabilities</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-7" type="checkbox" value="7" id="inlineCheckbox7"><label class="form-check-label" for="inlineCheckbox7">Error Messages</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-8" type="checkbox" value="8" id="inlineCheckbox8"><label class="form-check-label" for="inlineCheckbox8">Files Containing Juicy Info</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-9" type="checkbox" value="9" id="inlineCheckbox9"><label class="form-check-label" for="inlineCheckbox9">Files Containing Passwords</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-2" type="checkbox" value="2" id="inlineCheckbox2"><label class="form-check-label" for="inlineCheckbox2">Files Containing Usernames</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-1" type="checkbox" value="1" id="inlineCheckbox1"><label class="form-check-label" for="inlineCheckbox1">Footholds</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-11" type="checkbox" value="11" id="inlineCheckbox11"><label class="form-check-label" for="inlineCheckbox11">Network or Vulnerability Data</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-12" type="checkbox" value="12" id="inlineCheckbox12"><label class="form-check-label" for="inlineCheckbox12">Pages Containing Login Portals</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-3" type="checkbox" value="3" id="inlineCheckbox3"><label class="form-check-label" for="inlineCheckbox3">Sensitive Directories</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-10" type="checkbox" value="10" id="inlineCheckbox10"><label class="form-check-label" for="inlineCheckbox10">Sensitive Online Shopping Info</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-13" type="checkbox" value="13" id="inlineCheckbox13"><label class="form-check-label" for="inlineCheckbox13">Various Online Devices</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-5" type="checkbox" value="5" id="inlineCheckbox5"><label class="form-check-label" for="inlineCheckbox5">Vulnerable Files</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-6" type="checkbox" value="6" id="inlineCheckbox6"><label class="form-check-label" for="inlineCheckbox6">Vulnerable Servers</label></div><div class="form-check form-check-inline"><input name="categories" class="form-check-input form-check-input-4" type="checkbox" value="4" id="inlineCheckbox4"><label class="form-check-label" for="inlineCheckbox4">Web Server Detection</label></div>				            </div>
+			            </div>
+						
+                        <div class="collapse" id="collapseTableGuide">
+                            <div class="container" id="tipbox">
+                            
+							<ul>
+								<li> PreBuilt : Access over 7,000 prebuilt Dorks.</li>
+								<li> Builder : Build your own, mix &amp; match, discover new Dorks.</li>
+								<li> Submit : Found a new Dork? tell us &amp; we credit your handle.</li>
+							</ul>
+				            </div>
+			            </div>	
+                        <div class="collapse" id="collapseTableSubmit">
+                            <div class="container">
+                            Email : support@dorksearch.com.
+				            </div>
+			            </div>
+						
+                        <div class="collapse" id="collapseTable">
+                            <div class="container">
+                                <div class="table-wrapper">
+                                    <div class="table-scroll">
+                                    <table class="table-data">
+                                        <thead>
+                                            <tr>
+                                                <th><span class="text">Operator</span></th>
+                                                <th><span class="text">Purpose</span></th>
+                                                <th><span class="text">Web</span></th>
+                                                <th><span class="text">Images</span></th>
+                                                <th><span class="text">Groups</span></th>
+                                                <th><span class="text">News</span></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                            </tr><tr class="table-builder-row" data-title="intitle:"><td class="operator-td">intitle:</td><td>Search URL</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="allintitle:"><td class="operator-td">allintitle:</td><td>Search page title</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="inurl:"><td class="operator-td">inurl:</td><td>Search URL</td><td>yes</td><td>yes</td><td>not really</td><td>like intitle</td></tr><tr class="table-builder-row" data-title="allinurl:"><td class="operator-td">allinurl:</td><td>Search URL</td><td>yes</td><td>yes</td><td>yes</td><td>like intitle</td></tr><tr class="table-builder-row" data-title="filetype:"><td class="operator-td">filetype:</td><td>Search Specific Files</td><td>yes</td><td>yes</td><td>no</td><td>not really</td></tr><tr class="table-builder-row" data-title="allintext:"><td class="operator-td">allintext:</td><td>Search text of page only</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="site:"><td class="operator-td">site:</td><td>search specific site</td><td>yes</td><td>yes</td><td>no</td><td>not really</td></tr><tr class="table-builder-row" data-title="link:"><td class="operator-td">link:</td><td>Search for links to pages</td><td>yes</td><td>no</td><td>no</td><td>not really</td></tr><tr class="table-builder-row" data-title="inanchor:"><td class="operator-td">inanchor:</td><td>Search link anchor text</td><td>yes</td><td>yes</td><td>not really</td><td>yes</td></tr><tr class="table-builder-row" data-title="numrange:"><td class="operator-td">numrange:</td><td>Locate number</td><td>yes</td><td>no</td><td>no</td><td>not really</td></tr><tr class="table-builder-row" data-title="daterange:"><td class="operator-td">daterange:</td><td>Search in date range</td><td>yes</td><td>no</td><td>no</td><td>not really</td></tr><tr class="table-builder-row" data-title="author:"><td class="operator-td">author:</td><td>Group author search</td><td>no</td><td>no</td><td>yes</td><td>not really</td></tr><tr class="table-builder-row" data-title="group:"><td class="operator-td">group:</td><td>Group name search</td><td>no</td><td>no</td><td>yes</td><td>not really</td></tr><tr class="table-builder-row" data-title="insubject:"><td class="operator-td">insubject:</td><td>Group subject search</td><td>like intitle</td><td>like intitle</td><td>yes</td><td>like intitle</td></tr><tr class="table-builder-row" data-title="msgid:"><td class="operator-td">msgid:</td><td>Group msgid search</td><td>no</td><td>no</td><td>yes</td><td>not really</td></tr><tr class="table-builder-row" data-title="+"><td class="operator-td">+</td><td>force inclusion of something common</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="-"><td class="operator-td">-</td><td>exclude a search term</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="“"><td class="operator-td">“</td><td>use quotes around search phrases.  E.G “master card”.</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="."><td class="operator-td">.</td><td>a single-character wildcard</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="“"><td class="operator-td">“</td><td>use quotes around search phrases</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="."><td class="operator-td">.</td><td>a single-character wildcard</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="*"><td class="operator-td">*</td><td>any word</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="|"><td class="operator-td">|</td><td>boolean ‘OR’, E.G (“master card” | mastercard</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="*"><td class="operator-td">*</td><td>any word</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="|"><td class="operator-td">|</td><td>boolean ‘OR’, E.G (“master card” | mastercard</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr><tr class="table-builder-row" data-title="pdf"><td class="operator-td">pdf</td><td>File Type : Document</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="doc"><td class="operator-td">doc</td><td>File Type : Document</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pdf"><td class="operator-td">pdf</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="doc"><td class="operator-td">doc</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="docx"><td class="operator-td">docx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="csv"><td class="operator-td">csv</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xls"><td class="operator-td">xls</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xlsx"><td class="operator-td">xlsx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="txt"><td class="operator-td">txt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="rtf"><td class="operator-td">rtf</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="odt"><td class="operator-td">odt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="ppt"><td class="operator-td">ppt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pptx"><td class="operator-td">pptx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pptm"><td class="operator-td">pptm</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xml"><td class="operator-td">xml</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="klm"><td class="operator-td">klm</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="docx"><td class="operator-td">docx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="csv"><td class="operator-td">csv</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xls"><td class="operator-td">xls</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xlsx"><td class="operator-td">xlsx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="txt"><td class="operator-td">txt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="rtf"><td class="operator-td">rtf</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="odt"><td class="operator-td">odt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="ppt"><td class="operator-td">ppt</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pptx"><td class="operator-td">pptx</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pptm"><td class="operator-td">pptm</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="xml"><td class="operator-td">xml</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="klm"><td class="operator-td">klm</td><td>File Type : Document</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="php"><td class="operator-td">php</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="sql"><td class="operator-td">sql</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="sqlite"><td class="operator-td">sqlite</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="pdb"><td class="operator-td">pdb</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="idb"><td class="operator-td">idb</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="cdb"><td class="operator-td">cdb</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="sis"><td class="operator-td">sis</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="odb"><td class="operator-td">odb</td><td>File Type : Database</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="env"><td class="operator-td">env</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="cfg"><td class="operator-td">cfg</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="conf"><td class="operator-td">conf</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="config"><td class="operator-td">config</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="cfm"><td class="operator-td">cfm</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="log"><td class="operator-td">log</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr><tr class="table-builder-row" data-title="inf"><td class="operator-td">inf</td><td>File Type : System / Internal</td><td>yes</td><td>no</td><td>yes</td><td>yes</td></tr>                                            
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                </div>
+				            </div>
+			            </div>
+                    </form>
+
+			        <div class="ai-chat">
+			            <h4 class="ai-chat-heading">AI: Let me create your Dork queries</h4>
+                        <div id="chatbox"><div class="msgln msglnRight"><b class="user-name">Dork AI</b> I am here to help you.</div></div>
+                        <form name="message" action="" id="chatboxform">
+                            <input type="hidden" name="g-recaptcha-response" value="03AFcWeA6qjngin4Ef1gXMvQDrRySoPeinObHNAtJecwN-CMt3q5rBr9NfZqASJ8eGyVD_FhbI32UbQbIoZCu83yLK-lyF4EvJjRxYh55M4NuH5glDhIncUC37mtLYshSyfy10wJTH6l8gBJBRSeyHD5Ji_IotdpOyykEGe8Ol-xge6Z2fGAJv-9yhriOXqB4OWUHyu0XLuslLOkfSrsaBdApbSgFvTYyLWUAx8htdfmeudfXKRshxx5pfMI8nXYYGMj3dAzMoY6anHu5RFJx4idXuSRSk645tExdClgIB7KKho49vRxKqggZPjgBhcdXuNmyVIlZdqLpOqWZAtUhvetR0A2qCpiZTH6j7036UX3xFdfUzB-KVK_8PgoFmVOCpTzYzsH2jxZMEMk5aW7DizAuKH8z8ljgNTXynbk4lynb6m4D2NOW1YBYML4bf6n4Ev7rTbajDUZDuZ295zInYrr-6kxNO-FSuSks7Mm6ICnGxz2yMKR5Svpmo4vz8KkxFjycUzHxm8uCQKS4igDvYjVZpo9ZXN8ivevljFN3jIHxEBIrroyWT-q3Dx1zW4B8RBInfYzfnoPg44Z7fgyzGAp_buG6IX4q7aKA-Nw-DyBZqSI0WEO6nD49no57UEUYa8Q2kEMdEbsJjRTkcD-hr_HEqoCGiIpfIsA" id="g-recaptcha-response">
+                            <input name="usermsg" type="text" id="usermsg" placeholder="Make me a doogle dork to do XYZ">
+                            <input name="submitmsg" type="submit" id="submitmsg" value="Send">
+                        </form>
+                    </div>
+
+                </div>
+                <div class="column right">
+                    <div class="table-2-div">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© DorkSearch 2023.</p>
+        </div>
+    </div>
+    <script type="text/javascript">(function(){window['__CF$cv$params']={r:'6d850eb8d818904e',m:'DJrOftIt4M3atUXwqRpc5LRGIbFTq.g9_NF9Sv1KGts-1643989856-0-AYsWFcbMvtLlE+La+VPu3Cb3tQ3dMzgQF3bMO10H8sjouMEFhuFnJXM9jo9p9pcOysDbH6M7asZl8D5hIIfkdB4ILGMR/Dnjr/pyXX+xybffXBXoFwVx8Smh9w9YgiKpLLjulov1V0WWU5ey5saASdMIBCkfuDXFSGO+wldrXOGAJLrK/KXT7EYIbvy4H4Z7MA==',s:[0x8c5eed9ca8,0xd1b4aac9fa],}})();
+    </script>
+  
+  
+<ul id="ui-id-1" tabindex="0" class="ui-menu ui-widget ui-widget-content ui-autocomplete ui-front" style="display: none;" unselectable="on"></ul><div role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></div><div><div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; display: block; transition: right 0.3s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;"><div class="grecaptcha-logo"><iframe title="reCAPTCHA" width="256" height="60" role="presentation" name="a-sa1656hm5nsz" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LcUaS8kAAAAACrPz_mMmyj46t4pwrKSYcV8AyCv&amp;co=aHR0cHM6Ly9kb3Jrc2VhcmNoLmNvbTo0NDM.&amp;hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;size=invisible&amp;cb=tranqo1g2dod"></iframe></div><div class="grecaptcha-error"></div><textarea id="g-recaptcha-response-100000" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div></body></html>

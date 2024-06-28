@@ -1,0 +1,1439 @@
+<html class="v2" dir="ltr" lang="en"><head>
+<link href="https://www.blogger.com/static/v1/widgets/3566091532-css_bundle_v2.css" rel="stylesheet" type="text/css">
+<meta content="width=1100" name="viewport">
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta content="blogger" name="generator">
+<link href="https://standa-note.blogspot.com/favicon.ico" rel="icon" type="image/x-icon">
+<link href="http://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html" rel="canonical">
+<link rel="alternate" type="application/atom+xml" title="Satoshi's note - Atom" href="https://standa-note.blogspot.com/feeds/posts/default">
+<link rel="alternate" type="application/rss+xml" title="Satoshi's note - RSS" href="https://standa-note.blogspot.com/feeds/posts/default?alt=rss">
+<link rel="service.post" type="application/atom+xml" title="Satoshi's note - Atom" href="https://www.blogger.com/feeds/2937860723034111347/posts/default">
+
+<link rel="alternate" type="application/atom+xml" title="Satoshi's note - Atom" href="https://standa-note.blogspot.com/feeds/6588653298231192332/comments/default">
+<!--Can't find substitution for tag [blog.ieCssRetrofitLinks]-->
+<link href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w98-h98/image.png" rel="image_src">
+<meta content="http://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html" property="og:url">
+<meta content="Reverse engineering (Absolute) UEFI modules for beginners " property="og:title">
+<meta content="This post introduces how one can start reverse engineering UEFI-based BIOS modules. Taking Absolute as an example, this post serves as a tut..." property="og:description">
+<meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w1200-h630-p-k-no-nu/image.png" property="og:image">
+<title>Satoshi's note: Reverse engineering (Absolute) UEFI modules for beginners </title>
+<style id="page-skin-1" type="text/css"><!--
+/*
+-----------------------------------------------
+Blogger Template Style
+Name:     Simple
+Designer: Blogger
+URL:      www.blogger.com
+----------------------------------------------- */
+/* Content
+----------------------------------------------- */
+body {
+font: normal normal 14px 'Trebuchet MS', Trebuchet, Verdana, sans-serif;
+color: #666666;
+background: #ffffff none repeat scroll top left;
+padding: 0 0 0 0;
+}
+html body .region-inner {
+min-width: 0;
+max-width: 100%;
+width: auto;
+}
+h2 {
+font-size: 22px;
+}
+a:link {
+text-decoration:none;
+color: #2288bb;
+}
+a:visited {
+text-decoration:none;
+color: #888888;
+}
+a:hover {
+text-decoration:underline;
+color: #33aaff;
+}
+.body-fauxcolumn-outer .fauxcolumn-inner {
+background: transparent none repeat scroll top left;
+_background-image: none;
+}
+.body-fauxcolumn-outer .cap-top {
+position: absolute;
+z-index: 1;
+height: 400px;
+width: 100%;
+}
+.body-fauxcolumn-outer .cap-top .cap-left {
+width: 100%;
+background: transparent none repeat-x scroll top left;
+_background-image: none;
+}
+.content-outer {
+-moz-box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 0 0 #333333;
+box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+margin-bottom: 1px;
+}
+.content-inner {
+padding: 10px 40px;
+}
+.content-inner {
+background-color: #ffffff;
+}
+/* Header
+----------------------------------------------- */
+.header-outer {
+background: transparent none repeat-x scroll 0 -400px;
+_background-image: none;
+}
+.Header h1 {
+font: normal normal 40px 'Trebuchet MS',Trebuchet,Verdana,sans-serif;
+color: #000000;
+text-shadow: 0 0 0 rgba(0, 0, 0, .2);
+}
+.Header h1 a {
+color: #000000;
+}
+.Header .description {
+font-size: 18px;
+color: #000000;
+}
+.header-inner .Header .titlewrapper {
+padding: 22px 0;
+}
+.header-inner .Header .descriptionwrapper {
+padding: 0 0;
+}
+/* Tabs
+----------------------------------------------- */
+.tabs-inner .section:first-child {
+border-top: 0 solid #dddddd;
+}
+.tabs-inner .section:first-child ul {
+margin-top: -1px;
+border-top: 1px solid #dddddd;
+border-left: 1px solid #dddddd;
+border-right: 1px solid #dddddd;
+}
+.tabs-inner .widget ul {
+background: transparent none repeat-x scroll 0 -800px;
+_background-image: none;
+border-bottom: 1px solid #dddddd;
+margin-top: 0;
+margin-left: -30px;
+margin-right: -30px;
+}
+.tabs-inner .widget li a {
+display: inline-block;
+padding: .6em 1em;
+font: normal normal 14px 'Trebuchet MS', Trebuchet, Verdana, sans-serif;
+color: #000000;
+border-left: 1px solid #ffffff;
+border-right: 1px solid #dddddd;
+}
+.tabs-inner .widget li:first-child a {
+border-left: none;
+}
+.tabs-inner .widget li.selected a, .tabs-inner .widget li a:hover {
+color: #000000;
+background-color: #eeeeee;
+text-decoration: none;
+}
+/* Columns
+----------------------------------------------- */
+.main-outer {
+border-top: 0 solid transparent;
+}
+.fauxcolumn-left-outer .fauxcolumn-inner {
+border-right: 1px solid transparent;
+}
+.fauxcolumn-right-outer .fauxcolumn-inner {
+border-left: 1px solid transparent;
+}
+/* Headings
+----------------------------------------------- */
+div.widget > h2,
+div.widget h2.title {
+margin: 0 0 1em 0;
+font: normal bold 11px 'Trebuchet MS',Trebuchet,Verdana,sans-serif;
+color: #000000;
+}
+/* Widgets
+----------------------------------------------- */
+.widget .zippy {
+color: #999999;
+text-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
+}
+.widget .popular-posts ul {
+list-style: none;
+}
+/* Posts
+----------------------------------------------- */
+h2.date-header {
+font: normal bold 11px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+}
+.date-header span {
+background-color: #bbbbbb;
+color: #ffffff;
+padding: 0.4em;
+letter-spacing: 3px;
+margin: inherit;
+}
+.main-inner {
+padding-top: 35px;
+padding-bottom: 65px;
+}
+.main-inner .column-center-inner {
+padding: 0 0;
+}
+.main-inner .column-center-inner .section {
+margin: 0 1em;
+}
+.post {
+margin: 0 0 45px 0;
+}
+h3.post-title, .comments h4 {
+font: normal normal 22px 'Trebuchet MS',Trebuchet,Verdana,sans-serif;
+margin: .75em 0 0;
+}
+.post-body {
+font-size: 110%;
+line-height: 1.4;
+position: relative;
+}
+.post-body img, .post-body .tr-caption-container, .Profile img, .Image img,
+.BlogList .item-thumbnail img {
+padding: 2px;
+background: #ffffff;
+border: 1px solid #eeeeee;
+-moz-box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+-webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+}
+.post-body img, .post-body .tr-caption-container {
+padding: 5px;
+}
+.post-body .tr-caption-container {
+color: #666666;
+}
+.post-body .tr-caption-container img {
+padding: 0;
+background: transparent;
+border: none;
+-moz-box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+-webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+}
+.post-header {
+margin: 0 0 1.5em;
+line-height: 1.6;
+font-size: 90%;
+}
+.post-footer {
+margin: 20px -2px 0;
+padding: 5px 10px;
+color: #666666;
+background-color: #eeeeee;
+border-bottom: 1px solid #eeeeee;
+line-height: 1.6;
+font-size: 90%;
+}
+#comments .comment-author {
+padding-top: 1.5em;
+border-top: 1px solid transparent;
+background-position: 0 1.5em;
+}
+#comments .comment-author:first-child {
+padding-top: 0;
+border-top: none;
+}
+.avatar-image-container {
+margin: .2em 0 0;
+}
+#comments .avatar-image-container img {
+border: 1px solid #eeeeee;
+}
+/* Comments
+----------------------------------------------- */
+.comments .comments-content .icon.blog-author {
+background-repeat: no-repeat;
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAd0SU1FB9sLFwMeCjjhcOMAAAD+SURBVDjLtZSvTgNBEIe/WRRnm3U8RC1neQdsm1zSBIU9VVF1FkUguQQsD9ITmD7ECZIJSE4OZo9stoVjC/zc7ky+zH9hXwVwDpTAWWLrgS3QAe8AZgaAJI5zYAmc8r0G4AHYHQKVwII8PZrZFsBFkeRCABYiMh9BRUhnSkPTNCtVXYXURi1FpBDgArj8QU1eVXUzfnjv7yP7kwu1mYrkWlU33vs1QNu2qU8pwN0UpKoqokjWwCztrMuBhEhmh8bD5UDqur75asbcX0BGUB9/HAMB+r32hznJgXy2v0sGLBcyAJ1EK3LFcbo1s91JeLwAbwGYu7TP/3ZGfnXYPgAVNngtqatUNgAAAABJRU5ErkJggg==);
+}
+.comments .comments-content .loadmore a {
+border-top: 1px solid #999999;
+border-bottom: 1px solid #999999;
+}
+.comments .comment-thread.inline-thread {
+background-color: #eeeeee;
+}
+.comments .continue {
+border-top: 2px solid #999999;
+}
+/* Accents
+---------------------------------------------- */
+.section-columns td.columns-cell {
+border-left: 1px solid transparent;
+}
+.blog-pager {
+background: transparent url(//www.blogblog.com/1kt/simple/paging_dot.png) repeat-x scroll top center;
+}
+.blog-pager-older-link, .home-link,
+.blog-pager-newer-link {
+background-color: #ffffff;
+padding: 5px;
+}
+.footer-outer {
+border-top: 1px dashed #bbbbbb;
+}
+/* Mobile
+----------------------------------------------- */
+body.mobile  {
+background-size: auto;
+}
+.mobile .body-fauxcolumn-outer {
+background: transparent none repeat scroll top left;
+}
+.mobile .body-fauxcolumn-outer .cap-top {
+background-size: 100% auto;
+}
+.mobile .content-outer {
+-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+}
+.mobile .tabs-inner .widget ul {
+margin-left: 0;
+margin-right: 0;
+}
+.mobile .post {
+margin: 0;
+}
+.mobile .main-inner .column-center-inner .section {
+margin: 0;
+}
+.mobile .date-header span {
+padding: 0.1em 10px;
+margin: 0 -10px;
+}
+.mobile h3.post-title {
+margin: 0;
+}
+.mobile .blog-pager {
+background: transparent none no-repeat scroll top center;
+}
+.mobile .footer-outer {
+border-top: none;
+}
+.mobile .main-inner, .mobile .footer-inner {
+background-color: #ffffff;
+}
+.mobile-index-contents {
+color: #666666;
+}
+.mobile-link-button {
+background-color: #2288bb;
+}
+.mobile-link-button a:link, .mobile-link-button a:visited {
+color: #ffffff;
+}
+.mobile .tabs-inner .section:first-child {
+border-top: none;
+}
+.mobile .tabs-inner .PageList .widget-content {
+background-color: #eeeeee;
+color: #000000;
+border-top: 1px solid #dddddd;
+border-bottom: 1px solid #dddddd;
+}
+.mobile .tabs-inner .PageList .widget-content .pagelist-arrow {
+border-left: 1px solid #dddddd;
+}
+pre.prettyprint{
+height: auto;
+overflow: auto;
+max-width: 600px
+}
+code.prettyprint{
+height: auto;
+overflow: auto;
+max-width: 600px
+}
+--></style>
+<style id="template-skin-1" type="text/css"><!--
+body {
+min-width: 960px;
+}
+.content-outer, .content-fauxcolumn-outer, .region-inner {
+min-width: 960px;
+max-width: 960px;
+_width: 960px;
+}
+.main-inner .columns {
+padding-left: 0;
+padding-right: 260px;
+}
+.main-inner .fauxcolumn-center-outer {
+left: 0;
+right: 260px;
+/* IE6 does not respect left and right together */
+_width: expression(this.parentNode.offsetWidth -
+parseInt("0") -
+parseInt("260px") + 'px');
+}
+.main-inner .fauxcolumn-left-outer {
+width: 0;
+}
+.main-inner .fauxcolumn-right-outer {
+width: 260px;
+}
+.main-inner .column-left-outer {
+width: 0;
+right: 100%;
+margin-left: -0;
+}
+.main-inner .column-right-outer {
+width: 260px;
+margin-right: -260px;
+}
+#layout {
+min-width: 0;
+}
+#layout .content-outer {
+min-width: 0;
+width: 800px;
+}
+#layout .region-inner {
+min-width: 0;
+width: auto;
+}
+body#layout div.add_widget {
+padding: 8px;
+}
+body#layout div.add_widget a {
+margin-left: 32px;
+}
+--></style>
+<link href="https://www.blogger.com/dyn-css/authorization.css?targetBlogID=2937860723034111347&amp;zx=07147803-cbb1-4d38-99a6-062adb5db4d2" media="all" onload="if(media!='all')media='all'" rel="stylesheet"><noscript><link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=2937860723034111347&amp;zx=07147803-cbb1-4d38-99a6-062adb5db4d2' rel='stylesheet'/></noscript>
+<meta name="google-adsense-platform-account" content="ca-host-pub-1556223355139109">
+<meta name="google-adsense-platform-domain" content="blogspot.com">
+
+<script src="https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.pl.G_Xx-0O26DQ.O/m=gapi_iframes,gapi_iframes_style_bubble/rt=j/sv=1/d=1/ed=1/am=AAAQ/rs=AHpOoo8Nw84uIBBCxrKdPDDYYR2v5OFSfw/cb=gapi.loaded_0?le=scs" async=""></script><script type="text/javascript" language="javascript">
+  // Supply ads personalization default for EEA readers
+  // See https://www.blogger.com/go/adspersonalization
+  adsbygoogle = window.adsbygoogle || [];
+  if (typeof adsbygoogle.requestNonPersonalizedAds === 'undefined') {
+    adsbygoogle.requestNonPersonalizedAds = 1;
+  }
+</script>
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Consolas"><script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/js/google_top_exp.js"></script><style>.gc-bubbleDefault{background-color:transparent!important;text-align:left;padding:0!important;margin:0!important;border:0!important;table-layout:auto!important}.gc-reset{background-color:transparent!important;border:0!important;padding:0!important;margin:0!important;text-align:left}.pls-bubbleTop{border-bottom:1px solid #ccc!important}.pls-contentLeft,.pls-topTail,.pls-vertShimLeft{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif)!important}.pls-topTail{background-repeat:repeat-x!important;background-position:bottom!important}.pls-vertShim{background-color:#fff!important;text-align:right}.tbl-grey .pls-vertShim{background-color:#f5f5f5!important}.pls-vertShimLeft{background-repeat:repeat-y!important;background-position:100%!important;height:4px}.pls-vertShimRight{height:4px}.pls-confirm-container .pls-vertShim{background-color:#fff3c2!important}.pls-contentWrap{background-color:#fff!important;position:relative!important;vertical-align:top}.pls-contentLeft{background-repeat:repeat-y;background-position:100%;vertical-align:top}.pls-dropRight{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropR_3.png)!important;background-repeat:repeat-y!important;vertical-align:top}.pls-dropBL,.pls-dropTR .pls-dropBR,.pls-tailleft,.pls-vert,.pls-vert img{vertical-align:top}.pls-dropBottom{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropB_3.png)!important;background-repeat:repeat-x!important;width:100%;vertical-align:top}.pls-topLeft{background:inherit!important;text-align:right;vertical-align:bottom}.pls-topRight{background:inherit!important;text-align:left;vertical-align:bottom}.pls-bottomLeft{background:inherit!important;text-align:right}.pls-bottomRight{background:inherit!important;text-align:left;vertical-align:top}.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{display:none;position:relative}.pls-dropBL,.pls-dropBR,.pls-dropTR,.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite_3.png)!important;background-repeat:no-repeat}.tbl-grey .pls-dropBL,.tbl-grey .pls-dropBR,.tbl-grey .pls-dropTR,.tbl-grey .pls-tailbottom,.tbl-grey .pls-tailleft,.tbl-grey .pls-tailright,.tbl-grey .pls-tailtop{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite-grey.png)!important}.pls-tailbottom{background-position:-23px 0}.pls-confirm-container .pls-tailbottom{background-position:-23px -10px}.pls-tailtop{background-position:-19px -20px}.pls-tailright{background-position:0 0}.pls-tailleft{background-position:-10px 0}.pls-tailtop{vertical-align:top}.gc-bubbleDefault td{line-height:0;font-size:0}.pls-tailbottom,.pls-topLeft img,.pls-topRight img{vertical-align:bottom}.bubbleDropTR,.pls-bottomLeft,.pls-bottomLeft img,.pls-dropBottom img,.pls-dropBottomL img,.pls-dropBottomR img{vertical-align:top}.pls-dropTR{background-position:0 -22px}.pls-dropBR{background-position:0 -27px}.pls-dropBL{background-position:0 -16px}.pls-spacerbottom,.pls-spacerleft,.pls-spacerright,.pls-spacertop{position:static!important}.pls-spinner{bottom:0;position:absolute;left:0;margin:auto;right:0;top:0}</style><style class="singleton-element" type="text/css">.cookie-choices-info { position:fixed;width:100%;background-color:#666;margin:0;left:0;top:0;padding:0;z-index:4000;text-align:center;color:#fff;line-height:140%;padding:10px 0;font-family:roboto,Arial; } .cookie-choices-info .cookie-choices-inner { position:relative;width:initial;margin:0;left:0;top:0; } .cookie-choices-info .cookie-choices-text { display:inline-block;vertical-align:middle;font-size:16px;margin:10px 20px;color:#ccc;max-width:800px;text-align:left; }.cookie-choices-info .cookie-choices-buttons { display:inline-block;vertical-align:middle;white-space:nowrap;margin:0 10px; } .cookie-choices-info .cookie-choices-button:hover {  color: #fff; } .cookie-choices-info .cookie-choices-button { font-weight:bold;text-transform:UPPERCASE;white-space:nowrap;color:#eee;margin-left:8px;padding:0 6px; text-decoration:none; }</style></head>
+<body class=" variant-simplysimple">
+<div class="navbar section" id="navbar" name="Navbar"><div class="widget Navbar" data-version="1" id="Navbar1"><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"><iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="" tabindex="0" vspace="0" width="100%" id="navbar-iframe" name="navbar-iframe" src="https://www.blogger.com/navbar.g?targetBlogID=2937860723034111347&amp;blogName=Satoshi%27s+note&amp;publishMode=PUBLISH_MODE_BLOGSPOT&amp;navbarType=LIGHT&amp;layoutType=LAYOUTS&amp;searchRoot=https://standa-note.blogspot.com/search&amp;blogLocale=en&amp;v=2&amp;homepageUrl=https://standa-note.blogspot.com/&amp;targetPostID=6588653298231192332&amp;blogPostOrPageUrl=https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html&amp;vt=-1520300101018493861&amp;usegapi=1&amp;jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.pl.G_Xx-0O26DQ.O%2Fam%3DAAAQ%2Fd%3D1%2Frs%3DAHpOoo8Nw84uIBBCxrKdPDDYYR2v5OFSfw%2Fm%3D__features__#id=navbar-iframe&amp;_gfid=navbar-iframe&amp;parent=https%3A%2F%2Fstanda-note.blogspot.com&amp;pfname=&amp;rpctoken=22329823"></iframe></div>
+<script type="text/javascript" src="https://apis.google.com/js/platform.js" gapi_processed="true"></script>
+<script type="text/javascript">
+      gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          gapi.iframes.getContext().openChild({
+              url: 'https://www.blogger.com/navbar.g?targetBlogID\x3d2937860723034111347\x26blogName\x3dSatoshi\x27s+note\x26publishMode\x3dPUBLISH_MODE_BLOGSPOT\x26navbarType\x3dLIGHT\x26layoutType\x3dLAYOUTS\x26searchRoot\x3dhttps://standa-note.blogspot.com/search\x26blogLocale\x3den\x26v\x3d2\x26homepageUrl\x3dhttps://standa-note.blogspot.com/\x26targetPostID\x3d6588653298231192332\x26blogPostOrPageUrl\x3dhttps://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html\x26vt\x3d-1520300101018493861',
+              where: document.getElementById("navbar-iframe-container"),
+              id: "navbar-iframe"
+          });
+        }
+      });
+    </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div class="body-fauxcolumns">
+<div class="fauxcolumn-outer body-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="content-fauxcolumns">
+<div class="fauxcolumn-outer content-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content-outer">
+<div class="content-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left content-fauxborder-left">
+<div class="fauxborder-right content-fauxborder-right"></div>
+<div class="content-inner">
+<header>
+<div class="header-outer">
+<div class="header-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left header-fauxborder-left">
+<div class="fauxborder-right header-fauxborder-right"></div>
+<div class="region-inner header-inner">
+<div class="header section" id="header" name="Header"><div class="widget Header" data-version="1" id="Header1">
+<div id="header-inner">
+<div class="titlewrapper">
+<h1 class="title">
+<a href="https://standa-note.blogspot.com/">
+Satoshi's note
+</a>
+</h1>
+</div>
+<div class="descriptionwrapper">
+<p class="description"><span>
+</span></p>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="header-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</header>
+<div class="tabs-outer">
+<div class="tabs-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left tabs-fauxborder-left">
+<div class="fauxborder-right tabs-fauxborder-right"></div>
+<div class="region-inner tabs-inner">
+<div class="tabs no-items section" id="crosscol" name="Cross-Column"></div>
+<div class="tabs no-items section" id="crosscol-overflow" name="Cross-Column 2"></div>
+</div>
+</div>
+<div class="tabs-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="main-outer">
+<div class="main-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left main-fauxborder-left">
+<div class="fauxborder-right main-fauxborder-right"></div>
+<div class="region-inner main-inner">
+<div class="columns fauxcolumns">
+<div class="fauxcolumn-outer fauxcolumn-center-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-left-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-right-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<!-- corrects IE6 width calculation -->
+<div class="columns-inner">
+<div class="column-center-outer">
+<div class="column-center-inner">
+<div class="main section" id="main" name="Main"><div class="widget Blog" data-version="1" id="Blog1">
+<div class="blog-posts hfeed">
+
+          <div class="date-outer">
+        
+<h2 class="date-header"><span>Monday, April 12, 2021</span></h2>
+
+          <div class="date-posts">
+        
+<div class="post-outer">
+<div class="post hentry uncustomized-post-template" itemprop="blogPost" itemscope="itemscope" itemtype="http://schema.org/BlogPosting">
+<meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w98-h98/image.png" itemprop="image_url">
+<meta content="2937860723034111347" itemprop="blogId">
+<meta content="6588653298231192332" itemprop="postId">
+<a name="6588653298231192332"></a>
+<h3 class="post-title entry-title" itemprop="name">
+Reverse engineering (Absolute) UEFI modules for beginners 
+</h3>
+<div class="post-header">
+<div class="post-header-line-1"></div>
+</div>
+<div class="post-body entry-content" id="post-body-6588653298231192332" itemprop="description articleBody">
+<p>This post introduces how one can start reverse engineering
+UEFI-based BIOS modules. Taking Absolute as an example, this post serves as a tutorial of BIOS module reverse engineering with free tools and approachable steps for beginners.</p><p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal">This post is not to explain how to disable or discover issues in Absolute.</p><p class="MsoNormal">In this post, terms "BIOS", "UEFI" and "firmware" all refer to UEFI-based host firmware and are&nbsp; interchangeable.&nbsp;</p><p></p><h2>Background Story<o:p></o:p></h2><div><p class="MsoNormal">You can skip this section.&nbsp;<o:p></o:p></p>
+
+<p class="MsoNormal">Last week, I got a Dell laptop with activated Absolute.</p><p class="MsoNormal"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/" style="margin-left: 1em; margin-right: 1em; text-align: center;"><img alt="" data-original-height="1500" data-original-width="1500" height="98" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w98-h98/image.png" width="98"></a></p>Absolute, formally known as Computrace, is popular data and device security
+software with an interesting persistent technology as explained in <a href="https://en.wikipedia.org/wiki/Absolute_Software_Corporation">Wikipedia</a>.</div><div><p></p></div><p class="MsoNormal"></p><blockquote><p class="MsoNormal"><i>Absolute's flagship product is the Absolute Platform,
+formerly known as Data and Device Security (DDS). Absolute relies on patented
+Persistence technology, which is embedded into the firmware of most computers,
+tablets, and smartphones at the factory.[25]<o:p></o:p></i></p><p class="MsoNormal">
+
+</p><p class="MsoNormal"><i>The Persistence module is activated once the Absolute agent
+is installed. If the software client is removed from a device through flashing
+the firmware, replacing the hard drive, reimaging the device, or resetting the
+device back to factory settings, Persistence technology will trigger an
+automatic reinstallation of the software client.[25] Persistence technology is
+embedded in more than half a billion devices worldwide.</i></p></blockquote><p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal">I read multiple articles about its internals in the past
+but did not know much about the modules embedded in the firmware. Out of curiosity, I started to reverse engineer it, then decided to write up the steps I took because I believed this area needed more engineers' scrutiny and tutorials for it.</p><h2>Getting a BIOS image<o:p></o:p></h2><p class="MsoNormal">There are two easy ways to get a BIOS image to analyze:
+extracting from an update package or using CHIPSEC.<o:p></o:p></p><p class="MsoNormal">
+
+</p><p class="MsoNormal">BIOS images may be extracted from BIOS update packages OEMs
+publish. For example, any recent Dell's BIOS images can be extracted with a script in found in <a href="https://twitter.com/platomaniac">@platomaniac</a>'s&nbsp;<o:p></o:p><a href="https://github.com/platomav/BIOSUtilities">BIOSUtilities </a>repo.</p><p class="MsoNormal">As a handy sample, here is <a href="https://www.dell.com/support/home/en-ca/drivers/driversdetails?driverid=d0fh4&amp;oscode=wt64a&amp;productcode=xps-15-7590-laptop">the Dell BIOS image</a> we will analyze in this
+post.</p><p class="MsoNormal"></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0UAioYhd1BoKONIq5HGHf-eHr1GbJi9bfYqIFW030JQrtpW1Ddo7989tV15Za0DCvm6bLFZKAkZInXvG44t6BW4oRQDnM4GX_hkJ85K3L4t7ukbcdA-9_n6_an73pPKh-SKcYNXyNQoQ/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="269" data-original-width="1074" height="160" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0UAioYhd1BoKONIq5HGHf-eHr1GbJi9bfYqIFW030JQrtpW1Ddo7989tV15Za0DCvm6bLFZKAkZInXvG44t6BW4oRQDnM4GX_hkJ85K3L4t7ukbcdA-9_n6_an73pPKh-SKcYNXyNQoQ/w640-h160/image.png" width="640"></a></div><p class="MsoNormal">Alternatively, with <a href="https://github.com/chipsec/chipsec">CHIPSEC</a>,&nbsp;one can dump the BIOS image of the current system with
+this command after installation if the system is supported.</p><blockquote style="border: none; margin: 0px 0px 0px 40px; padding: 0px;"><p class="MsoNormal" style="text-align: left;">$ python chipsec_util.py spi dump rom.bin</p></blockquote><h2>Identifying Absolute's module<o:p></o:p></h2><p>UEFI modules are normally OS-agnostics. It is, however, not
+the case for the modules that need to interact with OS environment to establish
+OS-level persistency, for example. We can find out such peculiar modules by
+searching OS-specific strings such as "System32" and
+"NtOpen." Let us do this.</p><p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal">Open the the extracted image with <a href="https://github.com/LongSoft/UEFITool">UEFITool</a> and search
+"System32". This will list 821ACA26-29EA-4993-839F-597FC021708D.&nbsp;</p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhII2l8zfAP6NOj7wvCuNJjMb3unevPuhbz9JwcX4fZNptaclCn0maigXJjR7plrOsbnQpX8ueH4jS1Ff_6pp15zsOEfLrfxajunvP3GYVwhChDvqBdFHexqF2MxfSrLBEVYwlxPYLmL5g/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="186" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhII2l8zfAP6NOj7wvCuNJjMb3unevPuhbz9JwcX4fZNptaclCn0maigXJjR7plrOsbnQpX8ueH4jS1Ff_6pp15zsOEfLrfxajunvP3GYVwhChDvqBdFHexqF2MxfSrLBEVYwlxPYLmL5g/s16000/image.png"></a></div><o:p></o:p><p></p><p class="MsoNormal">Note that UEFI modules are identified by GUIDs and not
+human-friendly names. Names may be specified but are optional and unused by the
+platform software. Take 821ACA26-29EA-4993-839F-597FC021708D as an example, it
+is unnamed in our image, but in other image, it is named as
+"efiinstnats". The internet also suggests it may be named as
+"AbsoluteAbtInstaller".&nbsp;<o:p></o:p></p><h2>Reverse Engineering a UEFI module<o:p></o:p></h2><div><p class="MsoNormal">As the UEFITools shows, UEFI modules are vastly in the PF
+format and can be analyzed with existing tools.&nbsp;</p><p class="MsoNormal">To reserves engineer 821ACA26-29EA-4993-839F-597FC021708D, on UEFITool, right click the
+file and extract its body. Then, install <a href="https://ghidra-sre.org/">Ghidra</a> and the <a href="https://github.com/DSecurity/efiSeek">efiSeek</a> plugin as a free option. The other popular option is IDA and <a href="https://github.com/binarly-io/efiXplorer">efiXplorer</a>, though the
+free version of IDA is not usable for our scenario.&nbsp;</p></div><p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal">Open the extracted file
+(821ACA26-29EA-4993-839F-597FC021708D) with Ghidra and make sure efiSeek is
+checked for auto analysis. Ignore a warning about PDB if it appears.<o:p></o:p></p><p class="MsoNormal"></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEixeXLBd5LuFVtYmZvM4Rdv7p2nzYzFgTKlfIdu8zW9jRKhkONxEkYmXc4tR2z1L1KI2rSCwJELlZ4FGRuCodsovJ4_fB9JQd3HfmsmbMMycxuvlYRTMHnnTBO9sDiKF1i7dlinswvcfeA/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="333" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEixeXLBd5LuFVtYmZvM4Rdv7p2nzYzFgTKlfIdu8zW9jRKhkONxEkYmXc4tR2z1L1KI2rSCwJELlZ4FGRuCodsovJ4_fB9JQd3HfmsmbMMycxuvlYRTMHnnTBO9sDiKF1i7dlinswvcfeA/s16000/image.png"></a></div><br>Strings contained in the module is VERY interesting.<br><p></p><p class="MsoNormal"><span face="&quot;Calibri&quot;,sans-serif" style="font-size: 11pt; line-height: 107%; mso-ansi-language: EN-US; mso-ascii-theme-font: minor-latin; mso-bidi-font-family: &quot;Times New Roman&quot;; mso-bidi-language: AR-SA; mso-bidi-theme-font: minor-bidi; mso-fareast-font-family: &quot;Yu Mincho&quot;; mso-fareast-language: JA; mso-fareast-theme-font: minor-fareast; mso-hansi-theme-font: minor-latin;"></span></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyRWZ-c0LHNU5CoqeZoEOoMHocCLqlhgsTpGDPvpv-7RoLyY6mV6fer4nDeNSI6PuhbLaOmcwtLNcM7fJcTXFqewqDZCkadEaHRga_Ezz4W3ikcUNbx6fOr3y6JHc3pKVaq7S_gqGMLXA/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="346" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyRWZ-c0LHNU5CoqeZoEOoMHocCLqlhgsTpGDPvpv-7RoLyY6mV6fer4nDeNSI6PuhbLaOmcwtLNcM7fJcTXFqewqDZCkadEaHRga_Ezz4W3ikcUNbx6fOr3y6JHc3pKVaq7S_gqGMLXA/s16000/image.png"></a></div><p></p><p class="MsoNormal">What on earth a UEFI module has to do with SystemRoot. Either
+way, the string “Computrace” indicates this is Absolute’s component.</p><p class="MsoNormal">By peeking at functions called from the entry point, we can
+find an interesting function calling <a href="https://github.com/tianocore/edk2/blob/0ecdcb6142037dd1cdd08660a2349960bcf0270a/MdePkg/Include/Protocol/AcpiTable.h#L73">InstallAcpiTable()</a>.&nbsp;</p><p class="MsoNormal"></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjIU6WWXuiAg5nSnV1m6IFqMOTxA53nShoKBnh4eVf22DRm_t_gajYCR6LvCZ_wf00PqyIdW68hpScgXCyReTBrN6uBPxW7MqX1HASDaSYB8iCgMXgnSHSHjYIabAUUtgbI2rRg6-MNQbU/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="453" data-original-width="611" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjIU6WWXuiAg5nSnV1m6IFqMOTxA53nShoKBnh4eVf22DRm_t_gajYCR6LvCZ_wf00PqyIdW68hpScgXCyReTBrN6uBPxW7MqX1HASDaSYB8iCgMXgnSHSHjYIabAUUtgbI2rRg6-MNQbU/s16000/image.png"></a></div>As we can read from
+the API name it installs… an ACPI table, but what is it? With little bit of clean
+up, we can find some string literal looking values are assigned to the table
+variable, in particular, WPBT at the offset 0 looks interesting.&nbsp;<div><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhI2og1oPu0JQiZMLdnItelIOWgYAfwoxw9j-PIKlYwbskP8OEZnJg5n_kAberaapqY-KK4gYMKY3dxnJvDwuw9Oz8UczRnxUIuzeEQxuQWbO8jvGJUx52SRpTn4qpRURvxSi4M1idNXGQ/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="219" data-original-width="349" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhI2og1oPu0JQiZMLdnItelIOWgYAfwoxw9j-PIKlYwbskP8OEZnJg5n_kAberaapqY-KK4gYMKY3dxnJvDwuw9Oz8UczRnxUIuzeEQxuQWbO8jvGJUx52SRpTn4qpRURvxSi4M1idNXGQ/s16000/image.png"></a></div><p class="MsoNormal">With some google, we can find the Microsoft’s document
+explaining the table:&nbsp;<a href="https://download.microsoft.com/download/8/a/2/8a2fb72d-9b96-4e2d-a559-4a27cf905a80/windows-platform-binary-table.docx">Windows Platform Binary Table (WPBT)</a> (DOCX)</p><p class="MsoTitle"><o:p></o:p></p><p class="MsoNormal">In short, this type of ACPI table lets a UEFI module instruct
+Windows’ Session Manager to launch a specified executable on startup. We
+can see the use of the table in the code.</p><p class="MsoNormal"></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjTKW_48Pq_1rUReTsFPWVvqt0N-4rvUiKHCGuuzf5MBSklabRd6FGnNisVsjyFeDA5vakWNA89ehNN59fUcOHA60Xto4_VIvzVBIPQSwkSVwWKNyPBttmTVLRACoon-Cq73912YgKb9ac/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="79" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjTKW_48Pq_1rUReTsFPWVvqt0N-4rvUiKHCGuuzf5MBSklabRd6FGnNisVsjyFeDA5vakWNA89ehNN59fUcOHA60Xto4_VIvzVBIPQSwkSVwWKNyPBttmTVLRACoon-Cq73912YgKb9ac/s16000/image.png"></a></div><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjIRebgJvUpI-fkWK_yz1kFylkoaCDiibiWjVs_Xnexf7r-QVSW1C3gGuLQQiTLCJARUgxImQrBMS-C0MW5E1G2ZvdUbbIhb8hwxZdDfu8TrItrID0290dCCESY6lmdl-bpvldpGDKIEhU/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="400" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjIRebgJvUpI-fkWK_yz1kFylkoaCDiibiWjVs_Xnexf7r-QVSW1C3gGuLQQiTLCJARUgxImQrBMS-C0MW5E1G2ZvdUbbIhb8hwxZdDfu8TrItrID0290dCCESY6lmdl-bpvldpGDKIEhU/s16000/image.png"></a></div><p class="MsoNormal">Let us just verify what is being registered. The handoff
+memory appears to be initialized with the data at 0x80013178, which are coming from 0x80001138 containing the MZ header.</p><p class="MsoNormal"></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhHCEYbLfyEL4ZClFprgI7DpgHUIFYw9UVrHJ5Nf1IkTcyEzX-scd4ypZ9G8Dq_AD4Pu8OJhLJRR398Ppq9o-fLWC7vbBxnTeKWR1qNTDKIpcNpKinvqD8nIsiPp_ak9uD5lV7DJ9b-Rs/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="94" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhHCEYbLfyEL4ZClFprgI7DpgHUIFYw9UVrHJ5Nf1IkTcyEzX-scd4ypZ9G8Dq_AD4Pu8OJhLJRR398Ppq9o-fLWC7vbBxnTeKWR1qNTDKIpcNpKinvqD8nIsiPp_ak9uD5lV7DJ9b-Rs/s16000/image.png"></a></div>&nbsp;<div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjO-tNhvRAZyLxIuZ9RVL8iIXKWoiEQdRmMHcP2prnSwPR56TjNKiNZEsac0j2ZJitNUew2NdC1JYZypC2kajUUgiZwcnW-eonZfhAScLAHWvEv-r_1fSBWi3eJRRZmUK_eh9zCL3IA-Q8/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="52" data-original-width="350" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjO-tNhvRAZyLxIuZ9RVL8iIXKWoiEQdRmMHcP2prnSwPR56TjNKiNZEsac0j2ZJitNUew2NdC1JYZypC2kajUUgiZwcnW-eonZfhAScLAHWvEv-r_1fSBWi3eJRRZmUK_eh9zCL3IA-Q8/s16000/image.png"></a></div><div class="separator" style="clear: both; text-align: center;"><br></div><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYI0byMkkmNCrY7upsByJeloaZYOdSeDnJyCa9TjHXKYlnzaUtCXy1bbEFhkLbC1BE3lbXjt_Emy62Hk0ScHBMlC8ZMBWp6XW9Iq7oSYRhE5Y53v6gHiJj2RG3XxqVbapP7cxAd832IPs/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="151" data-original-width="328" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYI0byMkkmNCrY7upsByJeloaZYOdSeDnJyCa9TjHXKYlnzaUtCXy1bbEFhkLbC1BE3lbXjt_Emy62Hk0ScHBMlC8ZMBWp6XW9Iq7oSYRhE5Y53v6gHiJj2RG3XxqVbapP7cxAd832IPs/s16000/image.png"></a></div><p></p><p class="MsoNormal">From here, you could investigate smss.exe to see how the program
+is executed and wpbbin.exe to see the contents of the program. In this post, we are going to further
+look into BIOS, however.<o:p></o:p></p><p class="MsoNormal"><o:p></o:p></p><h2 style="text-align: left;">Tracking inter-module dependencies</h2><div><p class="MsoNormal">We have understood how the module installs auto startup mechanism for Windows, but how 821ACA26-29EA-4993-839F-597FC021708D<b> </b>gets
+executed? The file is an “Application” that is not automatically loaded the platform
+software.&nbsp;</p></div><p class="MsoNormal"><span face="&quot;Calibri&quot;,sans-serif" style="font-size: 11pt; line-height: 107%; mso-ansi-language: EN-US; mso-ascii-theme-font: minor-latin; mso-bidi-font-family: &quot;Times New Roman&quot;; mso-bidi-language: AR-SA; mso-bidi-theme-font: minor-bidi; mso-fareast-font-family: &quot;Yu Mincho&quot;; mso-fareast-language: JA; mso-fareast-theme-font: minor-fareast; mso-hansi-theme-font: minor-latin;"></span></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjI_RKzkNYVCmrpJwajWlaBd7rdI-Za9snSrPnJLxOxms8BnAIvDjRLQU6WKTwbOMVJ_w-u2PrHvuX0X_m3gKogtHS1TUT207IC3wWmG8ITlexB3_EfzRwANJHw5i8R-0ndT9-qp_2U7WY/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="60" data-original-width="624" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjI_RKzkNYVCmrpJwajWlaBd7rdI-Za9snSrPnJLxOxms8BnAIvDjRLQU6WKTwbOMVJ_w-u2PrHvuX0X_m3gKogtHS1TUT207IC3wWmG8ITlexB3_EfzRwANJHw5i8R-0ndT9-qp_2U7WY/s16000/image.png"></a></div><p></p><p class="MsoNormal">The short answer: another module starts it.&nbsp;<o:p></o:p></p><p class="MsoNormal">Finding the parent module requires UEFI specific knowledge that starting
+an application in the firmware image is done with those steps.&nbsp;<o:p></o:p></p><p class="MsoNormal"></p><ol style="text-align: left;"><li>Locating the application file via GUID through EFI_LOADED_IMAGE_PROTOCOL</li><li>Calling LoadImage() and StartImage()</li></ol><o:p></o:p><p></p><p class="MsoNormal">
+
+</p><p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal"><a href="https://edk2-docs.gitbook.io/edk-ii-uefi-driver-writer-s-guide/5_uefi_services/readme.2/524_loadimage_and_startimage">EDK2's UEFI Driver Writer's Guide</a> shows example code that looks about like this:</p><div style="background-color: #1e1e1e; color: #d4d4d4; font-family: Consolas, &quot;Courier New&quot;, monospace; font-size: 11px; line-height: 15px; white-space: pre;"><div>MEDIA_FW_VOL_FILEPATH_DEVICE_PATH&nbsp;devicePath;</div><div>devicePath.Header&nbsp;=&nbsp;<span style="color: #6a9955;">/*&nbsp;...&nbsp;*/</span></div><div>devicePath.FvFileName&nbsp;=&nbsp;FileGuid;&nbsp;&nbsp;&nbsp;<span style="color: #6a9955;">//&nbsp;GUID&nbsp;of&nbsp;the&nbsp;file&nbsp;to&nbsp;launch</span></div><div><span style="color: #6a9955;">//&nbsp;Open&nbsp;the&nbsp;loaded&nbsp;image&nbsp;protocol</span></div><div><span style="color: #9cdcfe;">gBS</span>-&gt;<span style="color: #dcdcaa;">OpenProtocol</span>(...,&nbsp;&amp;<span style="color: #9cdcfe;">EFI_LOADED_IMAGE_PROTOCOL_GUID</span>,&nbsp;&amp;<span style="color: #9cdcfe;">devicePathInterface</span>,&nbsp;...);</div><div><span style="color: #6a9955;">//&nbsp;Resolve&nbsp;the&nbsp;path&nbsp;in&nbsp;the&nbsp;firmware&nbsp;volume</span></div><div>path&nbsp;=&nbsp;<span style="color: #dcdcaa;">AppendDevicePathNode</span>(devicePathInterface,&nbsp;&amp;devicePath.Header);</div><div><span style="color: #6a9955;">//&nbsp;Start&nbsp;the&nbsp;file</span></div><div><span style="color: #9cdcfe;">gBS</span>-&gt;<span style="color: #dcdcaa;">LoadImage</span>(...,&nbsp;path,&nbsp;...,&nbsp;&amp;<span style="color: #9cdcfe;">NewImageHandle</span>);</div><div><span style="color: #9cdcfe;">gBS</span>-&gt;<span style="color: #dcdcaa;">StartImage</span>(NewImageHandle,&nbsp;...);</div></div><p class="MsoNormal">With this knowledge, we can search the GUID of the
+application (821ACA26-29EA-4993-839F-597FC021708D) and locate the parent module.&nbsp;</p><div class="separator" style="clear: both; text-align: center;"><div class="separator" style="clear: both; text-align: center;"><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYYRFR_MDsAsDXDT7A7sBs3oAZy8hSyrXpyIAv3EbTFGfNSSrCtZzJB8WN7C3uMoN3uV6eEd0M63bIz0jbj5lp5g62rHsZx7LtpWJ5e8GHHPjAJQzMB8ikRfuiQTKFyZYZ7WMinqRVJgw/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="104" data-original-width="624" height="106" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYYRFR_MDsAsDXDT7A7sBs3oAZy8hSyrXpyIAv3EbTFGfNSSrCtZzJB8WN7C3uMoN3uV6eEd0M63bIz0jbj5lp5g62rHsZx7LtpWJ5e8GHHPjAJQzMB8ikRfuiQTKFyZYZ7WMinqRVJgw/w640-h106/image.png" width="640"></a></div></div></div><div class="separator" style="clear: both; text-align: center;"><p class="MsoNormal" style="text-align: left;">As show above, the module 8B778A74-C275-49D5-93ED-4D709A129CB1 is found and is a DXE driver, meaning it is executed automatically by the platform software.
+Note that this module does not have the name in our image but other images had
+it as AbtDxe and DellAbtDxeBin.<o:p></o:p></p></div><p class="MsoNormal">Open the image with Ghidra and search the GUID through
+memory search. We can find the GUID at 0x800050e0 as shown below.<o:p></o:p></p><div class="separator" style="clear: both; text-align: center;"><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj-HTNcqBxxPrKJGvQUztve9p_qSyu8ju7u-OgbiSk3gm3SgiRHzoFb3-0Aq7qf9bbr2LDP4pmmrGHIXDafTDcj7RkP2Enlb0Ls8yThedQjZ3LkjGDCHgZH_H0MSa4-HQcyTlHC99Pn4k4/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="442" data-original-width="1118" height="253" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj-HTNcqBxxPrKJGvQUztve9p_qSyu8ju7u-OgbiSk3gm3SgiRHzoFb3-0Aq7qf9bbr2LDP4pmmrGHIXDafTDcj7RkP2Enlb0Ls8yThedQjZ3LkjGDCHgZH_H0MSa4-HQcyTlHC99Pn4k4/w640-h253/image.png" width="640"></a></div></div><br>By cross-referencing 0x800050e0, we can find the function using the GUID and calling StartImage().</div><div><br><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhISvx0-NLGgTyha0MZItWg3Vvd5fEs0XKI6KATlboCTSwMQ-mqewIRrT74eQkGMT1o42-QttoEGlULXu49We2ApuenF35_zeoXDs4QgNyC-jcKfhBJMg_ntvooNcS-MffJtK2Sz6-nbPk/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="279" data-original-width="501" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhISvx0-NLGgTyha0MZItWg3Vvd5fEs0XKI6KATlboCTSwMQ-mqewIRrT74eQkGMT1o42-QttoEGlULXu49We2ApuenF35_zeoXDs4QgNyC-jcKfhBJMg_ntvooNcS-MffJtK2Sz6-nbPk/s16000/image.png"></a></div><p class="MsoNormal">As we inspect the FUN_80002fe8 called above, it becomes obvious that the function calls LoadImage() with the GUID as input, and then, StartImage() is called, which launches the application.<o:p></o:p></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWBcfm36o8KKsyBE-rdLm50Y2ILB5tTvyKgfMEe1MedYxQ1Z6UPtoSSuhFN89MFrzoiCtDc86D641H-eitrjewqWYEx2ya16MEnUZnOpI9EBzT7YVXAYJ2kJDvTLS6FAg19iz3gnpoJHc/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="623" data-original-width="613" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWBcfm36o8KKsyBE-rdLm50Y2ILB5tTvyKgfMEe1MedYxQ1Z6UPtoSSuhFN89MFrzoiCtDc86D641H-eitrjewqWYEx2ya16MEnUZnOpI9EBzT7YVXAYJ2kJDvTLS6FAg19iz3gnpoJHc/s16000/image.png"></a></div><p class="MsoNormal">When are those functions called? By cross referencing the
+function, we can find that the pointer of the function is passed to the CreateEventEx() with EFI_EVENT_READY_TO_BOOT_GUID.&nbsp;<o:p></o:p></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_nEIpziOC_O9k1jJ_zPlpS3Vq4KuShprVUJoYKJi98vR3L5-BjBLp1fqcvdaeSbxgtfbKbaQiAaucnXd41iNY4JnJFFoCsQbfdCyGh-WYbEbV1RqvFx6iLrG9TqKxpHqhm4nO9cZCPmo/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="116" data-original-width="428" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_nEIpziOC_O9k1jJ_zPlpS3Vq4KuShprVUJoYKJi98vR3L5-BjBLp1fqcvdaeSbxgtfbKbaQiAaucnXd41iNY4JnJFFoCsQbfdCyGh-WYbEbV1RqvFx6iLrG9TqKxpHqhm4nO9cZCPmo/s16000/image.png"></a></div><br>We can make better sense of this with <a href="https://www.blogger.com/#">the UEFI specification (PDF)</a>.<br><br><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSWF1q3P19IbWVFbKMpGUd-W7RBa0gMNaa8fzQTGN1ItHf2HVeDmRrpErXDCw1YxNojOB1k47ciCb0pERfz7gghaTVLwU5V6Xg80MfCqCnYq9EhNxXkrR2BsnZ6X4HBSJDMD5pzwKVWY4/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="217" data-original-width="329" height="211" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSWF1q3P19IbWVFbKMpGUd-W7RBa0gMNaa8fzQTGN1ItHf2HVeDmRrpErXDCw1YxNojOB1k47ciCb0pERfz7gghaTVLwU5V6Xg80MfCqCnYq9EhNxXkrR2BsnZ6X4HBSJDMD5pzwKVWY4/" width="320"></a><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSWF1q3P19IbWVFbKMpGUd-W7RBa0gMNaa8fzQTGN1ItHf2HVeDmRrpErXDCw1YxNojOB1k47ciCb0pERfz7gghaTVLwU5V6Xg80MfCqCnYq9EhNxXkrR2BsnZ6X4HBSJDMD5pzwKVWY4/" style="margin-left: 1em; margin-right: 1em;"></a><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVBraf-ZEJekukYmHWiFnGpfuB0KtfLZA7tx3WBwQNIY_Dwv0QEl1rTjTFpVUiH1qs36lInG_hbkg9wnqBFt2Ky661_TEiLqrOUFswkKN8q8qRivIVJfUMHe0gvBbipx3Hshso6LCAEb0/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="72" data-original-width="426" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVBraf-ZEJekukYmHWiFnGpfuB0KtfLZA7tx3WBwQNIY_Dwv0QEl1rTjTFpVUiH1qs36lInG_hbkg9wnqBFt2Ky661_TEiLqrOUFswkKN8q8qRivIVJfUMHe0gvBbipx3Hshso6LCAEb0/s16000/image.png"></a></div></div><p class="MsoNormal">As highlighted, the function is set as a callback for the
+event that is called right before the OS boot loader starts.&nbsp;<o:p></o:p></p><p class="MsoNormal">To summarize the flow:<br></p><ol style="text-align: left;"><li>The driver 8B778A74-C275-49D5-93ED-4D709A129CB1 is loaded by the platform software.</li><li>The driver&nbsp;8B778A74-C275-49D5-93ED-4D709A129CB1 registers the event notification. </li><li>When the system is about to start the boot loader (eg, bootmgfw.efi and grub.efi), the event is signaled.</li><li>The driver&nbsp;8B778A74-C275-49D5-93ED-4D709A129CB1 starts the application 821ACA26-29EA-4993-839F-597FC021708D.</li><li>The application&nbsp;821ACA26-29EA-4993-839F-597FC021708D installs the WPBT ACPI table.</li><li>If Windows is booted, smss.exe creates wpbbin.exe from the table and executes it.</li></ol>This establishes the mechanism to auto start a Windows application, even if Windows is reinstalled. <p></p><h2 style="text-align: left;">More inter-module interactions</h2><p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal">An astute reader might notice we have not looked into how the above flow can be activated, or skipped in case Absolute is not enabled by the user. Answering to this question requires further analysis of UEFI variables and
+additional OEM-specific modules.</p><p class="MsoNormal">On the UEFI variables, Absolute uses few named as Abt* in the&nbsp;a0b1889e-00eb-445b-8ca9-e91ce43c907d namespace. They can be found as Unicode strings easily.&nbsp;&nbsp;</p><p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal">On the additional modules, the below snippet indicates that the condition
+to launch the applications is either:<o:p></o:p></p>
+
+<p class="MsoNormal"></p><ul style="text-align: left;"><li>LocateProtocol() failed, or</li><li>LocateProtocol() succeeded and the bit 0 of the retrieved
+data is set &nbsp;</li></ul><o:p></o:p><p></p>
+
+<p class="MsoNormal"><o:p></o:p></p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwaS-EaSOObBO8Ri-eOfW-rOXgSjUXZ4xBKB9LSTAPpq4sHfLIKc96cJFsCXjQxZzCZNjuHuqpXP-9o4WhxMYQwQKi170XU4wMzcZLhd9Cw5yBShbBZv5F7HR73nfwqYm68G5cPwQyndk/" style="margin-left: 1em; margin-right: 1em;"><img alt="" data-original-height="261" data-original-width="475" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwaS-EaSOObBO8Ri-eOfW-rOXgSjUXZ4xBKB9LSTAPpq4sHfLIKc96cJFsCXjQxZzCZNjuHuqpXP-9o4WhxMYQwQKi170XU4wMzcZLhd9Cw5yBShbBZv5F7HR73nfwqYm68G5cPwQyndk/s16000/image.png"></a></div><p class="MsoNormal">The first case does not appear to happen. The second case depends
+on whether another module that installed the “unknownProtocol_fa02fb02” protocol
+sets the bit on their side. Meaning that we would have to reverse engineer the
+other module to determine the exact condition. <o:p></o:p></p>
+
+<p class="MsoNormal">One can find the additional module by searching the protocol GUID
+on UEFITool again. Those are modules I found on my laptops:<o:p></o:p></p><p class="MsoNormal"></p><ul style="text-align: left;"><li>0FEBE434-A6AF-4166-BC2F-DE2C5952C87D (DellAbsoluteDxe) in Dell
+laptops</li><li>A81DD68E-F878-49FF-8309-798444A9C035 (AbtSmm) in an Acer
+laptop</li><li>458034FD-DE82-44F1-8398-6D941F85F473 and 22E6FAB5-A6C4-4FF6-AE8C-C16939911BCD
+in a HP laptop</li></ul><o:p></o:p><p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal">Analysis of the UEFI variable and OEM-specific modules is left as an exercise for
+readers, as they differ across OEMs.&nbsp;&nbsp;</p><h2 style="text-align: left;">Conclusion</h2><p class="MsoNormal"><o:p></o:p></p><p class="MsoNormal">Through this exercise, we studied:<o:p></o:p></p>
+
+<p class="MsoNormal"></p><ul style="text-align: left;"><li>How a BIOS image file can be extracted </li><li>How modules with tight dependency on Windows can be located&nbsp;</li><li>How the WBPT ACPI table may be used to establish persistency
+on Windows</li><li>How events can be used for differed execution </li><li>How dependent modules may be located in the BIOS&nbsp;image</li><li>Using only freely available, cross-platform software &nbsp;</li></ul><o:p></o:p><p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal"><o:p></o:p></p>
+
+<p class="MsoNormal">Hopefully, you found reverse engineering BIOS images was interesting and more
+approachable than previously you thought. &nbsp;</p><p class="MsoNormal" style="text-align: left;"><o:p></o:p></p><p class="MsoNormal"><o:p></o:p></p><p></p><p class="MsoNormal"><o:p></o:p></p><div></div></div>
+<div style="clear: both;"></div>
+</div>
+<div class="post-footer">
+<div class="post-footer-line post-footer-line-1">
+<span class="post-author vcard">
+Posted by
+<span class="fn" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person">
+<meta content="https://www.blogger.com/profile/14201125639595582699" itemprop="url">
+<a class="g-profile" href="https://www.blogger.com/profile/14201125639595582699" rel="author" title="author profile">
+<span itemprop="name">Satoshi Tanda</span>
+</a>
+</span>
+</span>
+<span class="post-timestamp">
+at
+<meta content="http://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html" itemprop="url">
+<a class="timestamp-link" href="https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html" rel="bookmark" title="permanent link"><abbr class="published" itemprop="datePublished" title="2021-04-12T06:52:00-07:00">6:52 AM</abbr></a>
+</span>
+<span class="post-comment-link">
+</span>
+<span class="post-icons">
+<span class="item-control blog-admin pid-1960573737">
+<a href="https://www.blogger.com/post-edit.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;from=pencil" title="Edit Post">
+<img alt="" class="icon-action" height="18" src="https://resources.blogblog.com/img/icon18_edit_allbkg.gif" width="18">
+</a>
+</span>
+</span>
+<div class="post-share-buttons goog-inline-block">
+<a class="goog-inline-block share-button sb-email" href="https://www.blogger.com/share-post.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;target=email" target="_blank" title="Email This"><span class="share-button-link-text">Email This</span></a><a class="goog-inline-block share-button sb-blog" href="https://www.blogger.com/share-post.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;target=blog" onclick="window.open(this.href, &quot;_blank&quot;, &quot;height=270,width=475&quot;); return false;" target="_blank" title="BlogThis!"><span class="share-button-link-text">BlogThis!</span></a><a class="goog-inline-block share-button sb-twitter" href="https://www.blogger.com/share-post.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;target=twitter" target="_blank" title="Share to Twitter"><span class="share-button-link-text">Share to Twitter</span></a><a class="goog-inline-block share-button sb-facebook" href="https://www.blogger.com/share-post.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;target=facebook" onclick="window.open(this.href, &quot;_blank&quot;, &quot;height=430,width=640&quot;); return false;" target="_blank" title="Share to Facebook"><span class="share-button-link-text">Share to Facebook</span></a><a class="goog-inline-block share-button sb-pinterest" href="https://www.blogger.com/share-post.g?blogID=2937860723034111347&amp;postID=6588653298231192332&amp;target=pinterest" target="_blank" title="Share to Pinterest"><span class="share-button-link-text">Share to Pinterest</span></a>
+</div>
+</div>
+<div class="post-footer-line post-footer-line-2">
+<span class="post-labels">
+</span>
+</div>
+<div class="post-footer-line post-footer-line-3">
+<span class="post-location">
+</span>
+</div>
+</div>
+</div>
+<div class="comments" id="comments">
+<a name="comments"></a>
+<h4>1 comment:</h4>
+<div class="comments-content">
+<script async="async" src="" type="text/javascript"></script>
+<script type="text/javascript">
+    (function() {
+      var items = null;
+      var msgs = null;
+      var config = {};
+
+// <![CDATA[
+      var cursor = null;
+      if (items && items.length > 0) {
+        cursor = parseInt(items[items.length - 1].timestamp) + 1;
+      }
+
+      var bodyFromEntry = function(entry) {
+        var text = (entry &&
+                    ((entry.content && entry.content.$t) ||
+                     (entry.summary && entry.summary.$t))) ||
+            '';
+        if (entry && entry.gd$extendedProperty) {
+          for (var k in entry.gd$extendedProperty) {
+            if (entry.gd$extendedProperty[k].name == 'blogger.contentRemoved') {
+              return '<span class="deleted-comment">' + text + '</span>';
+            }
+          }
+        }
+        return text;
+      }
+
+      var parse = function(data) {
+        cursor = null;
+        var comments = [];
+        if (data && data.feed && data.feed.entry) {
+          for (var i = 0, entry; entry = data.feed.entry[i]; i++) {
+            var comment = {};
+            // comment ID, parsed out of the original id format
+            var id = /blog-(\d+).post-(\d+)/.exec(entry.id.$t);
+            comment.id = id ? id[2] : null;
+            comment.body = bodyFromEntry(entry);
+            comment.timestamp = Date.parse(entry.published.$t) + '';
+            if (entry.author && entry.author.constructor === Array) {
+              var auth = entry.author[0];
+              if (auth) {
+                comment.author = {
+                  name: (auth.name ? auth.name.$t : undefined),
+                  profileUrl: (auth.uri ? auth.uri.$t : undefined),
+                  avatarUrl: (auth.gd$image ? auth.gd$image.src : undefined)
+                };
+              }
+            }
+            if (entry.link) {
+              if (entry.link[2]) {
+                comment.link = comment.permalink = entry.link[2].href;
+              }
+              if (entry.link[3]) {
+                var pid = /.*comments\/default\/(\d+)\?.*/.exec(entry.link[3].href);
+                if (pid && pid[1]) {
+                  comment.parentId = pid[1];
+                }
+              }
+            }
+            comment.deleteclass = 'item-control blog-admin';
+            if (entry.gd$extendedProperty) {
+              for (var k in entry.gd$extendedProperty) {
+                if (entry.gd$extendedProperty[k].name == 'blogger.itemClass') {
+                  comment.deleteclass += ' ' + entry.gd$extendedProperty[k].value;
+                } else if (entry.gd$extendedProperty[k].name == 'blogger.displayTime') {
+                  comment.displayTime = entry.gd$extendedProperty[k].value;
+                }
+              }
+            }
+            comments.push(comment);
+          }
+        }
+        return comments;
+      };
+
+      var paginator = function(callback) {
+        if (hasMore()) {
+          var url = config.feed + '?alt=json&v=2&orderby=published&reverse=false&max-results=50';
+          if (cursor) {
+            url += '&published-min=' + new Date(cursor).toISOString();
+          }
+          window.bloggercomments = function(data) {
+            var parsed = parse(data);
+            cursor = parsed.length < 50 ? null
+                : parseInt(parsed[parsed.length - 1].timestamp) + 1
+            callback(parsed);
+            window.bloggercomments = null;
+          }
+          url += '&callback=bloggercomments';
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = url;
+          document.getElementsByTagName('head')[0].appendChild(script);
+        }
+      };
+      var hasMore = function() {
+        return !!cursor;
+      };
+      var getMeta = function(key, comment) {
+        if ('iswriter' == key) {
+          var matches = !!comment.author
+              && comment.author.name == config.authorName
+              && comment.author.profileUrl == config.authorUrl;
+          return matches ? 'true' : '';
+        } else if ('deletelink' == key) {
+          return config.baseUri + '/delete-comment.g?blogID='
+               + config.blogId + '&postID=' + comment.id;
+        } else if ('deleteclass' == key) {
+          return comment.deleteclass;
+        }
+        return '';
+      };
+
+      var replybox = null;
+      var replyUrlParts = null;
+      var replyParent = undefined;
+
+      var onReply = function(commentId, domId) {
+        if (replybox == null) {
+          // lazily cache replybox, and adjust to suit this style:
+          replybox = document.getElementById('comment-editor');
+          if (replybox != null) {
+            replybox.height = '250px';
+            replybox.style.display = 'block';
+            replyUrlParts = replybox.src.split('#');
+          }
+        }
+        if (replybox && (commentId !== replyParent)) {
+          replybox.src = '';
+          document.getElementById(domId).insertBefore(replybox, null);
+          replybox.src = replyUrlParts[0]
+              + (commentId ? '&parentID=' + commentId : '')
+              + '#' + replyUrlParts[1];
+          replyParent = commentId;
+        }
+      };
+
+      var hash = (window.location.hash || '#').substring(1);
+      var startThread, targetComment;
+      if (/^comment-form_/.test(hash)) {
+        startThread = hash.substring('comment-form_'.length);
+      } else if (/^c[0-9]+$/.test(hash)) {
+        targetComment = hash.substring(1);
+      }
+
+      // Configure commenting API:
+      var configJso = {
+        'maxDepth': config.maxThreadDepth
+      };
+      var provider = {
+        'id': config.postId,
+        'data': items,
+        'loadNext': paginator,
+        'hasMore': hasMore,
+        'getMeta': getMeta,
+        'onReply': onReply,
+        'rendered': true,
+        'initComment': targetComment,
+        'initReplyThread': startThread,
+        'config': configJso,
+        'messages': msgs
+      };
+
+      var render = function() {
+        if (window.goog && window.goog.comments) {
+          var holder = document.getElementById('comment-holder');
+          window.goog.comments.render(holder, provider);
+        }
+      };
+
+      // render now, or queue to render when library loads:
+      if (window.goog && window.goog.comments) {
+        render();
+      } else {
+        window.goog = window.goog || {};
+        window.goog.comments = window.goog.comments || {};
+        window.goog.comments.loadQueue = window.goog.comments.loadQueue || [];
+        window.goog.comments.loadQueue.push(render);
+      }
+    })();
+// ]]>
+  </script>
+<div id="comment-holder">
+<div class="comment-thread toplevel-thread"><ol id="top-ra"><li class="comment" id="c3102141131064911590"><div class="avatar-image-container"><img src="//www.blogger.com/img/blogger_logo_round_35.png" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://www.blogger.com/profile/11094758114090230163" rel="nofollow">Josiah E</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html?showComment=1619714608251#c3102141131064911590">April 29, 2021 at 9:43 AM</a></span></div><p class="comment-content">Hey Satoshi! This is Josiah, I had emailed you several months ago about your AMD hypervisor. <br><br>Just wanted to say I hope you never stop writing to this blog, I'm finding every article super fascinating and it's been really helpful to me</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="3102141131064911590" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-1475234884"><a target="_self" href="https://www.blogger.com/delete-comment.g?blogID=2937860723034111347&amp;postID=3102141131064911590">Delete</a></span></span></div><div class="comment-replies"><div id="c3102141131064911590-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c3102141131064911590-ra" class="thread-chrome thread-expanded"><div></div><div id="c3102141131064911590-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="3102141131064911590" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c3102141131064911590-ce"></div></li></ol><div id="top-continue" class="continue hidden"><a class="comment-reply" target="_self" href="javascript:;">Add comment</a></div><div class="comment-replybox-thread" id="top-ce"><iframe allowtransparency="true" class="blogger-iframe-colorize blogger-comment-from-post" frameborder="0" height="88px" id="comment-editor" name="comment-editor" src="https://www.blogger.com/comment/frame/2937860723034111347?po=6588653298231192332&amp;hl=en&amp;blogspotRpcToken=6545376#%7B%22color%22:%22rgb(102,%20102,%20102)%22,%22backgroundColor%22:%22rgb(255,%20255,%20255)%22,%22unvisitedLinkColor%22:%22rgb(34,%20136,%20187)%22,%22fontFamily%22:%22%5C%22Trebuchet%20MS%5C%22,%20Trebuchet,%20Verdana,%20sans-serif%22%7D" width="100%" style="display: block;" data-resized="true"></iframe></div><div class="loadmore hidden" data-post-id="6588653298231192332"><a target="_self">Load more...</a></div></div>
+</div>
+</div>
+<p class="comment-footer">
+</p><div class="comment-form">
+<a name="comment-form"></a>
+<p>
+</p>
+<a href="https://www.blogger.com/comment/frame/2937860723034111347?po=6588653298231192332&amp;hl=en&amp;blogspotRpcToken=6545376" id="comment-editor-src"></a>
+
+<script src="https://www.blogger.com/static/v1/jsbin/1466990918-comment_from_post_iframe.js" type="text/javascript"></script>
+<script type="text/javascript">
+      BLOG_CMT_createIframe('https://www.blogger.com/rpc_relay.html');
+    </script>
+</div>
+<p></p>
+<div id="backlinks-container">
+<div id="Blog1_backlinks-container">
+</div>
+</div>
+</div>
+</div>
+
+        </div></div>
+      
+</div>
+<div class="blog-pager" id="blog-pager">
+<span id="blog-pager-newer-link">
+<a class="blog-pager-newer-link" href="https://standa-note.blogspot.com/2021/12/para-pass-through-hypervisors-and-their.html" id="Blog1_blog-pager-newer-link" title="Newer Post">Newer Post</a>
+</span>
+<span id="blog-pager-older-link">
+<a class="blog-pager-older-link" href="https://standa-note.blogspot.com/2021/03/debugging-system-with-dci-and-windbg.html" id="Blog1_blog-pager-older-link" title="Older Post">Older Post</a>
+</span>
+<a class="home-link" href="https://standa-note.blogspot.com/">Home</a>
+</div>
+<div class="clear"></div>
+<div class="post-feeds">
+<div class="feed-links">
+Subscribe to:
+<a class="feed-link" href="https://standa-note.blogspot.com/feeds/6588653298231192332/comments/default" target="_blank" type="application/atom+xml">Post Comments (Atom)</a>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="column-left-outer">
+<div class="column-left-inner">
+<aside>
+</aside>
+</div>
+</div>
+<div class="column-right-outer">
+<div class="column-right-inner">
+<aside>
+<div class="sidebar section" id="sidebar-right-1"><div class="widget BlogArchive" data-version="1" id="BlogArchive1">
+<h2>Blog Archive</h2>
+<div class="widget-content">
+<div id="ArchiveList">
+<div id="BlogArchive1_ArchiveList">
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2023/">
+2023
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2023/03/">
+March
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2021/">
+2021
+</a>
+<span class="post-count" dir="ltr">(3)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2021/12/">
+December
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2021/04/">
+April
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="posts">
+<li><a href="https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html">Reverse engineering (Absolute) UEFI modules for be...</a></li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2021/03/">
+March
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2020/">
+2020
+</a>
+<span class="post-count" dir="ltr">(5)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2020/12/">
+December
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2020/11/">
+November
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2020/05/">
+May
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2020/03/">
+March
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2018/">
+2018
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2018/02/">
+February
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/">
+2015
+</a>
+<span class="post-count" dir="ltr">(6)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/10/">
+October
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/08/">
+August
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/06/">
+June
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/03/">
+March
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2015/01/">
+January
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2014/">
+2014
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://standa-note.blogspot.com/2014/11/">
+November
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+</div></div>
+</aside>
+</div>
+</div>
+</div>
+<div style="clear: both"></div>
+<!-- columns -->
+</div>
+<!-- main -->
+</div>
+</div>
+<div class="main-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<footer>
+<div class="footer-outer">
+<div class="footer-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left footer-fauxborder-left">
+<div class="fauxborder-right footer-fauxborder-right"></div>
+<div class="region-inner footer-inner">
+<div class="foot no-items section" id="footer-1"></div>
+<table border="0" cellpadding="0" cellspacing="0" class="section-columns columns-2">
+<tbody>
+<tr>
+<td class="first columns-cell">
+<div class="foot no-items section" id="footer-2-1"></div>
+</td>
+<td class="columns-cell">
+<div class="foot no-items section" id="footer-2-2"></div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- outside of the include in order to lock Attribution widget -->
+<div class="foot section" id="footer-3" name="Footer"><div class="widget Attribution" data-version="1" id="Attribution1">
+<div class="widget-content" style="text-align: center;">
+Simple theme. Powered by <a href="https://www.blogger.com" target="_blank">Blogger</a>.
+</div>
+<div class="clear"></div>
+</div></div>
+</div>
+</div>
+<div class="footer-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</footer>
+<!-- content -->
+</div>
+</div>
+<div class="content-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+    window.setTimeout(function() {
+        document.body.className = document.body.className.replace('loading', '');
+      }, 10);
+  </script>
+<!--To Ty odpowiadasz za poinformowanie u\u017cytkownik\xf3w o\xa0u\u017cywaniu plik\xf3w cookie i\xa0zbieraniu danych na blogu. Blogger udost\u0119pnia standardowe powiadomienie, kt\xf3rego mo\u017cesz u\u017cywa\u0107 na swoim blogu. Mo\u017cesz je dostosowa\u0107 do swoich potrzeb lub zast\u0105pi\u0107 w\u0142asnym. Tu znajdziesz wi\u0119cej informacji: http://www.blogger.com/go/cookiechoices.-->
+<script defer="" src="/js/cookienotice.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(event) {
+      window.cookieChoices && cookieChoices.showCookieConsentBar && cookieChoices.showCookieConsentBar(
+          (window.cookieOptions && cookieOptions.msg) || 'W\xa0tej witrynie s\u0105 wykorzystywane pliki cookie, kt\xf3rych Google u\u017cywa do \u015bwiadczenia swoich us\u0142ug i\xa0analizowania ruchu. Tw\xf3j adres\xa0IP i\xa0nazwa klienta u\u017cytkownika oraz dane dotycz\u0105ce wydajno\u015bci i\xa0bezpiecze\u0144stwa s\u0105 udost\u0119pniane firmie Google, by zapewni\u0107 odpowiedni\u0105 jako\u015b\u0107 us\u0142ug, generowa\u0107 statystyki u\u017cytkowania oraz wykrywa\u0107 nadu\u017cycia i\xa0na nie reagowa\u0107.',
+          (window.cookieOptions && cookieOptions.close) || 'Rozumiem',
+          (window.cookieOptions && cookieOptions.learn) || 'Dowiedz si\u0119 wi\u0119cej',
+          (window.cookieOptions && cookieOptions.link) || 'https://www.blogger.com/go/blogspot-cookies');
+    });
+  </script>
+
+<script type="text/javascript" src="https://www.blogger.com/static/v1/widgets/922809059-widgets.js"></script>
+<script type="text/javascript">
+window['__wavt'] = 'AOuZoY6eGPrFDiBGq4m-ZjPuYNzy4zHnvg:1718445144142';_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d2937860723034111347','//standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html','2937860723034111347');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '2937860723034111347', 'title': 'Satoshi\x27s note', 'url': 'https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html', 'canonicalUrl': 'http://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html', 'homepageUrl': 'https://standa-note.blogspot.com/', 'searchUrl': 'https://standa-note.blogspot.com/search', 'canonicalHomepageUrl': 'http://standa-note.blogspot.com/', 'blogspotFaviconUrl': 'https://standa-note.blogspot.com/favicon.ico', 'bloggerUrl': 'https://www.blogger.com', 'hasCustomDomain': false, 'httpsEnabled': true, 'enabledCommentProfileImages': true, 'gPlusViewType': 'FILTERED_POSTMOD', 'adultContent': false, 'analyticsAccountNumber': '', 'encoding': 'UTF-8', 'locale': 'en', 'localeUnderscoreDelimited': 'en', 'languageDirection': 'ltr', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'isDynamicViewsAvailable': true, 'feedLinks': '\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Satoshi\x26#39;s note - Atom\x22 href\x3d\x22https://standa-note.blogspot.com/feeds/posts/default\x22 /\x3e\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/rss+xml\x22 title\x3d\x22Satoshi\x26#39;s note - RSS\x22 href\x3d\x22https://standa-note.blogspot.com/feeds/posts/default?alt\x3drss\x22 /\x3e\n\x3clink rel\x3d\x22service.post\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Satoshi\x26#39;s note - Atom\x22 href\x3d\x22https://www.blogger.com/feeds/2937860723034111347/posts/default\x22 /\x3e\n\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Satoshi\x26#39;s note - Atom\x22 href\x3d\x22https://standa-note.blogspot.com/feeds/6588653298231192332/comments/default\x22 /\x3e\n', 'meTag': '', 'adsenseHostId': 'ca-host-pub-1556223355139109', 'adsenseHasAds': false, 'adsenseAutoAds': false, 'boqCommentIframeForm': true, 'loginRedirectParam': '', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/1156f5042d12a8cd', 'plusOneApiSrc': 'https://apis.google.com/js/platform.js', 'disableGComments': true, 'interstitialAccepted': false, 'sharing': {'platforms': [{'name': 'Get link', 'key': 'link', 'shareMessage': 'Get link', 'target': ''}, {'name': 'Facebook', 'key': 'facebook', 'shareMessage': 'Share to Facebook', 'target': 'facebook'}, {'name': 'BlogThis!', 'key': 'blogThis', 'shareMessage': 'BlogThis!', 'target': 'blog'}, {'name': 'Twitter', 'key': 'twitter', 'shareMessage': 'Share to Twitter', 'target': 'twitter'}, {'name': 'Pinterest', 'key': 'pinterest', 'shareMessage': 'Share to Pinterest', 'target': 'pinterest'}, {'name': 'Email', 'key': 'email', 'shareMessage': 'Email', 'target': 'email'}], 'disableGooglePlus': true, 'googlePlusShareButtonWidth': 0, 'googlePlusBootstrap': '\x3cscript type\x3d\x22text/javascript\x22\x3ewindow.___gcfg \x3d {\x27lang\x27: \x27en\x27};\x3c/script\x3e'}, 'hasCustomJumpLinkMessage': false, 'jumpLinkMessage': 'Read more', 'pageType': 'item', 'postId': '6588653298231192332', 'postImageThumbnailUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/s72-w98-c-h98/image.png', 'postImageUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w98-h98/image.png', 'pageName': 'Reverse engineering (Absolute) UEFI modules for beginners ', 'pageTitle': 'Satoshi\x27s note: Reverse engineering (Absolute) UEFI modules for beginners '}}, {'name': 'features', 'data': {}}, {'name': 'messages', 'data': {'edit': 'Edit', 'linkCopiedToClipboard': 'Link copied to clipboard!', 'ok': 'Ok', 'postLink': 'Post Link'}}, {'name': 'template', 'data': {'name': 'Simple', 'localizedName': 'Simple', 'isResponsive': false, 'isAlternateRendering': false, 'isCustom': false, 'variant': 'simplysimple', 'variantId': 'simplysimple'}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '?view\x3dclassic'}, 'flipcard': {'name': 'flipcard', 'url': '?view\x3dflipcard'}, 'magazine': {'name': 'magazine', 'url': '?view\x3dmagazine'}, 'mosaic': {'name': 'mosaic', 'url': '?view\x3dmosaic'}, 'sidebar': {'name': 'sidebar', 'url': '?view\x3dsidebar'}, 'snapshot': {'name': 'snapshot', 'url': '?view\x3dsnapshot'}, 'timeslide': {'name': 'timeslide', 'url': '?view\x3dtimeslide'}, 'isMobile': false, 'title': 'Reverse engineering (Absolute) UEFI modules for beginners ', 'description': 'This post introduces how one can start reverse engineering UEFI-based BIOS modules. Taking Absolute as an example, this post serves as a tut...', 'featuredImage': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiteF2e9UwYchmZDCovx23WJawqMeUIZLIEHa8QNqMVZia__PW-Q9Z-duN4D-iqDe1kTyXMtyaXtRncsvYc87ah_pskj7rI5OmfC7SZNVzUF1XCH9IWPzhV5xm71-miPBP2zjgJBM4RTsM/w98-h98/image.png', 'url': 'https://standa-note.blogspot.com/2021/04/reverse-engineering-absolute-uefi.html', 'type': 'item', 'isSingleItem': true, 'isMultipleItems': false, 'isError': false, 'isPage': false, 'isPost': true, 'isHomepage': false, 'isArchive': false, 'isLabelSearch': false, 'postId': 6588653298231192332}}]);
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'lightboxEnabled': true, 'lightboxModuleUrl': 'https://www.blogger.com/static/v1/jsbin/630159536-lbx.js', 'lightboxCssUrl': 'https://www.blogger.com/static/v1/v-css/13464135-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar-right-1', document.getElementById('BlogArchive1'), {'languageDirection': 'ltr', 'loadingMessage': 'Loading\x26hellip;'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_AttributionView', new _WidgetInfo('Attribution1', 'footer-3', document.getElementById('Attribution1'), {}, 'displayModeFull'));
+</script>
+
+<div id="cookieChoiceInfo" class="cookie-choices-info singleton-element"><div class="cookie-choices-inner"><span class="cookie-choices-text">W&nbsp;tej witrynie są wykorzystywane pliki cookie, których Google używa do świadczenia swoich usług i&nbsp;analizowania ruchu. Twój adres&nbsp;IP i&nbsp;nazwa klienta użytkownika oraz dane dotyczące wydajności i&nbsp;bezpieczeństwa są udostępniane firmie Google, by zapewnić odpowiednią jakość usług, generować statystyki użytkowania oraz wykrywać nadużycia i&nbsp;na nie reagować.</span><span class="cookie-choices-buttons"><a href="https://www.blogger.com/go/blogspot-cookies" target="_blank" class="cookie-choices-button">Dowiedz się więcej</a><a id="cookieChoiceDismiss" href="#" class="cookie-choices-button">Rozumiem</a></span></div></div><link type="text/css" rel="stylesheet" href="https://www.blogger.com/static/v1/v-css/13464135-lightbox_bundle.css"><script type="text/javascript" src="https://www.blogger.com/static/v1/jsbin/630159536-lbx.js"></script></body></html>

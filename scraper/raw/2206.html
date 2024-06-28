@@ -1,0 +1,702 @@
+<html><head>
+        <meta charset="utf-8">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <title>Introducing DOM Invader: DOM XSS just got a whole lot easier to find | Blog - PortSwigger</title>
+        <meta name="description" content="Of the three main types of XSS, DOM-based XSS is by far the most difficult to find and exploit. But we come bearing good news! PortSwigger just released a new tool for Burp Suite Professional and Burp">
+        
+<!-- Twitter data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@PortSwigger">
+<meta name="twitter:title" content="Introducing DOM Invader: DOM XSS just got a whole lot easier to find">
+    <meta name="twitter:description" content="Of the three main types of XSS, DOM-based XSS is by far the most difficult to find and exploit. But we come bearing good news! PortSwigger just released a new tool for Burp Suite Professional and Burp">
+    <meta name="twitter:creator" content="@garethheyes">
+<meta name="twitter:image" content="https://portswigger.net/cms/images/9b/53/9c39-twittercard-dom_invader_twitter_card.png">
+
+<!-- Open Graph data -->
+<meta property="og:title" content="Introducing DOM Invader: DOM XSS just got a whole lot easier to find">
+    <meta property="og:description" content="Of the three main types of XSS, DOM-based XSS is by far the most difficult to find and exploit. But we come bearing good news! PortSwigger just released a new tool for Burp Suite Professional and Burp">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://portswigger.net/blog/introducing-dom-invader">
+<meta property="og:image" content="https://portswigger.net/cms/images/9b/53/9c39-twittercard-dom_invader_twitter_card.png">
+    <meta property="og:site_name" content="PortSwigger Blog">
+    <meta property="article:published_time" content="2021-06-30T16:47:00">
+
+        <link rel="canonical" href="https://portswigger.net/blog/introducing-dom-invader">
+        <link href="/content/images/logos/favicon.ico" rel="icon" type="image/x-icon">
+        <link href="/content/images/logos/apple-touch-icon.png" rel="apple-touch-icon">
+        <link href="/content/psblog.css" rel="stylesheet" type="text/css">
+        <link rel="preload" href="/content/fonts/ps-icons-small/ps-icons-small.woff?td2uot" as="font" crossorigin="anonymous">
+<link rel="preload" href="/content/fonts/ps-main/ps-icons.woff?l1la2n" as="font" crossorigin="anonymous">
+        
+<script type="text/javascript" id="www-widgetapi-script" src="https://www.youtube.com/s/player/74204f6c/www-widgetapi.vflset/www-widgetapi.js" async=""></script><script src="//www.youtube.com/iframe_api" async=""></script><script type="text/javascript" async="" defer="" src="https://ps.containers.piwik.pro/ppms.js"></script><script async="" src="https://ps.containers.piwik.pro/287552c2-4917-42e0-8982-ba994a2a73d7.js"></script><script nonce="">
+    const dimensionName = "dimension2";
+    const userRef = "";
+</script>
+
+
+
+<script nonce="">
+
+    (function(window, document, dataLayerName, id) {
+    function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d=";expires="+e.toUTCString()}document.cookie=a+"="+b+d+"; path=/"}
+    var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");
+    stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
+    var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");
+    var qPString=qP.length>0?("?"+qP.join("&")):"";
+    document.write('<nonce-script src="https://ps.containers.piwik.pro/'+id+'.sync.js' + qPString + '" nonce="xHpXkJcWegi4HvjZlmHk277gt+Xl9hmG"></' + 'nonce-script>');
+    })(window, document, 'dataLayer', '287552c2-4917-42e0-8982-ba994a2a73d7');
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        customerId : '',
+    });
+</script><script id="ppas_container_configuration" data-appid="287552c2-4917-42e0-8982-ba994a2a73d7" data-host="ps.piwik.pro"></script></head><body class="theme-blog"><nonce-script src="https://ps.containers.piwik.pro/287552c2-4917-42e0-8982-ba994a2a73d7.sync.js" nonce=""></nonce-script> 
+    
+    
+        
+
+
+<script nonce="">
+(function(window, document, dataLayerName, id) {
+    window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});
+    var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
+    function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d=";expires="+e.toUTCString()}document.cookie=a+"="+b+d+"; path=/"}
+    var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");
+    stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
+    var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),tags.nonce="xHpXkJcWegi4HvjZlmHk277gt+Xl9hmG",isStgDebug&&qP.push("stg_debug");
+    var qPString=qP.length>0?("?"+qP.join("&")):"";
+    tags.async=!0,tags.src="https://ps.containers.piwik.pro/"+id+".js"+qPString,
+    scripts.parentNode.insertBefore(tags,scripts);
+    !function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){
+    var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);
+    })(window, document, 'dataLayer', '287552c2-4917-42e0-8982-ba994a2a73d7');
+</script>
+        
+
+
+    <a href="https://portswigger.net/blog/introducing-dast-scanning-in-the-cloud-with-burp-suite-enterprise-edition" class="notification-banner theme-enterprise-2">
+        <strong>Burp Suite Enterprise Edition is now available in our secure Cloud</strong>&nbsp; – &nbsp;<span>Learn more</span>
+    </a>
+
+        <header class="page-header" id="top">
+            <div class="container">
+    <a class="logo" href="/"></a>
+    <div class="header-right">
+        <div class="login-buttons">
+                <a class="button-orange-small" href="/users">Login</a>
+        </div>
+
+
+    <input type="checkbox" id="hamburger-mobile" class="hamburger-input-mobile">
+    <input type="radio" id="hamburger-desktop" class="hamburger-input-desktop" name="mega-nav-input">
+    <div class="hamburger-menu-mobile">
+        <label class="hamburger-menu-label header-hidden" for="hamburger-mobile">
+            <span class="hamburger-layers"></span>
+        </label>
+    </div>
+    <div class="mega-nav">
+        <input type="radio" id="mega-nav-close" class="mega-nav-input-close" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-1" class="mega-nav-input-1" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-2" class="mega-nav-input-2" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-6" class="mega-nav-input-6" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-7" class="mega-nav-input-7" name="mega-nav-input">
+
+        <label for="mega-nav-close" class="mega-nav-close"></label>
+
+        <label class="mega-nav-label mega-nav-label-1" for="mega-nav-label-1">
+            <span class="mega-nav-text">Products</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <label class="mega-nav-label mega-nav-label-2" for="mega-nav-label-2">
+            <span class="mega-nav-text">Solutions</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <a class="mega-nav-link" href="/research"><span class="mega-nav-text">Research</span></a>
+        <a class="mega-nav-link" href="/web-security"><span class="mega-nav-text">Academy</span></a>
+        <label class="mega-nav-label mega-nav-label-6" for="mega-nav-label-6">
+            <span class="mega-nav-text">Support</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+
+        <label class="mega-nav-label mega-nav-label-7 header-hidden" for="mega-nav-label-7">
+            <span class="mega-nav-text">Company</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <div class="hamburger-menu-desktop">
+            <label class="hamburger-menu-label header-show" for="hamburger-desktop">
+                <span class="hamburger-layers"></span>
+            </label>
+            <div>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-1" href="/customers"><span class="mega-nav-text">Customers</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-3" href="/about"><span class="mega-nav-text">About</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-4" href="/blog"><span class="mega-nav-text">Blog</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-5" href="/careers"><span class="mega-nav-text">Careers</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-6" href="/legal"><span class="mega-nav-text">Legal</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-7" href="/contact"><span class="mega-nav-text">Contact</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-8" href="/support/reseller-faqs"><span class="mega-nav-text">Resellers</span></a>
+            </div>
+        </div>
+
+        <a class="mega-nav-link header-hidden" href="/users/youraccount"><span class="mega-nav-text">My account</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-1" href="/customers"><span class="mega-nav-text">Customers</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-3" href="/about"><span class="mega-nav-text">About</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-4" href="/blog"><span class="mega-nav-text">Blog</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-5" href="/careers"><span class="mega-nav-text">Careers</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-6" href="/legal"><span class="mega-nav-text">Legal</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-7" href="/contact"><span class="mega-nav-text">Contact</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-8" href="/support/reseller-faqs"><span class="mega-nav-text">Resellers</span></a>
+
+        <div class="mega-nav-container">
+
+            <div class="mega-nav-content mega-nav-content-1">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <a href="/burp/enterprise" class="link-block-white">
+                                <img src="/content/images/svg/icons/enterprise.svg" alt="Burp Suite Enterprise Edition">
+                                <span><strong>Burp Suite Enterprise Edition</strong></span>
+                                <span>The enterprise-enabled dynamic web vulnerability scanner.</span>
+                            </a>
+
+                            <a href="/burp/pro" class="link-block-white">
+                                <img src="/content/images/svg/icons/professional.svg" alt="Burp Suite Professional">
+                                <span><strong>Burp Suite Professional</strong></span>
+                                <span>The world's #1 web penetration testing toolkit.</span>
+                            </a>
+
+                            <a href="/burp/communitydownload" class="link-block-white">
+                                <img src="/content/images/svg/icons/community.svg" alt="Burp Suite Community Edition">
+                                <span><strong>Burp Suite Community Edition</strong></span>
+                                <span>The best manual tools to start web security testing.</span>
+                            </a>
+
+                            <a href="/burp/dastardly" class="link-block-white">
+                                <img src="/mega-nav/images/dastardly.svg" alt="Dastardly, from Burp Suite">
+                                <span><strong>Dastardly, from Burp Suite</strong></span>
+                                <span>Free, lightweight web application security scanning for CI/CD.</span>
+                            </a>
+
+                            <a href="/burp" class="chevron-after">View all product editions</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="/burp/vulnerability-scanner">
+                                    <p><strong>Burp Scanner</strong></p>
+                                    <p>Burp Suite's web vulnerability scanner</p>
+                                    <img src="/mega-nav/images/burp-suite-scanner.jpg" alt="Burp Suite's web vulnerability scanner'">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-nav-content mega-nav-content-2">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <div class="container-columns">
+                                <a href="/solutions/attack-surface-visibility" class="link-block-white">
+                                    <span><strong>Attack surface visibility</strong></span>
+                                    <span>Improve security posture, prioritize manual testing, free up time.</span>
+                                </a>
+                                <a href="/solutions/ci-driven-scanning" class="link-block-white">
+                                    <span><strong>CI-driven scanning</strong></span>
+                                    <span>More proactive security - find and fix vulnerabilities earlier.</span>
+                                </a>
+                                <a href="/solutions" class="link-block-white">
+                                    <span><strong>Application security testing</strong></span>
+                                    <span>See how our software enables the world to secure the web.</span>
+                                </a>
+                                <a href="/solutions/devsecops" class="link-block-white">
+                                    <span><strong>DevSecOps</strong></span>
+                                    <span>Catch critical bugs; ship more secure software, more quickly.</span>
+                                </a>
+
+                                <a href="/solutions/penetration-testing" class="link-block-white">
+                                    <span><strong>Penetration testing</strong></span>
+                                    <span>Accelerate penetration testing - find more bugs, more quickly.</span>
+                                </a>
+                                <a href="/solutions/automated-security-testing" class="link-block-white">
+                                    <span><strong>Automated scanning</strong></span>
+                                    <span>Scale dynamic scanning. Reduce risk. Save time/money.</span>
+                                </a>
+
+                                <a href="/solutions/bug-bounty-hunting" class="link-block-white">
+                                    <span><strong>Bug bounty hunting</strong></span>
+                                    <span>Level up your hacking and earn more bug bounties.</span>
+                                </a>
+                                <a href="/solutions/compliance" class="link-block-white">
+                                    <span><strong>Compliance</strong></span>
+                                    <span>Enhance security monitoring to comply with confidence.</span>
+                                </a>
+                            </div>
+                            <a href="/solutions" class="chevron-after">View all solutions</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="/burp/enterprise/resources/enterprise-edition-vs-professional">
+                                    <p><strong>Product comparison</strong></p>
+                                    <p>What's the difference between Pro and Enterprise Edition?</p>
+                                    <img src="/mega-nav/images/burp-suite.jpg" alt="Burp Suite Professional vs Burp Suite Enterprise Edition">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-nav-content mega-nav-content-6">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <div class="container-columns">
+                                <a href="/support" class="link-block-white">
+                                    <span><strong>Support Center</strong></span>
+                                    <span>Get help and advice from our experts on all things Burp.</span>
+                                </a>
+                                <a href="/burp/documentation" class="link-block-white">
+                                    <span><strong>Documentation</strong></span>
+                                    <span>Tutorials and guides for Burp Suite.</span>
+                                </a>
+                                <a href="/burp/documentation/desktop/getting-started" class="link-block-white">
+                                    <span><strong>Get Started - Professional</strong></span>
+                                    <span>Get started with Burp Suite Professional.</span>
+                                </a>
+                                <a href="/burp/documentation/enterprise/getting-started" class="link-block-white">
+                                    <span><strong>Get Started - Enterprise</strong></span>
+                                    <span>Get started with Burp Suite Enterprise Edition.</span>
+                                </a>
+                                <a href="https://forum.portswigger.net/" class="link-block-white">
+                                    <span><strong>User Forum</strong></span>
+                                    <span>Get your questions answered in the User Forum.</span>
+                                </a>
+                                <a href="/burp/releases" class="link-block-white">
+                                    <span><strong>Downloads</strong></span>
+                                    <span>Download the latest version of Burp Suite.</span>
+                                </a>
+                            </div>
+                            <a href="/support" class="chevron-after">Visit the Support Center</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="/burp/releases">
+                                    <p><strong>Downloads</strong></p>
+                                    <p>Download the latest version of Burp Suite.</p>
+                                    <img src="/mega-nav/images/latest-burp-suite-software-download.jpg" alt="The latest version of Burp Suite software for download">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+</div>
+        </header>
+        <div class="wrapper">
+            
+
+<div class="section theme-white blog">
+  
+    
+<h1>Introducing DOM Invader: DOM XSS just got a whole lot easier to find</h1>
+                
+    <div class="post-additionalinfo-container">
+        
+
+<div class="share-right">
+    <input id="share-button-right" type="checkbox">
+    <ul class="share-right-ul">
+        <li>
+            <a href="https://twitter.com/share?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader&amp;text=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find%20-%20%40PortSwiggerRes%0A" target="_blank">
+                <span class="icon-twitter"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://api.whatsapp.com/send?text=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-whatsapp"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://reddit.com/submit?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-reddit-dark"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/sharing/share-offsite?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-linkedin"></span>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:?subject=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find&amp;body=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find%0A%0AOf+the+three+main+types+of+XSS%2C+DOM-based+XSS+is+by+far+the+most+difficult+to+find+and+exploit.+But+we+come+bearing+good+news!+PortSwigger+just+released+a+new+tool+for+Burp+Suite+Professional+and+Burp%0A%0Ahttps://portswigger.net/blog/introducing-dom-invader">
+                <span class="icon-email"></span>
+            </a>
+        </li>
+        <li>
+            <a href="/research/rss">
+                <span class="icon-rss"></span>
+            </a>
+        </li>
+    </ul>
+
+    <label class="share-button" for="share-button-right">
+        <span class="icon-share"></span>
+    </label>
+</div>
+
+        <sup class="post-additionalinfo">
+            
+Gareth Heyes |
+30 June 2021 at 16:47 UTC
+        </sup>
+    </div>
+    <div class="container-flex-wrap post-additionalinfo-labels">
+            <a class="label-rounded-outline-grey-4" href="/blog/xss">
+                XSS
+            </a>
+            <a class="label-rounded-outline-grey-4" href="/blog/dom">
+                DOM
+            </a>
+            <a class="label-rounded-outline-grey-4" href="/blog/hacking-tools">
+                Hacking Tools
+            </a>
+    </div>
+
+    <!-- Article Start -->
+    <img src="/cms/images/f9/5c/938d-article-dom_invader_page_article_image.png" alt="Showing PortSwigger logo firing at aliens"><p>Of <a href="https://portswigger.net/web-security/cross-site-scripting">the three main types of XSS</a>, <a href="https://portswigger.net/web-security/cross-site-scripting/dom-based">DOM-based XSS</a> is by far the most difficult to find and exploit. But we come bearing good news! PortSwigger just released a new tool for <a href="https://portswigger.net/burp/pro">Burp Suite Professional</a> and <a href="https://portswigger.net/burp/communitydownload">Burp Suite Community Edition</a> that's going to make testing for DOM XSS much easier - and we think you're going to like it. Meet: DOM Invader.</p><p>We've created a YouTube video to show you how to use DOM Invader and solve an Academy lab:</p><p class="youtube-wrapper"><iframe src="https://www.youtube.com/embed/Wd2R47czzO0?origin=https://portswigger.net&amp;enablejsapi=1" data-pp-element-found="" id="widget2" data-listener-attached="true" title="Introducing DOM invader - A new tool within Burp Suite"></iframe></p><h2>Background</h2><p>Most modern sites use multiple JavaScript libraries - and have many lines of complex, minified code. This makes testing for DOM XSS a real headache. <a href="https://portswigger.net/research">PortSwigger Research</a> has specifically developed DOM Invader to make this process much easier.</p><p></p><blockquote>"The Augmented DOM allows you to find DOM XSS as if it were <a href="/web-security/cross-site-scripting/reflected">reflected XSS</a>."</blockquote><p></p><p>Through its Augmented DOM, DOM Invader will provide you with a convenient tree view of all of your target's sources and sinks. This greatly simplifies the task of hunting for DOM XSS, and will be big news for the <a href="https://portswigger.net/solutions/bug-bounty-hunting">bug bounty hunting</a> and <a href="https://portswigger.net/solutions/penetration-testing">pentest</a> communities.</p><p>So, without further ado, let's take a closer look at DOM Invader and what it can do:</p><p><img src="/cms/images/fa/47/b70d-article-01-augmented-dom-tree-view-resized.png" alt="DOM Invader's convenient tree view"></p><p>DOM Invader's Augmented DOM provides a convenient tree view of an application's sources and sinks.</p><h2>How to get started with DOM Invader</h2><p>DOM Invader is a completely new Burp Suite tool, implemented as an extension in the embedded browser. Simply update your version of Burp Suite Professional or Burp Suite Community Edition to <a href="https://portswigger.net/burp/releases/professional-community-2021-7?requestededition=professional">2021.7</a> on the Early Adopter channel to start using it. <a href="https://portswigger.net/burp/releases/professional-community-2021-7?requestededition=professional"><span>View the latest release notes</span></a>.</p><p>By default, DOM Invader is turned off (because it alters site behavior). Turn it on by clicking the icon in the top right hand corner of Burp Suite's embedded browser.</p><p><img src="/cms/images/7a/80/5d71-article-02-burps-embedded-browser-resized.png" alt="Burp's embedded browser with DOM Invader"></p><p>DOM Invader lives in Burp Suite's embedded browser.</p><p>DOM Invader instruments your target's DOM, intercepting any JavaScript sources and sinks it might come across, and organizing them ready for you to play with. A "source" could be any JavaScript object that allows user-controlled input (for example: location.search), while a "sink" is any function or setter that allows JavaScript/HTML execution. One notorious example of a sink is the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval">eval</a> function.</p><p>"Helpfully, DOM Invader orders sinks so that the most interesting ones appear first."</p><p>With DOM Invader, we're going to be working a lot with canaries. A canary is a unique string that's used to see where your user input is reflected inside a sink. By default, DOM Invader uses a random canary, but you can customize this value to whatever you like.</p><h2>How DOM Invader works</h2><p>We're not going to go into a full demo of how to use DOM Invader here (please see <a href="https://portswigger.net/burp/documentation/desktop/tools/dominvader/index.html">the documentation</a> for that), but as a broad overview, you're going to be spending a lot of your time using the tool in the Augmented DOM. The Augmented DOM will show you all the sources and sinks contained within your target, and allows you to find DOM XSS as if it were reflected XSS - by inspecting the value sent to the sink.</p><p>Essentially, you'll load up the site you want to test, and insert your canary into a query parameter or other such source. Opening DevTools in Burp Suite's embedded browser, you'll be able to click on a new "Augmented DOM" tab - which will show you any sources and sinks containing the canary value - as well as a tree view of all the sources and sinks available. Helpfully, DOM Invader orders sinks so that the most interesting ones appear first.</p><p><img src="/cms/images/5e/d9/bc6d-article-03-interesting-sinks-resized.png" alt="DOM Invader's augmented DOM showing most interesting sinks first"></p><p>DOM Invader will order lists of sinks with the most interesting ones appearing first.</p><p>When you find an interesting sink, DOM Invader will allow you to see the value contained in it, as well as a stack trace. It'll even highlight your canary for you. At this point, you might like to add some extra characters to your canary in the URL parameter or another source. You can then check the canary value in the Augmented DOM to see if those characters have been correctly encoded.</p><p><img src="/cms/images/18/b6/1466-article-04-highlights-resized.png" alt="DOM Invader highlighting the canary"></p><p>Canaries are automatically highlighted by DOM Invader.</p><p>Other useful features include the ability to search values sent to a sink, as well as automatically injecting canaries into URL parameters and form elements.</p><p><a href="https://portswigger.net/burp/documentation/desktop/tools/dominvader/index.html"><span>View the full documentation for DOM Invader.</span></a></p><h2>Web messages in DOM Invader</h2><p></p><p>When testing sites, we've always found it cumbersome to test for <a href="https://portswigger.net/web-security/dom-based/web-message-manipulation">web-message vulnerabilities</a>. Sure, you can add event listeners and breakpoints in Chrome - but there's no easy way to edit them without going to the effort of writing some JavaScript code. PortSwigger could hardly let this situation stand! So DOM Invader is set up to help you test for web-message vulnerabilities.</p><p>"DOM Invader is capable of manipulating web messages and spoofing their origin automatically, if you so wish."</p><p>DOM Invader lets you see web messages and easily reissue them in its Postmessage tab. Again, we won't go into full details here (please see <a href="https://portswigger.net/burp/documentation/desktop/tools/dominvader/index.html">the documentation</a> for that), but to access this functionality, just click on DOM Invader's icon in the embedded browser, and turn on "Postmessage interception".</p><p><img src="/cms/images/02/fe/9b37-article-05-postmessage-settings-resized.png" alt="DOM Invader Postmessage settings"></p><p>Through the Postmessage tab, you'll be able to see a bunch of useful information about any web messages your target sends. This includes their type (e.g. JSON string/JavaScript object), origin, actual data sent, and the location in the code where they occur (the Stack Trace).</p><p>You can then click through to open a web message, where you can manipulate the data sent. You can also have DOM Invader spoof the origin of a web message, simply by clicking the "Spoof origin" check box. Pretty cool, right?</p><p><img src="/cms/images/c9/31/ca97-article-06-spoof-origin-resized.png" alt="DOM Invader spoof origin dialog"></p><p>If you find a vulnerable event listener and you've successfully crafted an exploit in the data box, then you can generate a proof of concept at the touch of a button. Simply click the "Build PoC" button, and your PoC will be copied to the clipboard.</p><p>DOM Invader is capable of manipulating web messages and spoofing their origin automatically, if you so wish. DOM Invader also attempts to grade the severity and confidence of messages it sees based on several factors - including if the message data was found in a sink and what type of sink it was. When messages are manipulated, DOM Invader will attempt to do a follow up with more interesting characters. If this is successful it will upgrade the severity and confidence based on the follow up characters that were found unencoded in the sink.</p><h2>List of sources and sinks</h2><p>Whilst developing DOM Invader we quite naturally needed a list of sources and sinks so we decided to produce one and put it into DOM Invader. We decided to release this list and terminology as it was trivial to extract from the source anyway. This will be included in the <a href="/web-security/cross-site-scripting/cheat-sheet">XSS cheat sheet</a> when it's updated - but for now the current list will be added to this post. We use the sink ranking terminology in order to decide which sink is more important than others. The lower the value, the more important the sink is.</p><h3>Sources</h3><code>const sourcesList = [<br>&nbsp;&nbsp;&nbsp;&nbsp;"location",<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.href",<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.hash",<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.search",<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.pathname",<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.URL",<br>&nbsp;&nbsp;&nbsp;&nbsp;"window.name",<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.referrer",<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.documentURI",<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.baseURI",<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.cookie"<br>];</code><h3>Sinks</h3><code>const sinkRanking = {<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.globalEval":1,<br>&nbsp;&nbsp;&nbsp;&nbsp;"eval":2,<br>&nbsp;&nbsp;&nbsp;&nbsp;"Function":3,<br>&nbsp;&nbsp;&nbsp;&nbsp;"execScript":4,<br>&nbsp;&nbsp;&nbsp;&nbsp;"setTimeout":5,<br>&nbsp;&nbsp;&nbsp;&nbsp;"setInterval":6,<br>&nbsp;&nbsp;&nbsp;&nbsp;"setImmediate":7,<br>&nbsp;&nbsp;&nbsp;&nbsp;"msSetImmediate":7,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.src":8,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.textContent":9,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.text":10,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.innerText":11,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.innerHTML":12,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.appendChild":13,<br>&nbsp;&nbsp;&nbsp;&nbsp;"script.append":14,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.write": 15,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.writeln": 16,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery":17,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.$":18,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.constructor":19,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.parseHTML":20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.has":20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.init":20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.index":20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.add": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.append": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.appendTo": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.after": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.insertAfter": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.before": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.insertBefore": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.html": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prepend": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prependTo": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.replaceWith": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.replaceAll": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.wrap": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.wrapAll": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.wrapInner": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.innerHTML": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.outerHTML": 20,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.innerHTML":21,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.outerHTML":22,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.insertAdjacentHTML":23,<br>&nbsp;&nbsp;&nbsp;&nbsp;"iframe.srcdoc": 24,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.href":25,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.replace":26,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.assign":27,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location":28,<br>&nbsp;&nbsp;&nbsp;&nbsp;"window.open":29,<br>&nbsp;&nbsp;&nbsp;&nbsp;"iframe.src":30,<br>&nbsp;&nbsp;&nbsp;&nbsp;"javascriptURL":31,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onclick":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onmouseover":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onmousedown":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onmouseup":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onkeydown":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onkeypress":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.onkeyup":32,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onclick":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onmouseover":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onmousedown":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onmouseup":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onkeydown":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onkeypress":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.onkeyup":33,<br>&nbsp;&nbsp;&nbsp;&nbsp;"createContextualFragment":34,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.implementation.createHTMLDocument": 35,<br>&nbsp;&nbsp;&nbsp;&nbsp;"xhr.open":36,<br>&nbsp;&nbsp;&nbsp;&nbsp;"xhr.send": 36,<br>&nbsp;&nbsp;&nbsp;&nbsp;"fetch": 36,<br>&nbsp;&nbsp;&nbsp;&nbsp;"fetch.body": 36,<br>&nbsp;&nbsp;&nbsp;&nbsp;"xhr.setRequestHeader.name": 37,<br>&nbsp;&nbsp;&nbsp;&nbsp;"xhr.setRequestHeader.value": 38,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.href":39,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.src":40,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.data":41,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.action":42,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.attr.formaction":43,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.href":44,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.src":45,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.data":46,<br>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.action":47,<br><p></p>&nbsp;&nbsp;&nbsp;&nbsp;"jQuery.prop.formaction":48,<br>&nbsp;&nbsp;&nbsp;&nbsp;"form.action":49,<br>&nbsp;&nbsp;&nbsp;&nbsp;"input.formaction":50,<br>&nbsp;&nbsp;&nbsp;&nbsp;"button.formaction":51,<br>&nbsp;&nbsp;&nbsp;&nbsp;"button.value": 52,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.href":53,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.src":54,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.data":55,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.action":56,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.setAttribute.formaction":57,<br>&nbsp;&nbsp;&nbsp;&nbsp;"webdatabase.executeSql": 58,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.domain":59,<br>&nbsp;&nbsp;&nbsp;&nbsp;"history.pushState":60,<br>&nbsp;&nbsp;&nbsp;&nbsp;"history.replaceState":61,<br>&nbsp;&nbsp;&nbsp;&nbsp;"xhr.setRequestHeader":62,<br>&nbsp;&nbsp;&nbsp;&nbsp;"websocket":63,<br>&nbsp;&nbsp;&nbsp;&nbsp;"anchor.href":64,<br>&nbsp;&nbsp;&nbsp;&nbsp;"anchor.target": 65,<br>&nbsp;&nbsp;&nbsp;&nbsp;"JSON.parse": 66,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.cookie":67,<br>&nbsp;&nbsp;&nbsp;&nbsp;"localStorage.setItem.name": 68,<br>&nbsp;&nbsp;&nbsp;&nbsp;"localStorage.setItem.value": 69,<br>&nbsp;&nbsp;&nbsp;&nbsp;"sessionStorage.setItem.name": 70,<br>&nbsp;&nbsp;&nbsp;&nbsp;"sessionStorage.setItem.value": 71,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.outerText": 72,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.innerText": 73,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.textContent": 74,<br>&nbsp;&nbsp;&nbsp;&nbsp;"element.style.cssText": 75,<br>&nbsp;&nbsp;&nbsp;&nbsp;"RegExp":76,<br>&nbsp;&nbsp;&nbsp;&nbsp;"window.name":77,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.pathname": 78,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.protocol": 79,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.host": 80,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.hostname": 81,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.hash": 82,<br>&nbsp;&nbsp;&nbsp;&nbsp;"location.search": 83,<br>&nbsp;&nbsp;&nbsp;&nbsp;"input.value": 84,<br>&nbsp;&nbsp;&nbsp;&nbsp;"input.type": 85,<br>&nbsp;&nbsp;&nbsp;&nbsp;"document.evaluate": 86<br>};</code><h2>Team effort</h2><p>I temporarily joined the PortSwigger Scanner team whilst developing this tool and I worked with so many talented people. It was a real team effort to produce the final product. I'd like to thank <a href="https://twitter.com/albinowax">James Kettle</a> for coming up with the idea to create an extension and for helping with the initial design. James was inspired by <a href="https://twitter.com/filedescriptor">Filedescriptor's</a> (Cure53) similar tool.</p><p>I did some refactoring with Patrick Albinson and he proved he is a Gradle god when helping get DOM Invader into Burp. <a href="https://twitter.com/AlarmingOtter">Alex</a> was heavily involved in refactoring and improving DOM Invader so much and made quite brilliant suggestions to move it lightyears ahead of the initial prototype. Paul Wilshaw improved the UI tremendously and made everything look pretty, especially the Postmessage features. Thanks to Nolan Ward for doing the video editing and creating the fantastic animation. Thanks to <a href="https://twitter.com/mattatkinson42">Matt Atkinson</a> for helping with the copy editing and Nigel Evans for doing a great job with the documentation. Chris Wood really helped organizing UI sessions and finally I'd like to thank <a href="https://twitter.com/albinowax">James Kettle</a>, <a href="https://twitter.com/artsploit">Michael Stepankin</a>, Andrzej Matykiewicz and Trikster for being guinea pigs and UX testing the tool.</p><h2>Eating our own dog food</h2><p>Hopefully, you're now raring to go and find some DOM XSS with DOM Invader. We think there's plenty out there. In fact, we know there is, because we recently struck gold on a well-known bug bounty program while testing DOM Invader's functionality. Head over to the research channel to read up about the <a href="https://portswigger.net/research/finding-dom-polyglot-xss-in-paypal-the-easy-way" target="_blank">PayPal DOM XSS</a> I found.</p><p>To get started with DOM Invader, <a href="https://portswigger.net/burp/releases/professional-community-2021-7?requestededition=professional">download the early adopter latest version</a> of Burp Suite Professional/Community Edition and head to the embedded browser.</p><p><a href="https://portswigger.net/burp/documentation/desktop/tools/dominvader/index.html">View the full documentation for DOM Invader.</a></p><p>Don't forget to follow <a href="https://twitter.com/portswiggerres">@PortSwiggerRes</a> on Twitter for the latest Burp Suite news and hacking exploits. That includes a writeup of the hack above.</p>
+    <!-- Article End -->
+
+    <div class="post-authorinfo">
+        <div class="container-flex-wrap">
+                <a class="label-rounded-outline-grey-4" href="/blog/xss">
+                    XSS
+                </a>
+                <a class="label-rounded-outline-grey-4" href="/blog/dom">
+                    DOM
+                </a>
+                <a class="label-rounded-outline-grey-4" href="/blog/hacking-tools">
+                    Hacking Tools
+                </a>
+        </div>
+        <div class="container-flex-wrap callout-individual-profile">
+            
+
+<div class="share-right">
+    <input id="share-button-right" type="checkbox">
+    <ul class="share-right-ul">
+        <li>
+            <a href="https://twitter.com/share?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader&amp;text=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find%20-%20%40PortSwiggerRes%0A" target="_blank">
+                <span class="icon-twitter"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://api.whatsapp.com/send?text=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-whatsapp"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://reddit.com/submit?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-reddit-dark"></span>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/sharing/share-offsite?url=https%3A%2F%2Fportswigger.net%2Fblog%2Fintroducing-dom-invader" target="_blank">
+                <span class="icon-linkedin"></span>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:?subject=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find&amp;body=Introducing+DOM+Invader%3A+DOM+XSS+just+got+a+whole+lot+easier+to+find%0A%0AOf+the+three+main+types+of+XSS%2C+DOM-based+XSS+is+by+far+the+most+difficult+to+find+and+exploit.+But+we+come+bearing+good+news!+PortSwigger+just+released+a+new+tool+for+Burp+Suite+Professional+and+Burp%0A%0Ahttps://portswigger.net/blog/introducing-dom-invader">
+                <span class="icon-email"></span>
+            </a>
+        </li>
+        <li>
+            <a href="/research/rss">
+                <span class="icon-rss"></span>
+            </a>
+        </li>
+    </ul>
+
+    <label class="share-button" for="share-button-right">
+        <span class="icon-share"></span>
+    </label>
+</div>
+
+
+<img src="/cms/profiles/gareth-heyes.png" alt="Gareth Heyes">
+<div class="post-authorinfo-text">
+    <p class="heading-3"><!-- Author Start -->Gareth Heyes<!-- Author End --></p>
+        <p>
+            <a href="https://twitter.com/garethheyes">@garethheyes <span class="icon cmsicon-twitter"></span></a>
+        </p>
+</div>
+        </div>
+    </div>
+</div>
+<div class="section-full-width theme-grey-5">
+
+<div id="widgetcolumn" class="post-widgetcolumn rightcol">
+    <noscript>
+        <div class="noscript-warning">This page requires JavaScript for an enhanced user experience.</div>
+    </noscript>
+    <div class="widget-tile-container">
+        <div class="widget-title">Latest Posts</div>
+        <div class="widget-content">
+
+
+<a href="/blog/burp-suite-enterprise-edition-spring-update-2024" class="tile-container blog onecolumn widget-tile size0 style1 textstyle2" data-backgroundcolorid="10" style="background-image: url(&quot;/cms/images/8d/d9/2c30-tile-698329b2-9733-4279-8932-3c7ceb97d497.png&quot;); background-color: rgb(51, 51, 50); opacity: 0.9;">
+    
+<h3 class="tile-text1 notext2">
+Burp Suite Enterprise Edition spring update 2024</h3>
+    
+<span class="tile-date">16 May 2024</span>
+    
+<span class="tile-text1-alt">Burp Suite Enterprise Edition spring update 2024</span>
+        
+
+</a>
+
+<a href="/blog/one-month-of-burp-suite-in-the-cloud-how-are-appsec-teams-using-it" class="tile-container blog onecolumn widget-tile size0 style2 textstyle2" data-backgroundcolorid="5" style="background-image: url(&quot;/cms/images/53/aa/e6f3-widetile-c8985d43-38e7-4015-963b-0d029d20c7b8.png&quot;); background-color: rgb(255, 102, 51); opacity: 0.9;">
+    
+<h3 class="tile-text1 notext2">
+One month of Burp Suite in the cloud</h3>
+    
+<span class="tile-date">07 May 2024</span>
+    
+<span class="tile-text1-alt">One month of Burp Suite in the cloud</span>
+        
+
+</a>
+
+<a href="/blog/introducing-dast-scanning-in-the-cloud-with-burp-suite-enterprise-edition" class="tile-container blog onecolumn widget-tile size0 style2 textstyle2" data-backgroundcolorid="8" style="background-image: linear-gradient(rgba(50, 77, 92, 0.3), rgba(50, 77, 92, 0.3)), url(&quot;/cms/images/1a/69/251e-largetile-27th_march_-_swigginar_-_bsee_cloud_launch_(2).png&quot;); background-color: rgb(41, 172, 229); opacity: 0.9;">
+    
+<h3 class="tile-text1 notext2">
+Burp Suite Enterprise Edition in the Cloud</h3>
+    
+<span class="tile-date">18 April 2024</span>
+    
+<span class="tile-text1-alt">Burp Suite Enterprise Edition in the Cloud</span>
+        
+
+</a>        </div>
+    </div>
+</div></div>
+<div class="section-full-width theme-navy-1">
+
+            <div class="widget-tile">
+                <div class="container">
+                    <h3 class="text-center charcoal">Related stories</h3>
+                    <noscript>
+                        <div class="noscript-warning">This page requires JavaScript for an enhanced user experience.</div>
+                    </noscript>
+                    <div class="widget-tile-container has-1rows margin-top-m">
+
+
+<a href="/daily-swig/bug-bounty-radar-the-latest-bug-bounty-programs-for-march-2023" class="tile-container onecolumn widget-tile size0 style1 textstyle2" data-backgroundcolorid="0" style="background-image: url(&quot;/cms/images/58/c9/3d89-tile-bug-bounty-radar-2021-1x1-orange.jpg&quot;); background-color: rgb(255, 255, 255); opacity: 0.9;">
+    
+<h3 class="tile-text1 ">
+Bug Bounty Radar</h3>
+
+
+    <span class="tile-text2">
+The latest bug bounty programs for March 2023    </span>
+    
+<span class="tile-date">28 February 2023</span>
+    
+<span class="tile-text1-alt">Bug Bounty Radar</span>
+        
+        <span class="tile-text2-alt">The latest bug bounty programs for March 2023</span>
+
+</a>
+
+<a href="/daily-swig/oauth-masterclass-crowned-top-web-hacking-technique-of-2022" class="tile-container onecolumn widget-tile size0 style0 textstyle3" data-backgroundcolorid="4" style="background-image: url(&quot;/cms/images/01/ab/2bf8-tile-top_web_hacking_2022_1x1.jpg&quot;); background-color: rgb(214, 0, 0); opacity: 0.9;">
+    
+<h3 class="tile-text1 ">
+        <span class="tile-text-container">Top web hacking techniques</span>
+</h3>
+
+
+    <span class="tile-text2">
+            <span class="tile-text-container">Frans Rosén crowned for OAuth ‘masterclass’</span>
+    </span>
+    
+<span class="tile-date">10 February 2023</span>
+    
+<span class="tile-text1-alt">Top web hacking techniques</span>
+        
+        <span class="tile-text2-alt">Frans Rosén crowned for OAuth ‘masterclass’</span>
+
+</a>
+
+<a href="/daily-swig/radio-silence-from-dms-vendor-quartet-over-xss-zero-days" class="tile-container onecolumn widget-tile size0 style1 textstyle3" data-backgroundcolorid="0" style="background-image: url(&quot;/cms/images/49/8b/1275-tile-dms_xss_1x1.jpg&quot;); background-color: rgb(255, 255, 255); opacity: 0.9;">
+    
+<h3 class="tile-text1 notext2">
+        <span class="tile-text-container">Radio silence from DMS vendor quartet over XSS zero-days</span>
+</h3>
+    
+<span class="tile-date">10 February 2023</span>
+    
+<span class="tile-text1-alt">Radio silence from DMS vendor quartet over XSS zero-days</span>
+        
+        <span class="tile-text2-alt">No response or patch yet forthcoming from providers of vulnerable document management systems</span>
+
+</a>
+
+<a href="/daily-swig/dom-xss-vulnerability-in-gartner-peer-insights-widget-patched" class="tile-container onecolumn widget-tile size0 style0 textstyle5" data-backgroundcolorid="1" style="background-color: rgb(17, 95, 130); opacity: 0.9;">
+    
+<h3 class="tile-text1 ">
+        <span class="tile-text-container">Magic quadrant</span>
+</h3>
+
+
+    <span class="tile-text2">
+DOM XSS vulnerability in Gartner Peer Insights widget patched    </span>
+    
+<span class="tile-date">08 February 2023</span>
+    
+<span class="tile-text1-alt">Magic quadrant</span>
+        
+        <span class="tile-text2-alt">DOM XSS vulnerability in Gartner Peer Insights widget patched</span>
+
+</a>                    </div>
+                </div>
+            </div>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "author": {
+    "@type": "Person",
+    "name": "Gareth Heyes"
+  },
+  "dateModified": "2021-07-01",
+  "datePublished": "2021-06-30",
+  "headline": "Introducing DOM Invader: DOM XSS just got a whole lot easier to find",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://portswigger.net/blog/introducing-dom-invader"
+  },
+  "image":{
+    "@type": "ImageObject",
+    "url": "https://portswigger.net/cms/images/9b/53/9c39-twittercard-dom_invader_twitter_card.png"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://portswigger.net/content/images/logos/thumbnail.png"
+    },
+    "name": "PortSwigger Web Security Ltd",
+    "url": "https://portswigger.net/blog",
+    "sameAs": [
+      "https://twitter.com/portswigger"
+    ]
+  },
+  "url": "https://portswigger.net/blog/introducing-dom-invader"
+}
+</script>
+
+<script src="/bundles/cms/blog/details.js?v=xWxdqKz16duKV13HiZqCsh2GJQ0" nonce=""></script>
+        </div>
+
+        
+    <footer class="wrapper">
+        <div class="container">
+            <div>
+                <p>Burp Suite</p>
+                <a href="/burp/vulnerability-scanner">Web vulnerability scanner</a>
+                <a href="/burp">Burp Suite Editions</a>
+                <a href="/burp/releases">Release Notes</a>
+            </div>
+            <div>
+                <p>Vulnerabilities</p>
+                <a href="/web-security/cross-site-scripting">Cross-site scripting (XSS)</a>
+                <a href="/web-security/sql-injection">SQL injection</a>
+                <a href="/web-security/csrf">Cross-site request forgery</a>
+                <a href="/web-security/xxe">XML external entity injection</a>
+                <a href="/web-security/file-path-traversal">Directory traversal</a>
+                <a href="/web-security/ssrf">Server-side request forgery</a>
+            </div>
+            <div>
+                <p>Customers</p>
+                <a href="/organizations">Organizations</a>
+                <a href="/testers">Testers</a>
+                <a href="/developers">Developers</a>
+            </div>
+            <div>
+                <p>Company</p>
+                <a href="/about">About</a>
+                <a href="/careers">Careers</a>
+                <a href="/about/contact">Contact</a>
+                <a href="/legal">Legal</a>
+                <a href="/privacy">Privacy Notice</a>
+            </div>
+            <div>
+                <p>Insights</p>
+                <a href="/web-security">Web Security Academy</a>
+                <a href="/blog">Blog</a>
+                <a href="/research">Research</a>
+            </div>
+            <div>
+                <a href="/"><img src="/content/images/logos/portswigger-logo.svg" alt="PortSwigger Logo" class="footer-logo"></a>
+                <a class="button-outline-blue-small camelcase" href="https://twitter.com/Burp_Suite" rel="noreferrer"><span class="icon-twitter"></span>  Follow us</a>
+                <p class="grey">© 2024 PortSwigger Ltd.</p>
+            </div>
+        </div>
+    </footer>
+    <a href="#top" class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><polygon points="4.07 14.7 5.03 15.78 12.48 9.13 19.94 15.78 20.9 14.7 12.48 7.2 4.07 14.7" fill="#f63"></polygon><path d="M13,0A13,13,0,1,0,26,13,13,13,0,0,0,13,0Zm0,24.56A11.56,11.56,0,1,1,24.56,13,11.58,11.58,0,0,1,13,24.56Z" fill="#f63"></path></svg></a>
+
+    
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['setTrackingSource', 'jstc_tm']);
+    _paq.push(['enableLinkTracking']);
+    _paq.push(['setIpTracking', true]);
+    _paq.push(['setDomains', ['portswigger.net', 'undefined.web-security-academy.net/']]);
+    _paq.push(['setCustomDimensionValue', 1, '']);
+    _paq.push(['setCustomDimensionValue', 2, '']);
+    _paq.push(['setCustomDimensionValue', 3, '']);
+    _paq.push(['setCustomDimensionValue', 4, '']);
+    _paq.push(['setCustomDimensionValue', 5, '']);
+    var userId = '' ? '' : false;
+    if (userId) {
+    _paq.push(['setUserId', userId]);
+    }
+    _paq.push(['trackPageView']);
+    (function(p,i,w,ik) {
+        var g=ik.createElement('script'),s=ik.getElementsByTagName('script')[0];
+        _paq.push(['setTrackerUrl', p]);
+        _paq.push(['setSiteId', w]);
+        g.type='text/javascript';g.async=true;g.defer=true;g.src=i;s.parentNode.insertBefore(g,s);
+    })('https://ps.piwik.pro/ppms.php','https://ps.containers.piwik.pro/ppms.js','287552c2\u002D4917\u002D42e0\u002D8982\u002Dba994a2a73d7',document)
+</script>
+<script type="text/javascript">
+    (function(l,p){var e,t="PPHeatmapClickProxyEvent";l.addEventListener(t,function(e){p._paq.push(["trackEvent","Heatmap events","Click",function(e,t){function s(e){var t=e;return i.forEach(function(e){t=t.replace(new RegExp(e,"g")," ").trim()}),t}function a(e){for(var t,a=[],r=0,n=e[r];n&&n!==l&&n!==p&&"html"!==(t=n.tagName.toLowerCase());n=n.parentNode,r++){if(n.id){t="#".concat(n.id),a.push(t);break}if(1<Array.prototype.slice.call(n.parentNode.children).filter(function(e){return e.tagName.toLowerCase()===t}).length){var o=Array.prototype.slice.call(n.parentNode.children).indexOf(n)+1;0<o&&(t+=":nth-child(".concat(o,")"))}if("string"==typeof n.className&&n.className){var c=n.className.trim();i.length&&(c=s(c)),c=c.replace(/\s+/g,"."),t+=".".concat(c)}a.push(t)}return a.reverse().join(">")}var i=t.CSSClassesSeparators,r=[],n="";if(e.composedPath)n=a(e.composedPath());else{for(var o=e.target;null!==o.parentNode;)r.push(o),o=o.parentNode;r.push(p.document),n=a(r)}return n}(e,{CSSClassesSeparators:[/\|\|/]})])}),(e=l.createEvent("HTMLEvents")).initEvent(t,!0,!0),p.PPHeatmapClickEvent=e})(document,window);
+</script>
+<script>
+    (function(a,n,r){function o(e){var t;!function(e){try{e.contentWindow.location.href}catch(e){return 1}}(e)?setTimeout(function(){o(e)},500):(t=new YT.Player(e,{events:{onStateChange:c}}),e.setAttribute("data-listener-attached",!0),t.lastAction="i")}function i(e){return"function"==typeof e.getCurrentTime?e.getCurrentTime():e.playerInfo.currentTime}function s(e,t){n._paq=n._paq||[],n._paq.push(["trackEvent","Video - YouTube",t,("function"==typeof(t=e).getVideoData?t.getVideoData():t.playerInfo.videoData).title,i(e).toFixed()])}function c(e){var t=e.target;e.data===YT.PlayerState.PLAYING&&setTimeout(u,1e3,t),e.data===YT.PlayerState.PLAYING&&(-1<["i","p"].indexOf(t.lastAction)&&s(t,"i"===t.lastAction?"Play":"Resume"),t.lastAction=""),e.data===YT.PlayerState.PAUSED&&(s(t,"Pause"),t.lastAction="p"),e.data===YT.PlayerState.ENDED&&(s(t,"Watched"),t.lastAction="i")}function u(e){var t,a,n,o;("function"==typeof(t=e).getPlayerState?t.getPlayerState():t.playerInfo.playerState)===YT.PlayerState.PLAYING&&r.trackThresholds&&(t=r.thresholdsToTrack,o=e,o=Math.round(i(o)/("function"==typeof(o=o).getDuration?o.getDuration():o.playerInfo.duration)*100),n=o,o=t,(a=e).passedThresholds=a.passedThresholds||[],o.forEach(function(e){!a.passedThresholds.includes(e)&&e<n&&(a.passedThresholds.push(e),s(a,"Progress - "+e+"%"))}),setTimeout(u,1e3,e))}function e(){a.querySelectorAll("iframe").forEach(function(e){var t,a;/youtube.*\/embed/.test(e.src)&&!e.getAttribute("data-listener-attached")&&(-1===(a=(t=e).src).indexOf("enablejsapi=")&&(a+=(-1===a.indexOf("?")?"?":"&")+"enablejsapi=1"),-1===a.indexOf("origin=")&&(a+=(-1===a.indexOf("?")?"?":"&")+"origin="+encodeURIComponent(location.origin)),t.src=a,o(e))})}function t(e){var t;n.MutationObserver&&(t=a.getElementsByTagName("body")[0],new MutationObserver(e).observe(t,{childList:!0,attributes:!1,subtree:!0}))}var d,l,f;Boolean(n.YT)?(e(),t(e)):(d=n.onYouTubeIframeAPIReady,n.onYouTubeIframeAPIReady=function(){"function"==typeof d&&d(),e(),t(e)},l=a.createElement("script"),f=a.getElementsByTagName("script")[0],l.src="//www.youtube.com/iframe_api",l.async=!0,f.parentNode.insertBefore(l,f))})
+    (document,window,{
+        trackThresholds:0,
+        thresholdsToTrack:[]
+    });
+</script>
+</body></html>

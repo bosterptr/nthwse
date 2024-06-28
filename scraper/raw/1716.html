@@ -1,0 +1,1057 @@
+<html lang="de"><head>
+<meta charset="UTF-8">
+<title>Blog Process Injection - r-tec Cyber Security</title>
+<base href="https://www.r-tec.net/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta name="description" content="This Blog will show a novel way to avoid detections for Process Injection triggered by ETWti from Kernel.">
+<meta name="generator" content="Contao Open Source CMS">
+<link rel="canonical" href="https://www.r-tec.net/r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans.html">
+<link rel="stylesheet" href="assets/contao/css/layout.min.css?v=8a9171bc"><link rel="stylesheet" href="system/modules/Subcolumns/assets/yaml3/subcols.css?v=676cb9d4"><link rel="stylesheet" href="files/layout/css/main.css?v=781d5a10"><link rel="stylesheet" href="files/layout/css/additional.css?v=3ee9c646">        <!--[if lte IE 7]><link href="system/modules/Subcolumns/assets/yaml3/subcolsIEHacks.css" rel="stylesheet" type="text/css" /><![endif]--> <meta property="og:title" content="Blog Process Injection"><meta property="og:type" content="article"><meta property="og:image:width" content="800"><meta property="og:image:height" content="450"><meta property="og:image:secure_url" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta property="og:image" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta name="twitter:creator" content="@ShitSecure"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Blog Process Injection"><meta name="twitter:description" content="This Blog will show a novel way to avoid detections for Process Injection triggered by ETWti from Kernel."><meta name="twitter:image" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta property="og:locale" content="de_DE"><meta property="og:url" content="https://www.r-tec.net/r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans.html"><meta name="google-site-verification" content="WDULePqn79mGDCPpkbQ3zM_SNn8_hu4Foaw1g3E0C0g">
+<meta name="google-site-verification" content="cY6zlHuB1B-yojWYPmMN3YPE91JmDcYngl1Er5foapk">
+<script type="text/javascript" id="www-widgetapi-script" src="https://www.youtube.com/s/player/74204f6c/www-widgetapi.vflset/www-widgetapi.js" async=""></script><script src="https://www.youtube.com/iframe_api"></script><script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-MX8FNS6"></script><script type="text/javascript" charset="UTF-8" async="" src="https://consent.cookiebot.com/8999b058-10c6-403f-96c7-a163e2a3a5e3/cc.js?renew=false&amp;referer=www.r-tec.net&amp;dnt=false&amp;init=false"></script><script type="text/javascript" charset="UTF-8" src="https://consentcdn.cookiebot.com/consentconfig/8999b058-10c6-403f-96c7-a163e2a3a5e3/r-tec.net/configuration.js"></script><script data-cookieconsent="ignore">['CookiebotOnAccept','CookiebotOnDecline'].forEach(function(event){window.addEventListener(event,function(){if(Cookiebot.changed){var bodyEl=document.querySelector('body');bodyEl.style.opacity=0;bodyEl.style.pointerEvents='none';setTimeout(function(){window.location.reload()},800)}})})</script>
+<script data-cookieconsent="ignore">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag("consent","default",{ad_storage:"denied",analytics_storage:"denied",functionality_storage:"denied",personalization_storage:"denied",security_storage:"granted",wait_for_update:500,});gtag("set","ads_data_redaction",!0)</script>
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="8999b058-10c6-403f-96c7-a163e2a3a5e3" data-blockingmode="auto" type="text/javascript"></script><style type="text/css" id="CookieConsentStateDisplayStyles">.cookieconsent-optin-preferences,.cookieconsent-optin-statistics,.cookieconsent-optin-marketing,.cookieconsent-optin{display:none;}.cookieconsent-optout-preferences,.cookieconsent-optout-statistics,.cookieconsent-optout-marketing,.cookieconsent-optout{display:block;display:initial;}</style>
+<script data-cookieconsent="ignore">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=!0;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','GTM-MX8FNS6')</script>
+<!--<script defer id="klc" src="files/layout/js/klaro/config.js"></script>-->
+<!--<script defer id="klj" src="files/layout/js/klaro/klaro.js"></script>-->
+</head>
+<body id="top" class="r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans win firefox gecko fx126  " itemscope="" itemtype="http://schema.org/WebPage">
+<div class="emergency soforthilfe"> <div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="INCIDENT RESPONSE SERVICE" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>INCIDENT RESPONSE SERVICE</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<h3>Garantierte Reaktionszeiten.<br>Umfassende Vorbereitung.</h3>
+<p>Mit unserem Incident Response Service stellen wir sicher, dass Ihrem Unternehmen im Ernstfall die richtigen Ressourcen und Kompetenzen zur Verfügung stehen. Sie zahlen eine feste monatliche Pauschale und wir bieten Ihnen dafür einen Bereitschaftsdienst mit garantierten Annahme- und Reaktionszeiten. Durch einen im Vorfeld von uns erarbeiteten Maßnahmenplan sparen Sie im Ernstfall wertvolle Zeit.</p>
+<p><a href="incident-response-service.html">weiterlesen</a></p>            </div>
+</div>
+</div>
+<div id="wrapper">
+<header id="header" class="header">
+<div class="container">
+<div class="row clearfix">
+<div class="ce_hyperlink logo Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="files/layout/img/Logo.svg" width="221" height="89" alt="">
+</a>
+</figure>
+</div><div class="ce_hyperlink logo-black Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="files/layout/img/logo_black.svg" width="221" height="89" alt="">
+</a>
+</figure>
+</div><div class="ce_hyperlink logo-small Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="assets/images/7/Logo-50c16b65.svg" width="159" height="64" alt="">
+</a>
+</figure>
+</div>
+<!-- indexer::stop -->
+<nav class="mod_navigation block" itemscope="" itemtype="http://schema.org/SiteNavigationElement">
+<div class="nav-icon">
+<span></span>
+<span></span>
+</div>
+<a href="r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans.html#skipNavigation6" class="invisible">Navigation überspringen</a>
+<div class="nav__inside">
+<div class="container">
+<div class="row">
+<ul class="level_1">
+<li class="submenu megamenu first">
+<div style="position:relative;width:100%;">
+<a href="leistungen-loesungen.html" title="Leistungen" class="submenu megamenu first" aria-haspopup="true" itemprop="url"><span itemprop="name">Leistungen</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="leistungen-loesungen.html">
+zur Übersicht Leistungen                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="submenu first">
+<div style="position:relative;width:100%;">
+<a href="offensive-cyber-security-services.html" title="Offensive Cyber Security Services" class="submenu first" aria-haspopup="true" itemprop="url"><span itemprop="name">Offensive Services</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="pentests-sicherheitsanalysen.html" title="Pentests &amp; Sicherheitsanalysen" class="first" itemprop="url"><span itemprop="name">Pentests &amp; Sicherheitsanalysen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="red-teaming.html" title="Red Teaming" itemprop="url"><span itemprop="name">Red Teaming</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="social-engineering-awareness.html" title="Social Engineering Awareness" class="last" itemprop="url"><span itemprop="name">Social Engineering &amp; Awareness</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-consulting-integration.html" title="Security Consulting &amp; Integration" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Consulting &amp; Integration</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="incident-response-readiness.html" title="Incident Response Readiness" class="first" itemprop="url"><span itemprop="name">Incident Response Readiness</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="incident-response-readiness-assessment.html" title="Incident Response Readiness Assessment – r-tec Cyber Security" itemprop="url"><span itemprop="name">Incident Response Readiness Assessment</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="orientierungshilfe-sza-readiness-assessment.html" title="Orientierungshilfe SzA – Readiness Assessment" itemprop="url"><span itemprop="name">Orientierungshilfe SzA – Readiness Assessment</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="industrial-cyber-security-audit.html" title="Industrial Cyber Security Audit" itemprop="url"><span itemprop="name">Industrial Cyber Security Audit</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="active-directory-security.html" title="Active Directory Security – r-tec Cyber Security" itemprop="url"><span itemprop="name">Active Directory Security</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="cyber-security-design-integration.html" title="Cyber Security Design &amp; Integration" itemprop="url"><span itemprop="name">Cyber Security Design &amp; Integration</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="cyber-security-check.html" title="Cyber Security Check" itemprop="url"><span itemprop="name">Cyber Security Check</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-quick-check.html" title="Cyber Security Quick Check" class="last" itemprop="url"><span itemprop="name">Cyber Security Quick Check</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="cyber-defense-center.html" title="Cyber Defense Center" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Cyber Defense Center</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="incident-response-service.html" title="Incident Response Service" class="first" itemprop="url"><span itemprop="name">Incident Response Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-detection-and-response-service.html" title="MDR Service" itemprop="url"><span itemprop="name">MDR Service for IT</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-endpoint-detection-and-response-service.html" title="Managed EDR Service" itemprop="url"><span itemprop="name">Managed EDR Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-detection-and-response-for-ot.html" title="MDR Service for OT" itemprop="url"><span itemprop="name">MDR Service for OT</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="vulnerability-management-service.html" title="Vulnerability Management Service" itemprop="url"><span itemprop="name">Vulnerability Management Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="dark-web-monitoring-service.html" title="Dark Web Monitoring – r-tec Cyber Security" itemprop="url"><span itemprop="name">Dark Web Monitoring Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="threat-information-service.html" title="Threat Information Service" itemprop="url"><span itemprop="name">Threat Information Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="incident-response-emergency-team.html" title="Incident Response Emergency Team" class="last" itemprop="url"><span itemprop="name">Incident Response Emergency Team</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu last">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-operations-center.html" title="Cyber Security Operations Center" class="submenu last" aria-haspopup="true" itemprop="url"><span itemprop="name">Security Operations Center</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-support-services.html" title="Cyber Security Support Services" class="first" itemprop="url"><span itemprop="name">Cyber Security Support Services</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="megamenu last">
+<div style="position:relative;width:100%;">
+<a href="hersteller-partner.html" title="Hersteller + Partner" class="megamenu last" itemprop="url"><span itemprop="name">Hersteller + Partner</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu megamenu">
+<div style="position:relative;width:100%;">
+<a href="hersteller-partner.html" title="Hersteller + Partner" class="submenu megamenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Hersteller + Partner</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2 has-gt-8">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="hersteller-partner.html">
+zur Übersicht Hersteller + Partner                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="checkpoint-partner-services.html" title="Check Point Partner Services" class="first" itemprop="url"><span itemprop="name">Check Point</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="macmon-partner-services.html" title="macmon Partner Services" itemprop="url"><span itemprop="name">macmon</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="exabeam-partner-services.html" title="Exabeam Partner Services" itemprop="url"><span itemprop="name">Exabeam</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="sophos-partner-services.html" title="Sophos Partner Services" itemprop="url"><span itemprop="name">Sophos</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="claroty-partner-services.html" title="Claroty Partner Services" itemprop="url"><span itemprop="name">Claroty</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="trellix-partner-services.html" title="Trellix Partner Services" itemprop="url"><span itemprop="name">Trellix</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="skyhigh-partner-services.html" title="Skyhigh Partner Services" itemprop="url"><span itemprop="name">Skyhigh</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="tenable-partner-services.html" title="Tenable Partner Services" itemprop="url"><span itemprop="name">Tenable</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="netwrix-partner-services.html" title="Netwrix Partner Services" itemprop="url"><span itemprop="name">Netwrix</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="rsa-partner-services.html" title="RSA Partner Services" itemprop="url"><span itemprop="name">RSA</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="yubico-partner-services.html" title="Yubico Partner Services" itemprop="url"><span itemprop="name">Yubico</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="nextron-partner-services.html" title="Nextron Partner Services" itemprop="url"><span itemprop="name">Nextron</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="crowdstrike-partner-services.html" title="Crowdstrike Partner Services" itemprop="url"><span itemprop="name">Crowdstrike</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="darkowl-partner-services.html" title="DarkOwl Partner Services" class="last" itemprop="url"><span itemprop="name">DarkOwl</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="branchen-sektoren.html" title="Branchen + Sektoren" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Branchen + Sektoren</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="branchen-sektoren.html">
+zur Übersicht Branchen + Sektoren                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="industrial-cyber-security.html" title="Industrial Cyber Security" class="first" itemprop="url"><span itemprop="name">Industrial Cyber Security</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="mittelstand.html" title="Cyber Security für den Mittelstand" itemprop="url"><span itemprop="name">Mittelstand</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="kritis.html" title="Cyber Security für KRITIS-Unternehmen" itemprop="url"><span itemprop="name">KRITIS</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="energieversorger.html" title="Cyber Security für Energieversorger" itemprop="url"><span itemprop="name">Energieversorger</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="gesundheitswesen.html" title="Cyber Security für das Gesundheitswesen" itemprop="url"><span itemprop="name">Gesundheitswesen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="kommunen.html" title="IT-Security für öffentliche Einrichtungen" class="last" itemprop="url"><span itemprop="name">Kommunen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="trail">
+<div style="position:relative;width:100%;">
+<a href="news-events.html" title="Aktuelles" class="trail" itemprop="url"><span itemprop="name">Aktuelles</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="no-breadcrumb">
+<div style="position:relative;width:100%;">
+<a href="karriere-jobs.html" title="Karriere" class="no-breadcrumb" itemprop="url"><span itemprop="name">Karriere</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="submenu no-breadcrumb last">
+<div style="position:relative;width:100%;">
+<a href="unternehmen.html" title="Unternehmen" class="submenu no-breadcrumb last" aria-haspopup="true" itemprop="url"><span itemprop="name">Unternehmen</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="unternehmen.html">
+zur Übersicht Unternehmen                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first last">
+<div style="position:relative;width:100%;">
+<a href="kontakt.html" title="Kontakt" class="first last" itemprop="url"><span itemprop="name">Kontakt</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<div class="soforthilfe">
+<div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="Emergency Hotline" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>Emergency Hotline</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p><strong>Ihre Nummer für alle Fälle:</strong><br><a href="tel:+4920231767112">+ 49 202 31767-112</a></p>
+<p>Wenn Sie einen Sicherheits-Vorfall bemerken, zögern Sie nicht. Kontaktieren Sie unsere Spezialisten, um umgehend Hilfe zu erhalten.</p>            </div>
+</div>
+</div>
+<div class="emergency soforthilfe"> <div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="INCIDENT RESPONSE SERVICE" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>INCIDENT RESPONSE SERVICE</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<h3>Garantierte Reaktionszeiten.<br>Umfassende Vorbereitung.</h3>
+<p>Mit unserem Incident Response Service stellen wir sicher, dass Ihrem Unternehmen im Ernstfall die richtigen Ressourcen und Kompetenzen zur Verfügung stehen. Sie zahlen eine feste monatliche Pauschale und wir bieten Ihnen dafür einen Bereitschaftsdienst mit garantierten Annahme- und Reaktionszeiten. Durch einen im Vorfeld von uns erarbeiteten Maßnahmenplan sparen Sie im Ernstfall wertvolle Zeit.</p>
+<p><a href="incident-response-service.html">weiterlesen</a></p>            </div>
+</div>
+</div>
+</ul>
+</div>
+</div>
+</div>
+<a id="skipNavigation6" class="invisible">&nbsp;</a>
+</nav>
+<!-- indexer::continue -->
+<!-- indexer::stop -->
+<div class="mod_search block">
+<div class="search__icon"></div>
+<form action="suche.html" method="get">
+<div class="formbody">
+<div class="widget widget-text">
+<label for="ctrl_keywords_21" class="invisible">Suchbegriffe</label>
+<input type="search" placeholder="Suchbegriff eingeben" name="keywords" id="ctrl_keywords_21" class="text input-search-text" value="">
+</div>
+<div class="widget widget-submit">
+<button type="submit" id="ctrl_submit_21" class="submit">Suchen</button>
+</div>
+</div>
+</form>
+</div>
+<!-- indexer::continue -->
+<a href="/kontakt.html" class="contact-btn">Kontakt</a>
+</div>
+</div>
+</header>
+<div id="container">
+<div class="dz_stage">
+<div class="dz_stage__background dz_stage__withtext" style="background-image: url('files/content/img/Buehne_schmal/arif-wahid-266541-unsplash.jpg');">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Arif Wahid 266541 - Unsplash                                    </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+<div class="dz_stage__content">
+<h1 class="dz_stage__headline">Process Injection</h1>
+<p>Avoiding Kernel Triggered Memory Scans</p>                                                    </div>
+</div>
+</div>
+</div>
+</div>
+<main id="main">
+<div class="inside">
+<!-- indexer::stop -->
+<nav class="mod_breadcrumb container block" aria-label="Breadcrumb">
+<ul>
+<li><a href="news-events.html" title="Aktuelles">Aktuelles</a></li>
+<li class="active last" aria-current="page">r-tec Blog | Process Injection - Avoiding Kernel Triggered Memory Scans.</li>
+</ul>
+</nav>
+<!-- indexer::continue -->
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="article-2899">
+<div class="container container__article">
+<div class="row">
+<div class="ce_ContentDate Gering - 30px bg-  block">
+<div class="date">
+<p>November 2023 Author: Fabian Mosch, <a rel="noopener" href="https://twitter.com/ShitSecure" target="_blank">@ShitSecure</a></p></div>
+</div>
+<section class="ce_colsetStart subcolumns colcount_2 yaml3 col-66x33">
+<div class="c66l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>A very common technique used by threat actors as well as Red Teams is <a href="https://attack.mitre.org/techniques/T1055/">Process Injection</a>. By using Process Injection, any position-independent code (shellcode) can be written into a remote process and executed within that process, so that it afterward runs in the context of it. This technique has for example the following typical use cases:</p>
+<ul>
+<li>Impersonate another user by injecting into his process</li>
+<li>Hide Command &amp; Control (C2) traffic within a process, that does regular network connections</li>
+<li>Hide in general by running from within a legitimate system process instead of a non-trusted/new one</li>
+</ul>
+<p>The most well-known and obvious approach to do this is via using the following Windows APIs:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-17135">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%201%3A%20Exemplary%20Process%20Injection%20APIs.png" width="520" height="290" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 1: Exemplary Process Injection APIs</figcaption>
+</figure>
+<div id="image-modal-17135" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 1: Exemplary Process Injection APIs.png" alt="">
+<div class="modal-footer">Figure 1: Exemplary Process Injection APIs</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>First, a handle to the remote process is retrieved (<em>OpenProcess</em>). Virtual Memory (RAM) is allocated within that remote process (<em>VirtualAllocEx</em>), to afterwards write the shellcode into that newly allocated memory region (<em>WriteProcessMemory</em>). In the last step, this code is executed by for example creating a new thread via <em>CreateRemoteThread</em>.</p>
+<p>When using <span style="text-decoration: underline;">known malicious code</span> such as Open Source C2-Framework implants, this combination of APIs however will get you caught very easily in a mature company environment. An EDR running on the endpoint can spot the <span style="text-decoration: underline;">known malicious code</span> by utilizing Userland-Hooks or ETWti/Kernel Callbacks. Many EDR vendors still make heavy use of Userland-Hooks, but more and more vendors tend to use ETWti only as an alternative due to it being harder to bypass as it’s running in Kernelland. This Blog won’t go deep into the topic of how Userland-Hooks or ETWti/Kernel callbacks work, as this is already heavily documented in several blog posts. I wrote two personal Blog posts already about bypassing Userland-Hooks with summarizations of existing techniques:</p>
+<p>&nbsp; &nbsp; <a rel="noopener" href="https://s3cur3th1ssh1t.github.io/A-tale-of-EDR-bypass-methods/" target="_blank">https://s3cur3th1ssh1t.github.io/A-tale-of-EDR-bypass-methods/</a></p>
+<p>&nbsp; &nbsp; <a rel="noopener" href="https://s3cur3th1ssh1t.github.io/Cat_Mouse_or_Chess/" target="_blank">https://s3cur3th1ssh1t.github.io/Cat_Mouse_or_Chess/</a></p>
+<p>The second Blog post also explains a new approach including a Proof of Concept tool release <a rel="noopener" href="https://github.com/S3cur3Th1sSh1t/Ruy-Lopez" target="_blank">Ruy Lopez</a>.</p>
+<p>Instead, this Blog will show a novel way to avoid detections for Process Injection triggered by ETWti from Kernel.</p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33r col_2 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="1. Avoiding detections coming from Kernelland" href="#sprung1" data-hash="#sprung1" class="hyperlink_txt sprungmarke "><span>1. Avoiding detections coming from Kernelland</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="2. Introducing Caro-Kann" href="#sprung2" data-hash="#sprung2" class="hyperlink_txt sprungmarke "><span>2. Introducing Caro-Kann</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="3. OPSEC Improvements" href="#sprung3" data-hash="#sprung3" class="hyperlink_txt sprungmarke "><span>3. OPSEC Improvements</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="4. Closing words" href="#sprung4" data-hash="#sprung4" class="hyperlink_txt sprungmarke "><span>4. Closing words</span></a>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="sprung1">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="lab">
+<h2>1. Avoiding detections coming from Kernelland</h2>
+<div class="ce_text__content">
+<p>Kernel Callbacks can be used, to intercept/interact execution of processes on start or runtime. From my perspective, it is somehow imaginable like hooks with the difference that they are triggered after Syscall executions from within the kernel. There are different Kernel Callbacks that be used to check for potential malicious activity such as <em>PsSetCreateProcessNotifyRoutine()</em> to know about newly spawned processes and to check those before they get started or <em>PsSetCreateThreadNotifyRoutine()</em> to check newly created Threads and their entrypoint for <span style="text-decoration: underline;">known malicious code</span>. If some malicious behavior is found/verified, the process can be killed for example and an alert is raised.</p>
+<p>ETWti is an interface provided by Microsoft, where drivers can subscribe to receive special ETW events. These events are specifically meant to be used for detecting malicious activities and also include events such as Process creation, Allocation of memory, Thread creation, and much more.</p>
+<p>So our shown Process Injection API example could easily get detected via Kernel Callbacks or ETWti, even if we were using (In)-Direct Syscalls, Stack Spoofing, and whatever else techniques to avoid detections. This is because, in the moment of creating a new Thread in a remote process, the EDR can trigger a Yara-rule memory scan of the remote process memory sections and or Thread entrypoint to spot the <span style="text-decoration: underline;">known malicious code</span>.</p>
+<p>In many cases, however, not only the execute primitive (Thread creation/continue, Queuing an APC, […]) leads to a detection but the whole combination of events:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%202%3A%20Suspicious%20combination%20for%20Process%20Injection.png" width="924" height="290" alt="">
+</div>
+<figcaption class="caption">Figure 2: Suspicious combination for Process Injection</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block" id="tools">
+<div class="ce_text__content">
+<p style="font-weight: 400;">The memory scan is a very important piece of this puzzle, as vendors tend to <strong><u>verify</u></strong> malicious behavior before preventing execution to not have too many false positive events. There are applications doing code Injection or hooking for legitimate Use-Cases and only blocking execution due to a specific combination of APIs could interrupt production environments, which is not desired. Imagine a company buys an EDR software, which constantly alerts on legitimate processes or kills legitimate processes. This company would want to get rid of the software as fast as possible. So <u>verification</u> actually makes perfect sense and using a memory scan to check for <u>known malicious code</u> is a good way to do so.</p>
+<p style="font-weight: 400;">How does it look like when you got flagged by behavious or a memory scan? The detection nowadays typically also includes the name of the <u>known malicious</u> implant like that:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%203%3A%20Cobalt%20Strike%20specific%20detection.png" width="591" height="44" alt="">
+</div>
+<figcaption class="caption">Figure 3: Cobalt Strike specific detection</figcaption>
+</figure>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-top:20%;margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%204%3A%20Havoc%20specific%20detection.png" width="610" height="80" alt="">
+</div>
+<figcaption class="caption">Figure 4: Havoc specific detection</figcaption>
+</figure>
+</div><div class="ce_text Kein Abstand - 0px bg-  block" id="who">
+<div class="ce_text__content">
+<p>One way to get rid of such detections would be to obfuscate/change the code base (Open Source only) or to use self-written C2 Frameworks. This way, the Yara memory scan would not find a matching malicious code anymore. But of course, this may include a lot of resources/effort.</p>
+<p>&nbsp;</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="sprung2">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Gering - 30px bg-  block" id="discordc2">
+<h2>2. Introducing Caro-Kann</h2>
+<div class="ce_text__content">
+<p>After getting my hands dirty with self-written PIC-Code for the first time in developing Ruy-Lopez, a new world of ideas opened up in terms of malware development. You get full control of execution which led to another EDR bypass idea from my side. The idea for Caro-Kann was as follows:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15876">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%205%3A%20Caro-Kann%20workflow.png" width="644" height="384" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 5: Caro-Kann workflow</figcaption>
+</figure>
+<div id="image-modal-15876" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 5: Caro-Kann workflow.png" alt="">
+<div class="modal-footer">Figure 5: Caro-Kann workflow</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;"><span lang="EN-US">The Malware in this case injects <u>two,</u> instead of the one known malicious <span class="GramE">shellcode</span>. The <u>known malicious shellcode</u> in this case is still encrypted and written into <span class="GramE">a </span></span><em><span class="ATechnical1Zchn"><span lang="EN-US">READ_WRITE</span></span></em><span lang="EN-US"> protected memory page. A second custom self-written shellcode is injected into a small </span><em><span class="ATechnical1Zchn"><span lang="EN-US">READ_EXECUTE</span></span></em><span lang="EN-US"> memory section and the execute primitive points to this code instead of the actual implant code. As we do not prevent <span class="SpellE">ETWti</span> events or Kernel Callbacks from occurring at all, the typical memory scan for <u>verification</u> is triggered. The custom shellcode Sleeps for an amount of x seconds and therefore does nothing suspicious at all. In this time slot, the memory scan will not find any known malicious code, as </span><span class="ATechnical1Zchn"><span lang="EN-US"><em>READ_WRITE</em> </span></span><span lang="EN-US">protected pages may not have been scanned but even if so – the payload is still encrypted and therefore not found. The good thing here is, that this technique does not need any elevated privileges (such as the Driver exploitation tools, which were hyped in the last months), as it completely runs from Userland. <span class="GramE">Therefore</span> it is also suitable for initial access payloads.</span></p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15878">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%206%3A%20Custom%20shellcode%20Workflow.png" width="512" height="333" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 6: Custom shellcode Workflow</figcaption>
+</figure>
+<div id="image-modal-15878" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 6: Custom shellcode Workflow.png" alt="">
+<div class="modal-footer">Figure 6: Custom shellcode Workflow</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">After Sleep, the <em>READ_WRITE</em> encrypted payload is decrypted and the memory protection is changed to <em>READ_EXECUTE</em> so that it can get executed. Execution takes place with a direct JMP instruction, as this does not lead to any ETWti events being generated and does not trigger any Kernel Callback.</p>
+<p style="font-weight: 400;">You might wonder about how the custom shellcode knows about which memory address to decrypt and which shellcode length to use. In the published PoC I used an egg-hunter in the host process doing the injection. This process knows about the memory address and shellcode length and can therefore overwrite the eggs in the custom shellcode:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15880">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%207%3A%20Egg-hunter%20output%20from%20the%20injector.png" width="1049" height="399" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 7: Egg-hunter output from the injector</figcaption>
+</figure>
+<div id="image-modal-15880" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 7: Egg-hunter output from the injector.png" alt="">
+<div class="modal-footer">Figure 7: Egg-hunter output from the injector</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">Caro-Kann can be found here:</p>
+<p>&nbsp; &nbsp; <a href="https://github.com/S3cur3Th1sSh1t/Caro-Kann">https://github.com/S3cur3Th1sSh1t/Caro-Kann</a></p>
+<p style="font-weight: 400;">&nbsp;</p>
+<p style="font-weight: 400;"><u>Difference to existing tooling:</u></p>
+<p style="font-weight: 400;">This technique could somehow be compared to other long-time existing techniques. Shellcode encoders like <a rel="noopener" href="https://github.com/EgeBalci/sgn" target="_blank">Shikata ga nai (SGN)</a> also encrypt shellcode and decrypt it on runtime. If you encode your shellcode multiple hundreds or thousands of times via it, there is also a time delay which could prevent memory scans from finding the known malicious payload. But I made some tests against EDRs with it – leading to detections all of the time. So I’m <strong>assuming</strong> that at least some EDR vendors can <strong>debug/unpack</strong> SGN payloads already, which makes this alternative less effective.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="sprung3">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Gering - 30px bg-  block" id="remocs">
+<h2>3. OPSEC Improvements</h2>
+<div class="ce_text__content">
+<p>Even though the public Proof of Concept is using the initially mentioned “unsafe” Win32 API combination, it bypasses both Userland-Hook detections and the memory scan trigger from Kernel due to encryption &amp; Sleep. But this doesn’t mean you won’t pop an alert in a mature environment using this technique. As ETWti events are still logged and evaluated, the Process Injection behavior itself can generate Alerts by EDR vendors like this one:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15898">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%208%3A%20Suspicious%20Process%20Injection%20Alert.png" width="654" height="396" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 8: Suspicious Process Injection Alert</figcaption>
+</figure>
+<div id="image-modal-15898" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 8: Suspicious Process Injection Alert.png" alt="">
+<div class="modal-footer">Figure 8: Suspicious Process Injection Alert</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p>This is a Medium Alert, which is generated out of the following combination of events:</p>
+<ul>
+<li>Allocation of new memory in the remote process (<em>VirtualAllocEx</em> / <em>NtAllocateVirtualMemory</em>)</li>
+<li>Injection (<em>WriteProcessMemory</em> / <em>NtWriteVirtualMemory</em>) into the remote process</li>
+<li>Thread creation (<em>CreateRemoteThread</em> / <em>NtCreateThreadEx</em>)</li>
+</ul>
+<p>As long, as you’re using this combination of APIs – this Alert will get generated. This is by the way the same Alert you will see when using Direct Syscalls, as those also do not bypass ETWti events:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15900">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%209%3A%20Direct%20Syscall%20Injection%20Alert.png" width="594" height="134" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 9: Direct Syscall Injection Alert</figcaption>
+</figure>
+<div id="image-modal-15900" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 9: Direct Syscall Injection Alert.png" alt="">
+<div class="modal-footer">Figure 9: Direct Syscall Injection Alert</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">To get rid of such detections, you will therefore need to use alternatives for memory allocation or shellcode execution. For memory allocation, a non-exhaustive list of alternatives could be the following:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-15901">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%2010%3A%20Find%20Existing%20RWX%20Sections%20%26%20SetWindowsHookEx.png" width="844" height="283" alt="r-tec | Find Existing RWX Sections &amp; SetWindowsHookEx">
+</button>
+</div>
+<figcaption class="caption">Figure 10: Find Existing RWX Sections &amp; SetWindowsHookEx</figcaption>
+</figure>
+<div id="image-modal-15901" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 10: Find Existing RWX Sections &amp; SetWindowsHookEx.png" alt="r-tec | Find Existing RWX Sections &amp; SetWindowsHookEx">
+<div class="modal-footer">Figure 10: Find Existing RWX Sections &amp; SetWindowsHookEx</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">References for finding existing <em>RWX</em> sections or <em>SetWIndowsHookEx</em> are e.G. the following:</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp; <a rel="noopener" href="https://www.ired.team/offensive-security/defense-evasion/finding-all-rwx-protected-memory-regions" target="_blank">&nbsp;&nbsp;&nbsp; https://www.ired.team/offensive-security/defense-evasion/finding-all-rwx-protected-memory-regions</a></p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp; <a rel="noopener" href="https://twitter.com/MrUn1k0d3r/status/1627678626584883200" target="_blank">&nbsp;&nbsp;&nbsp; https://twitter.com/MrUn1k0d3r/status/1627678626584883200</a></p>
+<p style="font-weight: 400;">By for example overwriting existing memory, you can get rid of memory allocation ETWti events. This could be the <em>.text</em> section of a DLL (<a rel="noopener" href="https://blog.f-secure.com/hiding-malicious-code-with-module-stomping/" target="_blank">Module Stomping</a>) or other existing <em>RWX</em> regions&nbsp; (for example<a rel="noopener" href="https://www.securityjoes.com/post/process-mockingjay-echoing-rwx-in-userland-to-achieve-code-execution" target="_blank"> Mockingjay</a>).</p>
+<p style="font-weight: 400;">For the execute primitive, two public non-ETWti event alternatives would be <a rel="noopener" href="https://github.com/CCob/ThreadlessInject" target="_blank">ThreadlessInject</a> or <a rel="noopener" href="https://github.com/ShorSec/DllNotificationInjection" target="_blank">DllNotificationInjection</a>:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container" style="margin-left:20%;">
+<div style="position:relative;overflow:hidden;">
+<button type="button" class="btn btn-link image-lightbox__show" data-toggle="modal" data-target="#image-modal-17137">
+<img src="files/content/img/News%2BEvents/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure%2011%3A%20Execute%20primitive%20alternatives.png" width="596" height="393" alt="">
+</button>
+</div>
+<figcaption class="caption">Figure 11: Execute primitive alternatives</figcaption>
+</figure>
+<div id="image-modal-17137" class="image-lightbox__modal modal fade" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M84 63.2 80.8 60 72 68.8 63.2 60 60 63.2l8.8 8.8-8.8 8.8 3.2 3.2 8.8-8.8 8.8 8.8 3.2-3.2-8.8-8.8Z" transform="translate(-60 -60)" fill="#ffffff"></path></svg>
+</button>
+</div>
+<img src="files/content/img/News+Events/Blog_Process-Injection-Avoiding-Kernel-Triggered-Memory-Scans/Figure 11: Execute primitive alternatives.png" alt="">
+<div class="modal-footer">Figure 11: Execute primitive alternatives</div>
+</div>
+</div>
+</div>
+</div><div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">Some alternatives for the Inject/Write primitive were also outlined by <a rel="noopener" href="https://twitter.com/x86matthew" target="_blank">@x86matthew</a> in his blog posts:</p>
+<p>&nbsp; &nbsp; <a rel="noopener" href="https://www.x86matthew.com/view_post?id=writeprocessmemory_apc" target="_blank">https://www.x86matthew.com/view_post?id=writeprocessmemory_apc</a></p>
+<p>&nbsp; &nbsp; <a href="https://www.x86matthew.com/view_post?id=proc_env_injection">https</a><a href="https://www.x86matthew.com/view_post?id=proc_env_injection">://</a><a rel="noopener" href="https://www.x86matthew.com/view_post?id=proc_env_injection" target="_blank">www.x86matthew.com/view_post?id=proc_env_injection</a></p>
+<p style="font-weight: 400;">Both alternatives however create Threads in the remote process with corresponding ETWti events and the second could “only” be implemented for Spawn/Inject loaders.</p>
+<p style="font-weight: 400;">You could also get rid of generic Process Injection Alerts by changing <em>VirtualAllocEx</em> to Module Stomping and <em>CreateRemoteThread</em> to ThreadlessInject techniques. There is a public implementation of both techniques combined already by <a rel="noopener" href="https://twitter.com/OtterHacker" target="_blank">@OtterHacker</a>:</p>
+<p>&nbsp; &nbsp; <a rel="noopener" href="https://github.com/OtterHacker/Conferences/tree/main/Defcon31" target="_blank">https://github.com/OtterHacker/Conferences/tree/main/Defcon31</a></p>
+<p style="font-weight: 400;">&nbsp;</p>
+<p style="font-weight: 400;"><strong><u>C2-Considerations:</u></strong></p>
+<p style="font-weight: 400;">Caro-Kann is there to bypass the initial Process Injection-related memory scan. But as EDRs might also do memory scans after observing specific behaviors or just regularly in an interval of x minutes for all processes you might still get detected later on. To avoid such detections you should prefer to use C2-Frameworks with built-in sleep encryption (Such as <a rel="noopener" href="https://github.com/Cracked5pider/Ekko" target="_blank">Ekko</a>) or as an alternative add your own Sleep encryption into them.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="sprung4">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="initialaccess">
+<h2>4. Closing words</h2>
+<div class="ce_text__content">
+<p style="font-weight: 400;">More and more EDRs tend to trigger detections from Kernel which cannot easily get bypassed from Userland anymore. Especially Process Injection without getting detected got much harder so many Operators just don’t use this anymore for not getting detected.</p>
+<p style="font-weight: 400;">But most vendors (for good reasons) tend to <strong><u>verify</u></strong> known malicious before <u>preventing</u> execution via memory scans. By hiding the <u>known malicious</u> at the time of the execute primitive it’s therefore enough to still get a known malicious implant to run via Process Injection. The Proof of Concept Caro-Kann demonstrates that by injecting a second custom shellcode, which sleeps, decrypts the known malicious on runtime and jumps to it.</p>
+<p style="font-weight: 400;">The published PoC is not OPSec safe, as it will probably still generate generic Injection alerts. But by leaving out APIs that generate ETWti events (such as memory allocation and Thread creation) from the chain, these can also get bypassed. Exercise for the reader. ;-)</p>
+<p style="font-weight: 400;">As only the initial memory scan gets bypassed via the published technique, you should consider using C2-Frameworks with Sleep encryption or implementing it into existing Frameworks yourself, as otherwise you might get caught by regular interval scans.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<footer id="footer" class="footer no_contact">
+<div class="container">
+<div class="row clearfix">
+<div class="footer-top clearfix">
+<div class="ce_hyperlink toplink  bg-  block">
+<a title="Nach oben" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>Nach oben</span></a>
+</div>
+</div>
+<div class="footer-middle clearfix">
+<section class="ce_colsetStart subcolumns colcount_2 yaml3 col-50x50">
+<div class="c50l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<section class="ce_colsetStart subcolumns colcount_3 yaml3 col-33x33x33">
+<div class="c33l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>r-tec IT Security GmbH<br><a style="color: #fff;" href="mailto:info@r-tec.net">info@r-tec.net</a></p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33l col_2">
+<div class="subc" style="padding-right:0px;padding-left:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p><a href="tel:+4920231767100">tel +49 (0) 202 31767–100</a><br>fax +49 (0) 202 31767–199</p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33r col_3 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>Hatzfelder Str. 165-167<br>D-42281 Wuppertal</p>            </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+</div>
+</div>
+<div class="ce_colsetPart c50r col_2 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_hyperlink xing Kein Abstand - 0px bg-  block">
+<a title="Xing" href="https://www.xing.com/company/r-tec-it-security" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Xing</span></a>
+</div><div class="ce_hyperlink fb Kein Abstand - 0px bg-  block">
+<a title="Facebook" href="https://www.facebook.com/rtec.IT.Systeme.GmbH/" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Facebook</span></a>
+</div><div class="ce_hyperlink kununu Kein Abstand - 0px bg-  block">
+<a title="Kununu" href="https://www.kununu.com/de/r-tec-it-systeme1" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Kununu</span></a>
+</div><div class="ce_hyperlink linkedin Kein Abstand - 0px bg-  block">
+<a title="Linkedin" href="https://www.linkedin.com/company/r-tec-it-security-gmbh" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Linkedin</span></a>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+<section class="ce_colsetStart subcolumns colcount_4 yaml3 col-25x25x25x25">
+<div class="c25l col_1 first">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25l col_2">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25l col_3">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25r col_4 last">
+<div class="">
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+<div class="ce_text din Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>ISO 27001 &amp; ISO 9001 zertifiziert<br>Zertifizierter APT-Response-Dienstleister</p>            </div>
+</div>
+</div>
+<div class="footer-bottom clearfix">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>© 2024 r-tec IT Security GmbH – Alle Rechte vorbehalten</p>            </div>
+</div>
+<!-- indexer::stop -->
+<nav class="mod_customnav block">
+<a href="r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans.html#skipNavigation3" class="invisible">Navigation überspringen</a>
+<ul class="level_1">
+<li class="first"><a href="impressum.html" title="Impressum" class="first" itemprop="url"><span itemprop="name">Impressum</span></a></li>
+<li class="last"><a href="datenschutz.html" title="Datenschutz" class="last" itemprop="url"><span itemprop="name">Datenschutz</span></a></li>
+</ul>
+<span id="skipNavigation3" class="invisible"></span>
+</nav>
+<!-- indexer::continue -->
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script type="text/javascript">(function(){if(navigator.cookieEnabled)return;var e=document.querySelectorAll('input[name="REQUEST_TOKEN"]'),t,c,i;for(i=0;i<e.length;i++){c=e[i].parentNode;if('formbody'!==c.className)return;t=document.createElement('p');t.className='error nocookie';t.innerHTML='Sie werden dieses Formular nicht absenden können, da Sie Cookies in Ihrem Browser deaktiviert haben.';c.insertBefore(t,c.firstChild)}})()</script>
+<script type="application/ld+json">
+{
+    "@context": "https:\/\/schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage"
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "home.html",
+                        "name": "r-tec"
+                    },
+                    "position": 1
+                },
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "news-events.html",
+                        "name": "Aktuelles"
+                    },
+                    "position": 2
+                },
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "r-tec-blog-process-injection-avoiding-kernel-triggered-memory-scans.html",
+                        "name": "r-tec Blog | Process Injection - Avoiding Kernel Triggered Memory Scans."
+                    },
+                    "position": 3
+                }
+            ]
+        }
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https:\/\/schema.contao.org",
+    "@graph": [
+        {
+            "@type": "Page",
+            "fePreview": false,
+            "groups": [],
+            "noSearch": false,
+            "pageId": 387,
+            "protected": false,
+            "title": "Blog Process Injection"
+        }
+    ]
+}
+</script>
+<script data-cookieconsent="ignore" src="files/layout/js/build.js?1713253373"></script>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MX8FNS6" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<img id="CookiebotSessionPixel" src="https://imgsct.cookiebot.com/1.gif?dgi=8999b058-10c6-403f-96c7-a163e2a3a5e3" alt="Cookiebot session tracker icon loaded" data-cookieconsent="ignore" style="display: none;"><iframe style="display: none; position: absolute; width: 1px; height: 1px; top: -9999px;" name="__uspapiLocator" tabindex="-1" role="presentation" aria-hidden="true" title="Blank"></iframe><iframe style="position: absolute; width: 1px; height: 1px; top: -9999px;" tabindex="-1" role="presentation" aria-hidden="true" title="Blank" src="https://consentcdn.cookiebot.com/sdk/bc-v4.min.html"></iframe></body></html>

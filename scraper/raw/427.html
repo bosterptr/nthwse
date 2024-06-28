@@ -1,0 +1,2360 @@
+<html><head>
+<title>Valhalla YARA Rules - Valhalla</title>
+<link rel="stylesheet" href="/static/style.css?v=1.1.2">
+<link rel="stylesheet" href="/static/chart.min.css">
+<link rel="shortcut icon" href="/static/favicon.ico">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet" type="text/css">
+<link href="/static/fontawesome/css/fontawesome.css" rel="stylesheet">
+<link href="/static/fontawesome/css/brands.css" rel="stylesheet">
+<link href="/static/fontawesome/css/solid.css" rel="stylesheet">
+
+<!-- We use Daypilot Modal licenses under the Apache license
+     https://www.apache.org/licenses/LICENSE-2.0 -->
+<link href="/static/modal-alert/css/modal_flat.css" rel="stylesheet">
+<script type="text/javascript" src="/static/modal-alert/js/daypilot-modal-2.9.js"></script><style type="text/css"></style>
+
+<script src="/static/chart.min.js"></script>
+<meta charset="UTF-8">
+
+    <script language="JavaScript">
+        // Tab Handling
+        function openTab(evt, tabName) {
+          var i, tabcontent, tablinks;
+          tabcontent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+          }
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName).style.display = "block";
+          evt.currentTarget.className += " active";
+        }
+
+        // Demo Rules
+        demo_checked = false
+        function clickDemo() {
+            var demo = document.getElementById('demo');
+            var apikey = document.getElementById('apikey');
+            if ( demo.checked ) {
+                apikey.value = "1111111111111111111111111111111111111111111111111111111111111111";
+                apikey.disabled = true;
+            } else {
+                apikey.value = "insert your private API key";
+                apikey.disabled = false;
+            }
+        }
+    </script>
+
+<style type="text/css">/* Chart.js */
+@keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}.chartjs-size-monitor,.chartjs-size-monitor-expand,.chartjs-size-monitor-shrink{position:absolute;direction:ltr;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1}.chartjs-size-monitor-expand>div{position:absolute;width:1000000px;height:1000000px;left:0;top:0}.chartjs-size-monitor-shrink>div{position:absolute;width:200%;height:200%;left:0;top:0}</style></head>
+<body>
+<section class="content">
+    
+<section class="content">
+
+    <img src="/static/valhalla-logo.png" alt="Valhalla Logo" class="center">
+
+    <div class="serving-info">
+        <div>
+        <div class="lds-css ng-scope">
+            <div class="lds-blocks" style="100%;height:100%">
+                <div style="left:33px;top:33px;animation-delay:0s"></div>
+                <div style="left:107px;top:33px;animation-delay:0.75s"></div>
+                <div style="left:33px;top:107px;animation-delay:2.25s"></div>
+                <div style="left:107px;top:107px;animation-delay:1.5s"></div>
+            </div>
+        </div>
+        <div class="ruleinfo">
+            currently serving <span class="rulecount">20737</span> YARA rules and <span class="rulecount">3706</span> Sigma rules
+        </div>
+        </div>
+    </div>
+
+    <div class="search_form">
+        <form action="/info/search" method="get" id="search">
+            <span class="form_key">Query</span>
+            <input type="submit" value="Search" title="Search the Valhalla database for keyword">
+            <span class="apikey_span"><input type="text" id="keyword" name="keyword" class="apikey_input" placeholder="Keyword, tag, ATT&amp;CK technique, sha256 or rule name"></span>
+        </form>
+    </div>
+    <div class="quick_access_form">
+        <span class="form_key">API Key</span>
+        <form id="getsigma" method="post" action="/api/v1/getsigma">
+            <input type="hidden" id="apikey_sigma" name="apikey">
+            <input type="hidden" id="format_sigma" name="format" value="zip">
+            <input type="submit" value="Get Sigma Rules" title="Retrieve the Sigma rules as ZIP or JSON">
+        </form>
+        <form id="getyara" method="post" action="/api/v1/get">
+            <input type="submit" value="Get YARA Rules" title="Retrieve the YARA rules as plain text or JSON">
+            <span class="checkbox_span">
+                <label class="container">DEMO<input type="checkbox" id="demo" name="demo" value="demo" onclick="clickDemo()">
+                <span class="checkmark" id="demo_check"></span>
+                </label>
+            </span>
+            <span class="checkbox_span">
+                <label class="container">JSON<input type="checkbox" id="jsonformat">
+                <span class="checkmark"></span>
+                </label>
+            </span>
+            <span class="apikey_span"><input type="text" id="apikey" class="apikey_input" placeholder="Your API key or select demo API key"></span>
+            <input type="hidden" id="apikey_yara" name="apikey">
+            <input type="hidden" id="format_yara" name="format" value="text">
+        </form>
+    </div>
+
+<div class="tab">
+  <button class="tablinks active" onclick="openTab(event, 'Statistics')" id="defaultOpen">Statistics</button>
+  <button class="tablinks" onclick="window.open('https://nextronsystems.github.io/valhallaAPI/', '_blank')">API</button>
+  <button class="tablinks" onclick="openTab(event, 'Integration')">Integration</button>
+  <button class="tablinks" onclick="window.open('https://www.nextron-systems.com/yara-rule-feed/', '_blank')">Get Access</button>
+</div>
+
+<div id="Statistics" class="tabcontent" style="display: block;">
+
+    <h1>New Rules per Day</h1>
+    <div class="graph">
+        <canvas id="rule_update_stats" width="1210" height="483" style="display: block; height: 387px; width: 968px;" class="chartjs-render-monitor"></canvas>
+    </div>
+
+    <h1>Newest YARA Rules</h1>
+    <p>This table shows the newest additions to the YARA rule set</p>
+      <div class="table">
+      <div class="trow">
+      <div class="theading" style="width: 360px;">Rule</div><div class="theading">Description</div><div class="theading" style="width: 80px;">Date</div><div class="theading" style="width: 24px;">Ref</div>
+      </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_TunnelSpecter_May24</div>
+        <div class="tcell">Detects TunnelSpecter - a previously undocumented custom backdoor used in Chinese cyberespionage campaign to target governmental entities in the Middle East, Africa and Asia.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://unit42.paloaltonetworks.com/operation-diplomatic-specter/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_TunnelSpecter_Loader_May24</div>
+        <div class="tcell">Detects TunnelSpecter loader seen used in Chinese cyberespionage campaign.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://unit42.paloaltonetworks.com/operation-diplomatic-specter/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_SplitLoader_May24</div>
+        <div class="tcell">Detects SplitLoader - a custom malware loader related to Moonstone Sleet threat actor</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.microsoft.com/en-us/security/blog/2024/05/28/moonstone-sleet-emerges-as-new-north-korean-threat-actor-with-new-bag-of-tricks/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_YouieLoad_May24</div>
+        <div class="tcell">Detects YouieLoad - a custom malware loader related to Moonstone Sleet threat actor</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.microsoft.com/en-us/security/blog/2024/05/28/moonstone-sleet-emerges-as-new-north-korean-threat-actor-with-new-bag-of-tricks/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_PY_Compressed_B64_May24</div>
+        <div class="tcell">Detects a Python oneliner script which decompresses, base64 decodes and executes its payload. Seen in FIN7 campaign.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.esentire.com/blog/fin7-uses-trusted-brands-and-sponsored-google-ads-to-distribute-msix-payloads" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_OBFUSC_Bat_May24</div>
+        <div class="tcell">Detects obfuscated batch (BAT) file seen used by China-based Water Sigbin threat actor, exploiting CVE-2017-3506 and CVE-2023-21839 to deploy a crypto miner via a PowerShell script.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.trendmicro.com/en_us/research/24/e/decoding-8220-latest-obfuscation-tricks.html" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_EXPL_CVE_2017_3506_May24_1</div>
+        <div class="tcell">Detects possible exploitation of CVE-2017-3506 based on a suspicious PowerShell commands.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://hackerone.com/reports/810778" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_EXPL_CVE_2017_3506_May24_2</div>
+        <div class="tcell">Detects possible exploitation of CVE-2017-3506 based on suspicious commands</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://hackerone.com/reports/810778" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_EXPL_CVE_2017_3506_May24_3</div>
+        <div class="tcell">Detects possible exploitation of CVE-2017-3506 based on suspicious folder locations</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://hackerone.com/reports/810778" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_Downloader_May24</div>
+        <div class="tcell">Detects a malware that loads code hidden in images (steganography)</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://x.com/anyrun_app/status/1795829055146590300" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_Allasenha_May24</div>
+        <div class="tcell">Detects AllaSenha banking trojan targeting Brazilian bank accounts. Leverages Azure cloud as command and control (C2) infrastructure, and is another custom variant of AllaKore RAT.</div>
+        <div class="tcell">30.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://harfanglab.io/en/insidethelab/allasenha-allakore-variant-azure-c2-steal-banking-latin-america/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_NSIXLoader_May24</div>
+        <div class="tcell">Detects NSIXLoader packer delivered in NSIS package</div>
+        <div class="tcell">29.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://research.checkpoint.com/2024/static-unpacking-for-the-widespread-nsis-based-malicious-packer-family/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_GHOSTENGINE_EDR_Module_May24</div>
+        <div class="tcell">Detects GHOSTENGINE EDR controller module</div>
+        <div class="tcell">28.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.elastic.co/security-labs/invisible-miners-unveiling-ghostengine" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_GHOSTENGINE_May24</div>
+        <div class="tcell">Detects GHOSTENGINE that is responsible for retrieving and executing modules on the machine. It primarily uses HTTP to download files from a configured domain, with a backup IP in case domains are unavailable. Additionally, it employs FTP as a secondary protocol with embedded credentials.</div>
+        <div class="tcell">28.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.elastic.co/security-labs/invisible-miners-unveiling-ghostengine" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">HKTL_Sliver_C2_Client_Imports_Indicators_May24_1</div>
+        <div class="tcell">Detects a Go binary with the same imports as the Sliver C2 client and further indicators that point to Sliver C2</div>
+        <div class="tcell">28.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://x.com/JaromirHorejsi/status/1795001037746761892" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Sliver_C2_Client_Imports_Indicators_May24_1</div>
+        <div class="tcell">Detects a Go binary with the same imports as the Sliver C2 client (could be a false positive with some Go based applications; check their PE signatures)</div>
+        <div class="tcell">28.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://x.com/JaromirHorejsi/status/1795001037746761892" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">HKTL_LetMeowIn_May24</div>
+        <div class="tcell">Detects LetMeowIn - a sophisticated, covert Windows-based credential dumper using C++ and MASM x64.</div>
+        <div class="tcell">27.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/Meowmycks/LetMeowIn/blob/main/src/main.cpp" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_MAL_Syslog_Crond_PaloAlto_CVE_2024_3400_May24</div>
+        <div class="tcell">Detects suspicious syslog logs as seen in Palo Alto CVE-2024-3400 exploitation</div>
+        <div class="tcell">27.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.volexity.com/blog/2024/05/15/detecting-compromise-of-cve-2024-3400-on-palo-alto-networks-globalprotect-devices/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">HKTL_ADFSDump_PS_May24</div>
+        <div class="tcell">Detects PowerShell implementation of ADFSDump named 'Golden.ps1'</div>
+        <div class="tcell">24.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/ZephrFish/ADFSDump-PS" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Java_ProcessBuilder_May24_1</div>
+        <div class="tcell">Detects suspicious usage of Java ProcessBuilder to execute commands as often found in web shells or exploit codes</div>
+        <div class="tcell">24.05.2024</div>
+        
+            <div class="tcell"></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_SimpleHelp_Remote_Access_Client_HTTP_IP_Config_May24</div>
+        <div class="tcell">Detects remote admin tool named SimpleHelp Remote Access Client with a configuration that uses HTTP and an IP instead of a domain name (very suspicious and often used by MuddyWater threat actor)</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://x.com/MichalKoczwara/status/1793590992781865428" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">PUA_SUSP_SimpleHelp_Remote_Access_Client_May24</div>
+        <div class="tcell">Detects remote admin tool named SimpleHelp Remote Access Client, which could be used for legitimate purposes but also be abused by attackers</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://simple-help.com/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Curl_HTTP_IP_May24_1</div>
+        <div class="tcell">Detects suspicious usage of curl to download files from HTTP (not SSL/TLS protected) web servers using IP addresses</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/file/a9b8cf0e734878f37f137c1ffe75fb0dbde165b3c174794db12e604539e60f26/content" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Lasagne_Flag_Combination_May24_1</div>
+        <div class="tcell">Detects suspicious command line flag combination often found in relation to Lasagne.exe usage</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/AlessandroZ/LaZagne" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_PingCastle_Usage_May24_1</div>
+        <div class="tcell">Detects suspicious usage of PingCastle often found in attacker scripts</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.pingcastle.com/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_Unknown_Agent_May24_1</div>
+        <div class="tcell">Detects suspicious DLL file identified by various AV vendors</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://x.com/roydeepakku/status/1684244528415518720" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Dropper_Characteristics_May24_1</div>
+        <div class="tcell">Detects suspicious characteristics often found in droppers</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell"></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Base64_Encoded_Content_MIME_Type_DNS_May24_1</div>
+        <div class="tcell">Detects suspicious encoded content type statement with type DNS-Message as often found in various droppers</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell"></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">MAL_LNK_DarkGate_May24</div>
+        <div class="tcell">Detects LNK files seen in DarkGate campaign</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://blog.eclecticiq.com/darkgate-opening-gates-for-financially-motivated-threat-actors" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_PDF_Phishing_DoubleClick_May24</div>
+        <div class="tcell">Detects suspicious PDF files which might use Google doubleclick to hide phishing URLs</div>
+        <div class="tcell">23.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://blog.eclecticiq.com/darkgate-opening-gates-for-financially-motivated-threat-actors" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        </div>
+      
+      </div>
+
+    <h1>Successful YARA Rules in Set</h1>
+    <p>This table shows statistics of the best rules with lowest AV detection rates (rules created in the last 12 months, matches of the last 14 days)</p>
+
+    
+      <div class="table">
+      <div class="trow">
+      <div class="theading">Rule</div><div class="theading">Average AV Detection Rate</div><div class="theading">Sample Count</div><div class="theading">Info</div><div class="theading">VT</div>
+      </div>
+          
+            <div class="trow">
+            <div class="tcell">MAL_GuLoader_Shellcode_Oct22_3</div>
+            <div class="tcell">0.0</div>
+            <div class="tcell">20</div>
+            <div class="tcell-link"><a href="/info/rule/MAL_GuLoader_Shellcode_Oct22_3" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523mal_guloader_shellcode_oct22_3/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_MAL_EXFIL_Stealer_Output_Characteristics_Sep22_1</div>
+            <div class="tcell">0.04</div>
+            <div class="tcell">180</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_MAL_EXFIL_Stealer_Output_Characteristics_Sep22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_mal_exfil_stealer_output_characteristics_sep22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_PY_OBFUSC_Berserker_Indicators_Dec22_1</div>
+            <div class="tcell">0.21</div>
+            <div class="tcell">14</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_PY_OBFUSC_Berserker_Indicators_Dec22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_py_obfusc_berserker_indicators_dec22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_BAT_OBFUSC_Apr23_2</div>
+            <div class="tcell">0.59</div>
+            <div class="tcell">64</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_BAT_OBFUSC_Apr23_2" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_bat_obfusc_apr23_2/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_Encrypted_ZIP_Suspicious_Contents_Jul23_1_File</div>
+            <div class="tcell">0.64</div>
+            <div class="tcell">11</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_Encrypted_ZIP_Suspicious_Contents_Jul23_1_File" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_encrypted_zip_suspicious_contents_jul23_1_file/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_PUA_RustDesk_Apr23_1</div>
+            <div class="tcell">0.68</div>
+            <div class="tcell">22</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_PUA_RustDesk_Apr23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_pua_rustdesk_apr23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_BAT_PS1_Combo_Jan23_2</div>
+            <div class="tcell">0.71</div>
+            <div class="tcell">45</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_BAT_PS1_Combo_Jan23_2" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_bat_ps1_combo_jan23_2/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_JS_OBFUSC_Feb23_2</div>
+            <div class="tcell">1.04</div>
+            <div class="tcell">1736</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_JS_OBFUSC_Feb23_2" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_js_obfusc_feb23_2/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_WEvtUtil_ClearLogs_Sep22_1</div>
+            <div class="tcell">1.12</div>
+            <div class="tcell">43</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_WEvtUtil_ClearLogs_Sep22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_wevtutil_clearlogs_sep22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_CryptBase_PE_Info_NOT_Cryptbase_Feb23</div>
+            <div class="tcell">1.19</div>
+            <div class="tcell">21</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_CryptBase_PE_Info_NOT_Cryptbase_Feb23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_cryptbase_pe_info_not_cryptbase_feb23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_PY_Loader_Jun23_1</div>
+            <div class="tcell">1.48</div>
+            <div class="tcell">21</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_PY_Loader_Jun23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_py_loader_jun23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_Webshell_OBFUSC_Indicators_Aug22_1</div>
+            <div class="tcell">2.07</div>
+            <div class="tcell">14</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_Webshell_OBFUSC_Indicators_Aug22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_webshell_obfusc_indicators_aug22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_URL_Split_Jun23</div>
+            <div class="tcell">2.5</div>
+            <div class="tcell">18</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_URL_Split_Jun23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_url_split_jun23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_JS_Atob_Anomalies_Feb23</div>
+            <div class="tcell">2.69</div>
+            <div class="tcell">13</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_JS_Atob_Anomalies_Feb23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_js_atob_anomalies_feb23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">PUA_RuskDesk_Remote_Desktop_Jun23_1</div>
+            <div class="tcell">2.78</div>
+            <div class="tcell">18</div>
+            <div class="tcell-link"><a href="/info/rule/PUA_RuskDesk_Remote_Desktop_Jun23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523pua_ruskdesk_remote_desktop_jun23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_JS_Redirector_Mar23</div>
+            <div class="tcell">2.81</div>
+            <div class="tcell">108</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_JS_Redirector_Mar23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_js_redirector_mar23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_JS_Executing_Powershell_Apr23</div>
+            <div class="tcell">3.14</div>
+            <div class="tcell">274</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_JS_Executing_Powershell_Apr23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_js_executing_powershell_apr23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_PY_Reverse_Shell_Indicators_Jan23_1</div>
+            <div class="tcell">3.25</div>
+            <div class="tcell">16</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_PY_Reverse_Shell_Indicators_Jan23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_py_reverse_shell_indicators_jan23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_JS_Execute_Base64_Mar23</div>
+            <div class="tcell">3.26</div>
+            <div class="tcell">34</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_JS_Execute_Base64_Mar23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_js_execute_base64_mar23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_Encoded_Registry_Key_Paths_Sep22_1</div>
+            <div class="tcell">3.39</div>
+            <div class="tcell">64</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_Encoded_Registry_Key_Paths_Sep22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_encoded_registry_key_paths_sep22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_PE_OK_RU_URL_Jun23</div>
+            <div class="tcell">3.59</div>
+            <div class="tcell">17</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_PE_OK_RU_URL_Jun23" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_pe_ok_ru_url_jun23/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">HKTL_Clash_Tunneling_Tool_Aug22_2</div>
+            <div class="tcell">3.75</div>
+            <div class="tcell">16</div>
+            <div class="tcell-link"><a href="/info/rule/HKTL_Clash_Tunneling_Tool_Aug22_2" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523hktl_clash_tunneling_tool_aug22_2/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_PY_OBFUSC_Hyperion_Aug22_1</div>
+            <div class="tcell">4.0</div>
+            <div class="tcell">13</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_PY_OBFUSC_Hyperion_Aug22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_py_obfusc_hyperion_aug22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_BAT_OBFUSC_Apr23_1</div>
+            <div class="tcell">4.0</div>
+            <div class="tcell">16</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_BAT_OBFUSC_Apr23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_bat_obfusc_apr23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_RANSOM_Note_Aug22</div>
+            <div class="tcell">4.01</div>
+            <div class="tcell">171</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_RANSOM_Note_Aug22" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_ransom_note_aug22/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_JS_Atob_Anomalies_Feb23_2</div>
+            <div class="tcell">4.52</div>
+            <div class="tcell">67</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_JS_Atob_Anomalies_Feb23_2" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_js_atob_anomalies_feb23_2/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_BAT_PS1_Contents_Jan23_1</div>
+            <div class="tcell">5.11</div>
+            <div class="tcell">18</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_BAT_PS1_Contents_Jan23_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_bat_ps1_contents_jan23_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_PS1_FormatStrings_Dec22_1</div>
+            <div class="tcell">5.33</div>
+            <div class="tcell">12</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_PS1_FormatStrings_Dec22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_ps1_formatstrings_dec22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_BAT_OBFUSC_Apr23_4</div>
+            <div class="tcell">5.35</div>
+            <div class="tcell">26</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_BAT_OBFUSC_Apr23_4" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_bat_obfusc_apr23_4/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+            <div class="trow">
+            <div class="tcell">SUSP_OBFUSC_BAT_Dec22_1</div>
+            <div class="tcell">5.84</div>
+            <div class="tcell">31</div>
+            <div class="tcell-link"><a href="/info/rule/SUSP_OBFUSC_BAT_Dec22_1" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+            <div class="tcell-link"><a href="https://www.virustotal.com/gui/search/%2523susp_obfusc_bat_dec22_1/comments" target="_blank" title="Link to samples tagged with this rule on virustotal.com"><i class="fas fa-virus"></i></a></div>
+            </div>
+          
+      </div>
+    
+
+    <h1>Latest YARA Matches with Low AV Detection Rate</h1>
+      <p>This table lists the last matches with low AV detection rates (between 0 and 15 AV engines matched)</p>
+      <div class="table">
+      <div class="trow">
+      <div class="theading">Rule</div><div class="theading" style="width: 26px;">AVs</div><div class="theading" style="width: 500px;">Hash</div><div class="theading" style="width: 20px;">VT</div>
+      </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_PowerShell_Policies_Sep21_1</div>
+        <div class="tcell">4</div>
+        <div class="tcell">6391a75e268599fc5a5888d143236a0af40225433737bc2b8635793aaeb11a1b</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/6391a75e268599fc5a5888d143236a0af40225433737bc2b8635793aaeb11a1b/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Double_Base64Encoded_Kernel32_Functions</div>
+        <div class="tcell">9</div>
+        <div class="tcell">22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId_Ext1_Aug20</div>
+        <div class="tcell">9</div>
+        <div class="tcell">22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_Kernel32_Functions</div>
+        <div class="tcell">9</div>
+        <div class="tcell">22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId</div>
+        <div class="tcell">9</div>
+        <div class="tcell">22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId_FileOnly</div>
+        <div class="tcell">9</div>
+        <div class="tcell">22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/22e9ba6232e0dc9a7c90624abb6a90ea760167bdb87ac16ad34c8ac3a50d88bf/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">HKTL_P0wnedShell_Strings_Jan17</div>
+        <div class="tcell">1</div>
+        <div class="tcell">0519fbd64e60c6eddd766f5a2034ecf551f9c9eb8d0ea061e9c4df373635d602</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/0519fbd64e60c6eddd766f5a2034ecf551f9c9eb8d0ea061e9c4df373635d602/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">WEBSHELL_PHP_Gzinflated</div>
+        <div class="tcell">3</div>
+        <div class="tcell">2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">WEBSHELL_PHP_By_String_Known_Webshell</div>
+        <div class="tcell">3</div>
+        <div class="tcell">2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_WEBSHELL_OBFUSC_ChopperLike_Encoded</div>
+        <div class="tcell">3</div>
+        <div class="tcell">2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_LNX_Base64_Encoded_Webshell_Mar22</div>
+        <div class="tcell">3</div>
+        <div class="tcell">2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/2521f4edb558ef599caa04b33a410025efd78a3c2cee05179582f6f3e2553501/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_WEBSHELL_ASPX_DLL_Indicators_Jul22_1</div>
+        <div class="tcell">14</div>
+        <div class="tcell">0a3faab6a559e21f0f75c059a3baed508af703e75861c35cbbecc4a1853cbca2</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/0a3faab6a559e21f0f75c059a3baed508af703e75861c35cbbecc4a1853cbca2/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Base64_Encoded_GetEnvironmentVariable</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId_FileOnly</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId_Ext1_Aug20</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Double_Base64Encoded_Kernel32_Functions</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_Kernel32_Functions</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_Encoded_GetCurrentThreadId</div>
+        <div class="tcell">14</div>
+        <div class="tcell">11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/11d2fcd300f5dee623b82e6237c1f455a274076dbb5f0690317b5bdac8413889/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">WEBSHELL_PHP_Generic</div>
+        <div class="tcell">7</div>
+        <div class="tcell">061ae3a1d8101c379488d9503912e04ab1976f8dc1d8544a29e22967bc0f0c97</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/061ae3a1d8101c379488d9503912e04ab1976f8dc1d8544a29e22967bc0f0c97/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">SUSP_NotePad_PlusPlus_Plugin_Anomaly_Oct22_1</div>
+        <div class="tcell">11</div>
+        <div class="tcell">e5daf9aea01ff75040d5149fc6957101694f44b15a48d2d6fd7caed64e519328</div>
+        <div class="tcell-link">
+            <a href="https://www.virustotal.com/gui/file/e5daf9aea01ff75040d5149fc6957101694f44b15a48d2d6fd7caed64e519328/detection" target="_blank" title="Link to sample on virustotal.com"><i class="fas fa-virus"></i></a>
+        </div>
+        </div>
+      
+      </div>
+
+    <h1>YARA Rules Per Category</h1>
+      <p>This list shows the number of YARA rules in the subscribable categories (categories overlap as a rule can be in 'n' categories)</p>
+      <div class="table">
+      <div class="trow">
+      <div class="theading">Tag</div> <div class="theading">Count</div>
+      </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">Malware</div>
+        
+        <div class="tcell">6084</div>
+        </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">Threat Hunting (not subscribable, only in THOR scanner)</div>
+        
+        <div class="tcell">4971</div>
+        </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">APT</div>
+        
+        <div class="tcell">4821</div>
+        </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">Hacktools</div>
+        
+        <div class="tcell">4470</div>
+        </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">Webshells</div>
+        
+        <div class="tcell">2310</div>
+        </div>
+      
+        <div class="trow">
+        
+            <div class="tcell">Exploits</div>
+        
+        <div class="tcell">624</div>
+        </div>
+      
+    </div>
+
+    <h1>Newest Sigma Rules</h1>
+    <p>This table shows the newest additions to the Sigma rule set</p>
+      <div class="table">
+      <div class="trow">
+      <div class="theading" style="width: 360px;">Rule</div>
+        <div class="theading">Description</div>
+        <div class="theading" style="width: 80px;">Date</div>
+        <div class="theading" style="width: 24px;">Ref</div>
+        <div class="theading" style="width: 28px;">Info</div>
+      </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious MsBuild.EXE Execution Without CommandLine Flags</div>
+        <div class="tcell" style="width: 300;">Detects potentially suspicious MsBuild execution. In general, it is suspicious for msbuild.exe to execute without a corresponding command line. This could very likely be a sign of process injection or other suspicious activity.
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://redcanary.com/blog/threat-intelligence/msix-installers/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/0123e5b7-7c02-4fb1-bff1-018138033925" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious Child Process Of Program Compatibility Troubleshooter Invoker (Pcwrun.EXE)</div>
+        <div class="tcell" style="width: 300;">Detects the execution of a suspicious "msdt.exe" child process from the "pcwrun.exe" utility.
+When a certain number of argument is met the "pcwrun.exe" main function will call the "LaunchPcw" function. This function is responsible for launching the "msdt.exe" utility.
+Unfortunately the path to the "msdt.exe" binary is resolved dynamically by expanding the environement variable "%windir%".
+An attacker can manipulate this variable via the "set" command for example, and set it's value to a custom path instead of the default "C:\Windows". Which would allow him to execute any arbitrary binary named "msdt.exe"
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell"></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/454b2f80-d84d-49a1-91ab-366be60a449f" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious Schedule Task Execution Type OnIdle Set Via Schtasks.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the setting of a scheduled tasks execution type to "OnIdle". This will specifies that the task runs whenever the system is idle for a specified period of time.
+Attackers were seen using this type of scheduled tasks in order to achieve stealth and persistence.
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-change" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/43460610-98d5-4f7f-aa4d-8b91c2e3215d" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious Script File Created In WindowsApps Directory</div>
+        <div class="tcell" style="width: 300;">Detects the creation of a file with a script extension (ps1, vbs, bat) in the "WindowsApps" directory.
+This could be a sign of a rogue MSIX package.
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.esentire.com/blog/fin7-uses-trusted-brands-and-sponsored-google-ads-to-distribute-msix-payloads" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/d36faa80-36d7-44fd-afc2-9080298cefca" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">DLL Sideloading Via ExtExport.EXE</div>
+        <div class="tcell" style="width: 300;">Detects suspicious DLL sideloading activity via ExtExport.
+The ExtExport allows the export of bookmarks from both the Firefox and Qihoo 360 browsers. In order to achieve this it tries to load 3 specific DLLs via the "LoadLibraryExW" API.
+An attacker can load any DLLs with similar names via this binary by placing them in arbitrary directories.
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell"></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/b3a74d7d-9e8b-4c94-b2c8-bdf1a17d7e02" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious Outbound MsBuild Connection</div>
+        <div class="tcell" style="width: 300;">Detects suspicious outbound connection initiated by an MsBuild process launched without any command line flags.</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://redcanary.com/blog/threat-intelligence/msix-installers/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/0123e5b7-7c02-4fb1-bff1-018138033925" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious Fsutil.EXE Child Process</div>
+        <div class="tcell" style="width: 300;">Detects child process of "fsutil.exe" starting from uncommon locations.
+Starting from Windows 11 the "fsutil.exe" utility introduced a commandline flag called "trace". It allows the user to start, stop, query and decode an NTFS trace information.
+Internally these sub flags will make use of the "netsh.exe" and "logman.exe" utilities to decode and handle the trace respectively.
+An attacker can plant a fake instance of "netsh.exe" or "logman.exe" in the current directory of execution and get them launched by "fsutil.exe".
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://lolbas-project.github.io/lolbas/Binaries/Fsutil/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/b325d28f-a2ac-483c-959c-f44403d0878c" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious PowerShell Script With Decompression And Download Capabilities Executed</div>
+        <div class="tcell" style="width: 300;">Detects the execution of a potentially suspicious PowerShell script that contains references to "Download", "Decompression" and "Execution" cmdlets along with suspicious paths and file sharing websites.
+Threat actors were seen leveraging PowerShell scripts that download a compressed malicious payload from a file sharing domain such as "anonfiles" or some CDN hosting platform. Then decompressing and storing the payload in an unusual location such as "Temp" directories" and then executing it everything.
+</div>
+        <div class="tcell">06.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.esentire.com/blog/fin7-uses-trusted-brands-and-sponsored-google-ads-to-distribute-msix-payloads" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/387e16a3-ed06-4ecb-9b9c-7dae0d067440" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious Usage Of Qemu - Virtual Machine Created With Very Low RAM Size</div>
+        <div class="tcell" style="width: 300;">Detects potentially suspicious execution of the Qemu utility in a Windows environment where the allocated size for the Virtual Machine is very low.
+This could be a sign of abuse as shown by threat actors that have leveraged this utility and this technique for achieving network access as reported by Kaspersky.
+</div>
+        <div class="tcell">04.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://securelist.com/network-tunneling-with-qemu/111803/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/53fab9d4-fb29-4bdf-99b5-376a5886a589" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious Usage Of Qemu - Remote Connection To External IP</div>
+        <div class="tcell" style="width: 300;">Detects potentially suspicious execution of the Qemu utility in a Windows environment connecting to external IP address.
+Threat actors have leveraged this utility and this technique for achieving network access as reported by Kaspersky.
+</div>
+        <div class="tcell">04.06.2024</div>
+        
+            <div class="tcell-link"><a href="https://securelist.com/network-tunneling-with-qemu/111803/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/e16d848f-3de8-4f2d-bbbb-f89a101f954f" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Network Connection Initiated To Cloudflared Tunnels Domains</div>
+        <div class="tcell" style="width: 300;">Detects network connections to Cloudflared tunnels domains initiated by a process on the system.
+Attackers can abuse that feature to establish a reverse shell or persistence on a machine.
+</div>
+        <div class="tcell">27.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://defr0ggy.github.io/research/Abusing-Cloudflared-A-Proxy-Service-To-Host-Share-Applications/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/7cd1dcdc-6edf-4896-86dc-d1f19ad64903" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Uncommon Process Access Rights For Target Image</div>
+        <div class="tcell" style="width: 300;">Detects process access request to uncommon target images with a "PROCESS_ALL_ACCESS" access mask.
+</div>
+        <div class="tcell">27.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/a24e5861-c6ca-4fde-a93c-ba9256feddf0" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious Child Process of KeyScrambler.exe</div>
+        <div class="tcell" style="width: 300;">Detects potentially suspicious child processes of KeyScrambler.exe</div>
+        <div class="tcell">13.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://twitter.com/DTCERT/status/1712785421845790799" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/ca5583e9-8f80-46ac-ab91-7f314d13b984" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Uncommon File System Load Attempt By Format.com - ImageLoad</div>
+        <div class="tcell" style="width: 300;">Detects the load of uncommon file system DLLs by the "format.com" utility.
+An attacker can point "format.com" to load any DLL using the "/FS" flag.
+</div>
+        <div class="tcell">13.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://twitter.com/0gtweet/status/1477925112561209344" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/efbbe8d9-f6ad-4e0b-9381-ee7c9ea72d06" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Launch Agent/Daemon Execution Via Launchctl</div>
+        <div class="tcell" style="width: 300;">Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS.</div>
+        <div class="tcell">13.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1569.001/T1569.001.md" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potential Packet Capture Activity Via Start-NetEventSession - ScriptBlock</div>
+        <div class="tcell" style="width: 300;">Detects the execution of powershell scripts with calls to the "Start-NetEventSession" cmdlet. Which allows an attacker to start event and packet capture for a network event session.
+Adversaries may attempt to capture network to gather information over the course of an operation.
+Data captured via this technique may include user credentials, especially those sent over an insecure, unencrypted protocol.
+</div>
+        <div class="tcell">12.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/redcanaryco/atomic-red-team/blob/5f866ca4517e837c4ea576e7309d0891e78080a8/atomics/T1040/T1040.md#atomic-test-16---powershell-network-sniffing" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/da34e323-1e65-42db-83be-a6725ac2caa3" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">UAC Notification Disabled</div>
+        <div class="tcell" style="width: 300;">Detects when an attacker tries to disable User Account Control (UAC) notification by tampering with the "UACDisableNotify" value.
+UAC is a critical security feature in Windows that prevents unauthorized changes to the operating system. It prompts the user for permission or an administrator password before allowing actions that could affect the system's operation or change settings that affect other users.
+When "UACDisableNotify" is set to 1, UAC prompts are suppressed.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/redcanaryco/atomic-red-team/blob/7e11e9b79583545f208a6dc3fa062f2ed443d999/atomics/T1548.002/T1548.002.md" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/c5f6a85d-b647-40f7-bbad-c10b66bab038" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">UAC Secure Desktop Prompt Disabled</div>
+        <div class="tcell" style="width: 300;">Detects when an attacker tries to change User Account Control (UAC) elevation request destination via the "PromptOnSecureDesktop" value.
+The "PromptOnSecureDesktop" setting specifically determines whether UAC prompts are displayed on the secure desktop. The secure desktop is a separate desktop environment that's isolated from other processes running on the system. It's designed to prevent malicious software from intercepting or tampering with UAC prompts.
+When "PromptOnSecureDesktop" is set to 0, UAC prompts are displayed on the user's current desktop instead of the secure desktop. This reduces the level of security because it potentially exposes the prompts to manipulation by malicious software.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/redcanaryco/atomic-red-team/blob/7e11e9b79583545f208a6dc3fa062f2ed443d999/atomics/T1548.002/T1548.002.md" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/0d7ceeef-3539-4392-8953-3dc664912714" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Suspicious External WebDAV Execution</div>
+        <div class="tcell" style="width: 300;">Detects executables launched from external WebDAV shares using the WebDAV Explorer integration, commonly seen in initial access campaigns.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://dear-territory-023.notion.site/WebDav-Share-Testing-e4950fa0c00149c3aa430d779b9b1d0f?pvs=4" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/1ae64f96-72b6-48b3-ad3d-e71dff6c6398" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Potentially Suspicious Malware Callback Communication - Linux</div>
+        <div class="tcell" style="width: 300;">Detects programs that connect to known malware callback ports based on threat intelligence reports.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://www.mandiant.com/resources/blog/triton-actor-ttp-profile-custom-attack-tools-detections" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/dbfc7c98-04ab-4ab7-aa94-c74d22aa7376" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">New Firewall Rule Added In Windows Firewall Exception List Via WmiPrvSE.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the addition of a new "Allow" firewall rule by the WMI process (WmiPrvSE.EXE).
+This can occur if an attacker leverages PowerShell cmdlets such as "New-NetFirewallRule", or directly uses WMI CIM classes such as "MSFT_NetFirewallRule".
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1562.004/T1562.004.md#atomic-test-24---set-a-firewall-rule-using-new-netfirewallrule" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/eca81e8d-09e1-4d04-8614-c91f44fd0519" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Access To Windows Outlook Mail Files By Uncommon Application</div>
+        <div class="tcell" style="width: 300;">Detects file access requests to Windows Outlook Mail by uncommon processes.
+Could indicate potential attempt of credential stealing.
+Requires heavy baselining before usage
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://darkdefender.medium.com/windows-10-mail-app-forensics-39025f5418d2" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/fc3e237f-2fef-406c-b90d-b3ae7e02fa8f" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Sensitive File Dump Via Wbadmin.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the dump of highly sensitive files such as "NTDS.DIT" and "SECURITY" hive.
+Attackers can leverage the "wbadmin" utility in order to dump sensitive files that might contain credential or sensitive information.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/LOLBAS-Project/LOLBAS/blob/2cc01b01132b5c304027a658c698ae09dd6a92bf/yml/OSBinaries/Wbadmin.yml" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/8b93a509-1cb8-42e1-97aa-ee24224cdc15" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Sensitive File Recovery From Backup Via Wbadmin.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the dump of highly sensitive files such as "NTDS.DIT" and "SECURITY" hive.
+Attackers can leverage the "wbadmin" utility in order to dump sensitive files that might contain credential or sensitive information.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/LOLBAS-Project/LOLBAS/blob/2cc01b01132b5c304027a658c698ae09dd6a92bf/yml/OSBinaries/Wbadmin.yml" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/84972c80-251c-4c3a-9079-4f00aad93938" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">File Recovery From Backup Via Wbadmin.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the recovery of files from backups via "wbadmin.exe".
+Attackers can restore sensitive files such as NTDS.DIT or Registry Hives from backups in order to potentially extract credentials.
+</div>
+        <div class="tcell">10.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wbadmin-start-recovery" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/6fe4aa1e-0531-4510-8be2-782154b73b48" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Keyboard Layout - Scancode Map Modification - Registry</div>
+        <div class="tcell" style="width: 300;">Detects setting of the "Scancode Map" registry value.
+This value allow a user to customize and map keyboard keys to different values.
+Ransomware was seen using this technique in order to prevent user from interacting with the machine during the encryption process.
+</div>
+        <div class="tcell">07.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/randyrants/sharpkeys/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/f4c9d001-1d2c-4fc2-a39f-29c80922f388" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Keyboard Layout - Scancode Map Modification - CommandLine</div>
+        <div class="tcell" style="width: 300;">Detects setting of the "Scancode Map" registry value via command line.
+This value allow a user to customize and map keyboard keys to different values.
+Ransomware was seen using this technique in order to prevent user from interacting with the machine during the encryption process.
+</div>
+        <div class="tcell">03.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://github.com/randyrants/sharpkeys/" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/28573f97-f43e-460e-902c-c15beb30d575" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Remote Access Tool - HopToDesk Silent Installation</div>
+        <div class="tcell" style="width: 300;">Detects installtion of HopToDesk.EXE with the silent flag.
+HopToDesk is a free remote desktop tool allowing users to share their screen and allow remote control access to their computers and devices. It was seen being abused by ransomware threat actors in order deploy and execute malware remotely.
+</div>
+        <div class="tcell">03.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://help.hoptodesk.com/#command-line-arguments-1670685043" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/62d362a6-fa77-42cf-b581-a172b13d1424" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Renamed HopToDesk.EXE Execution</div>
+        <div class="tcell" style="width: 300;">Detects the execution of a renamed version of HopToDesk.EXE
+HopToDesk is a free remote desktop tool allowing users to share their screen and allow remote control access to their computers and devices. It was seen being abused by ransomware threat actors in order deploy and execute malware remotely.
+</div>
+        <div class="tcell">03.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://help.hoptodesk.com/#command-line-arguments-1670685043" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/0a5dca6a-f428-4ebe-8773-57d8ed927c1b" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+        <div class="trow">
+        <div class="tcell">Local Command Proxy Execution Via Winrs.EXE</div>
+        <div class="tcell" style="width: 300;">Detects the execution of local command via "winrs.exe" using the WinRM service.
+An attacker can enable the WinRM service locally and start to proxy commands on the system through "winrshost.exe".
+This form of execution can be used as a living of the land binary in order to potentially bypass application whitelisting.
+</div>
+        <div class="tcell">03.05.2024</div>
+        
+            <div class="tcell-link"><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/winrs" target="_blank" title="Link to reference for this rule"><i class="fas fa-link"></i></a></div>
+        
+        <div class="tcell-link"><a href="/info/sigma-rule/289d25bb-0f61-4c5b-a7fe-73b81dbfa5cb" target="_blank" title="Link to rule info page"><i class="fas fa-info-circle"></i></a></div>
+        </div>
+      
+      </div>
+
+    <h1>YARA/SIGMA Rule Count</h1>
+    <div class="table">
+      <div class="trow">
+        <div class="theading">Rule Type</div> <div class="theading">Community Feed</div> <div class="theading">Nextron Private Feed</div>
+      </div>
+      
+        <div class="trow">
+            <div class="tcell">Yara</div>
+            <div class="tcell">2965</div>
+            <div class="tcell">17772</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">Sigma</div>
+            <div class="tcell">3228</div>
+            <div class="tcell">478</div>
+        </div>
+      
+    </div>
+
+    <h1>Sigma Rules Per Category (Community)</h1>
+    <div class="table">
+      <div class="trow">
+        <div class="theading">Type</div> <div class="theading">Count</div>
+      </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / process_creation</div>
+            <div class="tcell">1211</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_set</div>
+            <div class="tcell">191</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_event</div>
+            <div class="tcell">184</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_script</div>
+            <div class="tcell">164</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / security</div>
+            <div class="tcell">153</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / process_creation</div>
+            <div class="tcell">109</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / image_load</div>
+            <div class="tcell">98</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">webserver</div>
+            <div class="tcell">78</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / system</div>
+            <div class="tcell">72</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">macos / process_creation</div>
+            <div class="tcell">57</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">proxy</div>
+            <div class="tcell">51</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / auditd</div>
+            <div class="tcell">49</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / network_connection</div>
+            <div class="tcell">48</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">azure / activitylogs</div>
+            <div class="tcell">43</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_event</div>
+            <div class="tcell">38</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">aws / cloudtrail</div>
+            <div class="tcell">35</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">azure / auditlogs</div>
+            <div class="tcell">35</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_module</div>
+            <div class="tcell">32</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / application</div>
+            <div class="tcell">28</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">azure / signinlogs</div>
+            <div class="tcell">24</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / process_access</div>
+            <div class="tcell">23</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">okta / okta</div>
+            <div class="tcell">22</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / dns_query</div>
+            <div class="tcell">20</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">azure / riskdetection</div>
+            <div class="tcell">19</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / pipe_created</div>
+            <div class="tcell">18</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">opencanary / application</div>
+            <div class="tcell">18</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux</div>
+            <div class="tcell">17</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">rpc_firewall / application</div>
+            <div class="tcell">17</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / windefend</div>
+            <div class="tcell">16</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">gcp / gcp.audit</div>
+            <div class="tcell">16</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">bitbucket / audit</div>
+            <div class="tcell">14</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">m365 / threat_management</div>
+            <div class="tcell">13</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / create_remote_thread</div>
+            <div class="tcell">12</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">cisco / aaa</div>
+            <div class="tcell">12</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_delete</div>
+            <div class="tcell">12</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_classic_start</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">kubernetes / application / audit</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / driver_load</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">github / audit</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / codeintegrity-operational</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / create_stream_hash</div>
+            <div class="tcell">9</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_add</div>
+            <div class="tcell">9</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / file_event</div>
+            <div class="tcell">9</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / firewall-as</div>
+            <div class="tcell">8</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / msexchange-management</div>
+            <div class="tcell">8</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">dns</div>
+            <div class="tcell">8</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">antivirus</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">azure / pim</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / appxdeployment-server</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_access</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">gcp / google_workspace.admin</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / bits-client</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / smb_files</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_delete</div>
+            <div class="tcell">6</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / dns-client</div>
+            <div class="tcell">5</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">jvm / application</div>
+            <div class="tcell">5</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / taskscheduler</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / network_connection</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / dce_rpc</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / dns</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / sysmon</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / http</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / wmi_event</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / powershell-classic</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ntlm</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / sshd</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / dns-server</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">onelogin / onelogin.events</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">macos / file_event</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">apache</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">qualys</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_change</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / security-mitigations</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">firewall</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">spring / application</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">m365 / audit</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / syslog</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / sysmon_status</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">sql / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / vsftpd</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / diagnosis-scripted</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / terminalservices-localsessionmanager</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / sysmon_error</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">database</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">m365 / threat_detection</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / rdp</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / kerberos</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / dns-server-analytic</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / printservice-operational</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / driver-framework</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / wmi</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_classic_provider_start</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / printservice-admin</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">nginx</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / lsa-server</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">fortios / sslvpnd</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">netflow</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">cisco / bgp</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ldap</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">cisco / syslog</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / auth</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">cisco / ldp</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">django / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / smbclient-connectivity</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / cron</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / openssh</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / process_tampering</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">paloalto / file_event / globalprotect</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">huawei / bgp</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / appmodel-runtime</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">nodejs / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">paloalto / appliance / globalprotect</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">cisco / duo</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / clamav</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">juniper / bgp</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / applocker</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / shell-core</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / raw_access_thread</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">python / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / guacamole</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / appxpackaging-om</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_executable_detected</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / capi2</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / microsoft-servicebus-client</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">velocity / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / certificateservicesclient-lifecycle-system</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / smbclient-security</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_rename</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">ruby_on_rails / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">m365 / exchange</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / sudo</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">zeek / x509</div>
+            <div class="tcell">1</div>
+        </div>
+      
+    </div>
+    <h1>Sigma Rules Per Category (Nextron Private Feed)</h1>
+    <div class="table">
+      <div class="trow">
+        <div class="theading">Type</div> <div class="theading">Count</div>
+      </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / process_creation</div>
+            <div class="tcell">202</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_script</div>
+            <div class="tcell">54</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_set</div>
+            <div class="tcell">51</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / wmi</div>
+            <div class="tcell">29</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_event</div>
+            <div class="tcell">21</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / image_load</div>
+            <div class="tcell">16</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">proxy</div>
+            <div class="tcell">11</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / system</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / security</div>
+            <div class="tcell">10</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / network_connection</div>
+            <div class="tcell">7</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / kernel-event-tracing</div>
+            <div class="tcell">6</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_module</div>
+            <div class="tcell">5</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ntfs</div>
+            <div class="tcell">5</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / create_remote_thread</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_event</div>
+            <div class="tcell">4</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">linux / process_creation</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / vhd</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry_delete</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / application-experience</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / hyper-v-worker</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">webserver</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / pipe_created</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / ps_classic_script</div>
+            <div class="tcell">3</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / taskscheduler</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / driver_load</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / kernel-shimengine</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / bits-client</div>
+            <div class="tcell">2</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / codeintegrity-operational</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">macos / process_creation</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / process_access</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / audit-cve</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / amsi</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_delete</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / registry-setinformation</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_rename</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / file_access</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / application</div>
+            <div class="tcell">1</div>
+        </div>
+      
+        <div class="trow">
+            <div class="tcell">windows / dns_query</div>
+            <div class="tcell">1</div>
+        </div>
+      
+    </div>
+</div>
+
+<div id="Integration" class="tabcontent" style="display: none;">
+
+    <h1>Tenable Nessus</h1>
+    <h3>Requirement: Privileged Scan</h3>
+    <ul>
+        <li>YARA Scanning with Nessus works only when scanning with credentials (privileged scan)</li>
+    </ul>
+    Tutorial: <a href="https://docs.tenable.com/nessus/Content/CredentialedChecksOnWindows.htm" target="_blank" class="textlink">https://docs.tenable.com/nessus/Content/CredentialedChecksOnWindows.htm</a>
+    <h3>YARA Scanning with Nessus</h3>
+    <ul>
+        <li>You can only upload a single .yar file</li>
+        <li>Filesystem scan has to be activated</li>
+        <li>You have to define the target locations</li>
+        <li>The Nessus plugin ID will be <a href="https://www.tenable.com/plugins/nessus/91990" target="_blank">91990</a></li>
+        <li>Only files with the following extensions can be scanned: .application, .asp, .aspx, .bat, .chm, .class, .cmd, .com, .cp, .csh, .dl, .doc, .docx, .drv, .exe, .gadget, .hta, .inf, .ins, .inx, .isu, .jar, .job, .jpeg, .jpg, .js, .jse, .jse, .jsp, .lnk, .msc, .msi, .msp, .mst, .paf, .pdf, .php, .pif, .ppt, .pptx, .ps1, .ps1xm, .ps2, .ps2xm, .psc1, .psc2, .reg, .rgs, .scf, .scr, .sct, .shb, .shs, .swf, .sys, .u3p, .vb, .vbe, .vbs, .vbscript, .ws, .wsf, .xls, .xls</li>
+    </ul>
+    Tutorial: <a href="https://de.tenable.com/blog/threat-hunting-with-yara-and-nessus" target="_blank" class="textlink">https://de.tenable.com/blog/threat-hunting-with-yara-and-nessus</a>
+
+
+    <hr>
+
+    <h1>Carbon Black</h1>
+
+    Tutorial: <a href="https://github.com/carbonblack/cb-yara-connector" target="_blank" class="textlink">https://github.com/carbonblack/cb-yara-connector</a>
+
+    <hr>
+
+    <h1>FireEye EX</h1>
+
+    Tutorial: <a href="https://www.fireeye.com/blog/products-and-services/2018/12/detect-and-block-email-threats-with-custom-yara-rules.html" target="_blank" class="textlink">https://www.fireeye.com/blog/products-and-services/2018/12/detect-and-block-email-threats-with-custom-yara-rules.html</a>
+
+</div>
+<!--
+<div id="README" class="tabcontent">
+
+</div>
+-->
+</section>
+
+<script type="text/javascript">
+    // click the first tab
+    document.getElementById("defaultOpen").click();
+
+
+    // fill the rule update graph with data
+    var ctx = document.getElementById('rule_update_stats').getContext('2d');
+    Chart.defaults.global.defaultFontColor = 'white';
+    Chart.defaults.global.legend.position = 'bottom';
+    Chart.defaults.global.tooltips.titleFontFamily = "'Roboto Condensed', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [ '5/16',  '5/17',  '5/19',  '5/21',  '5/22',  '5/23',  '5/24',  '5/27',  '5/28',  '5/29',  '5/30',  '6/4',  '6/6', ],
+            datasets: [{
+                label: '# of new YARA rules',
+                data: [ 1,  5,  3,  2,  1,  16,  2,  2,  4,  1,  11,  0,  0, ],
+                backgroundColor: 'rgba(70, 190, 218, 1)',
+                borderColor: 'rgba(70, 190, 218, 1)',
+                borderWidth: 5,
+                hoverBackgroundColor: 'rgba(162, 222, 236, 1)',
+                hoverBorderColor: 'rgba(162, 222, 236, 1)',
+            }, {
+                label: '# of new Sigma rules',
+                data: [ 0,  0,  0,  0,  0,  0,  0,  2,  0,  0,  0,  2,  8, ],
+                backgroundColor: 'rgba(188, 188, 188, 1)',
+                borderColor: 'rgba(188, 188, 188, 1)',
+                borderWidth: 5,
+                hoverBackgroundColor: 'rgba(221, 221, 221, 1)',
+                hoverBorderColor: 'rgba(221, 221, 221, 1)',
+            } ],
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        color: "rgba(255, 255, 255, 0)",
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                        zeroLineColor: "rgba(255, 255, 255, 1)",
+
+                    },
+                    barPercentage: 1,
+                    stacked: true,
+                }],
+                yAxes: [{
+                    gridLines: {
+                        color: "rgba(255, 255, 255, 1)",
+                        drawBorder: true,
+                        zeroLineColor: "rgba(255, 255, 255, 1)",
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    stacked: true,
+                }]
+            },
+            legend: {
+                labels: {
+                    fontColor: 'white',
+                },
+            },
+        }
+    });
+
+</script>
+
+
+    <div class="footer">
+        <a href="https://www.nextron-systems.com/thor/" target="_blank"><img src="/static/thor_symbol_16x16.png" alt="THOR Logo"></a>&nbsp;&nbsp;Scan your endpoints, forensic images or collected files with our portable scanner <a href="https://www.nextron-systems.com/thor/" target="_blank">THOR</a>
+    </div>
+    <div class="footer">
+        <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Warning: Access to VALHALLA is rate-limited - once you
+        prove unworthy, access gets denied
+    </div>
+    <div class="footer">
+        <i class="fa fa-copyright" aria-hidden="true"></i>&nbsp;&nbsp;Nextron Systems 2022
+    </div>
+</section>
+
+<script type="text/javascript">
+    // Forms
+    // Helpers
+    Array.prototype.sample = function(){
+        return this[Math.floor(Math.random()*this.length)];
+    }
+    // Form Handling
+    window.onload=function() {
+        // Get Rules Form Submit Button
+        if ( document.getElementById('getyara') ) {
+            document.getElementById('getyara').onsubmit=function(evt) {
+                var apikey = document.getElementById('apikey');
+                if ( apikey.value == "" ) {
+                    message = "The API key field is empty.<br/>We'll fill it with the demo key for you.";
+                    evt.preventDefault();
+                    DayPilot.Modal.alert(message, ["Ok",], { theme: "modal_flat" }).then(function(args) {
+                        if (args.result) {
+                            apikey.value = "1111111111111111111111111111111111111111111111111111111111111111";
+                            document.getElementById('apikey_yara').value = apikey.value;
+                            document.getElementById('format_yara').value = document.getElementById('jsonformat').checked ? "json" : "text";
+                            document.getElementById('getyara').submit();
+                        }
+                    });
+                    return;
+                }
+                document.getElementById('apikey_yara').value = apikey.value;
+                document.getElementById('format_yara').value = document.getElementById('jsonformat').checked ? "json" : "text";
+            }
+        }
+        if ( document.getElementById('getsigma') ) {
+            document.getElementById('getsigma').onsubmit=function(evt) {
+                var apikey = document.getElementById('apikey');
+                if ( apikey.value == "" ) {
+                    message = "The API key field is empty.<br/>We'll fill it with the demo key for you.";
+                    evt.preventDefault();
+                    DayPilot.Modal.alert(message, ["Ok",], { theme: "modal_flat" }).then(function(args) {
+                        if (args.result) {
+                            apikey.value = "1111111111111111111111111111111111111111111111111111111111111111";
+                            document.getElementById('apikey_sigma').value = apikey.value;
+                            document.getElementById('format_sigma').value = document.getElementById('jsonformat').checked ? "json" : "zip";
+                            document.getElementById('getsigma').submit();
+                        }
+                    });
+                    return;
+                }
+                document.getElementById('apikey_sigma').value = apikey.value;
+                document.getElementById('format_sigma').value = document.getElementById('jsonformat').checked ? "json" : "zip";
+            }
+        }
+
+        // Search Submit Button
+        document.getElementById('search').onsubmit=function(evt) {
+            evt.preventDefault();
+            var keyword = document.getElementById('keyword');
+            if ( keyword.value == "" ) {
+                message = "Your search query field is empty.<br/>Maybe you didn't know what to search for?<br/>Let me fill it for you.";
+                DayPilot.Modal.alert(message, ["Ok",], { theme: "modal_flat" }).then(function(args) {
+                    if (args.result) {
+                        keyword.value = ["OceanLotus", "APT 28", "Turla", "Winnti", "CobaltStrike", "Mimikatz"].sample();
+                        document.getElementById('search').submit();
+                    }
+                });
+            } else {
+                // Check for valid characters
+                if ( keyword.value.match(/^[A-Za-z_\-0-9\s]+$/) ) {
+                    document.getElementById('search').submit();
+                } else {
+                    message = "The search query field contains invalid characters.<br/>Don't enrage the gods.<br/>We'll replace these characters for you.";
+                    DayPilot.Modal.alert(message, ["Ok",], { theme: "modal_flat" }).then(function(args) {
+                    if (args.result) {
+                        keyword.value = keyword.value.replace(/[^A-Za-z_\-0-9\s]/g, '');
+                        document.getElementById('search').submit();
+                    }
+                });
+                }
+            }
+        }
+    }
+
+</script>
+
+
+</body></html>

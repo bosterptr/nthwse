@@ -1,0 +1,4841 @@
+<html lang="en"><head>
+	<meta name="generator" content="Hugo 0.78.2">
+  
+    <title>x86.syscall.sh</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="System calls for x86">
+<meta name="keywords" content="">
+<meta name="robots" content="noodp">
+<link rel="canonical" href="https://x86.syscall.sh/">
+
+
+
+
+<link rel="stylesheet" href="https://x86.syscall.sh/assets/style.css">
+
+  <link rel="stylesheet" href="https://x86.syscall.sh/assets/blue.css">
+
+
+
+<link rel="stylesheet" href="https://x86.syscall.sh/style.css">
+
+
+<link rel="apple-touch-icon" href="https://x86.syscall.sh/img/apple-touch-icon-192x192.png">
+
+  <link rel="shortcut icon" href="https://x86.syscall.sh/img/favicon/blue.png">
+
+
+
+<meta name="twitter:card" content="summary">
+
+  
+    <meta name="twitter:site" content="">
+  
+    <meta name="twitter:creator" content="">
+
+
+
+<meta property="og:locale" content="en">
+<meta property="og:type" content="website">
+<meta property="og:title" content="x86.syscall.sh">
+<meta property="og:description" content="System calls for x86">
+<meta property="og:url" content="https://x86.syscall.sh/">
+<meta property="og:site_name" content="x86.syscall.sh">
+
+  
+    <meta property="og:image" content="https://x86.syscall.sh/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+
+
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="x86.syscall.sh">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container full headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="https://syscall.sh">
+  <div class="logo">
+    x86.syscall.sh
+  </div>
+</a>
+
+    </div>
+    
+      <div class="menu-trigger hidden">menu</div>
+    
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="https://syscall.sh/about">about</a></li>
+        
+      
+        
+          <li><a href="https://api.syscall.sh">api</a></li>
+        
+      
+        
+          <li><a href="https://arm.syscall.sh">arm</a></li>
+        
+      
+        
+          <li><a href="https://arm64.syscall.sh">arm64</a></li>
+        
+      
+        
+          <li><a href="https://x64.syscall.sh">x64</a></li>
+        
+      
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="https://syscall.sh/about">about</a></li>
+      
+    
+      
+        <li><a href="https://api.syscall.sh">api</a></li>
+      
+    
+      
+        <li><a href="https://arm.syscall.sh">arm</a></li>
+      
+    
+      
+        <li><a href="https://arm64.syscall.sh">arm64</a></li>
+      
+    
+      
+        <li><a href="https://x64.syscall.sh">x64</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+  
+    <div class="index-content ">
+      <table>
+<thead>
+<tr>
+<th style="text-align:center">NR</th>
+<th style="text-align:center">SYSCALL NAME</th>
+<th style="text-align:center">references</th>
+<th style="text-align:center">eax</th>
+<th style="text-align:center">ARG0 (ebx)</th>
+<th style="text-align:center">ARG1 (ecx)</th>
+<th style="text-align:center">ARG2 (edx)</th>
+<th style="text-align:center">ARG3 (esi)</th>
+<th style="text-align:center">ARG4 (edi)</th>
+<th style="text-align:center">ARG5 (ebp)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">restart_syscall</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">exit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">int error_code</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">fork</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">read</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">write</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">const char *buf</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">open</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">close</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">waitpid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int *stat_addr</td>
+<td style="text-align:center">int options</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">creat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">const char *pathname</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">link</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center">const char *oldname</td>
+<td style="text-align:center">const char *newname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">unlink</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">const char *pathname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center">execve</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">const char *const *argv</td>
+<td style="text-align:center">const char *const *envp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:center">chdir</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:center">time</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D</td>
+<td style="text-align:center">time_t *tloc</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:center">mknod</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">unsigned dev</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:center">chmod</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">16</td>
+<td style="text-align:center">lchown</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">uid_t user</td>
+<td style="text-align:center">gid_t group</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">17</td>
+<td style="text-align:center">break</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">18</td>
+<td style="text-align:center">oldstat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">19</td>
+<td style="text-align:center">lseek</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">off_t offset</td>
+<td style="text-align:center">unsigned int whence</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">20</td>
+<td style="text-align:center">getpid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">21</td>
+<td style="text-align:center">mount</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">char *dev_name</td>
+<td style="text-align:center">char *dir_name</td>
+<td style="text-align:center">char *type</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">void *data</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">22</td>
+<td style="text-align:center">umount</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">char *name</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">23</td>
+<td style="text-align:center">setuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17</td>
+<td style="text-align:center">uid_t uid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:center">getuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">18</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">25</td>
+<td style="text-align:center">stime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">19</td>
+<td style="text-align:center">time_t *tptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">26</td>
+<td style="text-align:center">ptrace</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1A</td>
+<td style="text-align:center">long request</td>
+<td style="text-align:center">long pid</td>
+<td style="text-align:center">unsigned long addr</td>
+<td style="text-align:center">unsigned long data</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">27</td>
+<td style="text-align:center">alarm</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1B</td>
+<td style="text-align:center">unsigned int seconds</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">28</td>
+<td style="text-align:center">oldfstat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1C</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">29</td>
+<td style="text-align:center">pause</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1D</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">30</td>
+<td style="text-align:center">utime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1E</td>
+<td style="text-align:center">char *filename</td>
+<td style="text-align:center">struct utimbuf *times</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">31</td>
+<td style="text-align:center">stty</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">1F</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">32</td>
+<td style="text-align:center">gtty</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">33</td>
+<td style="text-align:center">access</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">21</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">int mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">34</td>
+<td style="text-align:center">nice</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">22</td>
+<td style="text-align:center">int increment</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">35</td>
+<td style="text-align:center">ftime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">23</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">36</td>
+<td style="text-align:center">sync</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">24</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">37</td>
+<td style="text-align:center">kill</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">38</td>
+<td style="text-align:center">rename</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">26</td>
+<td style="text-align:center">const char *oldname</td>
+<td style="text-align:center">const char *newname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">39</td>
+<td style="text-align:center">mkdir</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">27</td>
+<td style="text-align:center">const char *pathname</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">40</td>
+<td style="text-align:center">rmdir</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">28</td>
+<td style="text-align:center">const char *pathname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">41</td>
+<td style="text-align:center">dup</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">29</td>
+<td style="text-align:center">unsigned int fildes</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">42</td>
+<td style="text-align:center">pipe</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2A</td>
+<td style="text-align:center">int *fildes</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">43</td>
+<td style="text-align:center">times</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2B</td>
+<td style="text-align:center">struct tms *tbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">44</td>
+<td style="text-align:center">prof</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2C</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">45</td>
+<td style="text-align:center">brk</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2D</td>
+<td style="text-align:center">unsigned long brk</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">46</td>
+<td style="text-align:center">setgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2E</td>
+<td style="text-align:center">gid_t gid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">47</td>
+<td style="text-align:center">getgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">2F</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">48</td>
+<td style="text-align:center">signal</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">30</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">__sighandler_t handler</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">49</td>
+<td style="text-align:center">geteuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">31</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">50</td>
+<td style="text-align:center">getegid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">51</td>
+<td style="text-align:center">acct</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">33</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">52</td>
+<td style="text-align:center">umount2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">34</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">53</td>
+<td style="text-align:center">lock</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">35</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">54</td>
+<td style="text-align:center">ioctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">36</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">unsigned long arg</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">55</td>
+<td style="text-align:center">fcntl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">37</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">unsigned long arg</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">56</td>
+<td style="text-align:center">mpx</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">38</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">57</td>
+<td style="text-align:center">setpgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">39</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">pid_t pgid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">58</td>
+<td style="text-align:center">ulimit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3A</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">59</td>
+<td style="text-align:center">oldolduname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3B</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">60</td>
+<td style="text-align:center">umask</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3C</td>
+<td style="text-align:center">int mask</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">61</td>
+<td style="text-align:center">chroot</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3D</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">62</td>
+<td style="text-align:center">ustat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3E</td>
+<td style="text-align:center">unsigned dev</td>
+<td style="text-align:center">struct ustat *ubuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">63</td>
+<td style="text-align:center">dup2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">3F</td>
+<td style="text-align:center">unsigned int oldfd</td>
+<td style="text-align:center">unsigned int newfd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">64</td>
+<td style="text-align:center">getppid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">40</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">65</td>
+<td style="text-align:center">getpgrp</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">41</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">66</td>
+<td style="text-align:center">setsid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">42</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">67</td>
+<td style="text-align:center">sigaction</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">43</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">const struct old_sigaction *</td>
+<td style="text-align:center">struct old_sigaction *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">68</td>
+<td style="text-align:center">sgetmask</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">44</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">69</td>
+<td style="text-align:center">ssetmask</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">45</td>
+<td style="text-align:center">int newmask</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">70</td>
+<td style="text-align:center">setreuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">46</td>
+<td style="text-align:center">uid_t ruid</td>
+<td style="text-align:center">uid_t euid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">71</td>
+<td style="text-align:center">setregid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">47</td>
+<td style="text-align:center">gid_t rgid</td>
+<td style="text-align:center">gid_t egid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">72</td>
+<td style="text-align:center">sigsuspend</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">48</td>
+<td style="text-align:center">int unused1</td>
+<td style="text-align:center">int unused2</td>
+<td style="text-align:center">old_sigset_t mask</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">73</td>
+<td style="text-align:center">sigpending</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">49</td>
+<td style="text-align:center">old_sigset_t *uset</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">74</td>
+<td style="text-align:center">sethostname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4A</td>
+<td style="text-align:center">char *name</td>
+<td style="text-align:center">int len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">75</td>
+<td style="text-align:center">setrlimit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4B</td>
+<td style="text-align:center">unsigned int resource</td>
+<td style="text-align:center">struct rlimit *rlim</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">76</td>
+<td style="text-align:center">getrlimit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4C</td>
+<td style="text-align:center">unsigned int resource</td>
+<td style="text-align:center">struct rlimit *rlim</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">77</td>
+<td style="text-align:center">getrusage</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4D</td>
+<td style="text-align:center">int who</td>
+<td style="text-align:center">struct rusage *ru</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">78</td>
+<td style="text-align:center">gettimeofday</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4E</td>
+<td style="text-align:center">struct timeval *tv</td>
+<td style="text-align:center">struct timezone *tz</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">79</td>
+<td style="text-align:center">settimeofday</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">4F</td>
+<td style="text-align:center">struct timeval *tv</td>
+<td style="text-align:center">struct timezone *tz</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">80</td>
+<td style="text-align:center">getgroups</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">50</td>
+<td style="text-align:center">int gidsetsize</td>
+<td style="text-align:center">gid_t *grouplist</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">81</td>
+<td style="text-align:center">setgroups</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">51</td>
+<td style="text-align:center">int gidsetsize</td>
+<td style="text-align:center">gid_t *grouplist</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">82</td>
+<td style="text-align:center">select</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">52</td>
+<td style="text-align:center">int n</td>
+<td style="text-align:center">fd_set *inp</td>
+<td style="text-align:center">fd_set *outp</td>
+<td style="text-align:center">fd_set *exp</td>
+<td style="text-align:center">struct timeval *tvp</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">83</td>
+<td style="text-align:center">symlink</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">53</td>
+<td style="text-align:center">const char *old</td>
+<td style="text-align:center">const char *new</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">84</td>
+<td style="text-align:center">oldlstat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">54</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">85</td>
+<td style="text-align:center">readlink</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">55</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">int bufsiz</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">86</td>
+<td style="text-align:center">uselib</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">56</td>
+<td style="text-align:center">const char *library</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">87</td>
+<td style="text-align:center">swapon</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">57</td>
+<td style="text-align:center">const char *specialfile</td>
+<td style="text-align:center">int swap_flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">88</td>
+<td style="text-align:center">reboot</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">58</td>
+<td style="text-align:center">int magic1</td>
+<td style="text-align:center">int magic2</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">void *arg</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">89</td>
+<td style="text-align:center">readdir</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">59</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">90</td>
+<td style="text-align:center">mmap</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5A</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">91</td>
+<td style="text-align:center">munmap</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5B</td>
+<td style="text-align:center">unsigned long addr</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">92</td>
+<td style="text-align:center">truncate</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5C</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">long length</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">93</td>
+<td style="text-align:center">ftruncate</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5D</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">unsigned long length</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">94</td>
+<td style="text-align:center">fchmod</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5E</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">95</td>
+<td style="text-align:center">fchown</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">5F</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">uid_t user</td>
+<td style="text-align:center">gid_t group</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">96</td>
+<td style="text-align:center">getpriority</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">60</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">int who</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">97</td>
+<td style="text-align:center">setpriority</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">61</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">int who</td>
+<td style="text-align:center">int niceval</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">98</td>
+<td style="text-align:center">profil</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">62</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">99</td>
+<td style="text-align:center">statfs</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">63</td>
+<td style="text-align:center">const char * path</td>
+<td style="text-align:center">struct statfs *buf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">100</td>
+<td style="text-align:center">fstatfs</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">64</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">struct statfs *buf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">101</td>
+<td style="text-align:center">ioperm</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">65</td>
+<td style="text-align:center">unsigned long from</td>
+<td style="text-align:center">unsigned long num</td>
+<td style="text-align:center">int on</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">102</td>
+<td style="text-align:center">socketcall</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">66</td>
+<td style="text-align:center">int call</td>
+<td style="text-align:center">unsigned long *args</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">103</td>
+<td style="text-align:center">syslog</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">67</td>
+<td style="text-align:center">int type</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">int len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">104</td>
+<td style="text-align:center">setitimer</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">68</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">struct itimerval *value</td>
+<td style="text-align:center">struct itimerval *ovalue</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">105</td>
+<td style="text-align:center">getitimer</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">69</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">struct itimerval *value</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">106</td>
+<td style="text-align:center">stat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6A</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct __old_kernel_stat *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">107</td>
+<td style="text-align:center">lstat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6B</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct __old_kernel_stat *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">108</td>
+<td style="text-align:center">fstat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6C</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">struct __old_kernel_stat *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">109</td>
+<td style="text-align:center">olduname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6D</td>
+<td style="text-align:center">struct oldold_utsname *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">110</td>
+<td style="text-align:center">iopl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6E</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">111</td>
+<td style="text-align:center">vhangup</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">6F</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">112</td>
+<td style="text-align:center">idle</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">70</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">113</td>
+<td style="text-align:center">vm86old</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">71</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">114</td>
+<td style="text-align:center">wait4</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">72</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int *stat_addr</td>
+<td style="text-align:center">int options</td>
+<td style="text-align:center">struct rusage *ru</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">115</td>
+<td style="text-align:center">swapoff</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">73</td>
+<td style="text-align:center">const char *specialfile</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">116</td>
+<td style="text-align:center">sysinfo</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">74</td>
+<td style="text-align:center">struct sysinfo *info</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">117</td>
+<td style="text-align:center">ipc</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">75</td>
+<td style="text-align:center">unsigned int call</td>
+<td style="text-align:center">int first</td>
+<td style="text-align:center">unsigned long second</td>
+<td style="text-align:center">unsigned long third</td>
+<td style="text-align:center">void *ptr</td>
+<td style="text-align:center">long fifth</td>
+</tr>
+<tr>
+<td style="text-align:center">118</td>
+<td style="text-align:center">fsync</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">76</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">119</td>
+<td style="text-align:center">sigreturn</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">77</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">120</td>
+<td style="text-align:center">clone</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">unsigned long</td>
+<td style="text-align:center">unsigned long</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">unsigned long</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">121</td>
+<td style="text-align:center">setdomainname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">79</td>
+<td style="text-align:center">char *name</td>
+<td style="text-align:center">int len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">122</td>
+<td style="text-align:center">uname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7A</td>
+<td style="text-align:center">struct old_utsname *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">123</td>
+<td style="text-align:center">modify_ldt</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7B</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">124</td>
+<td style="text-align:center">adjtimex</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7C</td>
+<td style="text-align:center">struct __kernel_timex *txc_p</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">125</td>
+<td style="text-align:center">mprotect</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7D</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned long prot</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">126</td>
+<td style="text-align:center">sigprocmask</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7E</td>
+<td style="text-align:center">int how</td>
+<td style="text-align:center">old_sigset_t *set</td>
+<td style="text-align:center">old_sigset_t *oset</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">127</td>
+<td style="text-align:center">create_module</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">7F</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">128</td>
+<td style="text-align:center">init_module</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">80</td>
+<td style="text-align:center">void *umod</td>
+<td style="text-align:center">unsigned long len</td>
+<td style="text-align:center">const char *uargs</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">129</td>
+<td style="text-align:center">delete_module</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">81</td>
+<td style="text-align:center">const char *name_user</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">130</td>
+<td style="text-align:center">get_kernel_syms</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">82</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">131</td>
+<td style="text-align:center">quotactl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">83</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">const char *special</td>
+<td style="text-align:center">qid_t id</td>
+<td style="text-align:center">void *addr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">132</td>
+<td style="text-align:center">getpgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">84</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">133</td>
+<td style="text-align:center">fchdir</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">85</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">134</td>
+<td style="text-align:center">bdflush</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">86</td>
+<td style="text-align:center">int func</td>
+<td style="text-align:center">long data</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">135</td>
+<td style="text-align:center">sysfs</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">87</td>
+<td style="text-align:center">int option</td>
+<td style="text-align:center">unsigned long arg1</td>
+<td style="text-align:center">unsigned long arg2</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">136</td>
+<td style="text-align:center">personality</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">88</td>
+<td style="text-align:center">unsigned int personality</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">137</td>
+<td style="text-align:center">afs_syscall</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">89</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">138</td>
+<td style="text-align:center">setfsuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8A</td>
+<td style="text-align:center">uid_t uid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">139</td>
+<td style="text-align:center">setfsgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8B</td>
+<td style="text-align:center">gid_t gid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">140</td>
+<td style="text-align:center">_llseek</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8C</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">141</td>
+<td style="text-align:center">getdents</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8D</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">struct linux_dirent *dirent</td>
+<td style="text-align:center">unsigned int count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">142</td>
+<td style="text-align:center">_newselect</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8E</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">143</td>
+<td style="text-align:center">flock</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">8F</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">144</td>
+<td style="text-align:center">msync</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">90</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">145</td>
+<td style="text-align:center">readv</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">91</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">146</td>
+<td style="text-align:center">writev</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">92</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">147</td>
+<td style="text-align:center">getsid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">93</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">148</td>
+<td style="text-align:center">fdatasync</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">94</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">149</td>
+<td style="text-align:center">_sysctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">95</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">150</td>
+<td style="text-align:center">mlock</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">96</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">151</td>
+<td style="text-align:center">munlock</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">97</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">152</td>
+<td style="text-align:center">mlockall</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">98</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">153</td>
+<td style="text-align:center">munlockall</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">154</td>
+<td style="text-align:center">sched_setparam</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9A</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct sched_param *param</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">155</td>
+<td style="text-align:center">sched_getparam</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9B</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct sched_param *param</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">156</td>
+<td style="text-align:center">sched_setscheduler</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9C</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int policy</td>
+<td style="text-align:center">struct sched_param *param</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">157</td>
+<td style="text-align:center">sched_getscheduler</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9D</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">158</td>
+<td style="text-align:center">sched_yield</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9E</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">159</td>
+<td style="text-align:center">sched_get_priority_max</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">9F</td>
+<td style="text-align:center">int policy</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">160</td>
+<td style="text-align:center">sched_get_priority_min</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A0</td>
+<td style="text-align:center">int policy</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">161</td>
+<td style="text-align:center">sched_rr_get_interval</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A1</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct __kernel_timespec *interval</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">162</td>
+<td style="text-align:center">nanosleep</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A2</td>
+<td style="text-align:center">struct __kernel_timespec *rqtp</td>
+<td style="text-align:center">struct __kernel_timespec *rmtp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">163</td>
+<td style="text-align:center">mremap</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A3</td>
+<td style="text-align:center">unsigned long addr</td>
+<td style="text-align:center">unsigned long old_len</td>
+<td style="text-align:center">unsigned long new_len</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">unsigned long new_addr</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">164</td>
+<td style="text-align:center">setresuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A4</td>
+<td style="text-align:center">uid_t ruid</td>
+<td style="text-align:center">uid_t euid</td>
+<td style="text-align:center">uid_t suid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">165</td>
+<td style="text-align:center">getresuid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A5</td>
+<td style="text-align:center">uid_t *ruid</td>
+<td style="text-align:center">uid_t *euid</td>
+<td style="text-align:center">uid_t *suid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">166</td>
+<td style="text-align:center">vm86</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A6</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">167</td>
+<td style="text-align:center">query_module</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A7</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">168</td>
+<td style="text-align:center">poll</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A8</td>
+<td style="text-align:center">struct pollfd *ufds</td>
+<td style="text-align:center">unsigned int nfds</td>
+<td style="text-align:center">int timeout</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">169</td>
+<td style="text-align:center">nfsservctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">A9</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">170</td>
+<td style="text-align:center">setresgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AA</td>
+<td style="text-align:center">gid_t rgid</td>
+<td style="text-align:center">gid_t egid</td>
+<td style="text-align:center">gid_t sgid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">171</td>
+<td style="text-align:center">getresgid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AB</td>
+<td style="text-align:center">gid_t *rgid</td>
+<td style="text-align:center">gid_t *egid</td>
+<td style="text-align:center">gid_t *sgid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">172</td>
+<td style="text-align:center">prctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AC</td>
+<td style="text-align:center">int option</td>
+<td style="text-align:center">unsigned long arg2</td>
+<td style="text-align:center">unsigned long arg3</td>
+<td style="text-align:center">unsigned long arg4</td>
+<td style="text-align:center">unsigned long arg5</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">173</td>
+<td style="text-align:center">rt_sigreturn</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AD</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">174</td>
+<td style="text-align:center">rt_sigaction</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AE</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">const struct sigaction *</td>
+<td style="text-align:center">struct sigaction *</td>
+<td style="text-align:center">size_t</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">175</td>
+<td style="text-align:center">rt_sigprocmask</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">AF</td>
+<td style="text-align:center">int how</td>
+<td style="text-align:center">sigset_t *set</td>
+<td style="text-align:center">sigset_t *oset</td>
+<td style="text-align:center">size_t sigsetsize</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">176</td>
+<td style="text-align:center">rt_sigpending</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B0</td>
+<td style="text-align:center">sigset_t *set</td>
+<td style="text-align:center">size_t sigsetsize</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">177</td>
+<td style="text-align:center">rt_sigtimedwait</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B1</td>
+<td style="text-align:center">const sigset_t *uthese</td>
+<td style="text-align:center">siginfo_t *uinfo</td>
+<td style="text-align:center">const struct __kernel_timespec *uts</td>
+<td style="text-align:center">size_t sigsetsize</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">178</td>
+<td style="text-align:center">rt_sigqueueinfo</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B2</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">siginfo_t *uinfo</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">179</td>
+<td style="text-align:center">rt_sigsuspend</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B3</td>
+<td style="text-align:center">sigset_t *unewset</td>
+<td style="text-align:center">size_t sigsetsize</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">180</td>
+<td style="text-align:center">pread64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B4</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">loff_t pos</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">181</td>
+<td style="text-align:center">pwrite64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B5</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">const char *buf</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">loff_t pos</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">182</td>
+<td style="text-align:center">chown</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B6</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">uid_t user</td>
+<td style="text-align:center">gid_t group</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">183</td>
+<td style="text-align:center">getcwd</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B7</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">unsigned long size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">184</td>
+<td style="text-align:center">capget</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B8</td>
+<td style="text-align:center">cap_user_header_t header</td>
+<td style="text-align:center">cap_user_data_t dataptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">185</td>
+<td style="text-align:center">capset</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">B9</td>
+<td style="text-align:center">cap_user_header_t header</td>
+<td style="text-align:center">const cap_user_data_t data</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">186</td>
+<td style="text-align:center">sigaltstack</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BA</td>
+<td style="text-align:center">const struct sigaltstack *uss</td>
+<td style="text-align:center">struct sigaltstack *uoss</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">187</td>
+<td style="text-align:center">sendfile</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BB</td>
+<td style="text-align:center">int out_fd</td>
+<td style="text-align:center">int in_fd</td>
+<td style="text-align:center">off_t *offset</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">188</td>
+<td style="text-align:center">getpmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BC</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">189</td>
+<td style="text-align:center">putpmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BD</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">190</td>
+<td style="text-align:center">vfork</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BE</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">191</td>
+<td style="text-align:center">ugetrlimit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">BF</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">192</td>
+<td style="text-align:center">mmap2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C0</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">193</td>
+<td style="text-align:center">truncate64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C1</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">loff_t length</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">194</td>
+<td style="text-align:center">ftruncate64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C2</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">loff_t length</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">195</td>
+<td style="text-align:center">stat64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C3</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct stat64 *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">196</td>
+<td style="text-align:center">lstat64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C4</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct stat64 *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">197</td>
+<td style="text-align:center">fstat64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C5</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">struct stat64 *statbuf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">198</td>
+<td style="text-align:center">lchown32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C6</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">199</td>
+<td style="text-align:center">getuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C7</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">200</td>
+<td style="text-align:center">getgid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C8</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">201</td>
+<td style="text-align:center">geteuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">C9</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">202</td>
+<td style="text-align:center">getegid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CA</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">203</td>
+<td style="text-align:center">setreuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CB</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">204</td>
+<td style="text-align:center">setregid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CC</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">205</td>
+<td style="text-align:center">getgroups32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CD</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">206</td>
+<td style="text-align:center">setgroups32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CE</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">207</td>
+<td style="text-align:center">fchown32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">CF</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">208</td>
+<td style="text-align:center">setresuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D0</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">209</td>
+<td style="text-align:center">getresuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D1</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">210</td>
+<td style="text-align:center">setresgid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D2</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">211</td>
+<td style="text-align:center">getresgid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D3</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">212</td>
+<td style="text-align:center">chown32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D4</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">213</td>
+<td style="text-align:center">setuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D5</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">214</td>
+<td style="text-align:center">setgid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D6</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">215</td>
+<td style="text-align:center">setfsuid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D7</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">216</td>
+<td style="text-align:center">setfsgid32</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D8</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">217</td>
+<td style="text-align:center">pivot_root</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">D9</td>
+<td style="text-align:center">const char *new_root</td>
+<td style="text-align:center">const char *put_old</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">218</td>
+<td style="text-align:center">mincore</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">DA</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned char * vec</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">219</td>
+<td style="text-align:center">madvise</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">DB</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">int behavior</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">220</td>
+<td style="text-align:center">getdents64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">DC</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">struct linux_dirent64 *dirent</td>
+<td style="text-align:center">unsigned int count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">221</td>
+<td style="text-align:center">fcntl64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">DD</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">unsigned int cmd</td>
+<td style="text-align:center">unsigned long arg</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">222</td>
+<td style="text-align:center">not implemented</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">DE</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">223</td>
+<td style="text-align:center">not implemented</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">DF</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">224</td>
+<td style="text-align:center">gettid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E0</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">225</td>
+<td style="text-align:center">readahead</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E1</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">loff_t offset</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">226</td>
+<td style="text-align:center">setxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E2</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">const void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">227</td>
+<td style="text-align:center">lsetxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E3</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">const void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">228</td>
+<td style="text-align:center">fsetxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E4</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">const void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">229</td>
+<td style="text-align:center">getxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E5</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">230</td>
+<td style="text-align:center">lgetxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E6</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">231</td>
+<td style="text-align:center">fgetxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E7</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">void *value</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">232</td>
+<td style="text-align:center">listxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E8</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">char *list</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">233</td>
+<td style="text-align:center">llistxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">E9</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">char *list</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">234</td>
+<td style="text-align:center">flistxattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">EA</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">char *list</td>
+<td style="text-align:center">size_t size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">235</td>
+<td style="text-align:center">removexattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">EB</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">236</td>
+<td style="text-align:center">lremovexattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">EC</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">237</td>
+<td style="text-align:center">fremovexattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">ED</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">238</td>
+<td style="text-align:center">tkill</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">EE</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">239</td>
+<td style="text-align:center">sendfile64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">EF</td>
+<td style="text-align:center">int out_fd</td>
+<td style="text-align:center">int in_fd</td>
+<td style="text-align:center">loff_t *offset</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">240</td>
+<td style="text-align:center">futex</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F0</td>
+<td style="text-align:center">u32 *uaddr</td>
+<td style="text-align:center">int op</td>
+<td style="text-align:center">u32 val</td>
+<td style="text-align:center">struct __kernel_timespec *utime</td>
+<td style="text-align:center">u32 *uaddr2</td>
+<td style="text-align:center">u32 val3</td>
+</tr>
+<tr>
+<td style="text-align:center">241</td>
+<td style="text-align:center">sched_setaffinity</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F1</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">unsigned int len</td>
+<td style="text-align:center">unsigned long *user_mask_ptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">242</td>
+<td style="text-align:center">sched_getaffinity</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F2</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">unsigned int len</td>
+<td style="text-align:center">unsigned long *user_mask_ptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">243</td>
+<td style="text-align:center">set_thread_area</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F3</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">244</td>
+<td style="text-align:center">get_thread_area</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F4</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">245</td>
+<td style="text-align:center">io_setup</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F5</td>
+<td style="text-align:center">unsigned nr_reqs</td>
+<td style="text-align:center">aio_context_t *ctx</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">246</td>
+<td style="text-align:center">io_destroy</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F6</td>
+<td style="text-align:center">aio_context_t ctx</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">247</td>
+<td style="text-align:center">io_getevents</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F7</td>
+<td style="text-align:center">aio_context_t ctx_id</td>
+<td style="text-align:center">long min_nr</td>
+<td style="text-align:center">long nr</td>
+<td style="text-align:center">struct io_event *events</td>
+<td style="text-align:center">struct __kernel_timespec *timeout</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">248</td>
+<td style="text-align:center">io_submit</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F8</td>
+<td style="text-align:center">aio_context_t</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">struct iocb * *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">249</td>
+<td style="text-align:center">io_cancel</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">F9</td>
+<td style="text-align:center">aio_context_t ctx_id</td>
+<td style="text-align:center">struct iocb *iocb</td>
+<td style="text-align:center">struct io_event *result</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">250</td>
+<td style="text-align:center">fadvise64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">FA</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">loff_t offset</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">int advice</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">251</td>
+<td style="text-align:center">not implemented</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">FB</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">252</td>
+<td style="text-align:center">exit_group</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">FC</td>
+<td style="text-align:center">int error_code</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">253</td>
+<td style="text-align:center">lookup_dcookie</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">FD</td>
+<td style="text-align:center">u64 cookie64</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">254</td>
+<td style="text-align:center">epoll_create</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">FE</td>
+<td style="text-align:center">int size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">255</td>
+<td style="text-align:center">epoll_ctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">FF</td>
+<td style="text-align:center">int epfd</td>
+<td style="text-align:center">int op</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">struct epoll_event *event</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">256</td>
+<td style="text-align:center">epoll_wait</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">int epfd</td>
+<td style="text-align:center">struct epoll_event *events</td>
+<td style="text-align:center">int maxevents</td>
+<td style="text-align:center">int timeout</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">257</td>
+<td style="text-align:center">remap_file_pages</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">101</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">unsigned long size</td>
+<td style="text-align:center">unsigned long prot</td>
+<td style="text-align:center">unsigned long pgoff</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">258</td>
+<td style="text-align:center">set_tid_address</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">102</td>
+<td style="text-align:center">int *tidptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">259</td>
+<td style="text-align:center">timer_create</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">103</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">struct sigevent *timer_event_spec</td>
+<td style="text-align:center">timer_t * created_timer_id</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">260</td>
+<td style="text-align:center">timer_settime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">104</td>
+<td style="text-align:center">timer_t timer_id</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">const struct __kernel_itimerspec *new_setting</td>
+<td style="text-align:center">struct __kernel_itimerspec *old_setting</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">261</td>
+<td style="text-align:center">timer_gettime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">105</td>
+<td style="text-align:center">timer_t timer_id</td>
+<td style="text-align:center">struct __kernel_itimerspec *setting</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">262</td>
+<td style="text-align:center">timer_getoverrun</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">106</td>
+<td style="text-align:center">timer_t timer_id</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">263</td>
+<td style="text-align:center">timer_delete</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">107</td>
+<td style="text-align:center">timer_t timer_id</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">264</td>
+<td style="text-align:center">clock_settime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">108</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">const struct __kernel_timespec *tp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">265</td>
+<td style="text-align:center">clock_gettime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">109</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">struct __kernel_timespec *tp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">266</td>
+<td style="text-align:center">clock_getres</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10A</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">struct __kernel_timespec *tp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">267</td>
+<td style="text-align:center">clock_nanosleep</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10B</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">const struct __kernel_timespec *rqtp</td>
+<td style="text-align:center">struct __kernel_timespec *rmtp</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">268</td>
+<td style="text-align:center">statfs64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10C</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">size_t sz</td>
+<td style="text-align:center">struct statfs64 *buf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">269</td>
+<td style="text-align:center">fstatfs64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10D</td>
+<td style="text-align:center">unsigned int fd</td>
+<td style="text-align:center">size_t sz</td>
+<td style="text-align:center">struct statfs64 *buf</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">270</td>
+<td style="text-align:center">tgkill</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10E</td>
+<td style="text-align:center">pid_t tgid</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">271</td>
+<td style="text-align:center">utimes</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">10F</td>
+<td style="text-align:center">char *filename</td>
+<td style="text-align:center">struct timeval *utimes</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">272</td>
+<td style="text-align:center">fadvise64_64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">110</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">loff_t offset</td>
+<td style="text-align:center">loff_t len</td>
+<td style="text-align:center">int advice</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">273</td>
+<td style="text-align:center">vserver</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">111</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+<tr>
+<td style="text-align:center">274</td>
+<td style="text-align:center">mbind</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">112</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">unsigned long len</td>
+<td style="text-align:center">unsigned long mode</td>
+<td style="text-align:center">const unsigned long *nmask</td>
+<td style="text-align:center">unsigned long maxnode</td>
+<td style="text-align:center">unsigned flags</td>
+</tr>
+<tr>
+<td style="text-align:center">275</td>
+<td style="text-align:center">get_mempolicy</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">113</td>
+<td style="text-align:center">int *policy</td>
+<td style="text-align:center">unsigned long *nmask</td>
+<td style="text-align:center">unsigned long maxnode</td>
+<td style="text-align:center">unsigned long addr</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">276</td>
+<td style="text-align:center">set_mempolicy</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">114</td>
+<td style="text-align:center">int mode</td>
+<td style="text-align:center">const unsigned long *nmask</td>
+<td style="text-align:center">unsigned long maxnode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">277</td>
+<td style="text-align:center">mq_open</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">115</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">int oflag</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">struct mq_attr *attr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">278</td>
+<td style="text-align:center">mq_unlink</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">116</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">279</td>
+<td style="text-align:center">mq_timedsend</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">117</td>
+<td style="text-align:center">mqd_t mqdes</td>
+<td style="text-align:center">const char *msg_ptr</td>
+<td style="text-align:center">size_t msg_len</td>
+<td style="text-align:center">unsigned int msg_prio</td>
+<td style="text-align:center">const struct __kernel_timespec *abs_timeout</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">280</td>
+<td style="text-align:center">mq_timedreceive</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">118</td>
+<td style="text-align:center">mqd_t mqdes</td>
+<td style="text-align:center">char *msg_ptr</td>
+<td style="text-align:center">size_t msg_len</td>
+<td style="text-align:center">unsigned int *msg_prio</td>
+<td style="text-align:center">const struct __kernel_timespec *abs_timeout</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">281</td>
+<td style="text-align:center">mq_notify</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">119</td>
+<td style="text-align:center">mqd_t mqdes</td>
+<td style="text-align:center">const struct sigevent *notification</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">282</td>
+<td style="text-align:center">mq_getsetattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11A</td>
+<td style="text-align:center">mqd_t mqdes</td>
+<td style="text-align:center">const struct mq_attr *mqstat</td>
+<td style="text-align:center">struct mq_attr *omqstat</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">283</td>
+<td style="text-align:center">kexec_load</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11B</td>
+<td style="text-align:center">unsigned long entry</td>
+<td style="text-align:center">unsigned long nr_segments</td>
+<td style="text-align:center">struct kexec_segment *segments</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">284</td>
+<td style="text-align:center">waitid</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11C</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct siginfo *infop</td>
+<td style="text-align:center">int options</td>
+<td style="text-align:center">struct rusage *ru</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">285</td>
+<td style="text-align:center">not implemented</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">11D</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">286</td>
+<td style="text-align:center">add_key</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11E</td>
+<td style="text-align:center">const char *_type</td>
+<td style="text-align:center">const char *_description</td>
+<td style="text-align:center">const void *_payload</td>
+<td style="text-align:center">size_t plen</td>
+<td style="text-align:center">key_serial_t destringid</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">287</td>
+<td style="text-align:center">request_key</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">11F</td>
+<td style="text-align:center">const char *_type</td>
+<td style="text-align:center">const char *_description</td>
+<td style="text-align:center">const char *_callout_info</td>
+<td style="text-align:center">key_serial_t destringid</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">288</td>
+<td style="text-align:center">keyctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">120</td>
+<td style="text-align:center">int cmd</td>
+<td style="text-align:center">unsigned long arg2</td>
+<td style="text-align:center">unsigned long arg3</td>
+<td style="text-align:center">unsigned long arg4</td>
+<td style="text-align:center">unsigned long arg5</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">289</td>
+<td style="text-align:center">ioprio_set</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">121</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">int who</td>
+<td style="text-align:center">int ioprio</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">290</td>
+<td style="text-align:center">ioprio_get</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">122</td>
+<td style="text-align:center">int which</td>
+<td style="text-align:center">int who</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">291</td>
+<td style="text-align:center">inotify_init</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">123</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">292</td>
+<td style="text-align:center">inotify_add_watch</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">124</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">u32 mask</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">293</td>
+<td style="text-align:center">inotify_rm_watch</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">125</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">__s32 wd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">294</td>
+<td style="text-align:center">migrate_pages</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">126</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">unsigned long maxnode</td>
+<td style="text-align:center">const unsigned long *from</td>
+<td style="text-align:center">const unsigned long *to</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">295</td>
+<td style="text-align:center">openat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">127</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">296</td>
+<td style="text-align:center">mkdirat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">128</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char * pathname</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">297</td>
+<td style="text-align:center">mknodat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">129</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char * filename</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">unsigned dev</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">298</td>
+<td style="text-align:center">fchownat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12A</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">uid_t user</td>
+<td style="text-align:center">gid_t group</td>
+<td style="text-align:center">int flag</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">299</td>
+<td style="text-align:center">futimesat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12B</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct timeval *utimes</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">300</td>
+<td style="text-align:center">fstatat64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12C</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct stat64 *statbuf</td>
+<td style="text-align:center">int flag</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">301</td>
+<td style="text-align:center">unlinkat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12D</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char * pathname</td>
+<td style="text-align:center">int flag</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">302</td>
+<td style="text-align:center">renameat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12E</td>
+<td style="text-align:center">int olddfd</td>
+<td style="text-align:center">const char * oldname</td>
+<td style="text-align:center">int newdfd</td>
+<td style="text-align:center">const char * newname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">303</td>
+<td style="text-align:center">linkat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">12F</td>
+<td style="text-align:center">int olddfd</td>
+<td style="text-align:center">const char *oldname</td>
+<td style="text-align:center">int newdfd</td>
+<td style="text-align:center">const char *newname</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">304</td>
+<td style="text-align:center">symlinkat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">130</td>
+<td style="text-align:center">const char * oldname</td>
+<td style="text-align:center">int newdfd</td>
+<td style="text-align:center">const char * newname</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">305</td>
+<td style="text-align:center">readlinkat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">131</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">int bufsiz</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">306</td>
+<td style="text-align:center">fchmodat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">132</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char * filename</td>
+<td style="text-align:center">umode_t mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">307</td>
+<td style="text-align:center">faccessat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">133</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">int mode</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">308</td>
+<td style="text-align:center">pselect6</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">134</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">fd_set *</td>
+<td style="text-align:center">fd_set *</td>
+<td style="text-align:center">fd_set *</td>
+<td style="text-align:center">struct __kernel_timespec *</td>
+<td style="text-align:center">void *</td>
+</tr>
+<tr>
+<td style="text-align:center">309</td>
+<td style="text-align:center">ppoll</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">135</td>
+<td style="text-align:center">struct pollfd *</td>
+<td style="text-align:center">unsigned int</td>
+<td style="text-align:center">struct __kernel_timespec *</td>
+<td style="text-align:center">const sigset_t *</td>
+<td style="text-align:center">size_t</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">310</td>
+<td style="text-align:center">unshare</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">136</td>
+<td style="text-align:center">unsigned long unshare_flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">311</td>
+<td style="text-align:center">set_robust_list</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">137</td>
+<td style="text-align:center">struct robust_list_head *head</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">312</td>
+<td style="text-align:center">get_robust_list</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">138</td>
+<td style="text-align:center">int pid</td>
+<td style="text-align:center">struct robust_list_head * *head_ptr</td>
+<td style="text-align:center">size_t *len_ptr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">313</td>
+<td style="text-align:center">splice</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">139</td>
+<td style="text-align:center">int fd_in</td>
+<td style="text-align:center">loff_t *off_in</td>
+<td style="text-align:center">int fd_out</td>
+<td style="text-align:center">loff_t *off_out</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned int flags</td>
+</tr>
+<tr>
+<td style="text-align:center">314</td>
+<td style="text-align:center">sync_file_range</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13A</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">loff_t offset</td>
+<td style="text-align:center">loff_t nbytes</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">315</td>
+<td style="text-align:center">tee</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13B</td>
+<td style="text-align:center">int fdin</td>
+<td style="text-align:center">int fdout</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">316</td>
+<td style="text-align:center">vmsplice</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13C</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const struct iovec *iov</td>
+<td style="text-align:center">unsigned long nr_segs</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">317</td>
+<td style="text-align:center">move_pages</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13D</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">unsigned long nr_pages</td>
+<td style="text-align:center">const void * *pages</td>
+<td style="text-align:center">const int *nodes</td>
+<td style="text-align:center">int *status</td>
+<td style="text-align:center">int flags</td>
+</tr>
+<tr>
+<td style="text-align:center">318</td>
+<td style="text-align:center">getcpu</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13E</td>
+<td style="text-align:center">unsigned *cpu</td>
+<td style="text-align:center">unsigned *node</td>
+<td style="text-align:center">struct getcpu_cache *cache</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">319</td>
+<td style="text-align:center">epoll_pwait</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">13F</td>
+<td style="text-align:center">int epfd</td>
+<td style="text-align:center">struct epoll_event *events</td>
+<td style="text-align:center">int maxevents</td>
+<td style="text-align:center">int timeout</td>
+<td style="text-align:center">const sigset_t *sigmask</td>
+<td style="text-align:center">size_t sigsetsize</td>
+</tr>
+<tr>
+<td style="text-align:center">320</td>
+<td style="text-align:center">utimensat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">140</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">struct __kernel_timespec *utimes</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">321</td>
+<td style="text-align:center">signalfd</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">141</td>
+<td style="text-align:center">int ufd</td>
+<td style="text-align:center">sigset_t *user_mask</td>
+<td style="text-align:center">size_t sizemask</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">322</td>
+<td style="text-align:center">timerfd_create</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">142</td>
+<td style="text-align:center">int clockid</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">323</td>
+<td style="text-align:center">eventfd</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">143</td>
+<td style="text-align:center">unsigned int count</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">324</td>
+<td style="text-align:center">fallocate</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">144</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">int mode</td>
+<td style="text-align:center">loff_t offset</td>
+<td style="text-align:center">loff_t len</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">325</td>
+<td style="text-align:center">timerfd_settime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">145</td>
+<td style="text-align:center">int ufd</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">const struct __kernel_itimerspec *utmr</td>
+<td style="text-align:center">struct __kernel_itimerspec *otmr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">326</td>
+<td style="text-align:center">timerfd_gettime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">146</td>
+<td style="text-align:center">int ufd</td>
+<td style="text-align:center">struct __kernel_itimerspec *otmr</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">327</td>
+<td style="text-align:center">signalfd4</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">147</td>
+<td style="text-align:center">int ufd</td>
+<td style="text-align:center">sigset_t *user_mask</td>
+<td style="text-align:center">size_t sizemask</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">328</td>
+<td style="text-align:center">eventfd2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">148</td>
+<td style="text-align:center">unsigned int count</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">329</td>
+<td style="text-align:center">epoll_create1</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">149</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">330</td>
+<td style="text-align:center">dup3</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14A</td>
+<td style="text-align:center">unsigned int oldfd</td>
+<td style="text-align:center">unsigned int newfd</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">331</td>
+<td style="text-align:center">pipe2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14B</td>
+<td style="text-align:center">int *fildes</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">332</td>
+<td style="text-align:center">inotify_init1</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14C</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">333</td>
+<td style="text-align:center">preadv</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14D</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">unsigned long pos_l</td>
+<td style="text-align:center">unsigned long pos_h</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">334</td>
+<td style="text-align:center">pwritev</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14E</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">unsigned long pos_l</td>
+<td style="text-align:center">unsigned long pos_h</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">335</td>
+<td style="text-align:center">rt_tgsigqueueinfo</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">14F</td>
+<td style="text-align:center">pid_t tgid</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int sig</td>
+<td style="text-align:center">siginfo_t *uinfo</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">336</td>
+<td style="text-align:center">perf_event_open</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">150</td>
+<td style="text-align:center">struct perf_event_attr *attr_uptr</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">int cpu</td>
+<td style="text-align:center">int group_fd</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">337</td>
+<td style="text-align:center">recvmmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">151</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">struct mmsghdr *msg</td>
+<td style="text-align:center">unsigned int vlen</td>
+<td style="text-align:center">unsigned flags</td>
+<td style="text-align:center">struct __kernel_timespec *timeout</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">338</td>
+<td style="text-align:center">fanotify_init</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">152</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">unsigned int event_f_flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">339</td>
+<td style="text-align:center">fanotify_mark</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">153</td>
+<td style="text-align:center">int fanotify_fd</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">u64 mask</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *pathname</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">340</td>
+<td style="text-align:center">prlimit64</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">154</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">unsigned int resource</td>
+<td style="text-align:center">const struct rlimit64 *new_rlim</td>
+<td style="text-align:center">struct rlimit64 *old_rlim</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">341</td>
+<td style="text-align:center">name_to_handle_at</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">155</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *name</td>
+<td style="text-align:center">struct file_handle *handle</td>
+<td style="text-align:center">int *mnt_id</td>
+<td style="text-align:center">int flag</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">342</td>
+<td style="text-align:center">open_by_handle_at</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">156</td>
+<td style="text-align:center">int mountdirfd</td>
+<td style="text-align:center">struct file_handle *handle</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">343</td>
+<td style="text-align:center">clock_adjtime</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">157</td>
+<td style="text-align:center">clockid_t which_clock</td>
+<td style="text-align:center">struct __kernel_timex *tx</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">344</td>
+<td style="text-align:center">syncfs</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">158</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">345</td>
+<td style="text-align:center">sendmmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">159</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">struct mmsghdr *msg</td>
+<td style="text-align:center">unsigned int vlen</td>
+<td style="text-align:center">unsigned flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">346</td>
+<td style="text-align:center">setns</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15A</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">int nstype</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">347</td>
+<td style="text-align:center">process_vm_readv</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15B</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">const struct iovec *lvec</td>
+<td style="text-align:center">unsigned long liovcnt</td>
+<td style="text-align:center">const struct iovec *rvec</td>
+<td style="text-align:center">unsigned long riovcnt</td>
+<td style="text-align:center">unsigned long flags</td>
+</tr>
+<tr>
+<td style="text-align:center">348</td>
+<td style="text-align:center">process_vm_writev</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15C</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">const struct iovec *lvec</td>
+<td style="text-align:center">unsigned long liovcnt</td>
+<td style="text-align:center">const struct iovec *rvec</td>
+<td style="text-align:center">unsigned long riovcnt</td>
+<td style="text-align:center">unsigned long flags</td>
+</tr>
+<tr>
+<td style="text-align:center">349</td>
+<td style="text-align:center">kcmp</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15D</td>
+<td style="text-align:center">pid_t pid1</td>
+<td style="text-align:center">pid_t pid2</td>
+<td style="text-align:center">int type</td>
+<td style="text-align:center">unsigned long idx1</td>
+<td style="text-align:center">unsigned long idx2</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">350</td>
+<td style="text-align:center">finit_module</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15E</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">const char *uargs</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">351</td>
+<td style="text-align:center">sched_setattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">15F</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct sched_attr *attr</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">352</td>
+<td style="text-align:center">sched_getattr</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">160</td>
+<td style="text-align:center">pid_t pid</td>
+<td style="text-align:center">struct sched_attr *attr</td>
+<td style="text-align:center">unsigned int size</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">353</td>
+<td style="text-align:center">renameat2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">161</td>
+<td style="text-align:center">int olddfd</td>
+<td style="text-align:center">const char *oldname</td>
+<td style="text-align:center">int newdfd</td>
+<td style="text-align:center">const char *newname</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">354</td>
+<td style="text-align:center">seccomp</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">162</td>
+<td style="text-align:center">unsigned int op</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">void *uargs</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">355</td>
+<td style="text-align:center">getrandom</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">163</td>
+<td style="text-align:center">char *buf</td>
+<td style="text-align:center">size_t count</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">356</td>
+<td style="text-align:center">memfd_create</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">164</td>
+<td style="text-align:center">const char *uname_ptr</td>
+<td style="text-align:center">unsigned int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">357</td>
+<td style="text-align:center">bpf</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">165</td>
+<td style="text-align:center">int cmd</td>
+<td style="text-align:center">union bpf_attr *attr</td>
+<td style="text-align:center">unsigned int size</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">358</td>
+<td style="text-align:center">execveat</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">166</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *filename</td>
+<td style="text-align:center">const char *const *argv</td>
+<td style="text-align:center">const char *const *envp</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">359</td>
+<td style="text-align:center">socket</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">167</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">360</td>
+<td style="text-align:center">socketpair</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">168</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">361</td>
+<td style="text-align:center">bind</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">169</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">362</td>
+<td style="text-align:center">connect</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16A</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">363</td>
+<td style="text-align:center">listen</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16B</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">364</td>
+<td style="text-align:center">accept4</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16C</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">365</td>
+<td style="text-align:center">getsockopt</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16D</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">int level</td>
+<td style="text-align:center">int optname</td>
+<td style="text-align:center">char *optval</td>
+<td style="text-align:center">int *optlen</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">366</td>
+<td style="text-align:center">setsockopt</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16E</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">int level</td>
+<td style="text-align:center">int optname</td>
+<td style="text-align:center">char *optval</td>
+<td style="text-align:center">int optlen</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">367</td>
+<td style="text-align:center">getsockname</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">16F</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">368</td>
+<td style="text-align:center">getpeername</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">170</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int *</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">369</td>
+<td style="text-align:center">sendto</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">171</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">void *</td>
+<td style="text-align:center">size_t</td>
+<td style="text-align:center">unsigned</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">370</td>
+<td style="text-align:center">sendmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">172</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">struct user_msghdr *msg</td>
+<td style="text-align:center">unsigned flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">371</td>
+<td style="text-align:center">recvfrom</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">173</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">void *</td>
+<td style="text-align:center">size_t</td>
+<td style="text-align:center">unsigned</td>
+<td style="text-align:center">struct sockaddr *</td>
+<td style="text-align:center">int *</td>
+</tr>
+<tr>
+<td style="text-align:center">372</td>
+<td style="text-align:center">recvmsg</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">174</td>
+<td style="text-align:center">int fd</td>
+<td style="text-align:center">struct user_msghdr *msg</td>
+<td style="text-align:center">unsigned flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">373</td>
+<td style="text-align:center">shutdown</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">175</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">374</td>
+<td style="text-align:center">userfaultfd</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">176</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">375</td>
+<td style="text-align:center">membarrier</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">177</td>
+<td style="text-align:center">int cmd</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">376</td>
+<td style="text-align:center">mlock2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">178</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">int flags</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">377</td>
+<td style="text-align:center">copy_file_range</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">179</td>
+<td style="text-align:center">int fd_in</td>
+<td style="text-align:center">loff_t *off_in</td>
+<td style="text-align:center">int fd_out</td>
+<td style="text-align:center">loff_t *off_out</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned int flags</td>
+</tr>
+<tr>
+<td style="text-align:center">378</td>
+<td style="text-align:center">preadv2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17A</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">unsigned long pos_l</td>
+<td style="text-align:center">unsigned long pos_h</td>
+<td style="text-align:center">rwf_t flags</td>
+</tr>
+<tr>
+<td style="text-align:center">379</td>
+<td style="text-align:center">pwritev2</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17B</td>
+<td style="text-align:center">unsigned long fd</td>
+<td style="text-align:center">const struct iovec *vec</td>
+<td style="text-align:center">unsigned long vlen</td>
+<td style="text-align:center">unsigned long pos_l</td>
+<td style="text-align:center">unsigned long pos_h</td>
+<td style="text-align:center">rwf_t flags</td>
+</tr>
+<tr>
+<td style="text-align:center">380</td>
+<td style="text-align:center">pkey_mprotect</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17C</td>
+<td style="text-align:center">unsigned long start</td>
+<td style="text-align:center">size_t len</td>
+<td style="text-align:center">unsigned long prot</td>
+<td style="text-align:center">int pkey</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">381</td>
+<td style="text-align:center">pkey_alloc</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17D</td>
+<td style="text-align:center">unsigned long flags</td>
+<td style="text-align:center">unsigned long init_val</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">382</td>
+<td style="text-align:center">pkey_free</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17E</td>
+<td style="text-align:center">int pkey</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">383</td>
+<td style="text-align:center">statx</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">17F</td>
+<td style="text-align:center">int dfd</td>
+<td style="text-align:center">const char *path</td>
+<td style="text-align:center">unsigned flags</td>
+<td style="text-align:center">unsigned mask</td>
+<td style="text-align:center">struct statx *buffer</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">384</td>
+<td style="text-align:center">arch_prctl</td>
+<td style="text-align:center">man/ cs/</td>
+<td style="text-align:center">180</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+<td style="text-align:center">?</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+  
+  <div class="posts">
+    
+    
+
+    
+    
+      
+    
+    
+
+    
+    <div class="pagination">
+  <div class="pagination__buttons">
+    
+    
+  </div>
+</div>
+
+  </div>
+
+  </div>
+
+  
+    <footer class="footer">
+    <div class="footer__inner">
+        
+            <div class="copyright">
+                <span>© 2020</span>
+                
+                <span>:: <a href="https://github.com/guitmz/">TMZ</a></span>
+            </div>
+        </div>
+</footer>
+
+<script src="https://x86.syscall.sh/assets/main.js"></script>
+<script src="https://x86.syscall.sh/assets/prism.js"></script>
+
+
+
+
+
+
+  
+</div>
+
+
+
+</body></html>

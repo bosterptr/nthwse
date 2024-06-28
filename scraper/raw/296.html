@@ -1,0 +1,222 @@
+<html lang="en" class="no-js"><!-- BEGIN HEAD --><head>
+        <meta charset="utf-8">
+        <title>Reversing ARM Binaries</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <meta content="" name="description">
+        <meta content="" name="author">
+
+        <!-- GLOBAL MANDATORY STYLES -->
+        <link href="http://fonts.googleapis.com/css?family=Hind:300,400,500,600,700" rel="stylesheet" type="text/css">
+        <link href="vendor/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css">
+        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+
+        <!-- PAGE LEVEL PLUGIN STYLES -->
+        <link href="css/animate.css" rel="stylesheet">
+        <link href="vendor/swiper/css/swiper.min.css" rel="stylesheet" type="text/css">
+
+        <!-- THEME STYLES -->
+        <link href="css/layout.min.css" rel="stylesheet" type="text/css">
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="favicon.ico">
+        <script async="" src="https://cdn.splitbee.io/sb.js"></script>
+    </head>
+    <!-- END HEAD -->
+
+    <!-- BODY -->
+    <body id="body" data-spy="scroll" data-target=".header">
+<br><br>
+<br><br>
+
+        <center>
+            
+                <center><h1>Reversing ARM Binaries</h1></center>
+                <p style="font-size:150%;color:#585858;margin:0px 50px;">by @bellis1000</p>
+                <br><br>
+                <p style="font-size:150%;color:#585858;margin:10px 50px;">In this beginner-friendly tutorial we will take a look at the process of reverse engineering a simple ARM binary and patching it. The specific binary we will look at is named 'patchme1' and is a small program designed specifically for the purpose of this tutorial. Executing the program with zero arguments gives us a short 'usage' message that lets us know that we will need some kind of key in order to use this app.</p>
+                <img width="673.6px" height="458.4px" src="1.png">
+                    <p style="font-size:150%;color:#585858;margin:10px 50px;">Executing it again, this time with a random key as the first argument, gives us a red error message telling us that we have entered an incorrect key.</p>
+                    <img width="673.6px" height="458.4px" src="2.png">
+                        <p style="font-size:150%;color:#585858;margin:10px 50px;">So where do we go from here? Natural instinct for anyone with any kind of reversing knowlegde would be to scan the binary for strings to see if the key happens to be stored in plain ASCII text. We can do so by opening the patchme1 binary in Hopper disassembler for OS X (or another disassembler tool such as IDA or radare2) and navigating to the 'strings' section.</p>
+                        <img width="309.4px" height="246.4px" src="3.png">
+                            <p style="font-size:150%;color:#585858;margin:10px 50px;">Unfortunately for us, the key is not stored in plain ASCII. The only strings we can see are the 'usage' message, the 'invalid key' message, the path to /bin/sh and a 'You're in!' message. So what now? It is clear that this challenge will not be as simple as finding a string and using it to get through the check. We will need to look deeper into how this program works, and we'll start by disassembling main().</p>
+                            <p style="font-size:150%;color:#585858;margin:10px 50px;">We will start with the first chunk of instructions, up until the point of the first conditional branch.</p>
+                            <img width="507.6px" height="261.6px" src="4.png">
+                                <p style="font-size:150%;color:#585858;margin:10px 50px;">The first few instructions aren't too interesting. These instructions just make up the generic function prologue that contains the standard things you'd see in most ARM assembly functions, such as setting up the stack for later returning.</p>
+                                <p style="font-size:150%;color:#585858;margin:10px 50px;">Below that, we have a series of memory access instructions (LDRs and STRs) and then a CMP instruction, comparing the value of R0 to 0x2. This is simply checking the number of arguments the user supplied when executing the program. The BGE (Branch if Greater than or Equal to) instruction following this comparison then determines whether we are given the 'usage' message or whether we proceed to the next part of the program. We don't care too much about the 'usage' thing, so we'll continue on to the next stage of the program.</p>
+                                <img width="444px" height="123px" src="5.png">
+                                    <p style="font-size:150%;color:#585858;margin:10px 50px;">There are some interesting things happening here. Firstly, R0 is being loaded with user-supplied key and then a function 'hash' is BL(Branch with Link)'d to. The BL instruction is the equivalent of a CALL type instruction. It jumps or 'branches' to a new location in memory (in this case the entry point of the hash function) and then it returns to its caller.</p>
+                                    <p style="font-size:150%;color:#585858;margin:10px 50px;">Following the call to the hash function, there is a comparison between R0 and a very specific value, 0x203623b1. If the two are not equal, we branch to 0xbef0 which displays the 'invalid key' message and then exits. However, if they are equal then we continue to the restricted area of the program which, by looking at the disassembly, gives us a welcome message and then spawns a shell.</p>
+                                    <img width="562px" height="240px" src="6.png">
+                                        <p style="font-size:150%;color:#585858;margin:10px 50px;">So how do we get that very specific value into R0? On ARM, function return values are passed in R0. This makes it pretty clear and obvious that the hash function is what is generating this number (if you didn't already guess).</p>
+                                        <p style="font-size:150%;color:#585858;margin:10px 50px;">Looking at the disassembly for the hash function would likely overwhelm beginners (who of which this post is targetted at) so instead we will cheat and have a sneak peak at the source code instead ;).</p>
+                                        
+                                        <img width="424px" height="201px" src="7.png">
+                                            
+                                            <p style="font-size:150%;color:#585858;margin:10px 50px;">From the above code snippet we can understand that this 'hash' function takes in an array of chars (data[]) and returns an unsigned integer. The actual body of this function contains a loop that iterates through the characters in the char array an XOR(Exclusive OR)s each of them with the random number 83, adding the result to an integer variable named 'hash' and then multiplying the value of this by another random value, 839286441.</p>
+                                            <p style="font-size:150%;color:#585858;margin:10px 50px;">So in summary, this function implements a very basic hashing algorithm that generates a hash of the data passed to it and returns this hash to the caller. </p>
+                                            <p style="font-size:150%;color:#585858;margin:10px 50px;">If you know anything about hashing algorithms, you'll know that even simple ones like this are very tedious to reverse (find some specific data that returns a specific hash) so it would be easier for us to just patch this simple binary instead.</p>
+                                            <p style="font-size:150%;color:#585858;margin:10px 50px;">There are a few ways we could patch this specific binary, but we'll go with the simplest way which would be to remove or 'NOP out' this instruction:</p>
+                                            
+                                            <img width="550px" height="160px" src="8.png">
+                                                
+                                                <p style="font-size:150%;color:#585858;margin:10px 50px;">But what is a NOP? NOP stands for No-Operation and it is essentially an instruction that when executed, has no effect on the program or the state of the registers. In other words, it does nothing. We can use this to our advantage by placing a NOP where the conditional branch instruction would be, thus causing execution to automatically follow on to the chunk of code that executes the shell.</p>
+                                                 <p style="font-size:150%;color:#585858;margin:10px 50px;">In the ARMv7 instruction set, there is no dedicated NOP instruction, but we can easily create our own. Something like 'MOV R0, R0' acts as a NOP instruction. It moves the value of R0 into R0, leaving the registers unchanged. So it does nothing.</p>
+                                                 
+                                                 <p style="font-size:150%;color:#585858;margin:10px 50px;">To actually replace the instruction with our NOP we could use Hopper's built-in 'NOP Region' feature, however we will not be able to export the binary on the free version. Instead, I will assume that we don't have access to the full/paid version of Hopper and patch the instruction manually.</p>
+                                                 <p style="font-size:150%;color:#585858;margin:10px 50px;">We first need the encoding of our target instruction. This can be found in the right side bar in Hopper.</p>
+                                                 
+                                                 <img width="554px" height="152px" src="9.png">
+                                                     <p style="font-size:150%;color:#585858;margin:10px 50px;">Now, using your favourite Hex editor application (I'm using iHex), open the patchme1 binary and search for this specific byte combination inside the binary file.</p>
+                                                     <img width="566px" height="400px" src="10.png">
+                                                         <p style="font-size:150%;color:#585858;margin:10px 50px;">Once you've found it you can replace these 4 bytes with the bytes representing your chosen NOP instruction. In my case I will use 'MOV R0, R0' which has the instruction encoding of 00 00 A0 E1.</p>
+                                                     <img width="566px" height="400px" src="11.png">
+                                        <p style="font-size:150%;color:#585858;margin:10px 50px;">Save the file, and you're done! You've successfully patched the program by replacing a single instruction.</p>
+                                        <p style="font-size:150%;color:#585858;margin:10px 50px;">To test that the patch works as expected, execute the new patchme1 binary and see what happens.</p>
+                                         <img width="673.6px" height="458.4px" src="12.png">
+                                             <p style="font-size:150%;color:#585858;margin:10px 50px;">As the above screenshot shows, we are given access to the shell no matter what data we enter for the key. Challenge complete!</p>
+                                             <p style="font-size:150%;color:#585858;margin:10px 50px;">Hopefully you enjoyed this short tutorial! If you're new to ARM assembly then I highly recommend <a href="https://azeria-labs.com">Azeria's set of tutorials</a>. If you want to learn more on the topic of reverse engineering and exploit development on the ARM platform <a href="https://zygosec.com/products.html">check out my book</a> as well as my set of 'ARM Exploit Exercises' <a href="https://github.com/Billy-Ellis/Exploit-Challenges">available on my Github</a>. Thanks for reading! Feel free to tweet me <a href="https://twitter.com/bellis1000">@bellis1000</a> if you have any questions :)</p>
+            
+            
+        </center>
+        <!--========== SLIDER ==========-->
+
+        <!--========== PAGE LAYOUT ==========-->
+        <!-- About
+        <div id="about">
+            <div class="content-lg container">
+                <!-- Masonry Grid
+                <div class="masonry-grid row">
+                    <div class="masonry-grid-sizer col-xs-6 col-sm-6 col-md-1"></div>
+                    <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4 sm-margin-b-30">
+                        <div class="margin-b-60">
+                            <h2>Art Of Coding</h2>
+                            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed tempor incididunt ut laboret dolore magna ut consequat siad esqudiat dolor</p>
+                        </div>
+                        <img class="full-width img-responsive wow fadeInUp" src="img/500x500/01.jpg" alt="Portfolio Image" data-wow-duration=".3" data-wow-delay=".2s">
+                    </div>
+                    <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4">
+                        <div class="margin-b-60">
+                            <img class="full-width img-responsive wow fadeInUp" src="img/500x500/02.jpg" alt="Portfolio Image" data-wow-duration=".3" data-wow-delay=".3s">
+                        </div>
+                        <h2>Clean Design</h2>
+                        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed tempor incididunt ut laboret dolore magna ut consequat siad esqudiat dolor</p>
+                    </div>
+                    <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4">
+                        <div class="margin-t-60 margin-b-60">
+                            <h2>Amazing Support</h2>
+                            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed tempor incididunt ut laboret dolore magna ut consequat siad esqudiat dolor</p>
+                        </div>
+                        <img class="full-width img-responsive wow fadeInUp" src="img/500x500/03.jpg" alt="Portfolio Image" data-wow-duration=".3" data-wow-delay=".4s">
+                    </div>
+                </div>
+                <!-- End Masonry Grid -->
+            
+            
+            
+                
+            
+        
+        <!-- End About -->
+
+        <!-- Latest Products -->
+        
+        <!--<div id="products">
+            <div class="content-lg container">
+                <div class="row margin-b-40">
+                    <div class="col-sm-6">
+                        <h2>Latest Posts</h2>
+                        <p>Here you can find various written tutorials on topics related to ARM, reverse engineering, vulnerability research and exploit development.</p>
+                    </div>
+                </div>
+                <!--// end row
+
+                <div class="row">
+                    <!-- Latest Products
+                    <div class="col-sm-4 sm-margin-b-50">
+                        <div class="margin-b-20">
+                            <img class="img-responsive" src="img/970x647/01.jpg" alt="Latest Products Image">
+                        </div>
+                        <h4><a href="#">Reversing ARM Binaries for Beginners</a> <span class="text-uppercase margin-l-20">beginner</span></h4>
+                        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed tempor incdidunt ut laboret dolor magna ut consequat siad esqudiat dolor</p>
+                        <a class="link" href="#">Read More</a>
+                    </div>
+                    <!-- End Latest Products -->
+
+                
+                <!--// end row -->
+            
+        
+        <!-- End Latest Products -->
+
+<br><br>
+
+<center><h6>Copyright (c) 2018 ZygoSec</h6><center>
+                        
+                        
+                        
+                        <div class="col-sm-4">
+                        </div>
+                        <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4 md-margin-b-30">
+                            
+                        </div>
+                        <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4 md-margin-b-30">
+                           
+                        </div>
+                        <div class="masonry-grid-item col-xs-12 col-sm-6 col-md-4">
+                           
+                        </div>
+                    
+                    <!-- End Masonry Grid -->
+                
+            
+            
+            
+            
+            <!-- End Clients -->
+        
+        <!-- End Work -->
+
+
+        
+        
+        <!-- End Contact -->
+        <!--========== END PAGE LAYOUT ==========-->
+
+
+            <!-- End Copyright -->
+        
+        <!--========== END FOOTER ==========-->
+
+        <!-- Back To Top -->
+        <a href="javascript:void(0);" class="js-back-to-top back-to-top">Top</a>
+
+        <!-- JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+        <!-- CORE PLUGINS -->
+        <script src="vendor/jquery.min.js" type="text/javascript"></script>
+        <script src="vendor/jquery-migrate.min.js" type="text/javascript"></script>
+        <script src="vendor/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+
+        <!-- PAGE LEVEL PLUGINS -->
+        <script src="vendor/jquery.easing.js" type="text/javascript"></script>
+        <script src="vendor/jquery.back-to-top.js" type="text/javascript"></script>
+        <script src="vendor/jquery.smooth-scroll.js" type="text/javascript"></script>
+        <script src="vendor/jquery.wow.min.js" type="text/javascript"></script>
+        <script src="vendor/swiper/js/swiper.jquery.min.js" type="text/javascript"></script>
+        <script src="vendor/masonry/jquery.masonry.pkgd.min.js" type="text/javascript"></script>
+        <script src="vendor/masonry/imagesloaded.pkgd.min.js" type="text/javascript"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsXUGTFS09pLVdsYEE9YrO2y4IAncAO2U"></script>
+
+        <!-- PAGE LEVEL SCRIPTS -->
+        <script src="js/layout.min.js" type="text/javascript"></script>
+        <script src="js/components/wow.min.js" type="text/javascript"></script>
+        <script src="js/components/swiper.min.js" type="text/javascript"></script>
+        <script src="js/components/masonry.min.js" type="text/javascript"></script>
+        <script src="js/components/google-map.min.js" type="text/javascript"></script>
+
+
+    
+    
+
+</center></center></body><!-- END BODY --></html>

@@ -1,0 +1,2041 @@
+<html lang="en" prefix="og: https://ogp.me/ns#"><head>
+    
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index,follow">
+  <link rel="icon" href="/static/favicons/favicon.ico" type="image/x-icon" sizes="any">
+<link rel="icon" href="/static/favicons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" type="image/png" href="/static/favicons/apple-icon.png">
+<link ref="manifest" href="/static/favicons/manifest.json">
+<meta name="msapplication-config" content="/static/favicons/browserconfig.xml">
+  <link rel="canonical" href="https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/">
+  <title>Applying DevOps Principles in Incident Response</title>
+  <meta name="description" content="DevOps principles focus on helping teams and organizations deliver business value as quickly and consistently as possible and can be adapted for any number of domains.  I explore how to apply DevOps to the incident response domain.">
+  <meta name="Swiftbot" content="all">
+<meta class="swiftype" name="sei_site_priority" id="sei_site_priority" data-type="integer" content="2">
+<meta class="swiftype" name="sei_title" id="sei_title" data-type="string" content="Applying DevOps Principles in Incident Response">
+<meta class="swiftype" name="siteDomain" id="siteDomain" data-type="string" content="insights.sei.cmu.edu/">
+<meta class="swiftype" name="type" id="type" data-type="enum" content="blog">
+<meta class="swiftype" name="AssetTypeName" id="AssetTypeName" data-type="string" content="Blog Post">
+<meta class="swiftype" name="AssetType" id="AssetType" data-type="string" content="Blog Post">
+<meta class="swiftype" name="sei_date_published" id="sei_date_published" data-type="date" content="2015-09-18">
+<meta class="swiftype" name="sei_year_published" id="sei_year_published" data-type="integer" content="2015">
+<meta class="swiftype" name="Description" id="Description" data-type="string" content="DevOps principles focus on helping teams and organizations deliver business value as quickly and consistently as possible and can be adapted for any number of domains.  I explore how to apply DevOps to the incident response domain.">
+<meta class="swiftype" name="sei_topic" id="sei_topic" data-type="string" content="DevSecOps">
+<meta class="swiftype" name="sei_topic" id="sei_topic" data-type="string" content="Devops">
+<meta class="swiftype" name="sei_topic" id="sei_topic" data-type="string" content="DevSecOps">
+<meta class="swiftype" name="sei_author" id="sei_author" data-type="string" content="Todd Waits">
+  <meta property="og:url" content="https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Applying DevOps Principles in Incident Response">
+<meta property="og:description" content="DevOps principles focus on helping teams and organizations deliver business value as quickly and consistently as possible and can be adapted for any number of domains.  I explore how to apply DevOps to the incident response domain.">
+<meta property="og:site_name" content="SEI Blog">
+<meta property="og:image" content="https://insights.sei.cmu.edu/media/images/thumb_big_t-waits_blog_authors_.max-400x400.format-webp.webp">
+<meta property="og:image:width" content="400px">
+<meta property="og:image:height" content="400px">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:alt" content="Todd Waits">
+  <meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@SEI_CMU">
+<meta name="twitter:creator" content="@SEI_CMU">
+<meta name="twitter:title" content="Applying DevOps Principles in Incident Response">
+<meta name="twitter:description" content="DevOps principles focus on helping teams and organizations deliver business value as quickly and consistently as possible and can be adapted for any number of domains.  I explore how to apply DevOps to the incident response domain.">
+<meta name="twitter:image" content="https://insights.sei.cmu.edu/media/images/thumb_big_t-waits_blog_authors_.max-400x400.format-webp.webp">
+<meta name="twitter:image:alt" content="Todd Waits">
+  <meta name="silktide-cms" content="eyJjbXMiOiAiSldUIiwgImVkaXRvclVybCI6ICJodHRwczovL2luc2lnaHRzLnNlaS5jbXUuZWR1L2VkaXRvcnMvcGFnZXMvNzQyL2VkaXQvP25leHQ9L2VkaXRvcnMvYmxvZy9ibG9ncGFnZS8ifQ==">
+
+
+<script type="text/javascript" async="" src="https://snap.licdn.com/li.lms-analytics/insight.min.js" nonce=""></script><script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js" nonce=""></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-87WECW6HCS&amp;l=dataLayer&amp;cx=c" nonce=""></script><script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-M62LG9" nonce=""></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js" integrity="sha384-/1zmJ1mBdfKIOnwPxpdG6yaRrxP6qu3eVYm0cz2nOx+AcL4d3AqEFrwcqGZVVroG" crossorigin="anonymous"></script><style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/static/webpack_bundles/./css/main-0a026f3e9c1d67da02bc.css" rel="stylesheet">
+<link href="/static/webpack_bundles/./css/SEITailwind-0a026f3e9c1d67da02bc.css" rel="stylesheet">
+<link href="/static/webpack_bundles/SEITailwind-0a026f3e9c1d67da02bc.css" rel="stylesheet">
+
+    
+    
+      
+      
+    
+    
+      
+      <script src="https://analytics.silktide.com/a7d70b917ed89a9539b8a77ac24e9c2d.js"></script>
+      <script nonce="">
+        (function (s,i,l,k,y) {
+          s[i] = s[i] || y;
+          s[l] = s[l] || [];
+          s[k] = function(e, p) { p = p || {}; p.event = e; s[l].push(p); };
+          s[k]('page_load');
+        })(window, 'stConfig', 'stEvents', 'silktide', {});
+      </script>
+
+    
+  <style id="MJX-CHTML-styles">
+mjx-container[jax="CHTML"] {
+  line-height: 0;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > * {
+  display: table-cell;
+}
+
+mjx-mtext {
+  display: inline-block;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-c::before {
+  display: inline-block;
+  width: 0;
+}
+
+.mjx-n mjx-c {
+  font-family: MJXZERO, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-i mjx-c {
+  font-family: MJXZERO, MJXTEX-I, MJXTEX-MI, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-b.mjx-i mjx-c {
+  font-family: MJXZERO, MJXTEX-BI, MJXTEX-B, MJXTEX-I, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-cal mjx-c {
+  font-family: MJXZERO, MJXTEX-C, MJXTEX-I, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-cal.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-C-B, MJXTEX-C, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ds mjx-c {
+  font-family: MJXZERO, MJXTEX-A, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1;
+}
+
+.mjx-fr mjx-c {
+  font-family: MJXZERO, MJXTEX-FR, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-fr.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-FR-B, MJXTEX-FR, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-sc mjx-c {
+  font-family: MJXZERO, MJXTEX-SC, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-sc.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-SC-B, MJXTEX-SC, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ss mjx-c {
+  font-family: MJXZERO, MJXTEX-SS, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ss.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-SS-B, MJXTEX-SS, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ss.mjx-i mjx-c {
+  font-family: MJXZERO, MJXTEX-SS-I, MJXTEX-I, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ss.mjx-b.mjx-i mjx-c {
+  font-family: MJXZERO, MJXTEX-SS-B, MJXTEX-SS-I, MJXTEX-BI, MJXTEX-B, MJXTEX-I, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-ty mjx-c {
+  font-family: MJXZERO, MJXTEX-T, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-var mjx-c {
+  font-family: MJXZERO, MJXTEX-A, MJXTEX, MJXTEX-I, MJXTEX-S1;
+}
+
+.mjx-os mjx-c {
+  font-family: MJXZERO, MJXTEX-C, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-os.mjx-b mjx-c {
+  font-family: MJXZERO, MJXTEX-C-B, MJXTEX-C, MJXTEX-B, MJXTEX-BI, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-mit mjx-c {
+  font-family: MJXZERO, MJXTEX-MI, MJXTEX-I, MJXTEX, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-lop mjx-c {
+  font-family: MJXZERO, MJXTEX-S2, MJXTEX-S1, MJXTEX, MJXTEX-I, MJXTEX-A;
+}
+
+.mjx-sop mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX, MJXTEX-I, MJXTEX-A;
+}
+
+.mjx-s3 mjx-c {
+  font-family: MJXZERO, MJXTEX-S3, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.mjx-s4 mjx-c {
+  font-family: MJXZERO, MJXTEX-S4, MJXTEX, MJXTEX-I, MJXTEX-S1, MJXTEX-A;
+}
+
+.MJX-TEX {
+  font-family: MJXZERO;
+}
+
+mjx-stretchy-v mjx-c, mjx-stretchy-h mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX-S4, MJXTEX, MJXTEX-A ! important;
+}
+
+@font-face /* 0 */ {
+  font-family: MJXZERO;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff") format("woff");
+}
+
+@font-face /* 1 */ {
+  font-family: MJXTEX;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff") format("woff");
+}
+
+@font-face /* 2 */ {
+  font-family: MJXTEX-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Main-Bold.woff") format("woff");
+}
+
+@font-face /* 3 */ {
+  font-family: MJXTEX-I;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Main-Italic.woff") format("woff");
+}
+
+@font-face /* 4 */ {
+  font-family: MJXTEX-MI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff") format("woff");
+}
+
+@font-face /* 5 */ {
+  font-family: MJXTEX-BI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Math-BoldItalic.woff") format("woff");
+}
+
+@font-face /* 6 */ {
+  font-family: MJXTEX-S1;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff") format("woff");
+}
+
+@font-face /* 7 */ {
+  font-family: MJXTEX-S2;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff") format("woff");
+}
+
+@font-face /* 8 */ {
+  font-family: MJXTEX-S3;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Size3-Regular.woff") format("woff");
+}
+
+@font-face /* 9 */ {
+  font-family: MJXTEX-S4;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Size4-Regular.woff") format("woff");
+}
+
+@font-face /* 10 */ {
+  font-family: MJXTEX-A;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_AMS-Regular.woff") format("woff");
+}
+
+@font-face /* 11 */ {
+  font-family: MJXTEX-C;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Regular.woff") format("woff");
+}
+
+@font-face /* 12 */ {
+  font-family: MJXTEX-C-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Bold.woff") format("woff");
+}
+
+@font-face /* 13 */ {
+  font-family: MJXTEX-FR;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Regular.woff") format("woff");
+}
+
+@font-face /* 14 */ {
+  font-family: MJXTEX-FR-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Bold.woff") format("woff");
+}
+
+@font-face /* 15 */ {
+  font-family: MJXTEX-SS;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Regular.woff") format("woff");
+}
+
+@font-face /* 16 */ {
+  font-family: MJXTEX-SS-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Bold.woff") format("woff");
+}
+
+@font-face /* 17 */ {
+  font-family: MJXTEX-SS-I;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Italic.woff") format("woff");
+}
+
+@font-face /* 18 */ {
+  font-family: MJXTEX-SC;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Script-Regular.woff") format("woff");
+}
+
+@font-face /* 19 */ {
+  font-family: MJXTEX-T;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Typewriter-Regular.woff") format("woff");
+}
+
+@font-face /* 20 */ {
+  font-family: MJXTEX-V;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Regular.woff") format("woff");
+}
+
+@font-face /* 21 */ {
+  font-family: MJXTEX-VB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Bold.woff") format("woff");
+}
+</style></head>
+
+  <body>
+    <noscript> 
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M62LG9" sandbox="allow-scripts" height="0" width="0" class="hidden"></iframe>
+    </noscript> 
+    <div class="page-content-wrapper">
+        <div class="site-messages"></div>
+  <svg class="site-message-graphic" version="1.1" xmlns="http://www.w3.org/1000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+      <symbol id="icon-search" viewBox="0 0 32 32">
+        <title>search</title>
+        <path d="M31.008 27.231l-7.58-6.447c-0.784-0.705-1.622-1.029-2.299-0.998 1.789-2.096 2.87-4.815 2.87-7.787 0-6.627-5.373-12-12-12s-12 5.373-12 12 5.373 12 12 12c2.972 0 5.691-1.081 7.787-2.87-0.031 0.677 0.293 1.515 0.998 2.299l6.447 7.58c1.104 1.226 2.907 1.33 4.007 0.23s0.997-2.903-0.23-4.007zM12 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"></path>
+      </symbol>
+      <symbol id="icon-menu" viewBox="0 0 24 17">
+        <title>menu</title>
+        <rect width="24" height="3"></rect><rect y="7" width="24" height="3"></rect><rect y="14" width="24" height="3"></rect>
+      </symbol>
+      <symbol id="icon-carat-right" viewBox="0 0 8 12">
+        <title>icon-carat-right</title>
+        <polygon points="2 0 0 2 4 6 0 10 2 12 8 6 2 0"></polygon>
+      </symbol>
+      <symbol id="cmu-wordmark" viewBox="0 0 728.14 64.49">
+        <title>cmu-wordmark</title>
+        <polygon class="cls-1" points="213.53 18.71 213.53 45.54 218 45.54 218 47.31 200.12 47.31 200.12 45.54 204.59 45.54 204.59 20.6 201.12 20.6 201.12 18.71 213.53 18.71"></polygon><path class="cls-1" d="M36.93,1.38H35.31c-.07,1.38-.79,2-2.17,2C30.38,3.35,26.35,0,21.62,0,8.15,0,0,13.27,0,25S7.75,48.37,20.76,48.37c7.88,0,10.84-3.75,12.94-3.75,1.38,0,1.63,1.22,1.63,2.69h1.78V31.21H35.34l-.39,2.23C34,38.77,29.9,46.63,21.42,46.63,13.93,46.63,11,40.15,11,24.18,11,7.43,15,1.79,21.62,1.79c7.49,0,12.64,8.4,13.69,15.1h1.62Z"></path><path class="cls-1" d="M60,39.6c-.13,3.44-2.07,6.25-5.12,6.25-4.41,0-4.6-3.72-4.6-6.56,0-3.44.39-5.7,4.6-6.16L60,32.61ZM71.8,41.74c0,1.68-1.11,3.63-1.84,3.63-1.17,0-1.43-1.23-1.43-3.24V27.22c0-7.39-6.94-9.2-13.61-9.2-6.48,0-11.21,3.17-11.21,6.8A3.91,3.91,0,0,0,47.92,29a3.69,3.69,0,0,0,4-3.89c0-3.3-3.42-3.34-3.42-3.42,0-1.47,3.81-1.94,6-1.94,4.86,0,5.51,1.79,5.51,5.68v5.44l-6.35.52c-5.9.45-12.32,2-12.32,8.75,0,5.64,5.06,7.91,10,7.91,2.53,0,7-1,8.69-4.08a6.65,6.65,0,0,0,6.48,4.08c4.21,0,6.93-2.53,6.93-6.35Z"></path><polygon class="cls-1" points="674.53 18.61 674.53 45.45 679 45.45 679 47.22 661.11 47.22 661.11 45.45 665.58 45.45 665.58 20.5 661.11 20.5 661.11 18.61 674.53 18.61"></polygon><path class="cls-1" d="M286,32.45,296.7,1.73h14.81l0,1.83h-4.24v42h4.24v1.79H293.68V45.53H298V4h-.13l-15.1,43.29H281L265.53,3.25h-.13V40c0,5.25,1.36,5.53,4.86,5.53h.2v1.79H259.25V45.53h0c3.7,0,4.39-2.16,4.39-4.95v-37h-4.39V1.69h16.26Z"></path><path class="cls-1" d="M321.83,29.87V25.52c0-4.34,1.88-5.7,4.08-5.7,3.11,0,4.08,2.14,4.08,5.7v4.36Zm0,1.76h17.89c-.07-7-6.55-13.74-13.35-13.61-7.65,0-14.26,6.61-14.26,15.36,0,8.43,6.16,14.71,14.45,14.71,8,0,11.93-4.93,13.35-11.34h-1.77c-1.42,6-4.59,9.45-9.64,9.45-6,0-6.68-4.72-6.68-9.13Z"></path><path class="cls-1" d="M591.08,29.77V25.41c0-4.34,1.88-5.7,4.08-5.7,3.11,0,4.08,2.14,4.08,5.7v4.36Zm0,1.76H609c-.07-7-6.55-13.74-13.35-13.61-7.65,0-14.26,6.61-14.26,15.36,0,8.43,6.16,14.71,14.45,14.71,8,0,11.93-4.93,13.35-11.34H607.4c-1.42,6-4.59,9.45-9.64,9.45-6,0-6.68-4.72-6.68-9.13Z"></path><polygon class="cls-1" points="339.83 1.79 339.83 3.44 344.31 3.44 344.31 45.48 339.83 45.48 339.83 47.32 357.72 47.32 357.72 45.48 353.25 45.48 353.25 1.79 339.83 1.79"></polygon><polygon class="cls-1" points="358.97 1.79 358.97 3.44 363.44 3.44 363.44 45.48 358.97 45.48 358.97 47.32 376.86 47.32 376.86 45.48 372.39 45.48 372.39 1.79 358.97 1.79"></polygon><path class="cls-1" d="M397.43,39.47c0,4.86-2,6.87-5.31,6.87s-5.31-2-5.31-6.87V26.71c0-4.86,2-6.87,5.31-6.87s5.31,2,5.31,6.87Zm10.11-6.41c0-8.88-6.87-15-15.42-15s-15.42,6.16-15.42,15,6.87,15,15.42,15,15.42-6.16,15.42-15"></path><path class="cls-1" d="M454.05,3.28h4.53V32.07c0,10,6.93,16.14,17.5,16.14,11.93,0,17.11-6.29,17.11-15.81V7.78c0-3.76,1-4.5,3.37-4.5h1.31V1.54h-11.4V3.28h.82c3.3,0,3.76,1,3.76,4.76V33c0,8.82-5.47,12.83-11,12.83-9.46,0-11.34-6.35-11.9-14.65V3.28h4.25V1.54H454.05Z"></path><path class="cls-1" d="M566.34,47.95h1.75l9.59-22.68c1.94-4.24,3-4.77,4.47-4.84h.58V18.65H572.62v1.79h1.23c1.88,0,2.74-.12,2.74,1.56a10.5,10.5,0,0,1-1.1,3.94l-4.4,10.37L564,20.45h3.6V18.65H551.37v1.79h3Z"></path><path class="cls-1" d="M638.55,47.95h1.54a2.07,2.07,0,0,1,2.29-1.55c1.69,0,3.7,1.55,7.32,1.55a10.57,10.57,0,0,0,10.37-10.63c0-7.91-5.44-8.49-12.38-9.46-3.63-.52-5.68-1-5.68-3.89,0-3,2.66-4.32,6.16-4.32,4.86,0,6.75,3.22,8.36,7.44h1.53v-9.2h-1.47c0,.78-.67,1.43-1.9,1.43-2.08,0-3.76-1.43-6.74-1.43a9.63,9.63,0,0,0-9.66,9.66c0,8.36,6.35,9.08,11.28,9.66,4.67.58,6.35.88,6.35,3.86,0,3.43-2.85,5-6.35,5-4.92,0-8.31-4.26-9.48-9h-1.54Z"></path><polygon class="cls-1" points="549 18.61 549 45.45 553.47 45.45 553.47 47.22 535.58 47.22 535.58 45.45 540.05 45.45 540.05 20.5 535.58 20.5 535.58 18.61 549 18.61"></polygon><path class="cls-1" d="M540.06,9.67a4.46,4.46,0,1,0,4.46-4.47,4.45,4.45,0,0,0-4.46,4.47"></path><path class="cls-1" d="M665.57,9.67A4.46,4.46,0,1,0,670,5.2a4.45,4.45,0,0,0-4.46,4.47"></path><path class="cls-1" d="M149.79,29.86V25.51c0-4.34,1.88-5.7,4.08-5.7,3.11,0,4.08,2.14,4.08,5.7v4.35Zm0,1.76h17.89c-.07-7-6.55-13.74-13.35-13.61-7.65,0-14.26,6.61-14.26,15.36,0,8.43,6.16,14.71,14.45,14.71,8,0,11.93-4.93,13.35-11.34H166.1c-1.42,6-4.59,9.45-9.64,9.45-6,0-6.68-4.72-6.68-9.13Z"></path><path class="cls-1" d="M228,29.86V25.51c0-4.34,1.88-5.7,4.08-5.7s4.08,1.34,4.08,5.7v4.35Zm0,1.76h17.89c-.07-7-6.55-13.74-13.35-13.61-7.65,0-14.26,6.61-14.26,15.36,0,8.43,6.16,14.71,14.45,14.71,8,0,11.93-4.93,13.35-11.34h-1.77c-1.42,6-4.59,9.45-9.64,9.45-6,0-6.68-4.72-6.68-9.13Z"></path><path class="cls-1" d="M529.84,45.46V28c0-7-3-10.27-9.14-10.27-4.35,0-8.75,2.49-10.5,6.25h0V18.7H496.79v1.75h4.47v25h-4.47v1.75H514V45.46H510.2V28.36c.56-2.41,3.61-8,7.15-8,2.35,0,3.55.81,3.55,5.16v19.9h-3.7v1.75h17.11V45.46Z"></path><path class="cls-1" d="M420.93,18.8v5.25h0c1.75-3.76,6.15-6.25,10.5-6.25,6.16,0,9.14,3.27,9.14,10.27v17.5H445v1.75H427.93V45.57h3.7V25.67c0-4.35-1.19-5.16-3.55-5.16-3.54,0-6.59,5.55-7.15,8v17.1h3.83v1.75H407.52V45.57H412v-25h-4.47V18.8Z"></path><path class="cls-1" d="M135.52,45.56V28.06c0-7-3-10.27-9.14-10.27-4.35,0-8.75,2.49-10.5,6.25h0V18.79H102.47v1.75h4.47v25h-4.47v1.75h17.24V45.56h-3.83V28.46c.56-2.41,3.61-8,7.15-8,2.35,0,3.55.81,3.55,5.16v19.9h-3.7v1.75H140V45.56Z"></path><path class="cls-1" d="M204.62,9.84a4.46,4.46,0,1,0,4.46-4.47,4.45,4.45,0,0,0-4.46,4.47"></path><path class="cls-1" d="M718,18.62V20.5c2.76,0,4,.25,4,1.5a10.5,10.5,0,0,1-1.1,3.94l-4.4,10.37-7-15.81h3.68V18.62H690.81V4.72h-1.17c0,6.87-4.67,13.93-11.21,13.93v1.85h3.44V40.56A7.1,7.1,0,0,0,689,47.95a9.22,9.22,0,0,0,8.62-5l-1.39-.76c-.78,1.17-1.81,2.72-3.43,2.72-1.3,0-2-.92-2-3.06V20.51h9l11.84,27.31-4.1,9.65v0h0a.55.55,0,0,1-.49.32.54.54,0,0,1-.51-.37v0a4.46,4.46,0,1,0-6.3,5.18h0l.14.06.26.12a4.51,4.51,0,0,0,1.63.34c3.76.32,5.69-2.46,7-5.29.3-.64.57-1.29.83-1.9.57-1.37,1.56-3.73,2.73-6.48h0L714,46.82h0l9.12-21.55c1.94-4.24,2.69-4.78,5-4.78h0V18.62Z"></path><path class="cls-1" d="M95.94,17.71a9.29,9.29,0,0,0-8.56,6.09h-.13V18.87H74v1.81h4.47V45.62H74V47.4H93.34V45.62h-6v-14c0-4.17,1.09-8.44,3.83-10.79a.53.53,0,0,1,.85.5h0a6.22,6.22,0,0,0-.35,1.85,4.19,4.19,0,0,0,4.41,4.21,4.68,4.68,0,0,0,4.93-4.73C101.06,19.59,99,17.71,95.94,17.71Z"></path><path class="cls-1" d="M193.49,19.82c.13,0,.29-.11.39,0a.27.27,0,0,1,0,.35h0a2.78,2.78,0,0,0-.24,2.38,2.74,2.74,0,0,0,2,1.77,2.79,2.79,0,0,0,3.47-2.72,3,3,0,0,0-1.53-2.53,5.29,5.29,0,0,0-2.85-.75,7.68,7.68,0,0,0-4.76,2h0q-.44-.32-.92-.6A14,14,0,0,0,181.83,18c-5.44,0-11.28,3.56-11.28,9.46a8.42,8.42,0,0,0,5.38,7.91v.13A7.08,7.08,0,0,0,169.45,43c0,3.24,1.49,5.7,4.22,6.48v.13c-2.59.71-5.58,3.31-5.58,6.42,0,4.8,5.64,8.49,12.83,8.49,9,0,14.91-6.09,14.91-14,0-6.29-3.11-9.14-9.46-9H175.61c-1.62,0-2.7-.07-2.7-1.82s2.49-3.37,4.95-3.37a4.87,4.87,0,0,1,1.32.39,8.35,8.35,0,0,0,2.66.39c5.57,0,11.54-3.18,11.54-9.33A9.62,9.62,0,0,0,191,21.61a.22.22,0,0,1,0-.33,13.23,13.23,0,0,1,1.69-1.1,3.64,3.64,0,0,1,.76-.35Zm-8.61,29.82c6.48,0,8.2.27,8.2,4.23,0,4.73-5.8,9.07-12.34,9.07-5.83,0-8.63-3.58-8.76-6.69,0-2.85,1.42-4.73,3.17-6.61ZM186,27.51c0,7.53-1.75,7.78-4.08,7.78-2.59,0-4-.5-4-8,0-5.25.58-7.48,4-7.48,3,0,4,.2,4.08,7.66Z"></path><path class="cls-1" d="M631.67,17.45a9.29,9.29,0,0,0-8.56,6.09H623V18.61H609.7v1.81h4.47V45.36H609.7v1.77h19.38V45.36h-6v-14c0-4.17,1.09-8.43,3.82-10.78a.53.53,0,0,1,.85.5v0a6.23,6.23,0,0,0-.34,1.83,4.19,4.19,0,0,0,4.41,4.21,4.68,4.68,0,0,0,4.93-4.73C636.79,19.33,634.72,17.45,631.67,17.45Z"></path>
+      </symbol>
+    </defs>
+  </svg>
+
+  <input type="checkbox" id="menu-toggle" class="menu-input peer hidden">
+  <nav class="md:hidden peer-checked:!w-[300px] fixed top-0 right-0 h-screen w-0 z-20 overflow-y-auto sidebar-menu menu-content ease-in-out duration-300 bg-[#333]" role="toggle">
+    <ul class="w-100 p-0 m-0 block">
+      <li class="menu-close sticky pr-4 text-right flex list-none py-2 px-4 border-b border-neutral-200/10 hover:bg-neutral-200/20 select-none">
+        <label for="menu-toggle" class="select-none menu-label cursor-pointer text-slate-200 text-3xl font-black">✕</label>
+      </li>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-1-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-1-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/about/index.cfm">About</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" role="toggle" id="sub-menu-1">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/about/leadership/index.cfm">Leadership</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/about/divisions/index.cfm">Divisions</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/about/work-with-us/index.cfm">Work with Us</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/about/collaboration-with-cmu/index.cfm">Collaboration with CMU</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/about/history-of-innovation-at-the-sei/index.cfm">History of Innovation at the SEI</a>
+        </nav>
+      </div>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-2-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-2-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/our-work/index.cfm">Our Work</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" id="sub-menu-2">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/agile/index.cfm">Agile</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/artificial-intelligence-engineering/index.cfm">Artificial Intelligence Engineering</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/cyber-workforce-development/index.cfm">Cyber Workforce Development</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/cybersecurity-center-development/index.cfm">Cybersecurity Center Development</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/cybersecurity-engineering/index.cfm">Cybersecurity Engineering</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/devsecops/index.cfm">DevSecOps</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/enterprise-risk-resilience-management/index.cfm">Enterprise Risk and Resilience Management</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/all-topics/index.cfm">All Topics</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/our-work/projects/index.cfm">All Projects</a>
+        </nav>
+      </div>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-3-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-3-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/publications/index.cfm">Publications</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" id="sub-menu-3">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/publications/annual-reviews/index.cfm">Annual Reviews</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/blog/">Blog</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/library/">Digital Library</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/podcasts/">Podcast Series</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/software-tools/">Software and Tools</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/technical-papers/">Technical Papers</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.kb.cert.org/vuls">Vulnerability Notes Database</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/webcasts/">Webcasts</a>
+        </nav>
+      </div>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-4-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-4-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/news-events/index.cfm">News and Events</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" id="sub-menu-4">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/news/">News</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/news-events/events/index.cfm">Events</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="/sei-bulletin/">SEI Bulletin</a>
+        </nav>
+      </div>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-5-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-5-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/education-outreach/index.cfm">Education and Outreach</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" id="sub-menu-5">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/education-outreach/courses/index.cfm">Courses</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/education-outreach/credentials/index.cfm">Credentials</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/education-outreach/curricula/index.cfm">Curricula</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/education-outreach/license-sei-materials/index.cfm">License SEI Materials</a>
+        </nav>
+      </div>
+      <div class="wrapper">
+        <input type="checkbox" value="selected" id="sub-menu-6-toggle" class="toggle-input peer hidden">
+        <label for="sub-menu-6-toggle" class="toggle-label">
+          <li class="after:font-['FontAwesome'] after:text-white/75 after:transition after:duration-400 after:ease-in-out after:float-right after:font-bold after:cursor-pointer flex list-none py-2 pr-8 pl-6 whitespace-nowrap border-b border-neutral-200/10 hover:bg-neutral-200/20">
+            <a class="select-none font-bold !text-white/75 flex-[0_0_100%]" href="https://www.sei.cmu.edu/careers/index.cfm">Careers</a>
+          </li>
+        </label>
+        <nav class="sub-menu peer-checked:!max-h-[1000px] peer-checked:!opacity-100 peer-checked:!visible max-h-0 invisible opacity-0 toggle-submenu-content duration-400 ease-in-out transition block" id="sub-menu-6">
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://cmu.wd5.myworkdayjobs.com/SEI" target="_blank">Job Openings</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/careers/diversity-equity-inclusion/index.cfm">Diversity, Equity and Inclusion</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/careers/internship-opportunities/index.cfm">Internship Opportunities</a>
+          <a class="select-none block !text-white/75 bg-white/5 hover:bg-white/10 hover:no-underline flex[0_0_100%] py-2 pr-6 pl-8" href="https://www.sei.cmu.edu/careers/working-at-the-sei/index.cfm">Working at the SEI</a>
+        </nav>
+      </div>
+    </ul>
+  </nav>
+
+  <header class="roof">
+    <div class="container mx-auto sm:px-4 flex flex-wrap justify-between">
+      <div class="w-full md:w-1/2 py-1 px-4 flex justify-between">
+        <a class="wordmark" href="https://www.cmu.edu" target="_blank">
+          <span class="sr-only">Carnegie Mellon University</span>
+          <svg class="cmu-wordmark">
+            <use xlink:href="#cmu-wordmark"></use>
+          </svg>
+        </a>
+        <button class="md:hidden sm:inline menu-icon collapsed" aria-expanded="false">
+          <label for="menu-toggle" class="menu-label cursor-pointer">
+            <svg class="icon icon-menu flex">
+              <use xlink:href="#icon-menu"></use>
+            </svg>
+          </label>
+        </button>
+      </div><!--col-6-->
+
+      <div class="w-full md:w-2/5 px-4" id="search-div">
+
+        
+          <form class="h-full" action="#" method="get" name="swiftForm" id="swiftForm" placeholder="Search for" aria-label="Search for...">
+            <input type="hidden" name="csrfmiddlewaretoken" value="JWQxUWIJHZprvgGFN7cgXc78BSdPJeVEp2ajGCdDprIvrLF66y8bbupepxb2vcEj">
+            <div class="roof-search relative flex items-stretch w-full h-full">
+            
+              <input type="text" class="search-box h-full w-full py-0 px-2 text-base leading-normal block appearance-none text-white-800 border" id="stq" name="stq" placeholder="Search the blog">
+              <input type="hidden" id="sf" name="sf" value="blog">
+            
+              <span class="input-group-btn">
+                <button class="inline-block align-middle text-center select-none border h-full font-normal whitespace-no-wrap py-1 px-3 leading-normal no-underline bg-gray-600 text-white hover:bg-gray-700" type="submit" name="globalBasicSubmit" id="globalBasicSubmit">
+                  <svg class="icon icon-search">
+                    <use xlink:href="#icon-search"></use>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          </form>
+        
+
+      </div><!--col-6-->
+    </div><!--container-->
+  </header><!--roof-->
+
+      <div class="main-header container mx-auto sm:px-4">
+        <div class="institute">
+          <div class="grid grid-cols-1 gap-8">
+            <div class="col-span-1 px-4">
+              <h1 itemprop="creator" itemscope="" itemtype="http://schema.org/Organization">
+                <a href="https://www.sei.cmu.edu" itemprop="url">
+                  <span itemprop="legalName">Software Engineering Institute</span>
+                </a>
+              </h1>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-wrap">
+          <div class="sm:w-full px-4">
+            <nav class="md:block hidden">
+  <div id="cs_control_1525" class="cs_control CS_Element_Tree">
+    <ul class="flex list-none pl-0 mb-0 mt-0">
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center">
+        <a href="https://www.sei.cmu.edu/about/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">About</a>
+        <div class="dropdown-nav-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a href="https://www.sei.cmu.edu/about/leadership/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Leadership</a>
+          <a href="https://www.sei.cmu.edu/about/divisions/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Divisions</a>
+          <a href="https://www.sei.cmu.edu/about/work-with-us/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Work with Us</a>
+          <a href="https://www.sei.cmu.edu/about/collaboration-with-cmu/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Collaboration with CMU</a>
+          <a href="https://www.sei.cmu.edu/about/history-of-innovation-at-the-sei/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">History of Innovation at the SEI</a>
+        </div>
+      </li>
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center">
+        <a href="https://www.sei.cmu.edu/our-work/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">Our Work</a>
+        <div class="dropdown-nav-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a href="https://www.sei.cmu.edu/our-work/agile/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Agile</a>
+          <a href="https://www.sei.cmu.edu/our-work/artificial-intelligence-engineering/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Artificial Intelligence Engineering</a>
+          <a href="https://www.sei.cmu.edu/our-work/cloud-computing/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Cloud Computing</a>
+          <a href="https://www.sei.cmu.edu/our-work/cyber-workforce-development/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Cyber Workforce Development</a>
+          <a href="https://sei.cmu.edu/our-work/cybersecurity-center-development/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Cybersecurity Center Development</a>
+          <a href="https://sei.cmu.edu/our-work/cybersecurity-engineering/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Cybersecurity Engineering</a>
+          <a href="https://www.sei.cmu.edu/our-work/devsecops/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">DevSecOps</a>
+          <a href="https://www.sei.cmu.edu/our-work/all-topics/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">All Topics</a>
+          <a href="https://www.sei.cmu.edu/our-work/projects/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">All Projects</a>
+        </div>
+      </li>
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center">
+        <a href="https://www.sei.cmu.edu/publications/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">Publications</a>
+        <div class="dropdown-nav-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a href="https://www.sei.cmu.edu/publications/annual-reviews/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Annual Reviews</a>
+          <a href="/blog/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Blog</a>
+          <a href="/library/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_blank">Digital Library</a>
+          <a href="/podcasts/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Podcast Series</a>
+          <a href="/software-tools/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Software and Tools</a>
+          <a href="/technical-papers/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Technical Papers</a>
+          <a href="https://www.kb.cert.org/vuls" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 external-link" target="_self">Vulnerability Notes Database</a>
+          <a href="/webcasts/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Webcasts Series</a>
+        </div>
+      </li>
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center">
+        <a href="https://www.sei.cmu.edu/news-events/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">News and Events</a>
+        <div class="dropdown-nav-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a href="/news/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">News</a>
+          <a href="https://www.sei.cmu.edu/news-events/events/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Events</a>
+          <a href="/sei-bulletin/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">SEI Bulletin</a>
+        </div>
+      </li>
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center"><a href="https://www.sei.cmu.edu/education-outreach/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">Education and Outreach</a>
+        <div class="dropdown-nav-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a href="https://www.sei.cmu.edu/education-outreach/courses/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Courses</a>
+          <a href="/credentials/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Credentials</a>
+          <a href="https://www.sei.cmu.edu/education-outreach/curricula/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Curricula</a>
+          <a href="/license-sei-materials/" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">License SEI Materials</a>
+        </div>
+      </li>
+      <li class="nav-menu-item dropdown-nav flex flex-col justify-center">
+        <a href="https://www.sei.cmu.edu/careers/index.cfm" class="inline-block py-2 px-4 no-underline gtm-main-nav" target="_self" aria-haspopup="true" aria-expanded="false">Careers</a>
+        <div class="dropdown-nav-menu dropdown-nav-menu-last" aria-labelledby="navbarDropdownMenuLink">
+          <a href="https://cmu.wd5.myworkdayjobs.com/SEI" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 external-link" target="_blank">Job Openings</a>
+          <a href="https://www.sei.cmu.edu/careers/diversity-equity-inclusion/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Diversity, Equity, and Inclusion</a>
+          <a href="https://www.sei.cmu.edu/careers/internship-opportunities/index.cfm" class="block w-full py-1 px-6 font-normal text-gray-900 whitespace-no-wrap border-0 gtm-main-nav" target="_self">Internship Opportunities</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+          </div>
+        </div>
+      </div>
+      
+      
+      
+  
+  
+    
+  
+  
+    <section class="introduction blog--entry">
+      <div class="container" id="posts-container">
+        
+        
+
+
+
+<style>
+  .banner_home {
+    background-image: url('/media/images/blog-banner.original.max-1400x500.format-webp.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  a >.banner_regular {
+    background-image: url('/media/images/blog-banner.original.max-1200x300.format-webp.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  a.regular_banner_text {
+    text-decoration: none;
+  }
+</style>
+
+<div class="flex flex-wrap">
+  <div class="w-full px-4">
+    
+      
+        <a href="/blog/" class="regular_banner_text">
+      
+      <div class="banner_regular banner_regular">
+        <h1 class="banner_text">SEI <span class="banner--blog">Blog</span></h1>
+      </div>
+      
+        </a>
+      
+    
+  </div>
+</div>
+
+
+        
+        
+
+
+
+<div class="breadcrumb_block">
+  <nav id="breadcrumbs">
+    <ol>
+      <li><a href="https://www.sei.cmu.edu/" class="gtm-breadcrumb">Home</a></li>
+      <li><a href="https://www.sei.cmu.edu/publications/" class="gtm-breadcrumb">Publications</a></li>
+
+      
+        
+          
+            <li><a href="/blog/" class="gtm-breadcrumb">Blog</a></li>
+          
+        
+      
+
+      
+
+      
+        <li>
+          
+            
+              
+                Applying DevOps Principles in Incident Response
+              
+            
+          
+        </li>
+      
+
+    </ol>
+  </nav>
+</div>
+
+
+        
+        <div class="post-container">
+          
+          
+<input type="checkbox" id="get-citation">
+<div id="doiModal" class="modal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content modal-content--citation">
+      <div class="modal-header modal-header--citation">
+        <h3 class="header-m">Cite This Post</h3>
+        <span><label for="get-citation">×</label></span>
+      </div>
+      <div class="modal-body modal-body--citation">
+        <div role="tabpanel">
+          
+            <input type="radio" name="nav-tabs" id="ams-toggle" class="hidden" checked="checked">
+          
+          
+            <input type="radio" name="nav-tabs" id="apa-toggle" class="hidden">
+          
+          
+            <input type="radio" name="nav-tabs" id="chicago-toggle" class="hidden">
+          
+          
+            <input type="radio" name="nav-tabs" id="ieee-toggle" class="hidden">
+          
+          
+            <input type="radio" name="nav-tabs" id="bibtex-toggle" class="hidden">
+          
+          <ul class="nav-tabs--citation" role="tablist">
+            
+              <label for="ams-toggle" class="citation-tab">
+                <li role="presentation" class="nav-item--citation">
+                  <a href="#amsTab" class="nav-link--citation active">AMS</a>
+                </li>
+              </label>
+            
+            
+              <label for="apa-toggle" class="citation-tab">
+                <li role="presentation" class="nav-item--citation">
+                  <a href="#apaTab" class="nav-link--citation">APA</a>
+                </li>
+              </label>
+            
+            
+              <label for="chicago-toggle" class="citation-tab">
+                <li role="presentation" class="nav-item--citation">
+                  <a href="#chicagoTab" class="nav-link--citation">Chicago</a>
+                </li>
+              </label>
+            
+            
+              <label for="ieee-toggle" class="citation-tab">
+                <li role="presentation" class="nav-item--citation">
+                  <a href="#ieeeTab" class="nav-link--citation">IEEE</a>
+                </li>
+              </label>
+            
+            
+              <label for="bibtex-toggle" class="citation-tab">
+                <li role="presentation" class="nav-item--citation">
+                  <a href="#bibTextTab" class="nav-link--citation">BibTeX</a>
+                </li>
+              </label>
+            
+          </ul>
+
+          <!-- tab panels-->
+          <div class="tab-content">
+            
+              <div role="tabpanel" class="tab-pane active" id="amsTab">
+                <p class="body">AMS Citation</p>
+                <p id="amsText" class="citation amsText" readonly="">Waits, T., 2015: Applying DevOps Principles in Incident Response. Carnegie Mellon University, Software Engineering Institute's Insights (blog), Accessed June 12, 2024, https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/.</p>
+                <button id="copyButton-ams" class="copyButton btn--blog" data-clipboard-target=".amsText" value="amsText">Copy</button>
+              </div>
+            
+            
+              <div role="tabpanel" class="tab-pane" id="apaTab">
+                <p class="body">APA Citation</p>
+                <p readonly="" class="citation apaText" id="apaText">Waits, T. (2015, September 18). Applying DevOps Principles in Incident Response. Retrieved June 12, 2024, from https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/.</p>
+                <button id="copyButton-apa" class="copyButton btn--blog" data-clipboard-target=".apaText" value="apaText">Copy</button>
+              </div>
+            
+            
+              <div role="tabpanel" class="tab-pane" id="chicagoTab">
+                <p class="body">Chicago Citation</p>
+                <p class="citation chicagoText" readonly="" id="chicagoText">Waits, Todd. "Applying DevOps Principles in Incident Response." <em>Carnegie Mellon University, Software Engineering Institute's Insights (blog)</em>. Carnegie Mellon's Software Engineering Institute, September 18, 2015. https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/.</p>
+                <button id="copyButton-chicago" class="copyButton btn--blog" data-clipboard-target=".chicagoText" value="chicagoText">Copy</button>
+              </div>
+            
+            
+              <div role="tabpanel" class="tab-pane" id="ieeeTab">
+                <p class="body">IEEE Citation</p>
+                <p id="ieeeText" class="citation ieeeText" readonly="">T. Waits, "Applying DevOps Principles in Incident Response," <em>Carnegie Mellon University, Software Engineering Institute's Insights (blog)</em>. Carnegie Mellon's Software Engineering Institute, 18-Sep-2015 [Online]. Available: https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/. [Accessed: 12-Jun-2024].</p>
+                <button id="copyButton-ieee" class="copyButton btn--blog" data-clipboard-target=".ieeeText" value="ieeeText">Copy</button>
+              </div>
+            
+            
+              <div role="tabpanel" class="tab-pane" id="bibTextTab">
+                <p class="body">BibTeX Code</p>
+                <p id="bibText" class="citation bibText" readonly="">@misc{waits_2015,<br><span>author={Waits, Todd},</span><br><span>title={Applying DevOps Principles in Incident Response},</span><br><span>month={Sep},</span><br><span>year={2015},</span><br><span>howpublished={Carnegie Mellon University, Software Engineering Institute's Insights (blog)},</span><br><span>url={https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/},</span><br><span>note={Accessed: 2024-Jun-12}</span><br>}</p>
+                <button id="copyButton-bibText" class="copyButton btn--blog" data-clipboard-target=".bibText" value="bibText">Copy</button>
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <label for="get-citation">
+      <div class="close-modal absolute top-0 left-0 w-screen h-screen z-10"></div>
+    </label>
+  </div>
+</div>
+
+
+
+          
+          <div class="left-column">
+            <article class="article_blog mb-16" itemid="https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/" itemscope="" itemtype="https://schema.org/BlogPosting">
+              
+              <div class="m-media-object__listing" itemprop="about">
+                <meta itemprop="headline" content="Applying DevOps Principles in Incident Response">
+                <meta itemprop="url" content="https://insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/">
+                <h2 itemprop="name" class="header-xl">
+                  Applying DevOps Principles in Incident Response
+                </h2>
+
+                
+                
+<div class="header-authors__block">
+  
+    
+       <!-- Make sure that only first author image is used for blog image microdata-->
+        <img align="left" alt="Todd Waits" class="img--small" decoding="async" height="180" id="auth" imageprop="image" loading="lazy" src="/media/images/thumb_big_t-waits_blog_authors_.max-180x180.format-webp.webp" width="180">
+      
+    
+  
+  <div class="author-name-wrapper">
+    <h6 class="header-meta-1">
+      <div itemprop="author">
+        <div itemscope="" itemtype="https://schema.org/Person">
+          
+            
+              <a href="/authors/todd-waits">Todd Waits</a>
+            
+            
+            
+          
+        </div>
+      </div>
+    </h6>
+    <h6 class="header-meta-1" id="alert">
+      <time datetime="Sept. 17, 2015, 8 p.m." itemprop="datePublished" content="2015-09-17T20:00:00-04:00">
+        September 18, 2015
+      </time>
+    </h6>
+  </div>
+</div>
+
+              </div>
+
+              
+              <div class="action_block block md:hidden">
+                
+                
+  <div class="published-in-topic__block">
+    <h5 class="header-xs">PUBLISHED IN</h5>
+    <p class="navigation">
+      <a href="/blog/topics/devsecops/" class="navigation">DevSecOps</a>
+    </p>
+  </div>
+
+
+
+
+                
+                
+  <div class="citation__sidebar">
+    <h5 class="header-xs">CITE</h5>
+    
+    
+      <label for="get-citation">
+        <button class="btn--blog-link btn--blog-link-navigation navigation">Get Citation</button>
+      </label>
+    
+  </div>
+
+
+
+                
+                
+  <div class="tags__block">
+    <h5 class="header-xs">TAGS</h5>
+    
+      <span class="badge--blog">
+        <a itemprop="articleSection" rel="tag" href="/blog/tags/devsecops">
+          DevSecOps
+        </a>
+      </span>
+    
+      <span class="badge--blog">
+        <a itemprop="articleSection" rel="tag" href="/blog/tags/devops">
+          Devops
+        </a>
+      </span>
+    
+  </div>
+
+
+
+                
+                
+  <div class="sei-share">
+    <h5 class="header-xs">SHARE</h5>
+    <ul>
+      <li>
+        <a class="sei-share-facebook" href="https://www.facebook.com/share.php?u=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F" target="_blank" title="Share on Facebook">
+          <i class="fa-brands fa-facebook share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-twitter" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F&amp;text=Applying%20DevOps%20Principles%20in%20Incident%20Response" target="_blank" title="Share on X">
+          <i class="fa-brands fa-x-twitter share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F" target="_blank" title="Share on LinkedIn">
+          <i class="fa-brands fa-linkedin share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-email" href="mailto:?subject=Applying%20DevOps%20Principles%20in%20Incident%20Response&amp;body=Check%20out%20this%20blog%20post%3A%0Ahttps%3A//insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/" target="_blank" title="Share via Email">
+          <i class="fa fa-envelope share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-print" target="_blank" title="Print this article">
+          <i class="fa fa-print"></i>
+        </a>
+      </li>
+    </ul>
+
+    
+  </div>
+
+
+              </div>
+
+              
+              <div class="blog-post-body" itemprop="articleBody">
+                
+                  
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><a href="/blog/an-introduction-to-devops/">DevOps</a> principles focus on helping teams and organizations deliver business value as quickly and consistently as possible. While the principles advocate for improving the coordination between development and operational teams, they can be adapted for any number of domains. <a href="/blog/what-is-devops/">The key components of DevOps</a> we want to emulate across other domains are:</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p></p><ul><li>collaboration between project team roles</li><li>infrastructure as code</li><li>automation of tasks, processes, and workflows</li><li>monitoring of applications and infrastructure</li></ul>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>In this blog post, I explore how to apply DevOps to the <a href="https://searchsecurity.techtarget.com/definition/incident-response">incident response</a> domain. In the same way that advances in methodologies surrounding software development were gleaned from <a href="https://www.infoq.com/articles/qa-gene-kim-state-devops-survey/">Toyota's manufacturing processes</a>, we can apply lessons learned from DevOps across domains.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Incident Response</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>Incident response is the method by which organizations identify and mitigate risks created as the result of a security breach or attack. It involves various teams: analysts, security, operations, legal, business, IT, and even developers. To protect the organization and sensitive data, the primary tasks during an incident are analysis, communication, and response. At the onset of responding to the incident, analysts are trying to collect data in a safe, non-destructive way that maintains the data's authenticity and integrity. Once the data is secured, analysts are able to assess and interpret it. Any findings or conclusions must be communicated in a timely manner to the appropriate parties. The team works to identify the best response or mitigation. In most cases, the transitions between each of these tasks require direct, manual action.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>Responding to security incidents, especially in a government or enterprise environment, is a process rich with opportunity for improvement. Response teams are frequently bogged down with writing narrative reports about the analysis performed. Individuals on incident response teams can carry significant caseloads that divide their efforts across multiple projects. Context switching can eat up significant cycles as analysts alternate between cases or task domains (from using tools to writing documents). Relying on human-driven notifications rather than <a href="/blog/chatops-in-the-devops-team/">ChatOps</a> principles introduces room for error and missed connections. The very problem the teams are trying to address is constantly changing and rarely well-defined.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>DevOps Principles</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>The DevOps components mentioned above can greatly increase the ability for incident responders to deliver "business value" to organizations. Defining the business value in relation to a security team seems like an obvious step, but so many organizations continue to treat security as an afterthought or a black-box unit. To implement DevOps across the organization, business value must be defined in a measurable sense for each team. The manual processes at play in much of the work can be identified and <a href="/blog/a-generalized-model-for-automated-devops/">automated</a>. If automation is not an immediate possibility, restructuring the workflow or process can help get to the point where the process can be automated. No team ever works in isolation, so incident response teams should be encouraged to work with their counterparts. Providing tools and using automation to increase collaboration will lower the time to fix, and "<a href="https://blog.sonatype.com/2013/09/devops-success-is-contingent-on-shifting-left/">shift left</a>" the knowledge needed to respond to an incident.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Business Value in Incident Response</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>Keeping team members focused on delivering business value is key. Organizations therefore need to define what <i>business value</i> means for them. For law enforcement, <i>business value</i> could be defined as identifying and prosecuting perpetrators. For industry incident response, <i>business value</i> could be delivering secure, functional, and usable product to customers.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>In some circumstances, incident response may not involve criminal prosecution; it may be as simple as fixing bugs or patching security vulnerabilities to protect the organization's data and customers. While different teams may address different aspects of an organization's mission, it is important to remember that having a unified goal is what prevents a lot of "not my job" conversations.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>A key objective of DevOps is breaking down organizational silos and increasing collaboration between teams. Once business value is defined in the context of an organization's mission, it clarifies the types of deliverables that are expected and, most importantly, what types of deliverables should not be executed. Security and incident response teams can focus on mitigating risk to the customer to an acceptable level, or being able to quantify the risk as a means of delivering business value in line with the organization's mission.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Identifying Areas for Automation</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>Automation increases team productivity by identifying areas where human error is introduced in repetitive tasks. Automation also ensures that a process is repeated precisely and enforces requirements on processes, meaning if requisite information is missing, the automated process can fail a process and ask for human input. Automation provides resource-strapped teams with tools to address thousands of cases or incidents in a given year. Given the consistent outputs from the tools analysts use in their day-to-day work, scripts can be written to dynamically generate narrative reports from the work they do.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>An automated process ensures consistent information and presentation and reduces the need for case-by-case interpretation. If errors are discovered in the results, the automated process can be fixed and all reports will immediately reap the benefits. By leveraging tools and the environments in which analysts work, we can keep people working where they are the most useful while offloading the more time-consuming and productivity draining work to automated processes.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Collaboration and Communication</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>As report-generation tasking is automated, notification and delivery of the artifacts generated by the new processes can also be enhanced. The detected security concerns can notify the proper teams such as operations, development, business units, or legal teams. Automation can generate a ticket in the enterprise issue tracker to patch infrastructure or to alert development teams of code changes for a specific vulnerability. Legal teams can receive updates to ongoing investigations that directly concern their teams. Teams can automate notifications to deliver the information the parties need to perform their job functions and ultimately deliver business value.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Shifting Left</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>The ability to analyze requirements of various departments and align objectives along common business goals, enables organizations to deliver the right information to everyone as early in the process as possible--<i>shift left</i>. In the same way, the use of infrastructure as code establishes environment parity throughout the software development and delivery process. The use of standardized documentation and reporting helps incident response teams reach the right people much faster and with more clarity. For incident response teams, building <a href="/blog/three-challenges-to-documentation-for-devops-teams/">automated documentation</a> and notifications into the tasks they accomplish will allow the analysts to keep working rather than <a href="/blog/addressing-the-detrimental-effects-of-context-switching-with-devops/">context switching</a> between analysis and documentation tasking. Instead of waiting for the full narrative, organizations can begin responding to actionable intelligence as the analysis tasks are completed and committed. Shifting incident response left will allow risk mitigations and lessons learned gleaned by the response team to be incorporated as an integral part of the development process rather than as an afterthought.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Wrapping Up and Looking Ahead</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>Adapting and applying DevOps principles will allow incident responders to better support the organization. Automation allows organizations to have a better understanding about how to use the skill sets incident response teams provide. Applying these principles empowers the organization to approach incident response in a fashion similar to their approach to tracking other metrics. They can quickly identify outliers and focus their efforts where they can yield a higher return on investment for their effort.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><i>Every two weeks, the SEI will publish a new blog post that offers technical</i> <a href="/blog/?tag=devops"><i>guidelines and practical advice</i></a> <i>for DevOps in practice. We welcome your feedback on this series, as well as suggestions for future content. Please leave feedback in the comments section below.</i></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p><b>Additional Resources</b></p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>To view the webinar <i>DevOps Security: Ignore It As Much As You Would Ignore Regular Security</i> by Chris Taschner and Tim Palko, please click <a href="https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=450440">here</a>.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>To view the webinar <i>Culture Shock: Unlocking DevOps with Collaboration and Communication</i> with Aaron Volkmann and Todd Waits please click <a href="https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=442589">here</a>.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>To view the webinar <i>What DevOps is Not!</i> with Hasan Yasar and C. Aaron Cois, please click<a href="https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=441674">here</a>.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>To listen to the podcast <i>DevOps--Transform Development and Operations for Fast, Secure Deployments</i> featuring Gene Kim and Julia Allen, please click <a href="https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=58525">here</a>.</p>
+                      
+                    </section>
+                  
+                    <section class="block-paragraph_block">
+                      
+                      
+                        <p>To read all of the blog posts in our DevOps series, please click <a href="https://insights.sei.cmu.edu/devops/devops-tips/">here</a>.</p>
+                      
+                    </section>
+                  
+                
+              </div>
+
+              
+              
+
+
+
+            </article>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              
+              
+
+
+
+  <div class="authors__block">
+    <h5 class="header-xs">Written By</h5>
+
+    
+      <div class="wrapper">
+        
+          <div>
+            <a href="/authors/todd-waits/" class="select-none">
+              <img alt="Todd Waits" decoding="async" height="180" id="auth" img="" loading="lazy" src="/media/images/thumb_big_t-waits_blog_authors_.format-webp.max-180x180.webp" width="180">
+            </a>
+          </div>
+        
+        <div>
+          <h3 class="header-m">Todd Waits</h3>
+          <h6 class="header-meta-1">
+            <a href="/authors/todd-waits/">Author Page</a>
+          </h6>
+          
+            <h6 class="header-meta-1">
+              <a href="https://resources.sei.cmu.edu/library/author.cfm?authorid=42657">Digital Library Publications</a>
+            </h6>
+          
+          <h6 class="header-meta-1">
+            <a href="https://www.sei.cmu.edu/contact-us/index.cfm?f=Todd&amp;l=Waits" referrerpolicy="no-referrer-when-downgrade">Send a Message</a>
+          </h6>
+        </div>
+      </div>
+    
+  </div>
+
+
+
+              
+              
+  <div class="recent-posts__block">
+    <h5 class="header-xs">More By The Author</h5>
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/three-strategies-to-minimize-the-implementation-dip-in-devops/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Three Strategies to Minimize the Implementation Dip in DevOps</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Sept. 15, 2016, 8 p.m.">September 16, 2016</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/todd-waits/"> Todd Waits</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/malicious-user-stories-rejection-criteria-and-the-new-business-value/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Malicious User Stories, Rejection Criteria, and the New Business Value</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Feb. 5, 2016, 10:28 a.m.">February 5, 2016</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/todd-waits/"> Todd Waits</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/three-challenges-to-documentation-for-devops-teams/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Three Challenges to Documentation for DevOps Teams</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Aug. 6, 2015, 8 p.m.">August 7, 2015</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/todd-waits/"> Todd Waits</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/the-benefits-of-high-frequency-testing/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">The Benefits of High Frequency Testing</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="June 10, 2015, 8 p.m.">June 11, 2015</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/todd-waits/"> Todd Waits</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/addressing-the-detrimental-effects-of-context-switching-with-devops/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Addressing the Detrimental Effects of Context Switching with DevOps</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="March 4, 2015, 7 p.m.">March 5, 2015</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/todd-waits/"> Todd Waits</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+  </div>
+
+
+
+              
+              
+  <div class="more-in-topic">
+    <h5 class="header-xs">More In DevSecOps</h5>
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/polar-improving-devsecops-observability/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Polar: Improving DevSecOps Observability</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="May 6, 2024, 7 a.m.">May 6, 2024</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/morgan-farrah/"> Morgan Farrah</a>,
+            
+          
+            
+              <a href="/authors/vaughn-coates/"> Vaughn Coates</a>,
+            
+          
+            
+              <a href="/authors/patrick-earl/"> Patrick Earl</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/example-case-using-devsecops-to-redefine-minimum-viable-product/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Example Case: Using DevSecOps to Redefine Minimum Viable Product</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="March 11, 2024, 11 a.m.">March 11, 2024</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/joe-yankel/"> Joe Yankel</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/acquisition-archetypes-seen-in-the-wild-devsecops-edition-clinging-to-the-old-ways/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Acquisition Archetypes Seen in the Wild, DevSecOps Edition: Clinging to the Old Ways</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Dec. 18, 2023, 11 a.m.">December 18, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/bill-novak/"> William E. Novak</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/extending-agile-and-devsecops-to-improve-efforts-tangential-to-software-product-development/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Extending Agile and DevSecOps to Improve Efforts Tangential to Software Product Development</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Aug. 7, 2023, 11 a.m.">August 7, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/david-sweeney/"> David Sweeney</a>,
+            
+          
+            
+              <a href="/authors/lyndsi-hughes/"> Lyndsi A. Hughes</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/5-challenges-to-implementing-devsecops-and-how-to-overcome-them/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">5 Challenges to Implementing DevSecOps and How to Overcome Them</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="June 12, 2023, 11 a.m.">June 12, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/joe-yankel/"> Joe Yankel</a>,
+            
+          
+            
+              <a href="/authors/hasan-yasar/"> Hasan Yasar</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+  </div>
+
+
+            </div>
+          </div>
+          
+
+          
+          <div class="right-column">
+            
+            <div class="sticky top-16">
+              
+              
+  <div class="published-in-topic__block">
+    <h5 class="header-xs">PUBLISHED IN</h5>
+    <p class="navigation">
+      <a href="/blog/topics/devsecops/" class="navigation">DevSecOps</a>
+    </p>
+  </div>
+
+
+
+
+              
+              
+  <div class="citation__sidebar">
+    <h5 class="header-xs">CITE</h5>
+    
+    
+      <label for="get-citation">
+        <button class="btn--blog-link btn--blog-link-navigation navigation">Get Citation</button>
+      </label>
+    
+  </div>
+
+
+
+              
+              
+
+
+              
+              
+  <div class="tags__block">
+    <h5 class="header-xs">TAGS</h5>
+    
+      <span class="badge--blog">
+        <a itemprop="articleSection" rel="tag" href="/blog/tags/devsecops">
+          DevSecOps
+        </a>
+      </span>
+    
+      <span class="badge--blog">
+        <a itemprop="articleSection" rel="tag" href="/blog/tags/devops">
+          Devops
+        </a>
+      </span>
+    
+  </div>
+
+
+
+              
+              
+  <div class="sei-share">
+    <h5 class="header-xs">SHARE</h5>
+    <ul>
+      <li>
+        <a class="sei-share-facebook" href="https://www.facebook.com/share.php?u=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F" target="_blank" title="Share on Facebook">
+          <i class="fa-brands fa-facebook share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-twitter" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F&amp;text=Applying%20DevOps%20Principles%20in%20Incident%20Response" target="_blank" title="Share on X">
+          <i class="fa-brands fa-x-twitter share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Finsights.sei.cmu.edu%2Fblog%2Fapplying-devops-principles-in-incident-response%2F" target="_blank" title="Share on LinkedIn">
+          <i class="fa-brands fa-linkedin share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-email" href="mailto:?subject=Applying%20DevOps%20Principles%20in%20Incident%20Response&amp;body=Check%20out%20this%20blog%20post%3A%0Ahttps%3A//insights.sei.cmu.edu/blog/applying-devops-principles-in-incident-response/" target="_blank" title="Share via Email">
+          <i class="fa fa-envelope share-button"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sei-share-print" target="_blank" title="Print this article">
+          <i class="fa fa-print"></i>
+        </a>
+      </li>
+    </ul>
+
+    
+  </div>
+
+
+
+              
+              <div class="subscribe_small">
+  <div class="container">
+    <h3 class="header-l">Get updates on our latest work.</h3>
+    <p class="body-small">
+      Sign up to have the latest post sent to your inbox weekly.
+    </p>
+    <a href="/blog/subscribe" class="btn--blog">Subscribe</a>
+    <a href="/blog/feeds/latest/rss/" class="link--gray">Get our RSS feed</a>
+  </div>
+</div>
+
+
+              
+              
+  <div class="more-in-topic">
+    <h5 class="header-xs">More In DevSecOps</h5>
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/polar-improving-devsecops-observability/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Polar: Improving DevSecOps Observability</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="May 6, 2024, 7 a.m.">May 6, 2024</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/morgan-farrah/"> Morgan Farrah</a>,
+            
+          
+            
+              <a href="/authors/vaughn-coates/"> Vaughn Coates</a>,
+            
+          
+            
+              <a href="/authors/patrick-earl/"> Patrick Earl</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/example-case-using-devsecops-to-redefine-minimum-viable-product/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Example Case: Using DevSecOps to Redefine Minimum Viable Product</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="March 11, 2024, 11 a.m.">March 11, 2024</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/joe-yankel/"> Joe Yankel</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/acquisition-archetypes-seen-in-the-wild-devsecops-edition-clinging-to-the-old-ways/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Acquisition Archetypes Seen in the Wild, DevSecOps Edition: Clinging to the Old Ways</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Dec. 18, 2023, 11 a.m.">December 18, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/bill-novak/"> William E. Novak</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/extending-agile-and-devsecops-to-improve-efforts-tangential-to-software-product-development/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">Extending Agile and DevSecOps to Improve Efforts Tangential to Software Product Development</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="Aug. 7, 2023, 11 a.m.">August 7, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/david-sweeney/"> David Sweeney</a>,
+            
+          
+            
+              <a href="/authors/lyndsi-hughes/"> Lyndsi A. Hughes</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+      
+<div class="m-media-object__listing post_block mb-6">
+  <!-- Entry Title -->
+  <a href="/blog/5-challenges-to-implementing-devsecops-and-how-to-overcome-them/" class="link--dark-gray">
+    <h4 class="header-s mb-2 mt-0">5 Challenges to Implementing DevSecOps and How to Overcome Them</h4>
+  </a>
+  <div class="blog-list-item">
+    <div class="flex-1">
+      <!-- Entry Excerpt -->
+      <!-- Entry Time -->
+      <h6 class="header-meta-1 mt-0" id="alert">
+        <time datetime="June 12, 2023, 11 a.m.">June 12, 2023</time>
+        <span class="px-1">•</span>
+        <span>
+          By
+          
+            
+              <a href="/authors/joe-yankel/"> Joe Yankel</a>,
+            
+          
+            
+              <a href="/authors/hasan-yasar/"> Hasan Yasar</a>
+            
+          
+        </span>
+      </h6>
+    </div>
+  </div>
+</div>
+
+    
+  </div>
+
+
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+    <section class="subscribe_large">
+  <div class="container">
+    <div>
+      <h2 class="header-xxl">Get updates on our latest work.</h2>
+      <p class="header-s">
+        Each week, our researchers write about the latest in software engineering, cybersecurity and artificial intelligence. Sign up to get the latest post sent to your inbox the day it's published.
+      </p>
+      <a href="/blog/subscribe" class="btn--blog">Subscribe</a>
+      <a href="/blog/feeds/latest/rss/" class="body-small link--gray">Get our RSS feed</a>
+    </div>
+  </div>
+</section>
+
+    <input type="hidden" id="pageNum" value="1">
+  
+
+    </div>
+    
+
+<footer class="px-0 text-cmu-white-alpha-100">
+  <div class="pre-footer py-8 bg-cmu-gray-400 h-fit">
+    <ul class="container grid grid-cols-1 lg:grid-cols-3 mx-auto my-0 gap-x-8 gap-y-2 px-4 print:hidden list-none">
+      <li>
+        <a class="gtm-footer" href="https://www.kb.cert.org/vuls/report/">Report a Vulnerability to CERT/CC</a>
+      </li>
+      <li>
+        <a class="gtm-footer" href="https://www.sei.cmu.edu/subscribe-to-sei-bulletin/">Subscribe to SEI Bulletin</a>
+      </li>
+      <li>
+        <a class="gtm-footer" href="https://www.sei.cmu.edu/legal/request-permission-to-use-sei-material">Request Permission to Use SEI Materials</a>
+      </li>
+    </ul>
+  </div>
+  <div class="flex flex-col gap-x-8 gap-y-12 py-16 bg-cmu-gray-800">
+    <div class="container grid grid-cols-1 lg:grid-cols-3 mx-auto my-0 gap-8 px-4 print:hidden list-none">
+      <div class="footer-address" itemprop="address" itemscope="" itemtype="https://schema.org/PostalAddress">
+        <p>
+          <span>Carnegie Mellon University</span><br>
+          <span>Software Engineering Institute</span><br>
+          <span itemprop="streetAddress">4500 Fifth Avenue</span><br>
+          <span itemprop="addressLocality">Pittsburgh, PA</span> <span itemprop="postalCode">15213-2612</span><br>
+          <a href="tel:+14122685800" itemprop="telephone" class="gtm-footer">412-268-5800</a>
+        </p>
+      </div>
+      <div class="sei-share !pb-0">
+        <ul>
+          <li itemprop="sameAs">
+            <a class="sei-share-facebook" href="https://www.facebook.com/SEICMU/" target="_blank" rel="noreferrer noopener" title="Visit the SEI on Facebook">
+              <i class="fa-brands fa-facebook share-button"></i>
+            </a>
+          </li>
+          <li itemprop="sameAs">
+            <a class="sei-share-twitter" href="https://twitter.com/SEInews" target="_blank" rel="noreferrer noopener" title="Visit the SEI on X">
+              <i class="fa-brands fa-x-twitter share-button"></i>
+            </a>
+          </li>
+          <li itemprop="sameAs">
+            <a class="sei-share-linkedin" href="https://www.linkedin.com/company/software-engineering-institute" target="_blank" title="Visit the SEI on LinkedIn" rel="noreferrer noopener">
+              <i class="fa-brands fa-linkedin share-button"></i>
+            </a>
+          </li>
+          <li itemprop="sameAs">
+            <a class="sei-share-youtube" href="https://www.youtube.com/user/TheSEICMU" target="_blank" rel="noreferrer noopener" title="Visit the SEI on YouTube">
+              <i class="fa-brands fa-youtube share-button"></i>
+            </a>
+          </li>
+          <li itemprop="sameAs">
+            <a class="sei-share-apple-podcasts" href="https://itunes.apple.com/us/podcast/software-engineering-institute-sei-podcast-series/id566573552?mt=2" target="_blank" rel="noreferrer noopener" title="Visit the SEI on Apple Podcasts">
+              <i class="fa-solid fa-podcast"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-cta">
+        <a href="https://www.sei.cmu.edu/contact-us/" class="gtm-footer" referrerpolicy="no-referrer-when-downgrade">Contact Us</a>
+      </div>
+    </div>
+    <div class="container flex flex-row mx-auto my-0 gap-x-8 gap-y-2 px-4 print:hidden list-none justify-between">
+      <ul class="footer-info mb-0">
+        <li><a href="https://www.sei.cmu.edu/locations/index.cfm" class="gtm-footer">Office Locations</a></li>
+        <li><a href="https://www.sei.cmu.edu/additional-sites-directory/index.cfm" class="gtm-footer">Additional Sites Directory</a></li>
+        <li><a href="https://www.sei.cmu.edu/legal/index.cfm" class="gtm-footer">Legal</a></li>
+        <li><a href="https://www.sei.cmu.edu/legal/privacy-notice/index.cfm" class="gtm-footer">Privacy Notice</a></li>
+        <li itemprop="ethicsPolicy"><a href="https://www.cmu.edu/hr/resources/ethics-hotline.html" itemprop="url" class="gtm-footer">CMU Ethics Hotline</a></li>
+        <li><a href="https://www.sei.cmu.edu/index.cfm" class="gtm-footer"><span itemprop="url">www.sei.cmu.edu</span></a></li>
+      </ul>
+    </div>
+    <div class="container flex flex-row mx-auto my-0 gap-x-8 gap-y-2 px-4 print:hidden list-none justify-between">
+      <div class="footer-copyright copyright flex flex-row flex-nowrap whitespace-nowrap text-cmu-xs">
+        <span>2024</span>
+        <div itemscope="" itemtype="http://schema.org/Organization" itemprop="parentOrganization">
+          <span itemprop="legalName">Carnegie Mellon University</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script nonce="">
+    (function(w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      var n = d.querySelector('[nonce]');
+      n && j.setAttribute('nonce', n.nonce || n.getAttribute('nonce'));
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M62LG9');
+  </script>
+</footer>
+
+<!-- loads the main bundles js at the end of the page load.-->
+<script src="/static/webpack_bundles/main-0a026f3e9c1d67da02bc.js"></script>
+<script src="/static/webpack_bundles/vue-0a026f3e9c1d67da02bc.js"></script>
+<script src="/static/webpack_bundles/vendor.js"></script>
+<script nonce="">
+  /* Prisma code highlighting */
+  const forceRedraw = (element) => {
+    if (!element) { return; }
+    let n = document.createTextNode(' ');
+    let disp = element.style.display;
+
+    element.appendChild(n);
+    element.style.display = 'none';
+    element.style.display = disp;
+    n.parentNode.removeChild(n);
+  }
+</script>
+
+  
+  
+
+</body></html>

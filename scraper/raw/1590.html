@@ -1,0 +1,879 @@
+<html class="no-js" lang="pl"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="initial-scale=1.0">
+    <title>    Rekomendacje dla wzmocnienia ochrony systemów OT | CERT Polska
+</title>
+    <script src="https://analytics.cert.pl/matomo.js" async=""></script><script src="/cdn-cgi/apps/head/PEvw3s8613GSRV9fbbdzEXs0fS8.js"></script><script src="/cdn-cgi/apps/body/IdNtJLu6t8XUiH1CogR5bO8BE3g.js"></script><link rel="canonical" href="https://cert.pl/posts/2024/05/rekomendacje-ot/">
+
+    <link rel="icon" href="/theme/assets/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;700;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/assets/css/fonts.css">
+
+        <link rel="stylesheet" href="/theme/assets/css/style.min.css?c6a76667">
+
+    <link rel="stylesheet" href="/theme/assets/css/pygment.css">
+    <link rel="stylesheet" href="/theme/assets/css/legacy.css">
+    <meta property="og:description" content="CERT Polska wydał rekomendacje w związku z obserwowaną zwiększoną liczbę ataków na przemysłowe systemy sterowania (ICS/OT) dostępne bezpośrednio z internetu.">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Rekomendacje dla wzmocnienia ochrony systemów OT">
+    <meta property="og:image" content="https://cert.pl/uploads/2020/12/factory.png">
+
+    <link rel="alternate" type="application/atom+xml" title="CERT Polska - Atom" href="/atom.xml">
+    <link rel="alternate" type="application/rss+xml" title="CERT Polska - RSS" href="/rss.xml">
+
+</head>
+<body class="desktop">
+
+<script src="/theme/assets/js/jquery.js"></script>
+<script src="/theme/assets/js/foundation.min.js"></script>
+
+<script>
+    $body = $('body');
+
+    function changed_mobile(media) {
+        if (media.matches) {
+            window.mobile = true;
+            window.desktop = false;
+            $body.removeClass('desktop');
+            $body.addClass('mobile');
+        } else {
+            window.mobile = false;
+            window.desktop = true;
+            $body.removeClass('mobile');
+            $body.addClass('desktop');
+        }
+    }
+
+    let media = window.matchMedia('(max-width: 800px)');
+    media.addEventListener('change', changed_mobile);
+    changed_mobile(media);
+</script>
+
+<style>
+    @media (max-width: 800px) {
+        .mobile-header { display: inherit; }
+        .desktop-header { display: none; }
+        
+        .mobile-slider { display: inherit; }
+        .desktop-slider { display: none; }
+        .hide-mobile { display: none; }
+        
+        body {
+            padding-top: 117px;
+        }
+    }
+
+    @media (min-width: 800px) {
+        .mobile-header { display: none; }
+        .desktop-header { display: inherit; }
+        
+        .mobile-slider { display: none; }
+        .desktop-slider { display: inherit; }
+        .hide-desktop { display: none; }
+    }
+
+    .cta {
+        border-radius: 8px;
+        min-height: 44px;
+        display: inline-block;
+        padding: 10px 25px;
+        transition: background-color ease-out 0.2s;
+    }
+
+    .cta > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    .cta.primary {
+        color: #FCFDFD !important;
+        background-color: #155C25;
+    }
+
+    .cta.primary:hover {
+        color: #FCFDFD !important;
+        background-color: #1B7730;
+    }
+
+    .card.important {
+        background-color: #121f28;
+        color: #FCFDFD;
+    }
+
+    .card.important a {
+        color: #ccfdcd !important;
+    }
+</style>
+
+<style>
+    .mobile-header {
+        top: 0;
+        width: 100%;
+        color: #FCFDFD;
+        background-color: #212E3B;
+        position: fixed;
+        font-size: 130%;
+        transition: background-color ease-out 0.2s;
+        z-index: 10000;
+    }
+    
+    .mobile-header .top {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .mobile-header .logo {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTMzIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMTMzIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNOTguMzc2MSAxOC45MDA3SDEwMi42ODhWMjMuMzA1OEgxMDIuNzU3TDEwNy42NjEgMTguOTAwN0gxMTIuNjMzTDEwNy4zNDYgMjMuMzA1OEwxMTMuMDkgMjguOTIxN0gxMDcuNzlMMTAyLjc2MiAyMy41OTY1SDEwMi42OTNWMjguOTIxN0g5OC4zODA0VjE4LjkwMDdIOTguMzc2MVpNODQuMjE4NiAyNS44MDEySDg4LjU0MzlDODguNTQzOSAyNi4xNzQ1IDg4LjY4MTkgMjYuNDY1MyA4OS4wNjU3IDI2Ljc2MDRDODkuMzgwNSAyNy4wMDc4IDg5Ljk2MjcgMjcuMTc3IDkwLjc5OTMgMjcuMjE2MUM5MS41ODQxIDI3LjIxNjEgOTIuMTYyIDI3LjEzMzYgOTIuNjAxOSAyNi45MjUzQzkzLjA1NDYgMjYuNzYwNCA5My4zMTc3IDI2LjUwODcgOTMuMzE3NyAyNi4yMTc5QzkzLjMxNzcgMjYuMDA5NiA5My4xOTcgMjUuODAxMiA5My4wMDI5IDI1LjY3NTRDOTIuODA4OCAyNS41MTA1IDkyLjU0NTggMjUuMzg0NiA5Mi4yMzEgMjUuMzAyMkM5MS45NTUgMjUuMjE5NyA5MS41ODQxIDI1LjEzNzIgOTEuMjUyMSAyNS4wOTM4QzkwLjg2ODMgMjUuMDExNCA5MC41MzYyIDI0Ljk3MjMgOTAuMjIxNCAyNC45Mjg5Qzg4Ljk5NjcgMjQuNzIwNiA4Ny45NjE3IDI0LjU1NTcgODcuMTg5OCAyNC4zNDc0Qzg2LjQ3NCAyNC4xODI0IDg1LjgyNzEgMjMuODkxNyA4NS4yNjIyIDIzLjUxNDFDODQuNzM2MSAyMy4wOTc1IDg0LjQ3NzQgMjIuNTk4NCA4NC40Nzc0IDIxLjkzNDNDODQuNDc3NCAyMS4xODM1IDg0LjczNjEgMjAuNjAyIDg1LjMxODMgMjAuMTQ2M0M4NS44OTYxIDE5LjY4NjIgODYuNjgxIDE5LjMxMyA4Ny42OTg3IDE5LjEwNDdDODguNjc3NiAxOC44OTY0IDg5LjgzMzMgMTguNzcwNSA5MS4xMzEzIDE4Ljc3MDVDOTMuMTk3IDE4Ljc3MDUgOTQuODA5OCAxOS4wNjEzIDk1Ljc3MTQgMTkuNTYwNEM5Ni44MDY0IDIwLjA1OTUgOTcuMzE1MyAyMC43NjY5IDk3LjMxNTMgMjEuNjM5MlYyMS45M0g5My4wMDI5QzkzLjAwMjkgMjEuNTU2OCA5Mi44NjQ5IDIxLjI2MTYgOTIuNDc2OCAyMS4wNTc3QzkyLjA5MyAyMC44MDYgOTEuNTg0MSAyMC43MjM1IDkwLjkzNzMgMjAuNzIzNUM5MC4zNTk0IDIwLjcyMzUgODkuOTAyMyAyMC44MDU5IDg5LjU3NDYgMjEuMDE0M0M4OS4xOTA4IDIxLjE3OTIgODguOTk2NyAyMS40MzA5IDg4Ljk5NjcgMjEuNjc4M0M4OC45OTY3IDIyLjE3NzQgODkuODM3NiAyMi41NTA2IDkxLjU4NDEgMjIuODAyM0M5Mi43Mzk4IDIyLjk2NzMgOTMuNTgwOCAyMy4wOTMxIDk0LjE2MjkgMjMuMTc5OUM5NC43NDA4IDIzLjMwMTQgOTUuMzE4NiAyMy40MjczIDk1Ljg5NjUgMjMuNjM1NkM5Ni40OTE2IDIzLjg0MzkgOTYuOTQ0NCAyNC4xMzQ3IDk3LjMxNTMgMjQuNTA3OUM5Ny42NDczIDI0LjgzNzggOTcuODM3MSAyNS4zNDEyIDk3LjkwNjEgMjUuODc5NEM5Ny45MDYxIDI2LjYyNTggOTcuNTg2OSAyNy4yMTE3IDk2Ljk5NjIgMjcuNzEwOEM5Ni4zNDkzIDI4LjIwOTkgOTUuNTI1NiAyOC41NDQxIDk0LjQ3MzQgMjguNzkxNUM5My40NTU3IDI4Ljk5OTggOTIuMjgyNyAyOS4xMDgzIDkxLjA1OCAyOS4xMDgzQzg5LjUxNDIgMjkuMTA4MyA4OC4yMjA1IDI4Ljk5NTUgODcuMjU0NSAyOC43OTE1Qzg2LjI3NTYgMjguNTQ0MSA4NS41MDM3IDI4LjE2NjUgODQuOTk0OCAyNy42Njc0Qzg0LjQ3MyAyNy4xNjgzIDg0LjIxIDI2LjU0MzQgODQuMjEgMjUuNzk2OU03OC42NzI5IDI1LjA1MDRMNzYuNjc2MyAyMC44OTI3SDc2LjYwNzNMNzQuNTU0NiAyNS4wNTA0SDc4LjY3MjlaTTc0LjIzOTggMTguODk2NEg3OS40NTc4TDg1LjU3MjcgMjguOTE3M0g4MC43Mzg1TDc5LjcwMzYgMjcuMDAzNEg3My40NjM2TDcyLjQyODYgMjguOTE3M0g2OC4xMDMzTDc0LjIzMTIgMTguODk2NEg3NC4yMzk4Wk01Mi42NjkzIDE4Ljg5NjRINTguNzk3Mkw2NC4yMjIyIDI2LjM4MjhMNjQuMjkxMiAyNi4zMzk0VjE4Ljg5NjRINjcuOTY5NlYyOC45MTczSDYyLjEwMDVMNTYuNjA2NSAyMS4yNjZINTYuNTUwNVYyOC45MTczSDUyLjY2NVYxOC44OTY0SDUyLjY2OTNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNDIuNjk1IDIzLjkzOTRDNDIuNjk1IDE2LjE5MjYgMzYuNDU1IDkuOTE2OTkgMjguNzYxOCA5LjkxNjk5QzIxLjA2ODUgOS45MTY5OSAxNC44MjQyIDE2LjE5NjkgMTQuODI0MiAyMy45Mzk0QzE0LjgyNDIgMzEuNjgxOSAyMS4wNjQyIDM3Ljk2NjIgMjguNzYxOCAzNy45NjYyQzM2LjQ1OTQgMzcuOTY2MiA0Mi42OTUgMzEuNjg2MyA0Mi42OTUgMjMuOTM5NCIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM0LjA4MzMgMTcuNzE2MUMzMy45NzU1IDE3LjYwNzYgMzMuNzk4NiAxNy40Mjk3IDMzLjY5MDggMTcuMzIxMkwzMy40MjM1IDE3LjA1MjFDMzMuMzE1NyAxNi45NDM2IDMzLjEzODkgMTYuOTQzNiAzMy4wMzEgMTcuMDUyMUwzMi4xMDgyIDE3Ljk4MDhDMzIuMDAwNCAxOC4wODkzIDMyLjAwMDQgMTguMjY3MyAzMi4xMDgyIDE4LjM3NThMMzIuMzcxMyAxOC42NDQ4QzMyLjQ3OTEgMTguNzUzMyAzMi42NTU5IDE4LjkzMTMgMzIuNzYzNyAxOS4wMzk4TDM3LjQzNCAyMy43NEMzNy41NDE4IDIzLjg0ODUgMzcuNTQxOCAyNC4wMjY0IDM3LjQzNCAyNC4xMzQ5TDMyLjc2MzcgMjguODM1MUMzMi42NTU5IDI4Ljk0MzYgMzIuNDc5MSAyOS4xMjE1IDMyLjM3MTMgMjkuMjNMMzIuMTA4MiAyOS40OTkxQzMyLjAwMDQgMjkuNjA3NiAzMi4wMDA0IDI5Ljc4NTUgMzIuMTA4MiAyOS44OTRMMzMuMDMxIDMwLjgyMjhDMzMuMTM4OSAzMC45MzEzIDMzLjMxNTcgMzAuOTMxMyAzMy40MjM1IDMwLjgyMjhMMzMuNjkwOCAzMC41NTM3QzMzLjc5ODYgMzAuNDQ1MiAzMy45NzU1IDMwLjI2NzMgMzQuMDgzMyAzMC4xNTg4TDM5LjQxMzMgMjQuNzk0NkMzOS41MjEyIDI0LjY4NjEgMzkuNjExNyAyNC40NzM0IDM5LjYxMTcgMjQuMzE3MlYyMy41NDlDMzkuNjExNyAyMy4zOTcxIDM5LjUyNTUgMjMuMTgwMSAzOS40MTMzIDIzLjA3MTZMMzQuMDgzMyAxNy43MDc0VjE3LjcxNjFaIiBmaWxsPSIjMjhBNzQ1Ii8+CjxwYXRoIGQ9Ik0yOC4wMjQgMTcuMjQzMkgyNC41Njk4QzI0LjQxODkgMTcuMjQzMiAyNC4xNzc0IDE3LjI5MDkgMjQuMDM1MSAxNy4zNTE3TDIzLjg4ODUgMTcuNDEyNEMyMy43NDYyIDE3LjQ3MzIgMjMuNTQzNSAxNy42MDc3IDIzLjQzNTcgMTcuNzE2MkwxOC4xMDU2IDIzLjA4MDRDMTcuOTk3OCAyMy4xODg5IDE3LjkwNzIgMjMuNDAxNiAxNy45MDcyIDIzLjU1NzhWMjQuMzI2QzE3LjkwNzIgMjQuNDc3OSAxNy45OTM1IDI0LjY5NDkgMTguMTA1NiAyNC44MDM0TDIzLjQzNTcgMzAuMTY3NkMyMy41NDM1IDMwLjI3NjEgMjMuNzQ2MiAzMC40MTUgMjMuODg4NSAzMC40NzE0TDI0LjAzNTEgMzAuNTMyMUMyNC4xNzc0IDMwLjU5MjkgMjQuNDE0NiAzMC42NDA2IDI0LjU2OTggMzAuNjQwNkgyOC4wMjRDMjguMTc1IDMwLjY0MDYgMjguMyAzMC41MTQ4IDI4LjMgMzAuMzYyOVYyOS4wNDc5QzI4LjMgMjguODk2IDI4LjE3NSAyOC43NzAxIDI4LjAyNCAyOC43NzAxSDI0Ljk1NzlDMjQuODA3IDI4Ljc3MDEgMjQuNTkxNCAyOC42ODMzIDI0LjQ4MzYgMjguNTc0OEwyMC4wODUgMjQuMTQ4QzE5Ljk3NzIgMjQuMDM5NSAxOS45NzcyIDIzLjg2MTYgMjAuMDg1IDIzLjc1MzFMMjQuNDgzNiAxOS4zMjYzQzI0LjU5MTQgMTkuMjE3OCAyNC44MDI3IDE5LjEyNjcgMjQuOTU3OSAxOS4xMjY3SDI4LjAyNEMyOC4xNzUgMTkuMTI2NyAyOC4zIDE5LjAwMDggMjguMyAxOC44NDlWMTcuNTMzOUMyOC4zIDE3LjM4MiAyOC4xNzUgMTcuMjU2MiAyOC4wMjQgMTcuMjU2MiIgZmlsbD0iIzIxMkUzOSIvPgo8L3N2Zz4K");
+        width: 120px;
+        height: 48px;
+        margin: 10px auto 10px 0;
+    }
+
+    .mobile-header .report-incident {
+        margin: 10px 10px 10px auto;
+    }
+
+    .mobile-header .menu-bar {
+        display: flex;
+        padding: 0 15px;
+    }
+
+    .mobile-header .menu-bar .language {
+        height: 50px;
+        width: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: auto;
+        display: inline-block;
+    }
+    
+    .mobile-header .menu-bar .language.pl {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAyMiAyMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzcyNF8xMDM2MCkiPgo8cGF0aCBkPSJNMTkuNTU1NiAzLjA1NTY2SDIuNDQ0NDRDMS43OTYxNCAzLjA1NTY2IDEuMTc0MzggMy4zMTMyIDAuNzE1OTYxIDMuNzcxNjNDMC4yNTc1MzkgNC4yMzAwNSAwIDQuODUxOCAwIDUuNTAwMTFMMCAxMS4wMDAxSDIyVjUuNTAwMTFDMjIgNC44NTE4IDIxLjc0MjUgNC4yMzAwNSAyMS4yODQgMy43NzE2M0MyMC44MjU2IDMuMzEzMiAyMC4yMDM5IDMuMDU1NjYgMTkuNTU1NiAzLjA1NTY2WiIgZmlsbD0iI0VFRUVFRSIvPgo8cGF0aCBkPSJNMCAxNi41QzAgMTcuMTQ4MyAwLjI1NzUzOSAxNy43NzAxIDAuNzE1OTYxIDE4LjIyODVDMS4xNzQzOCAxOC42ODY5IDEuNzk2MTQgMTguOTQ0NCAyLjQ0NDQ0IDE4Ljk0NDRIMTkuNTU1NkMyMC4yMDM5IDE4Ljk0NDQgMjAuODI1NiAxOC42ODY5IDIxLjI4NCAxOC4yMjg1QzIxLjc0MjUgMTcuNzcwMSAyMiAxNy4xNDgzIDIyIDE2LjVWMTFIMFYxNi41WiIgZmlsbD0iI0RDMTQzQyIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzcyNF8xMDM2MCI+CjxyZWN0IHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K");
+    }
+    
+    .mobile-header .menu-bar .language.en {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAyMiAyMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzc4MV8xMDkzNSkiPgo8cGF0aCBkPSJNMTMuMDYyNSAxOC41NjI1SDE4LjU2MjVDMTkuMjQyMSAxOC41NjI1IDE5LjgxOTYgMTguNDA5MiAyMC4yOTkyIDE4LjE0MjFMMTMuMDYyNSAxMy44MjUzVjE4LjU2MjVaTTIxLjg4MzIgMTUuODg0N0MyMS45NjE1IDE1LjUzNTEgMjIuMDAxNCAxNS4xNjQ5IDIyLjAwMTQgMTQuNzgwOVYxMy4wNjIySDE3LjE1MTFMMjEuODgxOCAxNS44ODQ3TTAuMTIwMzUzIDYuMTA0NjZDMC4wMzg4ODU4IDYuNDcwMzggLTAuMDAxNDY4NjMgNi44NDQwNiA0LjA4MjMyZS0wNSA3LjIxODc1VjguOTM3NUg0Ljg2ODkyTDAuMTIwMzUzIDYuMTA0NjZaTTguOTM3NTQgMy40Mzc1SDMuNDM3NTRDMi43NjI3NiAzLjQzNzUgMi4xODkwNCAzLjU4ODc1IDEuNzExNTcgMy44NTIwNkw4LjkzNzU0IDguMTYyNjlWMy40Mzc1Wk0xLjczMzU3IDE4LjE1ODlDMi4yMDY1NyAxOC40MTQ3IDIuNzcyNzMgMTguNTYyNSAzLjQzNzU0IDE4LjU2MjVIOC45Mzc1NFYxMy44NjE0TDEuNzMzNTcgMTguMTU4OVpNNC4wODIzMmUtMDUgMTMuMDYyNVYxNC43ODEyQzQuMDgyMzJlLTA1IDE1LjE3NjkgMC4wNDE5NzgzIDE1LjU1ODEgMC4xMjQ4MjIgMTUuOTE2N0w0LjkwOTQ4IDEzLjA2MjVINC4wODIzMmUtMDVaTTIwLjMyMDggMy44Njg5MUMxOS44Mzc1IDMuNTk0NTkgMTkuMjUyMSAzLjQzNzUgMTguNTYyNSAzLjQzNzVIMTMuMDYyNVY4LjE5ODc4TDIwLjMyMDggMy44Njg5MVpNMjIgOC45Mzc1VjcuMjE4NzVDMjIgNi44NDI2OSAyMS45NjEyIDYuNDgwMDMgMjEuODg1OSA2LjEzNjk3TDE3LjE5MTcgOC45Mzc1SDIyWiIgZmlsbD0iIzJFMzE5MiIvPgo8cGF0aCBkPSJNMTcuMTkxNiA4LjkzNzVMMjEuODg1OSA2LjEzNjk3QzIxLjY3MDcgNS4xNTI0NyAyMS4xNDY4IDQuMzM3NDQgMjAuMzIwOCAzLjg2ODkxTDEzLjA2MjUgOC4xOTg3OFYzLjQzNzVIMTIuMzc1VjkuNjI1SDIyVjguOTM3NUgxNy4xOTE2Wk0wIDEyLjM3NVYxMy4wNjI1SDQuOTA5NDRMMC4xMjQ3ODEgMTUuOTE2N0MwLjM1MiAxNi44OTgxIDAuODkxNjg4IDE3LjcwMzggMS43MzM1MyAxOC4xNTg5TDguOTM3NSAxMy44NjE0VjE4LjU2MjVIOS42MjVWMTIuMzc1SDBaTTIyIDEyLjM3NUgxMi4zNzVWMTguNTYyNUgxMy4wNjI1VjEzLjgyNTNMMjAuMjk5MSAxOC4xNDI0QzIxLjEzMTMgMTcuNjc5MSAyMS42NjE3IDE2Ljg2ODUgMjEuODgxOCAxNS44ODU0TDE3LjE1MTEgMTMuMDYyNUgyMlYxMi4zNzVaTTguOTM3NSAzLjQzNzVWOC4xNjI2OUwxLjcxMTUzIDMuODUyMDZDMC44NzYyMTkgNC4zMTI2OSAwLjM0MjM3NSA1LjEyMTg4IDAuMTE5OTY5IDYuMTA0NjZMNC44Njg4OCA4LjkzNzVIMFY5LjYyNUg5LjYyNVYzLjQzNzVIOC45Mzc1WiIgZmlsbD0iI0U2RTdFOCIvPgo8cGF0aCBkPSJNMTIuMzc1IDkuNjI1VjMuNDM3NUg5LjYyNVY5LjYyNUgwVjEyLjM3NUg5LjYyNVYxOC41NjI1SDEyLjM3NVYxMi4zNzVIMjJWOS42MjVIMTIuMzc1WiIgZmlsbD0iI0JFMUUyRCIvPgo8cGF0aCBkPSJNNy41NDA4IDguOTM3ODZMMC42NDg2MDkgNC44MjM1MkMwLjUwMDQ1MyA1LjA0MzUyIDAuMzgxNTE2IDUuMjg1NTIgMC4yODMyMDMgNS41NDMzM0w1Ljk3MTIzIDguOTM3ODZINy41Mzk3N00yMS42ODY4IDE2LjUzMTNMMTUuOTA3MyAxMy4wNjI5SDE0LjMwNjhMMjEuMjg5NCAxNy4yNjMxQzIxLjQ1MTMgMTcuMDM2OSAyMS41ODQ4IDE2Ljc5MTUgMjEuNjg2OCAxNi41MzI3TTIwLjg3MTggNC4yNTk3N0wxMy4wNTE1IDguOTM3ODZMMTQuNjM5MiA4LjkzODg5TDIxLjM4NzQgNC44OTg4QzIxLjIzNjggNC42MjQ4MyAyMS4wNzggNC40NDgxNCAyMC44NzE4IDQuMjU5NzdaTTAuNjIyODI4IDE3LjE0NDlDMC43Nzc0NTggMTcuMzgwNCAwLjk2MzU0NCAxNy41OTM3IDEuMTc1OTIgMTcuNzc4OEw4Ljk1ODc3IDEzLjA2MjlINy4zOTAyM0wwLjYyMjgyOCAxNy4xNDQ5WiIgZmlsbD0iI0JFMUUyRCIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzc4MV8xMDkzNSI+CjxyZWN0IHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K");
+    }
+    
+    .mobile-header .menu-bar .search {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMjM0NyIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTIzNDcpIj4KPHBhdGggZD0iTTIzLjczMTUgMjUuMzMzN0wxNy4yNzE5IDE4Ljg4MjlDMTYuNzYzMyAxOS4yNzIzIDE2LjE3ODMgMTkuNTg1NSAxNS41MTcxIDE5LjgyMjVDMTQuODU1OSAyMC4wNTk2IDE0LjE1MjMgMjAuMTc4MSAxMy40MDYzIDIwLjE3ODFDMTEuNTI0NCAyMC4xNzgxIDkuOTMwNjkgMTkuNTIxOCA4LjYyNTIxIDE4LjIwOTNDNy4zMTk3MyAxNi44OTc1IDYuNjY2OTkgMTUuMzAxOSA2LjY2Njk5IDEzLjQyMjVDNi42NjY5OSAxMS41NDMyIDcuMzE5NzMgOS45NDcyNSA4LjYyNTIxIDguNjM0NzRDOS45MzA2OSA3LjMyMjkxIDExLjUyNDQgNi42NjY5OSAxMy40MDYzIDYuNjY2OTlDMTUuMjg4MiA2LjY2Njk5IDE2Ljg4NjQgNy4zMjI5MSAxOC4yMDA3IDguNjM0NzRDMTkuNTE0MyA5Ljk0NzI1IDIwLjE3MTEgMTEuNTQzMiAyMC4xNzExIDEzLjQyMjVDMjAuMTcxMSAxNC4xNjc1IDIwLjA1NjggMTQuODcwMiAxOS44MjgzIDE1LjUzMDVDMTkuNTk5IDE2LjE5MDggMTkuMjg5NSAxNi43NjY1IDE4Ljg5OTUgMTcuMjU3NUwyNS4zMzM3IDIzLjcwODNMMjMuNzMxNSAyNS4zMzM3Wk0xMy40MDYzIDE3Ljg0MTZDMTQuNjQ0IDE3Ljg0MTYgMTUuNjk1MSAxNy40MTM5IDE2LjU1OTggMTYuNTU4NUMxNy40MjQ1IDE1LjcwMzkgMTcuODU2OCAxNC42NTg1IDE3Ljg1NjggMTMuNDIyNUMxNy44NTY4IDEyLjE4NjYgMTcuNDI0NSAxMS4xNDA5IDE2LjU1OTggMTAuMjg1NUMxNS42OTUxIDkuNDMwODQgMTQuNjQ0IDkuMDAzNSAxMy40MDYzIDkuMDAzNUMxMi4xNjg3IDkuMDAzNSAxMS4xMjE5IDkuNDMwODQgMTAuMjY2IDEwLjI4NTVDOS40MDk1MiAxMS4xNDA5IDguOTgxMjUgMTIuMTg2NiA4Ljk4MTI1IDEzLjQyMjVDOC45ODEyNSAxNC42NTg1IDkuNDA5NTIgMTUuNzAzOSAxMC4yNjYgMTYuNTU4NUMxMS4xMjE5IDE3LjQxMzkgMTIuMTY4NyAxNy44NDE2IDEzLjQwNjMgMTcuODQxNloiIGZpbGw9IiNGQ0ZERkQiLz4KPC9nPgo8L3N2Zz4K");
+        height: 50px;
+        width: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: inline-block;
+        margin-left: 20px;
+    }
+    
+    .mobile-header .menu-bar .burger {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMzI0OSIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTMyNDkpIj4KPHBhdGggZD0iTTEyLjAwMDMgMjRWMjEuMDc2M0gyNS4zMzQyVjI0SDEyLjAwMDNaTTYuNjY2OTkgMTcuMzMzM1YxNC42NjY3TDI1LjMzNDIgMTQuNTIyMVYxNy40Nzc5TDYuNjY2OTkgMTcuMzMzM1pNOS4zMzQyMSAxMC45MjM3VjhIMjUuMzM0MlYxMC45MjM3SDkuMzM0MjFaIiBmaWxsPSIjRkNGREZEIi8+CjwvZz4KPC9zdmc+Cg==");
+        width: 50px;
+        height: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: 20px;
+    }
+    
+    .mobile-header .menu-bar .burger.active {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMzQzNCIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTM0MzQpIj4KPHBhdGggZD0iTTIxLjY1NjYgMjMuODI1M0wxNS45OTk3IDE4LjE2ODVMMTAuMzQyOSAyMy44MjUzTDguMTc0NDMgMjEuNjU2OUwxMy44MzEzIDE2TDguMTc0NDMgMTAuMzQzMUwxMC4zNDI5IDguMTc0NjlMMTUuOTk5NyAxMy44MzE1TDIxLjY1NjYgOC4xNzQ2OUwyMy44MjUxIDEwLjM0MzFMMTguMTY4MiAxNkwyMy44MjUxIDIxLjY1NjlMMjEuNjU2NiAyMy44MjUzWiIgZmlsbD0iI0ZDRkRGRCIvPgo8L2c+Cjwvc3ZnPgo=");
+    }
+
+    .mobile-header .menu-bar .return {
+        display: none;
+        align-items: center;
+    }
+
+    .mobile-header .menu-bar .return i {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMzQ2NyIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KPHJlY3QgeD0iMzIiIHk9IjMyIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHRyYW5zZm9ybT0icm90YXRlKC0xODAgMzIgMzIpIiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTM0NjcpIj4KPHBhdGggZD0iTTE5LjQ2NjMgNy43MzMyN0wyMS41OTk2IDkuODY2NkwxNS40NjYzIDE1Ljk5OTlMMjEuNTk5NiAyMi4xMzMzTDE5LjQ2NjMgMjQuMjY2NkwxMS4xOTk2IDE1Ljk5OTlMMTkuNDY2MyA3LjczMzI3WiIgZmlsbD0iI0ZDRkRGRCIvPgo8L2c+Cjwvc3ZnPgo=");
+        width: 32px;
+        height: 32px;
+    }
+
+    .mobile-header .menu-overlay {
+        position: absolute;
+        width: 100%;
+        background-color: #121F29;
+        display: none;
+    }
+
+    .mobile-header .menu-overlay .menu-container {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        position: relative;
+        padding: 20px;
+    }
+
+    .mobile-header .menu-overlay .menu-container ul,
+    .mobile-header .menu-overlay .menu-container li {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .mobile-header .menu-overlay .menu-container li:not(.menu-header) {
+        padding: 10px 0;
+        font-weight: bold;
+        font-size: 1.3rem;
+        cursor: pointer;
+    }
+    
+    .mobile-header .menu-overlay .menu-container .menu-root > li:not(.menu-header) {
+        font-size: 2rem;
+    }
+
+    .mobile-header .menu-overlay .menu-container ul {
+        list-style: none;
+    }
+
+    .mobile-header .menu-overlay .menu-container ul {
+        display: block;
+        width: 100%;
+    }
+
+    .mobile-header .menu-overlay .menu-container li > ul {
+        position: absolute;
+        top: 0;
+        left: 100vw;
+        float: left;
+    }
+
+    .mobile-header .menu-overlay .menu-container .menu-root {
+        position: relative;
+        transition: transform 0.2s ease-out;
+    }
+
+    .mobile-header .menu-overlay .menu-container ul:not(.menu-active) {
+        display: none;
+    }
+    
+    .mobile-header .menu-button {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAyOCAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMzIzMyIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4Ij4KPHJlY3Qgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4IiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTMyMzMpIj4KPHBhdGggZD0iTTEwLjk2NjMgMjEuMjMzM0w5LjA5OTYxIDE5LjM2NjZMMTQuNDY2MyAxMy45OTk5TDkuMDk5NjEgOC42MzMyN0wxMC45NjYzIDYuNzY2NkwxOC4xOTk2IDEzLjk5OTlMMTAuOTY2MyAyMS4yMzMzWiIgZmlsbD0iI0ZDRkRGRCIvPgo8L2c+Cjwvc3ZnPgo=");
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 2.5rem;
+    }
+    
+    .mobile-header .menu-header {
+        color: #858889;
+        font-size: 1.2rem;
+        padding-top: 1.5rem !important;
+        padding-bottom: 0.3rem !important;
+    }
+    
+    .mobile-header .menu-container a {
+        display: block;
+        width: 100%;
+        color: #FCFDFD;
+    }
+</style>
+
+<script>
+    $(function() {
+        let $mobile_header = $('.mobile-header');
+        let $burger = $('.mobile-header .burger');
+        let $menu_overlay = $('.mobile-header .menu-overlay');
+        let $return = $('.mobile-header .return');
+
+        let active = false;
+        let level = 0;
+        let $menu_root = $('.mobile-header .menu-root');
+
+        let overlay_height = window.innerHeight - $('.mobile-header .top')[0].scrollHeight
+            - $('.mobile-header .menu-bar')[0].scrollHeight;
+        $('.mobile-header .menu-overlay').css({'height': overlay_height});
+
+        $burger.on('click', function() {
+            if (active) {
+                active = false;
+                $menu_overlay.fadeOut(200);
+                $return.css({'opacity': 0});
+                $mobile_header.css({'background-color': '#212E3B'});
+                $burger.removeClass('active');
+                $('body').css({'overflow': 'inherit'});
+            } else {
+                active = true;
+                $menu_overlay.fadeIn(200);
+                $return.css({'opacity': 1});
+                $mobile_header.css({'background-color': '#121F29'});
+                $burger.addClass('active');
+                $('body').css({'overflow': 'hidden'});
+            }
+        });
+        
+        $return.on('click', function () {
+            if (level < 1) return;
+
+            $menu_root.find('> li > ul '.repeat(level)).removeClass('menu-active');
+            level -= 1;
+            $menu_root.css({'transform': 'translateX(' + (-level * 100) + 'vw)'});
+            
+            if (level === 0) {
+                $return.css({'display': 'none'});
+            }
+        });
+    
+        $menu_root.on('click', function (event) {
+            let $target = $(event.target);
+            if ($target.hasClass('menu-button')) {
+                level += 1;
+                $menu_root.find('> li > ul '.repeat(level)).removeClass('menu-active');
+                $target.children('ul').first().addClass('menu-active');
+                $menu_root.css({'transform': 'translateX(' + (-level * 100) + 'vw)'});
+                $return.css({'display': 'flex'});
+            }
+        });
+        
+        let last_scroll = window.scrollY, top = 0, max = $mobile_header.outerHeight();
+        $(window).on('scroll', function() {
+            top += last_scroll - window.scrollY;
+
+            if (top < -max) top = -max;
+            if (top > 0) top = 0;
+
+            $mobile_header.css({'top': top + 'px'});
+            last_scroll = window.scrollY;
+        });
+    });
+</script>
+
+<header class="mobile-header" style="">
+    <div class="top">
+        <a href="/" class="logo"></a>
+
+            <a href="https://incydent.cert.pl/" class="cta primary report-incident">Zgłoś incydent</a>
+    </div>
+    <div class="menu-bar">
+        <div class="return"><i></i>Cofnij</div>
+        
+    
+        <a href="../../../../en" class="language en"></a>
+        <a href="/szukaj" class="search"></a>
+        <div class="burger"></div>
+    </div>
+    <div class="menu-overlay" style="height: 692px;">
+        <div class="menu-container">
+            <ul class="menu-root menu-active">
+                <li class="menu-header">Jesteś w nawigacji</li>
+                <li class="menu-button">O nas
+                    <ul>
+                        <li class="menu-header">O nas</li>
+                        <li><a href="../../../../o-nas/">O zespole</a></li>
+<li><a href="/praca">Praca</a></li>                        <li><a href="../../../../kontakt/">Kontakt</a></li>
+                    </ul>
+                </li>
+                <li><a href="../../../../news/">Aktualności</a></li>
+                <li class="menu-button">Baza wiedzy
+                    <ul>
+                        <li class="menu-header">Baza wiedzy</li>
+                        <li><a href="/falszywe-inwestycje">Fałszywe inwestycje</a></li>
+                        <li><a href="/falszywe-sklepy">Uważaj na fałszywe sklepy online</a></li>
+                        <li><a href="/baza-wiedzy/niebezpieczne-platnosci">(Nie)bezpieczne płatności</a></li>
+                        <li><a href="/baza-wiedzy/falszywi-konsultanci">Fałszywi konsultanci</a></li>
+                        <li><a href="/bezpieczne-hasla">Zadbaj o bezpieczne hasła i logowanie</a></li>
+                        <li><a href="/falszywe-zalaczniki">Fałszywe załączniki w mailach</a></li>
+                        <li><a href="/szybkie-przelewy">Fałszywe prośby o szybki przelew</a></li>
+                        <li><a href="/baza-wiedzy/falszywe-smsy">Fałszywe SMSy - plaga ostatnich miesięcy</a></li>
+                        
+                        <li class="menu-header">Biuletyn OUCH!</li>
+                        <li><a href="/ouch">Porady bezpieczeństwa OUCH!</a></li>
+                    </ul>
+                </li>
+                <li class="menu-button">Dla ekspertów
+                    <ul>
+                        <li class="menu-header">Dla ekspertów</li>
+                        <li><a href="../../../../news/">Aktualności</a></li>
+                        <li><a href="../../../../publikacje/">Publikacje</a></li>
+                            <li><a href="/lista-ostrzezen/">Lista ostrzeżeń</a></li>
+                            <li><a href="/hasla/">Kompendium o hasłach</a></li>
+                        
+                        <li class="menu-header">Projekty</li>
+                        <li><a href="../../../../n6/">n6</a></li>
+                        <li><a href="/skanowanie/">Artemis</a></li>
+                        <li><a href="https://mwdb.cert.pl/">MWDB</a></li>
+                    
+                        <li class="menu-header">Program CVD</li>
+                        <li><a href="../../../../cvd">Polityka CVD</a></li>
+                        <li><a href="../../../../cve">Lista podatności</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header><style>
+    .desktop-header {
+        width: 100%;
+        background-color: #212E3B;
+        color: #FCFDFD;
+        z-index: 99999999;
+        transition: background-color 0.2s ease-out;
+    }
+    
+    .desktop-header.active {
+        background-color: #121F29;
+    }
+    
+    .desktop-header .top {
+        display: flex;
+        align-items: center;
+        max-width: 1110px;
+        margin: 0 auto;
+    }
+    
+    .desktop-header .logo {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTczIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTczIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMTA5LjMyOCAzOS40NTczSDExMy42MTdMMTE3LjQxIDQ0LjU4MDNMMTE3LjQ2MiA0NC41NTQ5VjM5LjQ1NzNIMTIwLjAzM1Y0Ni4zMTU0SDExNS45MjVMMTEyLjA4IDQxLjA3ODRIMTEyLjA0MVY0Ni4zMTU0SDEwOS4zMjJWMzkuNDU3M0gxMDkuMzI4Wk0xMjQuNDE4IDM5LjQ1NzNIMTI4LjA3TDEzMi4zNDYgNDYuMzE1NEgxMjguOTY0TDEyOC4yNDQgNDUuMDA0NkgxMjMuODc4TDEyMy4xNTggNDYuMzE1NEgxMjAuMTNMMTI0LjQxOCAzOS40NTczWk0xMjcuNTI0IDQzLjY2ODRMMTI2LjEyOSA0MC44MTg4SDEyNi4wODRMMTI0LjY1IDQzLjY2ODRIMTI3LjUzSDEyNy41MjRaTTEzMS4zOTQgNDQuMTgxM0gxMzQuNDIzQzEzNC40MjMgNDQuNDM0NiAxMzQuNTE5IDQ0LjYzNzMgMTM0Ljc4OSA0NC44Mzk5QzEzNS4wMDggNDUuMDEwOSAxMzUuNDEzIDQ1LjEyNDkgMTM2LjAwNCA0NS4xNTAyQzEzNi41NTEgNDUuMTUwMiAxMzYuOTU2IDQ1LjA5MzIgMTM3LjI2NSA0NC45NTM5QzEzNy41OCA0NC44Mzk5IDEzNy43NjYgNDQuNjY4OSAxMzcuNzY2IDQ0LjQ3MjZDMTM3Ljc2NiA0NC4zMjcgMTM3LjY4MyA0NC4xODc3IDEzNy41NDggNDQuMTA1M0MxMzcuNDEyIDQzLjk5MTQgMTM3LjIzMiA0My45MDkgMTM3LjAwNyA0My44NTJDMTM2LjgxNSA0My43OTUxIDEzNi41NTcgNDMuNzM4MSAxMzYuMzI2IDQzLjcwNjRDMTM2LjA1NiA0My42NDk0IDEzNS44MjQgNDMuNjI0MSAxMzUuNjA2IDQzLjU5MjRDMTM0Ljc1MSA0My40NTMxIDEzNC4wMjQgNDMuMzMyOCAxMzMuNDg0IDQzLjE5MzVDMTMyLjk4MyA0My4wNzk1IDEzMi41MzIgNDIuODgzMiAxMzIuMTM0IDQyLjYyMzVDMTMxLjc2NyA0Mi4zMzg2IDEzMS41ODcgNDEuOTk2NiAxMzEuNTg3IDQxLjU0MDdDMTMxLjU4NyA0MS4wMjc4IDEzMS43NjcgNDAuNjI4OCAxMzIuMTcyIDQwLjMxODVDMTMyLjU3NyA0MC4wMDE5IDEzMy4xMjQgMzkuNzQ4NiAxMzMuODM4IDM5LjYwM0MxMzQuNTE5IDM5LjQ2MzcgMTM1LjMyOSAzOS4zNzUgMTM2LjIzNiAzOS4zNzVDMTM3LjY4MyAzOS4zNzUgMTM4LjgwOCAzOS41NzEzIDEzOS40ODMgMzkuOTEzM0MxNDAuMjA5IDQwLjI1NTIgMTQwLjU2MyA0MC43NDI4IDE0MC41NjMgNDEuMzM4MVY0MS41NDA3SDEzNy41NDhDMTM3LjU0OCA0MS4yODExIDEzNy40NTEgNDEuMDg0OCAxMzcuMTgxIDQwLjk0NTVDMTM2LjkxMSA0MC43NzQ1IDEzNi41NTcgNDAuNzE3NSAxMzYuMTAxIDQwLjcxNzVDMTM1LjY5NiA0MC43MTc1IDEzNS4zODEgNDAuNzc0NSAxMzUuMTQ5IDQwLjkyMDFDMTM0Ljg3OSA0MS4wMzQxIDEzNC43NDQgNDEuMjA1MSAxMzQuNzQ0IDQxLjM3NjFDMTM0Ljc0NCA0MS43MTggMTM1LjMyOSA0MS45NzEzIDEzNi41NTcgNDIuMTQyM0MxMzcuMzY3IDQyLjI1NjMgMTM3Ljk1MyA0Mi4zMzg2IDEzOC4zNTggNDIuNDAxOUMxMzguNzYzIDQyLjQ4NDIgMTM5LjE2OCA0Mi41NzI5IDEzOS41NzMgNDIuNzEyMkMxMzkuOTkxIDQyLjg1MTUgMTQwLjMwNiA0My4wNTQyIDE0MC41NjMgNDMuMzA3NUMxNDAuNzk0IDQzLjUzNTQgMTQwLjkyOSA0My44Nzc0IDE0MC45NzQgNDQuMjQ0N0MxNDAuOTc0IDQ0Ljc1NzYgMTQwLjc0OSA0NS4xNTY1IDE0MC4zMzggNDUuNDk4NUMxMzkuODg4IDQ1Ljg0MDQgMTM5LjMwOSA0Ni4wNjg0IDEzOC41NzYgNDYuMjM5NEMxMzcuODYzIDQ2LjM3ODcgMTM3LjA0NiA0Ni40NTQ3IDEzNi4xODQgNDYuNDU0N0MxMzUuMTA0IDQ2LjQ1NDcgMTM0LjE5OCA0Ni4zNzg3IDEzMy41MjMgNDYuMjM5NEMxMzIuODQxIDQ2LjA2ODQgMTMyLjMwMSA0NS44MTUxIDEzMS45NDEgNDUuNDczMkMxMzEuNTc0IDQ1LjEzMTIgMTMxLjM5NCA0NC43MDY5IDEzMS4zOTQgNDQuMTk0TTE0MS4zMDIgMzkuNDdIMTQ0LjMxOFY0Mi40ODQySDE0NC4zNjlMMTQ3Ljc5NiAzOS40N0gxNTEuMjc1TDE0Ny41NzggNDIuNDg0MkwxNTEuNTk2IDQ2LjMyOEgxNDcuODg2TDE0NC4zNjkgNDIuNjgwNUgxNDQuMzE4VjQ2LjMyOEgxNDEuMzAyVjM5LjQ3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEyOC41NTkgMTQuMzgwOEMxMjguNDA1IDE0LjIyODggMTI4LjE0NyAxMy45ODE5IDEyOCAxMy44Mjk5TDEyNy42MiAxMy40NTYzQzEyNy40NjYgMTMuMzA0MyAxMjcuMjE1IDEzLjMwNDMgMTI3LjA2MSAxMy40NTYzTDEyNS43MzYgMTQuNzYwOEMxMjUuNTgyIDE0LjkxMjcgMTI1LjU4MiAxNS4xNjYgMTI1LjczNiAxNS4zMThMMTI2LjExNiAxNS42OTE2QzEyNi4yNyAxNS44NDM2IDEyNi41MjcgMTYuMDk2OSAxMjYuNjgxIDE2LjI0ODlMMTMzLjM4MSAyMi44NDczQzEzMy41MzUgMjIuOTk5MyAxMzMuNTM1IDIzLjI0NjIgMTMzLjM4MSAyMy4zOTgyTDEyNi42ODEgMjkuOTk2NkMxMjYuNTI3IDMwLjE0ODYgMTI2LjI3NiAzMC4zOTU2IDEyNi4xMTYgMzAuNTUzOUwxMjUuNzM2IDMwLjkyNzVDMTI1LjU4MiAzMS4wNzk1IDEyNS41ODIgMzEuMzI2NSAxMjUuNzM2IDMxLjQ3ODRMMTI3LjA2MSAzMi43ODI5QzEyNy4yMTUgMzIuOTM0OSAxMjcuNDY2IDMyLjkzNDkgMTI3LjYyIDMyLjc4MjlMMTI4IDMyLjQwOTNDMTI4LjE1NCAzMi4yNTczIDEyOC40MTEgMzIuMDEwNCAxMjguNTU5IDMxLjg1ODRMMTM2LjIwNCAyNC4zMjkxQzEzNi4zNTggMjQuMTc3MSAxMzYuNDg3IDIzLjg3MzIgMTM2LjQ4NyAyMy42NTc5VjIyLjU4MTNDMTM2LjQ4NyAyMi4zNjYgMTM2LjM1OCAyMi4wNjIxIDEzNi4yMDQgMjEuOTEwMUwxMjguNTU5IDE0LjM4MDhaIiBmaWxsPSIjMjhBNzQ1Ii8+CjxwYXRoIGQ9Ik0xNTEuMTkxIDI5Ljg4MjhIMTM3LjcyN0MxMzcuNTA5IDI5Ljg4MjggMTM3LjMyOSAzMC4wNjAxIDEzNy4zMjkgMzAuMjc1NFYzMi4xMTgyQzEzNy4zMjkgMzIuMzMzNSAxMzcuNTA5IDMyLjUxMDggMTM3LjcyNyAzMi41MTA4SDE1MS4xOTFDMTUxLjQxIDMyLjUxMDggMTUxLjU5IDMyLjMzMzUgMTUxLjU5IDMyLjExODJWMzAuMjc1NEMxNTEuNTkgMzAuMDYwMSAxNTEuNDEgMjkuODgyOCAxNTEuMTkxIDI5Ljg4MjhaIiBmaWxsPSIjMjhBNzQ1Ii8+CjxwYXRoIGQ9Ik0zNS45Mjg0IDEzLjcxNThIMzAuOTc3N0MzMC43NTkxIDEzLjcxNTggMzAuNDExOSAxMy43ODU1IDMwLjIxMjUgMTMuODY3OEwzMC4wMDA0IDEzLjk1MDFDMjkuNzk0NiAxNC4wMzI0IDI5LjUwNTMgMTQuMjIyNCAyOS4zNTEgMTQuMzc0NEwyMS43MDYyIDIxLjkwMzdDMjEuNTUxOSAyMi4wNTU3IDIxLjQyMzMgMjIuMzU5NiAyMS40MjMzIDIyLjU3NDlWMjMuNjUxNEMyMS40MjMzIDIzLjg2NjcgMjEuNTUxOSAyNC4xNzA3IDIxLjcwNjIgMjQuMzIyN0wyOS4zNTEgMzEuODUyQzI5LjUwNTMgMzIuMDAzOSAyOS43OTQ2IDMyLjE5MzkgMzAuMDAwNCAzMi4yNzYyTDMwLjIxMjUgMzIuMzU4NkMzMC40MTE5IDMyLjQ0MDkgMzAuNzU5MSAzMi41MTA1IDMwLjk3NzcgMzIuNTEwNUgzNS45Mjg0QzM2LjE0NyAzMi41MTA1IDM2LjMyNyAzMi4zMzMyIDM2LjMyNyAzMi4xMTc5VjMwLjI3NTJDMzYuMzI3IDMwLjA1OTkgMzYuMTQ3IDI5Ljg4MjYgMzUuOTI4NCAyOS44ODI2SDMxLjUzMDZDMzEuMzEyIDI5Ljg4MjYgMzEuMDAzNCAyOS43NTU5IDMwLjg0OTEgMjkuNjAzOUwyNC41NDE3IDIzLjM5MThDMjQuMzg3NCAyMy4yMzk4IDI0LjM4NzQgMjIuOTkyOSAyNC41NDE3IDIyLjgzNDZMMzAuODQ5MSAxNi42MjI0QzMxLjAwMzQgMTYuNDcwNCAzMS4zMTIgMTYuMzQzOCAzMS41MzA2IDE2LjM0MzhIMzUuOTI4NEMzNi4xNDcgMTYuMzQzOCAzNi4zMjcgMTYuMTY2NSAzNi4zMjcgMTUuOTUxMlYxNC4xMDg0QzM2LjMyNyAxMy44OTMxIDM2LjE0NyAxMy43MTU4IDM1LjkyODQgMTMuNzE1OFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01Mi40MjAyIDEzLjcxNThINDEuNTI4NUM0MS4zMDk5IDEzLjcxNTggNDEuMDAxMyAxMy44NDI1IDQwLjg1MzQgMTMuOTk0NEw0MC4wODgzIDE0Ljc1NDNDMzkuOTM0IDE0LjkwNjMgMzkuODA1NCAxNS4yMTAzIDM5LjgwNTQgMTUuNDI1NlYyMS40MTYxQzM5LjgwNTQgMjEuNjMxNCAzOS44MDU0IDIxLjgwODcgMzkuODA1NCAyMS44MDg3VjI0LjAzNzdDMzkuODA1NCAyNC4yNTMgMzkuODA1NCAyNC40MzAzIDM5LjgwNTQgMjQuNDMwM1YzMC44MTM0QzM5LjgwNTQgMzEuMDI4NyAzOS45MzQgMzEuMzMyNyA0MC4wODE5IDMxLjQ4NDdMNDAuODUzNCAzMi4yNDQ2QzQxLjAwNzcgMzIuMzk2NiA0MS4zMDk5IDMyLjUyMzIgNDEuNTI4NSAzMi41MjMySDUyLjQyMDJDNTIuNjM4OCAzMi41MjMyIDUyLjgxODggMzIuMzQ1OSA1Mi44MTg4IDMyLjEzMDZWMzAuMjg3OUM1Mi44MTg4IDMwLjA3MjUgNTIuNjM4OCAyOS44OTUyIDUyLjQyMDIgMjkuODk1Mkg0Mi44NTk1QzQyLjY0MDkgMjkuODk1MiA0Mi40NjA4IDI5LjcxNzkgNDIuNDYwOCAyOS41MDI2VjI0LjgyOTNDNDIuNDYwOCAyNC42MTQgNDIuNjQwOSAyNC40MzY3IDQyLjg1OTUgMjQuNDM2N0g0OS45MTkxQzUwLjEzNzcgMjQuNDM2NyA1MC4zMTc3IDI0LjI1OTQgNTAuMzE3NyAyNC4wNDQxVjIyLjIwNzZDNTAuMzE3NyAyMS45OTIzIDUwLjEzNzcgMjEuODE1IDQ5LjkxOTEgMjEuODE1SDQyLjg1OTVDNDIuNjQwOSAyMS44MTUgNDIuNDYwOCAyMS42Mzc3IDQyLjQ2MDggMjEuNDIyNFYxNi43NDkxQzQyLjQ2MDggMTYuNTMzOCA0Mi42NDA5IDE2LjM1NjUgNDIuODU5NSAxNi4zNTY1SDUyLjQyMDJDNTIuNjM4OCAxNi4zNTY1IDUyLjgxODggMTYuMTc5MSA1Mi44MTg4IDE1Ljk2MzhWMTQuMTIxMUM1Mi44MTg4IDEzLjkwNTggNTIuNjM4OCAxMy43Mjg1IDUyLjQyMDIgMTMuNzI4NSIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTg1LjcwNTkgMTUuOTUxMlYxNC4xMDg0Qzg1LjcwNTkgMTMuODkzMSA4NS41MjU5IDEzLjcxNTggODUuMzA3MyAxMy43MTU4SDcyLjMzMjVDNzIuMTEzOSAxMy43MTU4IDcxLjkzMzggMTMuODkzMSA3MS45MzM4IDE0LjEwODRWMTUuOTUxMkM3MS45MzM4IDE2LjE2NjUgNzIuMTEzOSAxNi4zNDM4IDcyLjMzMjUgMTYuMzQzOEg3Ny4wOTAzQzc3LjMwODkgMTYuMzQzOCA3Ny40ODkgMTYuNTIxMSA3Ny40ODkgMTYuNzM2NFYzMi4xMTc5Qzc3LjQ4OSAzMi4zMzMyIDc3LjY2OSAzMi41MTA1IDc3Ljg4NzYgMzIuNTEwNUg3OS43NTg2Qzc5Ljk3NzIgMzIuNTEwNSA4MC4xNTcyIDMyLjMzMzIgODAuMTU3MiAzMi4xMTc5VjE2LjczNjRDODAuMTU3MiAxNi41MjExIDgwLjMzNzMgMTYuMzQzOCA4MC41NTU5IDE2LjM0MzhIODUuMzEzN0M4NS41MzIzIDE2LjM0MzggODUuNzEyNCAxNi4xNjY1IDg1LjcxMjQgMTUuOTUxMiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTY0LjIzNzggMjQuNzIxNkM2NC4wOTY0IDI0LjU1NyA2NC4xNTQyIDI0LjQyNCA2NC4zNzkzIDI0LjQyNEg2Ny42NTE5QzY3Ljg3MDUgMjQuNDI0IDY4LjE3OTEgMjQuMjk3NCA2OC4zMjcgMjQuMTQ1NEw2OS4wOTg2IDIzLjM3MjhDNjkuMjUyOSAyMy4yMjA4IDY5LjM3NSAyMi45MTY5IDY5LjM2ODYgMjIuNzAxNlYxNS41Mzk2QzY5LjM2ODYgMTUuMzI0MyA2OS4yNCAxNS4wMjY3IDY5LjA4NTcgMTQuODc0N0w2OC4xNzkxIDEzLjk5NDVDNjguMDI0OCAxMy44NDI1IDY3LjcxNjIgMTMuNzIyMiA2Ny40OTc2IDEzLjcyMjJINTcuNTcwNEM1Ny4zNTE4IDEzLjcyMjIgNTcuMDQzMSAxMy44NDg4IDU2Ljg4ODggMTQuMDAwOEw1Ni4xMTczIDE0Ljc2MDdDNTUuOTYzIDE0LjkxMjcgNTUuODQwOCAxNS4yMTY2IDU1Ljg0MDggMTUuNDMxOVYzMi4xMTc5QzU1Ljg0MDggMzIuMzMzMyA1Ni4wMjA4IDMyLjUxMDYgNTYuMjM5NSAzMi41MTA2SDU4LjEwNEM1OC4zMjI2IDMyLjUxMDYgNTguNTAyNyAzMi4zMzMzIDU4LjUwMjcgMzIuMTE3OVYxNi43MzY0QzU4LjUwMjcgMTYuNTIxMSA1OC42ODI3IDE2LjM0MzggNTguOTAxMyAxNi4zNDM4SDY2LjI1NjdDNjYuNDc1MyAxNi4zNDM4IDY2LjY1NTMgMTYuNTIxMSA2Ni42NjE4IDE2LjczNjRMNjYuNjc0NiAyMS40MDk4QzY2LjY3NDYgMjEuNjI1MSA2Ni41MDEgMjEuODAyNCA2Ni4yODI0IDIxLjgwMjRINjEuODEzOUM2MS41OTUzIDIxLjgwMjQgNjEuMzM4MSAyMS45NjA3IDYxLjI0ODEgMjIuMTU3TDYwLjU3MyAyMy42MTM1QzYwLjQ4MyAyMy44MDk4IDYwLjUyMTUgMjQuMTAxMSA2MC42Njk0IDI0LjI2NTdMNjcuMjY2MSAzMi4yMTI5QzY3LjQwNzYgMzIuMzc3NiA2Ny43MDMzIDMyLjUxMDYgNjcuOTIyIDMyLjUxMDZINzAuNjQxN0M3MC44NjAzIDMyLjUxMDYgNzAuOTI0NiAzMi4zNzc2IDcwLjc3NjcgMzIuMjEyOUw2NC4yMTg1IDI0LjcyMTZINjQuMjM3OFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMTkuOTI0IDI5Ljg4MjZIMTEyLjM5NUMxMTIuMTc3IDI5Ljg4MjYgMTExLjk5NyAyOS43MDUzIDExMS45OTcgMjkuNDlWMTQuMTE0OEMxMTEuOTk3IDEzLjg5OTUgMTExLjgxNyAxMy43MjIyIDExMS41OTggMTMuNzIyMkgxMDkuNzMzQzEwOS41MTUgMTMuNzIyMiAxMDkuMzM1IDEzLjg5OTUgMTA5LjMzNSAxNC4xMTQ4VjMwLjgwNzFDMTA5LjMzNSAzMS4wMjI0IDEwOS40NjMgMzEuMzI2NCAxMDkuNjE4IDMxLjQ3ODRMMTEwLjM4OSAzMi4yMzgzQzExMC41NDMgMzIuMzkwMiAxMTAuODQ2IDMyLjUxNjkgMTExLjA2NCAzMi41MTY5SDExOS45MjRDMTIwLjE0MyAzMi41MTY5IDEyMC4zMjMgMzIuMzM5NiAxMjAuMzIzIDMyLjEyNDNWMzAuMjgxNUMxMjAuMzIzIDMwLjA2NjIgMTIwLjE0MyAyOS44ODg5IDExOS45MjQgMjkuODg4OSIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEwNS4wNTkgMTMuOTk0NEMxMDQuOTA1IDEzLjg0MjUgMTA0LjU5NiAxMy43MTU4IDEwNC4zNzcgMTMuNzE1OEg5NC42NTU5Qzk0LjQzNzMgMTMuNzE1OCA5NC4xMjg3IDEzLjg0MjUgOTMuOTc0NCAxMy45OTQ0TDkzLjIwMjggMTQuNzU0M0M5My4wNDg1IDE0LjkwNjMgOTIuOTE5OSAxNS4yMTAzIDkyLjkxOTkgMTUuNDI1NlYzMi4xMTE2QzkyLjkxOTkgMzIuMzI2OSA5My4wOTk5IDMyLjUwNDIgOTMuMzE4NiAzMi41MDQySDk1LjE4MzFDOTUuNDAxNyAzMi41MDQyIDk1LjU4MTggMzIuMzI2OSA5NS41ODE4IDMyLjExMTZWMTYuNzQyN0M5NS41ODE4IDE2LjUyNzQgOTUuNzYxOCAxNi4zNTAxIDk1Ljk4MDQgMTYuMzUwMUgxMDMuMTExQzEwMy4zMjkgMTYuMzUwMSAxMDMuNTA5IDE2LjUyNzQgMTAzLjUxNiAxNi43NDI3VjIxLjQwOThDMTAzLjUxNiAyMS42MjUxIDEwMy4zNDIgMjEuODAyNCAxMDMuMTI0IDIxLjgwMjRIOTcuNDA3N0M5Ny4xODkxIDIxLjgwMjQgOTcuMDA5MSAyMS45Nzk3IDk3LjAwOTEgMjIuMTk1VjI0LjAzNzdDOTcuMDA5MSAyNC4yNTMgOTcuMTg5MSAyNC40MzAzIDk3LjQwNzcgMjQuNDMwM0gxMDQuNTEyQzEwNC43MzEgMjQuNDMwMyAxMDUuMDMzIDI0LjMwMzcgMTA1LjE4OCAyNC4xNTE3TDEwNS45NTkgMjMuMzc5MUMxMDYuMTEzIDIzLjIyNzIgMTA2LjIzNiAyMi45MjMyIDEwNi4yMjkgMjIuNzA3OVYxNS40MDY2QzEwNi4yMjkgMTUuMTkxMyAxMDYuMDk0IDE0Ljg5MzcgMTA1Ljk0IDE0Ljc0MTdMMTA1LjA0NiAxNC4wMDA4TDEwNS4wNTkgMTMuOTk0NFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik04Ny40NTQ5IDI5LjUwMjlIODUuMzY1M0M4NS4xMjA5IDI5LjUwMjkgODQuOTIxNiAyOS42OTkyIDg0LjkyMTYgMjkuOTM5OVYzMi4wNjc2Qzg0LjkyMTYgMzIuMzA4MiA4NS4xMjA5IDMyLjUwNDUgODUuMzY1MyAzMi41MDQ1SDg3LjQ1NDlDODcuNjk5MiAzMi41MDQ1IDg3Ljg5ODUgMzIuMzA4MiA4Ny44OTg1IDMyLjA2NzZWMjkuOTM5OUM4Ny44OTg1IDI5LjY5OTIgODcuNjk5MiAyOS41MDI5IDg3LjQ1NDkgMjkuNTAyOVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=");
+        width: 173px;
+        height: 60px;
+        margin: 10px 10px 10px 10px;
+    }
+    
+    .desktop-header .menu-root a {
+        color: #C8CCCE;
+    }
+    
+    .desktop-header .menu-root a:hover {
+        color: #FCFDFD;
+    }
+    
+    .desktop-header .menu-root {
+        color: #C8CCCE;
+    }
+    
+    .desktop-header .menu-root ul,
+    .desktop-header .menu-root li {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .desktop-header .menu-root ul {
+        list-style: none;
+        display: flex;
+        gap: 15px;
+    }
+    
+    .desktop-header .menu-root li {
+        display: flex;
+        align-items: center;
+    }
+    
+    .desktop-header .menu-root li.menu-button {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY0MF83OTgyIiBzdHlsZT0ibWFzay10eXBlOmFscGhhIiBtYXNrVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiPgo8cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIGZpbGw9IiNEOUQ5RDkiLz4KPC9tYXNrPgo8ZyBtYXNrPSJ1cmwoI21hc2swXzY0MF83OTgyKSI+CjxwYXRoIGQ9Ik0xMC4xNjY3IDEzLjI5NjlMNSA4LjI5MTY3TDYuMzMzMzMgN0wxMC4xNjY3IDEwLjcxMzVMMTQgN0wxNS4zMzMzIDguMjkxNjdMMTAuMTY2NyAxMy4yOTY5WiIgZmlsbD0iI0M4Q0NDRSIvPgo8L2c+Cjwvc3ZnPgo=");
+        background-repeat: no-repeat;
+        background-position: right center;
+        padding-right: 25px;
+    }
+    
+    .desktop-header .menu-root li.menu-button.active {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY0MF83OTg4IiBzdHlsZT0ibWFzay10eXBlOmFscGhhIiBtYXNrVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdHJhbnNmb3JtPSJyb3RhdGUoLTE4MCAyMCAyMCkiIGZpbGw9IiNEOUQ5RDkiLz4KPC9tYXNrPgo8ZyBtYXNrPSJ1cmwoI21hc2swXzY0MF83OTg4KSI+CjxwYXRoIGQ9Ik05LjgzMzU4IDYuNzAzMTJMMTUuMDAwMiAxMS43MDgzTDEzLjY2NjkgMTNMOS44MzM1OCA5LjI4NjQ2TDYuMDAwMjQgMTNMNC42NjY5MSAxMS43MDgzTDkuODMzNTggNi43MDMxMloiIGZpbGw9IiNGQ0ZERkQiLz4KPC9nPgo8L3N2Zz4K");
+        color: #FCFDFD;
+    }
+    
+    .desktop-header .language {
+        height: 50px;
+        width: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: auto;
+        display: inline-block;
+    }
+    
+    .desktop-header .language.pl {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAyMiAyMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzcyNF8xMDM2MCkiPgo8cGF0aCBkPSJNMTkuNTU1NiAzLjA1NTY2SDIuNDQ0NDRDMS43OTYxNCAzLjA1NTY2IDEuMTc0MzggMy4zMTMyIDAuNzE1OTYxIDMuNzcxNjNDMC4yNTc1MzkgNC4yMzAwNSAwIDQuODUxOCAwIDUuNTAwMTFMMCAxMS4wMDAxSDIyVjUuNTAwMTFDMjIgNC44NTE4IDIxLjc0MjUgNC4yMzAwNSAyMS4yODQgMy43NzE2M0MyMC44MjU2IDMuMzEzMiAyMC4yMDM5IDMuMDU1NjYgMTkuNTU1NiAzLjA1NTY2WiIgZmlsbD0iI0VFRUVFRSIvPgo8cGF0aCBkPSJNMCAxNi41QzAgMTcuMTQ4MyAwLjI1NzUzOSAxNy43NzAxIDAuNzE1OTYxIDE4LjIyODVDMS4xNzQzOCAxOC42ODY5IDEuNzk2MTQgMTguOTQ0NCAyLjQ0NDQ0IDE4Ljk0NDRIMTkuNTU1NkMyMC4yMDM5IDE4Ljk0NDQgMjAuODI1NiAxOC42ODY5IDIxLjI4NCAxOC4yMjg1QzIxLjc0MjUgMTcuNzcwMSAyMiAxNy4xNDgzIDIyIDE2LjVWMTFIMFYxNi41WiIgZmlsbD0iI0RDMTQzQyIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzcyNF8xMDM2MCI+CjxyZWN0IHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K");
+    }
+    
+    .desktop-header .language.en {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAyMiAyMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzc4MV8xMDkzNSkiPgo8cGF0aCBkPSJNMTMuMDYyNSAxOC41NjI1SDE4LjU2MjVDMTkuMjQyMSAxOC41NjI1IDE5LjgxOTYgMTguNDA5MiAyMC4yOTkyIDE4LjE0MjFMMTMuMDYyNSAxMy44MjUzVjE4LjU2MjVaTTIxLjg4MzIgMTUuODg0N0MyMS45NjE1IDE1LjUzNTEgMjIuMDAxNCAxNS4xNjQ5IDIyLjAwMTQgMTQuNzgwOVYxMy4wNjIySDE3LjE1MTFMMjEuODgxOCAxNS44ODQ3TTAuMTIwMzUzIDYuMTA0NjZDMC4wMzg4ODU4IDYuNDcwMzggLTAuMDAxNDY4NjMgNi44NDQwNiA0LjA4MjMyZS0wNSA3LjIxODc1VjguOTM3NUg0Ljg2ODkyTDAuMTIwMzUzIDYuMTA0NjZaTTguOTM3NTQgMy40Mzc1SDMuNDM3NTRDMi43NjI3NiAzLjQzNzUgMi4xODkwNCAzLjU4ODc1IDEuNzExNTcgMy44NTIwNkw4LjkzNzU0IDguMTYyNjlWMy40Mzc1Wk0xLjczMzU3IDE4LjE1ODlDMi4yMDY1NyAxOC40MTQ3IDIuNzcyNzMgMTguNTYyNSAzLjQzNzU0IDE4LjU2MjVIOC45Mzc1NFYxMy44NjE0TDEuNzMzNTcgMTguMTU4OVpNNC4wODIzMmUtMDUgMTMuMDYyNVYxNC43ODEyQzQuMDgyMzJlLTA1IDE1LjE3NjkgMC4wNDE5NzgzIDE1LjU1ODEgMC4xMjQ4MjIgMTUuOTE2N0w0LjkwOTQ4IDEzLjA2MjVINC4wODIzMmUtMDVaTTIwLjMyMDggMy44Njg5MUMxOS44Mzc1IDMuNTk0NTkgMTkuMjUyMSAzLjQzNzUgMTguNTYyNSAzLjQzNzVIMTMuMDYyNVY4LjE5ODc4TDIwLjMyMDggMy44Njg5MVpNMjIgOC45Mzc1VjcuMjE4NzVDMjIgNi44NDI2OSAyMS45NjEyIDYuNDgwMDMgMjEuODg1OSA2LjEzNjk3TDE3LjE5MTcgOC45Mzc1SDIyWiIgZmlsbD0iIzJFMzE5MiIvPgo8cGF0aCBkPSJNMTcuMTkxNiA4LjkzNzVMMjEuODg1OSA2LjEzNjk3QzIxLjY3MDcgNS4xNTI0NyAyMS4xNDY4IDQuMzM3NDQgMjAuMzIwOCAzLjg2ODkxTDEzLjA2MjUgOC4xOTg3OFYzLjQzNzVIMTIuMzc1VjkuNjI1SDIyVjguOTM3NUgxNy4xOTE2Wk0wIDEyLjM3NVYxMy4wNjI1SDQuOTA5NDRMMC4xMjQ3ODEgMTUuOTE2N0MwLjM1MiAxNi44OTgxIDAuODkxNjg4IDE3LjcwMzggMS43MzM1MyAxOC4xNTg5TDguOTM3NSAxMy44NjE0VjE4LjU2MjVIOS42MjVWMTIuMzc1SDBaTTIyIDEyLjM3NUgxMi4zNzVWMTguNTYyNUgxMy4wNjI1VjEzLjgyNTNMMjAuMjk5MSAxOC4xNDI0QzIxLjEzMTMgMTcuNjc5MSAyMS42NjE3IDE2Ljg2ODUgMjEuODgxOCAxNS44ODU0TDE3LjE1MTEgMTMuMDYyNUgyMlYxMi4zNzVaTTguOTM3NSAzLjQzNzVWOC4xNjI2OUwxLjcxMTUzIDMuODUyMDZDMC44NzYyMTkgNC4zMTI2OSAwLjM0MjM3NSA1LjEyMTg4IDAuMTE5OTY5IDYuMTA0NjZMNC44Njg4OCA4LjkzNzVIMFY5LjYyNUg5LjYyNVYzLjQzNzVIOC45Mzc1WiIgZmlsbD0iI0U2RTdFOCIvPgo8cGF0aCBkPSJNMTIuMzc1IDkuNjI1VjMuNDM3NUg5LjYyNVY5LjYyNUgwVjEyLjM3NUg5LjYyNVYxOC41NjI1SDEyLjM3NVYxMi4zNzVIMjJWOS42MjVIMTIuMzc1WiIgZmlsbD0iI0JFMUUyRCIvPgo8cGF0aCBkPSJNNy41NDA4IDguOTM3ODZMMC42NDg2MDkgNC44MjM1MkMwLjUwMDQ1MyA1LjA0MzUyIDAuMzgxNTE2IDUuMjg1NTIgMC4yODMyMDMgNS41NDMzM0w1Ljk3MTIzIDguOTM3ODZINy41Mzk3N00yMS42ODY4IDE2LjUzMTNMMTUuOTA3MyAxMy4wNjI5SDE0LjMwNjhMMjEuMjg5NCAxNy4yNjMxQzIxLjQ1MTMgMTcuMDM2OSAyMS41ODQ4IDE2Ljc5MTUgMjEuNjg2OCAxNi41MzI3TTIwLjg3MTggNC4yNTk3N0wxMy4wNTE1IDguOTM3ODZMMTQuNjM5MiA4LjkzODg5TDIxLjM4NzQgNC44OTg4QzIxLjIzNjggNC42MjQ4MyAyMS4wNzggNC40NDgxNCAyMC44NzE4IDQuMjU5NzdaTTAuNjIyODI4IDE3LjE0NDlDMC43Nzc0NTggMTcuMzgwNCAwLjk2MzU0NCAxNy41OTM3IDEuMTc1OTIgMTcuNzc4OEw4Ljk1ODc3IDEzLjA2MjlINy4zOTAyM0wwLjYyMjgyOCAxNy4xNDQ5WiIgZmlsbD0iI0JFMUUyRCIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzc4MV8xMDkzNSI+CjxyZWN0IHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K");
+    }
+    
+    .desktop-header .search {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzY1NF8xMjM0NyIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRDlEOUQ5Ii8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF82NTRfMTIzNDcpIj4KPHBhdGggZD0iTTIzLjczMTUgMjUuMzMzN0wxNy4yNzE5IDE4Ljg4MjlDMTYuNzYzMyAxOS4yNzIzIDE2LjE3ODMgMTkuNTg1NSAxNS41MTcxIDE5LjgyMjVDMTQuODU1OSAyMC4wNTk2IDE0LjE1MjMgMjAuMTc4MSAxMy40MDYzIDIwLjE3ODFDMTEuNTI0NCAyMC4xNzgxIDkuOTMwNjkgMTkuNTIxOCA4LjYyNTIxIDE4LjIwOTNDNy4zMTk3MyAxNi44OTc1IDYuNjY2OTkgMTUuMzAxOSA2LjY2Njk5IDEzLjQyMjVDNi42NjY5OSAxMS41NDMyIDcuMzE5NzMgOS45NDcyNSA4LjYyNTIxIDguNjM0NzRDOS45MzA2OSA3LjMyMjkxIDExLjUyNDQgNi42NjY5OSAxMy40MDYzIDYuNjY2OTlDMTUuMjg4MiA2LjY2Njk5IDE2Ljg4NjQgNy4zMjI5MSAxOC4yMDA3IDguNjM0NzRDMTkuNTE0MyA5Ljk0NzI1IDIwLjE3MTEgMTEuNTQzMiAyMC4xNzExIDEzLjQyMjVDMjAuMTcxMSAxNC4xNjc1IDIwLjA1NjggMTQuODcwMiAxOS44MjgzIDE1LjUzMDVDMTkuNTk5IDE2LjE5MDggMTkuMjg5NSAxNi43NjY1IDE4Ljg5OTUgMTcuMjU3NUwyNS4zMzM3IDIzLjcwODNMMjMuNzMxNSAyNS4zMzM3Wk0xMy40MDYzIDE3Ljg0MTZDMTQuNjQ0IDE3Ljg0MTYgMTUuNjk1MSAxNy40MTM5IDE2LjU1OTggMTYuNTU4NUMxNy40MjQ1IDE1LjcwMzkgMTcuODU2OCAxNC42NTg1IDE3Ljg1NjggMTMuNDIyNUMxNy44NTY4IDEyLjE4NjYgMTcuNDI0NSAxMS4xNDA5IDE2LjU1OTggMTAuMjg1NUMxNS42OTUxIDkuNDMwODQgMTQuNjQ0IDkuMDAzNSAxMy40MDYzIDkuMDAzNUMxMi4xNjg3IDkuMDAzNSAxMS4xMjE5IDkuNDMwODQgMTAuMjY2IDEwLjI4NTVDOS40MDk1MiAxMS4xNDA5IDguOTgxMjUgMTIuMTg2NiA4Ljk4MTI1IDEzLjQyMjVDOC45ODEyNSAxNC42NTg1IDkuNDA5NTIgMTUuNzAzOSAxMC4yNjYgMTYuNTU4NUMxMS4xMjE5IDE3LjQxMzkgMTIuMTY4NyAxNy44NDE2IDEzLjQwNjMgMTcuODQxNloiIGZpbGw9IiNGQ0ZERkQiLz4KPC9nPgo8L3N2Zz4K");
+        height: 50px;
+        width: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: inline-block;
+    }
+    
+    .desktop-header .report-incident {
+        margin: 0 0 0 10px;
+    }
+    
+    .desktop-header .slide-menu-overlay {
+        width: 100%;
+        position: absolute;
+        background-color: #212E3B;
+        display: none;
+        transition: height 0.2s ease-out, background-color 0.2s ease-out;
+        overflow: hidden;
+        z-index: 99999999;
+    }
+    
+    .desktop-header.active .slide-menu-overlay {
+        background-color: #121F29;
+    }
+    
+    @media (max-width: 1160px) {
+        .desktop-header .slide-menu-overlay {
+            padding: 0 15px;
+        }
+    }
+    
+    .desktop-header .slide-menu-container {
+        position: relative;
+        max-width: 1110px;
+        margin: 0 auto;
+    }
+    
+    .desktop-header .slide-menu {
+        display: none;
+        padding-bottom: 2rem;
+    }
+    
+    .desktop-header .slide-menu .menu-header {
+        color: #858889;
+        font-size: 1.2rem;
+        padding-top: 1rem;
+        padding-bottom: 1.3rem;
+    }
+    
+    .desktop-header .slide-menu .links {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 1.4rem;
+    }
+    
+    .desktop-header .slide-menu-about .links,
+    .desktop-header .slide-menu-expert .links
+    {
+        flex-direction: column;
+    }
+    
+    .desktop-header .slide-menu-expert-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .desktop-header .slide-menu-expert-container > div {
+        width: 50%;
+    }
+    
+    .desktop-header .slide-menu .links a {
+        color: #C8CCCE;
+        width: 50%;
+        padding-bottom: 15px;
+    }
+    
+    .desktop-header .slide-menu .links a:hover {
+        color: #FCFDFD;
+    }
+</style>
+
+<script>
+    $(function() {
+        let open = false;
+        let active = null;
+        let closeTimer = null;
+        
+        $('.desktop-header .menu-root .menu-button').on('mouseover', function() {
+            let new_active = $(this).data('menu');
+            
+            if (active && active !== new_active) {
+                $('.desktop-header .slide-menu-' + active).css({'display': 'none'});
+                $('.desktop-header .menu-button').removeClass('active');
+            }
+            
+            $('.desktop-header .slide-menu-' + new_active).css({'display': 'inherit'});
+            $(this).addClass('active');
+            active = new_active;
+            
+            let height = $('.desktop-header .slide-menu-' + active)[0].scrollHeight + 'px';
+            $('.desktop-header .slide-menu-overlay').css({'height': height});
+            
+            if (!open) {
+                open = true;
+                $('.desktop-header').addClass('active');
+                $('.desktop-header .slide-menu-overlay').css({'display': 'inherit'});
+                
+                if (height === '0px') {
+                    height = $('.desktop-header .slide-menu-' + active)[0].scrollHeight + 'px';
+                    $('.desktop-header .slide-menu-overlay').css({'height': height});
+                }
+            }
+        });
+        
+        $('.desktop-header').on('mouseover', function() {
+           clearTimeout(closeTimer);
+        });
+        
+        $('.desktop-header').on('mouseout', function() {
+            if (open) {
+                closeTimer = setTimeout(function() {
+                    $('.desktop-header').removeClass('active');
+                    $('.desktop-header .menu-button').removeClass('active');
+                    
+                    $('.desktop-header .slide-menu-overlay').css({'height': '0'});
+
+                    let _active = active;
+                    setTimeout(function() {
+                        $('.desktop-header .slide-menu-' + _active).css({'display': 'none'});
+                    }, 250);
+                    
+                    active = null;
+                    open = false;
+                }, 400);
+            }
+        });
+    });
+</script>
+
+<header class="desktop-header">
+    <div class="top">
+        <a href="/" class="logo"></a>
+
+        <div class="menu-root">
+            <ul>
+                <li class="menu-button" data-menu="about">O nas</li>
+                <li><a href="../../../../news/">Aktualności</a></li>
+                <li class="menu-button" data-menu="kb">Baza wiedzy</li>
+                <li class="menu-button" data-menu="expert">Dla ekspertów</li>
+            </ul>
+        </div>
+    
+        
+        <a href="../../../../en" class="language en" alt="switch language"></a>
+        <a href="/szukaj" class="search" alt="search"></a>
+        
+            <a href="https://incydent.cert.pl/" class="cta primary report-incident"><span>Zgłoś incydent</span></a>
+    </div>
+    <div class="slide-menu-overlay">
+        <div class="slide-menu-container">
+            <div class="slide-menu slide-menu-about">
+                <div class="menu-header">O nas</div>
+                <div class="links">
+                    <a href="../../../../o-nas/">O zespole</a>
+                            <a href="/praca">Praca</a>
+                    <a href="../../../../kontakt/">Kontakt</a>
+                </div>
+            </div>
+            <div class="slide-menu slide-menu-kb">
+                <div class="menu-header">Baza wiedzy</div>
+                <div class="links">
+                    <a href="/falszywe-inwestycje">Fałszywe inwestycje</a>
+                    <a href="/falszywe-sklepy">Uważaj na fałszywe sklepy online</a>
+                    <a href="/baza-wiedzy/niebezpieczne-platnosci">(Nie)bezpieczne płatności</a>
+                    <a href="/baza-wiedzy/falszywi-konsultanci">Fałszywi konsultanci</a>
+                    <a href="/bezpieczne-hasla">Zadbaj o bezpieczne hasła i logowanie</a>
+                    <a href="/falszywe-zalaczniki">Fałszywe załączniki w mailach</a>
+                    <a href="/szybkie-przelewy">Fałszywe prośby o szybki przelew</a>
+                    <a href="/baza-wiedzy/falszywe-smsy">Fałszywe SMSy - plaga ostatnich miesięcy</a>
+                </div>
+                
+                <div class="menu-header">Biuletyn OUCH!</div>
+                <div class="links">
+                    <a href="/ouch">Porady bezpieczeństwa OUCH!</a>
+                </div>
+            </div>
+            <div class="slide-menu slide-menu-expert">
+                <div class="slide-menu-expert-container">
+                    <div>
+                        <div class="menu-header">Dla ekspertów</div>
+                        <div class="links">
+                            <a href="../../../../publikacje/">Publikacje</a>
+                                <a href="/lista-ostrzezen/">Lista ostrzeżeń</a>
+                                <a href="/hasla/">Kompendium o hasłach</a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="menu-header">Projekty</div>
+                        <div class="links">
+                            <a href="../../../../n6/">n6</a>
+                            <a href="/skanowanie/">Artemis</a>
+                            <a href="https://mwdb.cert.pl/">MWDB</a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="menu-header">Program CVD</div>
+                        <div class="links">
+                            <a href="../../../../cvd">Polityka CVD</a>
+                            <a href="../../../../cve">Lista podatności</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</header>
+        <div class="current-page">
+            <div class="grid-container content">
+                <div class="cert-title">
+    Rekomendacje dla wzmocnienia ochrony systemów OT
+                </div>
+                <div class="cert-subtitle">
+    17 maja 2024
+ |         <a href="../../../../author/cert-polska/">CERT Polska</a> |         <a href="../../../../tag/rekomendacje/">#rekomendacje</a>,         <a href="../../../../tag/ics/">#ICS</a>,         <a href="../../../../tag/ot/">#OT</a>,         <a href="../../../../tag/scada/">#SCADA</a>,         <a href="../../../../tag/bezpiecznyprzemysl/">#BezpiecznyPrzemysł</a>                </div>
+            </div>
+        </div>
+
+    <div class="content grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="main cell entry">
+                <div class="article">
+                    <p>W ostatnim czasie CERT Polska obserwuje zwiększoną liczbę ataków na przemysłowe systemy sterowania (ICS/OT) dostępne bezpośrednio z internetu. Podobne przypadki <a href="https://www.cisa.gov/resources-tools/resources/defending-ot-operations-against-ongoing-pro-russia-hacktivist-activity">odnotowali również nasi zagraniczni partnerzy</a>. Ataki te najczęściej są motywowane aktywistycznie lub politycznie i mają na celu medialne wykorzystanie udanego ataku. Warto zaznaczyć, że CERT Polska odnotował również przypadki, w których atak miał realny wpływ na działanie fizycznych systemów.</p>
+<p>W związku z obserwowanym zagrożeniem CERT Polska od trzech lat prowadzi działania pod nazwą <a href="https://cert.pl/uploads/docs/Raport_CP_2023.pdf#page=58">#BezpiecznyPrzemysł</a>, w ramach których w sposób zautomatyzowany poszukiwane są źle zabezpieczone urządzenia przemysłowe dostępne z internetu. W przypadku wykrycia błędnej konfiguracji właściciel urządzenia (jeśli to możliwe) otrzymuje powiadomienie o związanym z tym zagrożeniu wraz z rekomendacjami.</p>
+<p>Niestety w wielu przypadkach urządzenia przemysłowe podłączone są do internetu przez routery komórkowe, których adres IP wskazuje na operatora komórkowego, którego karta SIM została użyta. W takiej sytuacji nie mamy możliwości dotarcia do właściciela, możemy jedynie przekazać informacje do operatora telekomunikacyjnego. <strong>Dlatego kluczowa jest świadomość zagrożeń związanych z wystawieniem urządzeń do internetu</strong> i znajomość najlepszych praktyk realizacji dostępu zdalnego tam, gdzie jest on konieczny – <strong>zarówno po stronie właścicieli urządzeń, jak i firm wdrażających i sprzedających rozwiązania OT</strong>. </p>
+<h4 style="background-color:#FFCCCB; color: black; "> W związku z poważnym zagrożeniem wzywamy podmioty posiadające systemy przemysłowe do podjęcia natychmiastowych działań i wprowadzenia opisanych poniżej rekomendacji.</h4>
+
+<h2>Techniczny opis zagrożenia</h2>
+<p>Obserwujemy działania licznych grup, najczęściej prorosyjskich, które wykorzystując ogólnodostępne serwisy, takie jak Shodan, Zoomeye czy Censys, wyszukują urządzenia i aplikacje związane z przemysłowymi systemami sterowania. 
+<strong>Najczęściej ataki przeprowadzane są na dostępne z internetu</strong>:</p>
+<ul>
+<li>panele WWW systemów HMI i SCADA z brakiem uwierzytelniania lub słabym hasłem,</li>
+<li>usługi VNC z brakiem uwierzytelniania lub słabym hasłem, dające zdalny dostęp do panelu HMI czy systemu SCADA,</li>
+<li>routery z modemem komórkowym z domyślnym lub słabym hasłem albo posiadające znane podatności,</li>
+<li>protokoły przemysłowe bez uwierzytelniania, jak Modbus, BACnet czy PCOM.</li>
+</ul>
+<p>Poniżej prezentujemy fragment filmu opublikowanego przez jedną z grup prorosyjskich, który pokazuje modyfikację parametrów pracy gminnej oczyszczalni ścieków, po uzyskaniu do niej dostępu przez usługę VNC ze słabym hasłem:</p>
+<video controls="" muted="" playsinline="" style="display: block; padding: 0px; width: 70%">
+<source src="/uploads/2024/05/oczszcalnia-video.mp4" type="video/mp4">
+</video>
+
+<h2>Najważniejsze zalecenie</h2>
+<p>Kategorycznie odradza się eksponowanie bezpośrednio do internetu systemu umożliwiającego sterowanie procesem przemysłowym, nawet jeśli wydaje się, że jest on skonfigurowany w trybie tylko do odczytu. Oznacza to, że:</p>
+<ul>
+<li><strong>NIE NALEŻY</strong> umożliwiać bezpośredniego zdalnego połączenia z wykorzystaniem protokołów jak VNC czy RDP oraz oprogramowania zdalnego wsparcia technicznego,</li>
+<li><strong>NIE NALEŻY</strong> umożliwiać bezpośredniego zdalnego dostępu do panelu WWW systemów sterowania i wizualizacji, nawet jeśli stosowane jest silne hasło,</li>
+<li><strong>NIE NALEŻY</strong> udostępniać portów, na których działają protokoły przemysłowe – w szczególności umożliwiające konfigurację urządzenia. </li>
+</ul>
+<p>Jeśli do odczytu lub sterowania procesem wymagany jest zdalny dostęp, należy skorzystać z VPN z wieloskładnikowym uwierzytelnianiem. Dotyczy to również małych instalacji, które najczęściej padają ofiarą ataków.</p>
+<h2>Zalecenia szczegółowe</h2>
+<p>Poniższe rekomendacje są rozbudowane i zdajemy sobie sprawę, że nie każdy podmiot będzie w stanie je wdrożyć. W pierwszej kolejności należy zatem zadbać o opisane powyżej najważniejsze zalecenia.</p>
+<p><strong>CERT Polska/CSIRT NASK w zakresie opisanego problemu rekomenduje:</strong> </p>
+<ol>
+<li>Zmniejszenie do minimum ekspozycji sieci przemysłowej, zarówno sieci lokalnej, jak i punktów styku, poprzez identyfikację i ograniczenie do koniecznych połączeń „z" i „ do" tej sieci.</li>
+<li>Przeprowadzenie przeglądu zdalnego dostępu i ograniczenie go do niezbędnego minimum, w szczególności należy zwrócić uwagę na modemy komórkowe i metody zdalnego dostępu podwykonawców.</li>
+<li>W przypadku gdy zdalny dostęp jest potrzebny, powinien być zawsze realizowany za pomocą VPN z wieloskładnikowym uwierzytelnianiem.</li>
+<li>Tam, gdzie to możliwe, ograniczenie dostępu do VPN dla określonych adresów IP lub ich zakresów. Przykładowo: gdy podmiot nie ma współpracowników ani podwykonawców zagranicznych, rekomenduje się ograniczenie możliwości nawiązania sesji VPN tylko dla polskich adresów IP.</li>
+<li>W przypadku gdy niezbędny jest zdalny przesył danych telemetrycznych za pomocą sieci komórkowej, rekomenduje się wykorzystanie prywatnych APN-ów.</li>
+<li>Zmianę domyślnych danych uwierzytelniających z zastosowaniem <a href="https://cert.pl/hasla/">dobrych praktyk związanych z silnymi hasłami</a> (o ile urządzenie takie hasła wspiera) na wszystkich urządzeniach, w szczególności tych posiadających interfejs webowy, oraz wyłączenie niewykorzystywanych kont.</li>
+<li>W miarę możliwości, gdy nie ma przeciwwskazań, aktualizowanie wykorzystywanych systemów, w szczególności podczas planowych postojów.</li>
+<li>Stosowanie segmentacji sieci – minimalnie na styku sieci przemysłowej z innymi sieciami, a preferencyjnie, zależnie od rozmiaru i złożoności sieci, również wewnątrz.</li>
+<li>Przeprowadzenie analizy widoczności urządzeń poprzez zewnętrzne skanowanie zakresu adresacji należącej do obiektu czy wykorzystanie narzędzi typu <a href="https://www.shodan.io/">Shodan</a>.</li>
+<li>Tam, gdzie to możliwe zdalny dostęp powinien być realizowany na żądanie. Każde prowadzenie zdalnych czynności na systemie powinno zostać odnotowane w sposób pozwalający jednoznacznie zidentyfikować czas, cel i źródło prowadzonych prac.</li>
+<li>Wykrywanie anomalii w ruchu sieciowym, w szczególności odbiegających od połączeń realizowanych podczas normalnego trybu pracy instalacji.</li>
+<li>Utwardzenie konfiguracji wykorzystywanych urządzeń i oprogramowania przez wyłączenie niewykorzystywanych funkcji i konfigurację wbudowanych dodatkowych mechanizmów bezpieczeństwa. Często domyślnie są one nieaktywne.</li>
+<li><a href="https://incydent.cert.pl/osoba-kontaktowa#!/lang=pl">Zgłoszenie osoby kontaktowej do CSIRT NASK</a>, aby usprawnić ścieżkę reakcji w przypadku wykrycia tego typu incydentu.</li>
+<li><a href="https://cert.pl/n6/">Zarejestrowanie się w systemie n6</a> przez podanie swojej adresacji IP i domeny, co pozwoli na wysyłanie przez CERT Polska powiadomień w przypadku wykrycia nieprawidłowości.</li>
+</ol>
+<h2>Case Study</h2>
+<p>Na początku roku CSIRT NASK otrzymał od CSIRT MON informację o atakach brute force na usługę SMTP jednego z podmiotów. Atak prowadzono z dwóch adresów IP. Alarmujące było to, że na obu adresach widoczne były usługi związane z systemami przemysłowymi – na jednym był to port 502 (protokół Modbus), a na drugim port 102 (protokół S7) oraz panel WWW sterownika Siemens S7-1200. Po dokładniejszej analizie uznano, że cechą wspólną, nietypową dla tego typu urządzeń, jest port 22 (SSH). Dodatkowo na jednym z adresów na porcie 80 był dostępny panel WWW komórkowego routera przemysłowego <a href="https://www.elmark.com.pl/sklep/elmatic/sparrow-nw10-router-lte">Elmatic Sparrow</a>. Z dużym prawdopodobieństwem stwierdziliśmy, że zaobserwowane wcześniej protokoły przemysłowe zostały udostępnione właśnie za pomocą tego routera komórkowego.</p>
+<p><img alt="" src="/uploads/2024/05/elmatic-sparrow-login-page.png"></p>
+<p>Nadal nie było jednak jasne, jak atakujący mógł przeprowadzić atak brute force, wychodząc z danego adresu IP. W tym celu musiałby albo przejąć router i wykonywać to bezpośrednio z niego, albo prowadzić atak z zainfekowanego urządzenia wewnątrz sieci. W danym momencie bardziej prawdopodobna wydawała się druga możliwość.</p>
+<p>Udało się nam nawiązać kontakt z jednym z dotkniętych podmiotów i poprosić go o analizę ruchu wewnątrz sieci. Okazało się, że żaden podejrzany ruch nie był widoczny, mimo że ataki nadal trwały. W takiej sytuacji, o ile ruch został poprawnie zebrany, ataki musiały wychodzić bezpośrednio z routera komórkowego, co prawdopodobnie powodowało, że były one niewidoczne dla systemów monitorujących sieć wewnętrzną.</p>
+<p>Przeszukując dostępne źródła, nie natrafiliśmy na żadne znane podatności dotyczące routera Elmatic Sparrow ani NavigateWorx (który technicznie jest tym samym urządzeniem). Poprosiliśmy dotknięty podmiot o pozwolenie na zalogowanie się na urządzenie, ale podmiot nie miał informacji o danych logowania – urządzenie zostało zainstalowane przez firmę trzecią. Bardzo niepokojące było to, że <strong>domyślne ustawienia: login i hasło (admin:admin) zadziałały</strong>. Jednak w interfejsie webowym nie było bezpośrednio możliwości przeprowadzenia omawianego ataku (o ile nie została użyta podatność w tym interfejsie).</p>
+<p>Router poprzez interfejs webowy posiada wbudowane narzędzie pozwalające nagrać ruch sieciowy na interfejsie WAN. Wykorzystaliśmy je i udało się potwierdzić wychodzące ataki brute force na znaczną liczbę podmiotów:</p>
+<div class="grid-x align-center"><img class="cell small-12 medium-11 large-9" src="/uploads/2024/05/smtp-bruteforce-traffic.png"></div>
+
+<p>Podejrzewaliśmy wykorzystanie nieznanej podatności, więc skontaktowaliśmy się z firmą Elmark Automatyka będącą jedynym dystrybutorem  urządzenia Elmatic Sparrow w Polsce. Reakcja firmy była pozytywna i otrzymaliśmy egzemplarz urządzenia do testów.</p>
+<div class="grid-x align-center"><img class="cell small-12 medium-11 large-9 custom-small-img" src="/uploads/2024/05/elmatic-sparrow-photo.jpg"></div>
+
+<p>Po uruchomieniu routera i sprawdzeniu otwartych portów zauważyliśmy, że poza panelem WWW dostępna jest również usługa SSH na porcie 22. Port ten widzieliśmy też wcześniej, otwarty na urządzeniach, z których był prowadzony atak. Okazało się, że w domyślnej konfiguracji możliwe jest zalogowanie do usługi SSH również z użyciem poświadczeń <code>admin:admin</code>, a co więcej, jest ona domyślnie włączona na interfejsie WAN:</p>
+<div class="grid-x align-center"><img class="cell small-12 medium-9 large-7" src="/uploads/2024/05/ssh-enabled-wan.png"></div>
+
+<p>Byliśmy pewni, że w ten sposób uzyskamy dostęp do powłoki systemu, gdzie znajdziemy skrypt prowadzący atak. Jednak po zalogowaniu okazało się, że router udostępnia jedynie bardzo ograniczoną <a href="https://clish.sourceforge.net/">powłokę CLISH</a>.</p>
+<p><img alt="" src="/uploads/2024/05/elmatic-sparrow-clish.png"></p>
+<p>Podczas prowadzonych testów nie udało się nam z eskalować z ograniczonej powłoki i nie znaleźliśmy sposobu na uruchomienie dodatkowych poleceń pozwalających wykonać atak z konta admin. Nie znaleźliśmy również (w czasie krótkich testów) żadnej podatności pozwalającej uzyskać zdalny dostęp do powłoki systemu.</p>
+<p>Potwierdziliśmy natomiast, że na obu dotkniętych adresach IP działało hasło admin:admin do SSH (a na jednym z adresów nie było dostępnego panelu WWW). W związku z tym nasza uwaga jeszcze mocniej skoncentrowała się na tej usłudze. Niestety nie mogliśmy dostać fizycznie urządzeń, które były zaatakowane, aby poddać je dokładniejszej analizie.</p>
+<p>Kolejną hipotezą, którą rozważyliśmy było wykorzystanie usługi SSH, posiadającej domyślne poświadczenia, do stworzenia tunelu, który pozwoliłby skorzystać z routera jako proxy do prowadzenia ataków.</p>
+<p><img alt="" src="/uploads/2024/05/ssh-tunnel.png"></p>
+<p>Przetestowaliśmy, czy taki sposób wykorzystania zadziała na naszym egzemplarzu urządzenia:</p>
+<div class="highlight"><pre><span></span><code>ssh -p <span class="m">22</span> -o <span class="nv">HostKeyAlgorithms</span><span class="o">=</span>+ssh-rsa -o <span class="nv">PubkeyAcceptedKeyTypes</span><span class="o">=</span>+ssh-rsa -N -D <span class="m">127</span>.0.0.1:1080 admin@x.x.x.183
+</code></pre></div>
+
+
+<p>Powyższa komenda powinna otworzyć lokalnie port 1080, z którego cały ruch przychodzący będzie tunelowany przez urządzenie. Potwierdziliśmy, że faktycznie jesteśmy w stanie uzyskać adres IP urządzenia, odwołując się do zasobu w internecie:
+<img alt="" src="/uploads/2024/05/ssh-tunnel-terminal.jpg"></p>
+<p>Po przedstawieniu tych informacji dotkniętym podmiotom i we współpracy z nimi udało się potwierdzić, że istotnie był to użyty wektor ataku.</p>
+<p>W tym przypadku tunel został użyty do przeprowadzenia ataków brute force na inne usługi w internecie, ale tego typu atak mógł posłużyć również do uzyskania dostępu do wewnętrznej sieci LAN atakowanego podmiotu, co byłoby znacznie groźniejsze. W konsekwencji możliwe byłoby uzyskanie poprzez tunel bezpośredniego połączenia z urządzeniami przemysłowymi wewnątrz sieci. Co więcej, nawet jeśli podmiot korzystałby z VPN skonfigurowanego na urządzeniu dla dostępu do sieci LAN, to pozostawienie na urządzeniu usługi SSH ze słabym hasłem pozwoliłoby atakującemu ominąć VPN.</p>
+<p>Razem z firmą Elmark Automatyka podjęliśmy działania, aby znaleźć właścicieli wszystkich routerów Elmatic Sparrow oraz NavigateWorx, widocznych w internecie, i powiadomić ich o konieczności zmiany domyślnego hasła i wyłączenia nadmiarowych usług. Dodatkowo firma Elmark Automatyka przygotowała na swojej stronie internetowej, a także rozesłała do klientów <a href="https://www.elmark.com.pl/blog/sparrow-nw10nw20-zadbaj-o-cyberbezpieczestwo">poradnik, jak bezpiecznie skonfigurować urządzenie</a> oraz ma w planach dołączenie wydrukowanej ulotki na ten temat do pudełka z urządzeniem. Mamy również nadzieję, że w kolejnych wydaniach firmware domyślne ustawienia zostaną zmienione na bezpieczniejsze.</p>
+<p>Przedstawiony przypadek pokazuje, jak ważne są: zmiana domyślnych poświadczeń, utwardzanie konfiguracji urządzenia przez ograniczanie dostępnych usług oraz monitorowanie sieci – na wypadek gdyby atakujący użyli urządzenia do ataku na sieć lokalną.</p>
+<p>Dziękujemy firmie Elmark Automatyka za wzorową współpracę i zachęcamy innych dostawców w Polsce do tworzenia w języku polskim instrukcji bezpiecznej konfiguracji dla urządzeń przemysłowych.</p>
+<style>
+
+.custom-small-img {
+    width: 100%;
+    max-width: 350px; 
+    height: auto; 
+}
+
+</style>
+                </div>
+
+                    <div class="sharebox">
+                            Udostępnij:
+
+                            <a class="wykop" href="https://www.wykop.pl/dodaj/link/?url=https%3A//cert.pl/posts/2024/05/rekomendacje-ot/&amp;title=Rekomendacje%20dla%20wzmocnienia%20ochrony%20system%C3%B3w%20OT&amp;desc=CERT%20Polska%20wyda%C5%82%20rekomendacje%20w%20zwi%C4%85zku%20z%20obserwowan%C4%85%20zwi%C4%99kszon%C4%85%20liczb%C4%99%20atak%C3%B3w%20na%20przemys%C5%82owe%20systemy%20sterowania%20%28ICS/OT%29%20dost%C4%99pne%20bezpo%C5%9Brednio%20z%20internetu."><img class="sprite-wykop-share-icon" src="/theme/assets/img/img.gif"></a>
+                        <a class="twitter" href="https://twitter.com/intent/tweet?text=Rekomendacje%20dla%20wzmocnienia%20ochrony%20system%C3%B3w%20OT&amp;url=https%3A//cert.pl/posts/2024/05/rekomendacje-ot/&amp;hashtags=rekomendacje,ics,ot,scada,bezpiecznyprzemysl"><img class="sprite-twitter-share-icon" src="/theme/assets/img/img.gif"></a>
+                        <a class="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A//cert.pl/posts/2024/05/rekomendacje-ot/"><img class="sprite-facebook-share-icon" src="/theme/assets/img/img.gif"></a>
+                        <a class="linkedin" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A//cert.pl/posts/2024/05/rekomendacje-ot/&amp;title=Rekomendacje%20dla%20wzmocnienia%20ochrony%20system%C3%B3w%20OT&amp;summary=CERT%20Polska%20wyda%C5%82%20rekomendacje%20w%20zwi%C4%85zku%20z%20obserwowan%C4%85%20zwi%C4%99kszon%C4%85%20liczb%C4%99%20atak%C3%B3w%20na%20przemys%C5%82owe%20systemy%20sterowania%20%28ICS/OT%29%20dost%C4%99pne%20bezpo%C5%9Brednio%20z%20internetu.&amp;source=https%3A//cert.pl/posts/2024/05/rekomendacje-ot/"><img class="sprite-linkedin-share-icon" src="/theme/assets/img/img.gif"></a>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+<footer>
+        <div class="footer-main">
+            <div class="footer-main-wrapper">
+                <div class="grid-x grid-padding-x">
+                    <div class="large-4 medium-4 small-12 cell">
+                        <div class="small-logo"></div>
+                        <p>Zespół CERT Polska działa w strukturach NASK (Naukowej i Akademickiej Sieci Komputerowej) –
+                            instytutu badawczego prowadzącego działalność naukową, krajowy rejestr domen .pl i
+                            dostarczającego zaawansowane usługi teleinformatyczne.</p>
+                    </div>
+                    <div class="socialmedia large-5 medium-5 small-12 cell">
+                        <h1>CERT Polska <br> w social mediach</h1>
+                        <a href="https://www.facebook.com/CERT.Polska/"><img class="sprite-facebook-icon" src="/theme/assets/img/img.gif" aria-hidden="true">Facebook</a>
+                        <a href="https://twitter.com/CERT_Polska"><img class="sprite-twitter-icon" src="/theme/assets/img/img.gif" aria-hidden="true">Twitter</a>
+                        <a href="https://github.com/CERT-Polska"><img class="sprite-github-icon" src="/theme/assets/img/img.gif" aria-hidden="true">GitHub</a>
+                    </div>
+                    <div class="contact large-3 medium-3 small-12 cell text-right">
+                        <h1>Kontakt</h1>
+                        <p>
+                            ul. Kolska 12, 01-045 Warszawa<br>
+                            tel.: +48 22 380 82 74<br>
+                            (w dni robocze, w godz. 08:30 – 16:30)<br>
+                            fax: +48 22 380 83 99<br>
+                            ePUAP: /NASK-Instytut/SkrytkaESP<br>
+                            <br>
+                            e-mail: <a href="mailto:info@cert.pl">info@cert.pl</a><br>
+                            Zgłaszanie incydentów: <a href="mailto:cert@cert.pl">cert@cert.pl</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-wrapper">
+                <div class="float-left">
+                    <img src="/theme/assets/img/ue.png" alt="Współfinansowane przez instrument Unii Europejskiej Łącząc Europę">
+                </div>
+                <div class="footer-bottom-right float-right">
+                    <ul class="menu">
+                        <li>© 2024 <a href="https://nask.pl/">NASK</a></li>
+                        <li><a href="/uploads/misc/privacy-policy.pdf">Polityka prywatności</a></li>
+                        <li><a href="https://csirt.gov.pl/">CSIRT GOV</a></li>
+                        <li><a href="https://csirt-mon.wp.mil.pl/">CSIRT MON</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+</footer>
+
+
+
+</body></html>

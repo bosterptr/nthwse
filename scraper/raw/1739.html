@@ -1,0 +1,1202 @@
+<html lang="en" class=" js "><head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up - Syrion</title>
+<meta name="description" content="In February 2024 Group-IB wrote a blog post about a mobile Trojan developed by a Chinese-speaking cybercrimine group called Gold Pickaxe.">
+
+
+  <meta name="author" content="Raffaele Sabato">
+  
+  <meta property="article:author" content="Raffaele Sabato">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Syrion">
+<meta property="og:title" content="Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up">
+<meta property="og:url" content="https://syrion.me/goldpickaxe-technical-analysis-ipa-c2/">
+
+
+  <meta property="og:description" content="In February 2024 Group-IB wrote a blog post about a mobile Trojan developed by a Chinese-speaking cybercrimine group called Gold Pickaxe.">
+
+
+
+  <meta property="og:image" content="https://syrion.me/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img0.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-04-19T00:00:00+02:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://syrion.me/goldpickaxe-technical-analysis-ipa-c2/">
+
+
+
+
+<script type="text/javascript" async="" src="https://ssl.google-analytics.com/ga.js"></script><script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Syrion",
+      "url": "https://syrion.me/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Syrion Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  <style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style></head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/favicon.png" alt="Syrion"></a>
+        
+        <a class="site-title" href="/">
+          Syrion
+          <span class="site-subtitle">Offensive Security &amp; Reverse Engineering</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/categories/">Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/whoami/">Whoami</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button" count="0">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero" style=" background-image: url('');">
+  
+    <img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img0.png" alt="Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up" class="page__hero-image">
+  
+  
+    <span class="page__hero-caption">Picture credit: <a href="https://www.midjourney.com"><strong>Midjourney</strong></a>
+</span>
+  
+</div>
+
+
+
+
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope="" itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+
+          <meta itemprop="position" content="1">
+        </li>
+        <span class="sep">/</span>
+      
+      
+        <li class="current">Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope="" itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="https://syrion.me/">
+        <img src="/assets/images/whoami/bio-photo.jpg" alt="Raffaele Sabato" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="https://syrion.me/" itemprop="url">Raffaele Sabato</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>Cyber Security Consultant. Interested in Offensive Security, Malwares and Reverse Engineering.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope="" itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Italy</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+            <li><a href="https://twitter.com/syrion89" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/raffaelesabato" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">Linkedin</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/Syrion89" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope="" itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up">
+    <meta itemprop="description" content="In February 2024 Group-IB wrote a blog post about a mobile Trojan developed by a Chinese-speaking cybercrimine group called Gold Pickaxe.">
+    <meta itemprop="datePublished" content="2024-04-19T00:00:00+02:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="https://syrion.me/goldpickaxe-technical-analysis-ipa-c2/" class="u-url" itemprop="url">Gold Pickaxe iOS Technical Analysis: IPA Overview and C2 Communication Start up
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+02:00">April 19, 2024</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          13 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <p>In February 2024 <strong>Group-IB</strong> wrote a <a href="https://www.group-ib.com/blog/goldfactory-ios-trojan/">blog post</a> about a mobile <strong>Trojan</strong> developed by a Chinese-speaking cybercrimine group called <strong>Gold Pickaxe</strong>.</p>
+
+<p>This malware targets both <strong>iOS</strong> and <strong>Android</strong> users in the Asia Pacific region in order to collect identity documents, SMS, pictures and other data related to the compromised phones.</p>
+
+<p>The malware communicates with the C2 using two protocols:</p>
+<ul>
+  <li>The <strong>websocket</strong> protocol used to listen for incoming commands</li>
+  <li>The <strong>HTTP</strong> protocol used to send information and data to the <strong>C2</strong></li>
+</ul>
+
+<p>In this article we are going to analyse the <strong>IPA</strong> file, and then describe how the malware connects to the <strong>C2 websocket</strong> server.</p>
+
+<p>How the malware listens for incoming commands and executes them are not in the scope of this blog post.</p>
+
+<h1 id="technical-analysis">Technical Analysis<a class="header-link" href="#technical-analysis" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h1>
+
+<h2 id="ipa-overview">IPA Overview<a class="header-link" href="#ipa-overview" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>The <strong>SHA-256</strong> of the <strong>IPA</strong> file is <strong>4571f8c8560a8a66a90763d7236f55273750cf8dd8f4fdf443b5a07d7a93a3df</strong>, and it is reported as malicious on <a href="https://www.virustotal.com/gui/file/4571f8c8560a8a66a90763d7236f55273750cf8dd8f4fdf443b5a07d7a93a3df">VirusTotal</a>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img1.png" alt="Screenshot">
+<em></em></p><center><em>Figure 1 - VirusTotal Digital Pensions.ipa</em></center><p></p>
+
+<p>The application bundle contains all the application files, there are interesting files related to the <strong>fast reverse proxy</strong> configuration, the <strong>html</strong> pages shown to the user, and a <strong>plugin</strong> used to intercept sms.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img2.png" alt="Screenshot">
+<em></em></p><center><em>Figure 2 - Chinp.app Bundle</em></center><p></p>
+
+<p>The iOS application is signed with the following information:</p>
+<ul>
+  <li><strong>Bundle ID</strong>: com.want.long.chinp</li>
+  <li><strong>Associated Domain</strong>: apple.hzc5[.]xyz</li>
+  <li><strong>Developer Team ID</strong>: 27S3W42PY8</li>
+</ul>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img3.png" alt="Screenshot">
+<em></em></p><center><em>Figure 3 - Chinp.app Codesign</em></center><p></p>
+
+<p>Obviously the associated domain is reported as malicious.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img4.png" alt="Screenshot">
+<em></em></p><center><em>Figure 4 - VirusTotal Associated Domain</em></center><p></p>
+
+<p>Analyzing the <strong>Info.plist</strong> file, we can see interesting information: the application name is <strong>Digital Pensions</strong>, the bundle id is <strong>com.want.long.chinp</strong>, furthermore the following settings let us know that the malware accesses the photo library and camera:</p>
+<ul>
+  <li>Privacy - Photo Library Usage Description</li>
+  <li>Privacy - Photo Library Additions Usage Description</li>
+  <li>Privacy - Camera Usage Description</li>
+</ul>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img5.png" alt="Screenshot">
+<em></em></p><center><em>Figure 5 - Chinp.app Info.plist</em></center><p></p>
+
+<p>The <strong>config.ini</strong> file contains information related to the <strong>fast reverse proxy</strong> configuration as shown in the image below.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img6.png" alt="Screenshot">
+<em></em></p><center><em>Figure 6 - FRP Con</em></center><p></p>
+
+<p>The values “<strong>#server_addr</strong>”, “<strong>#server_port</strong>”,”<strong>#token</strong>”, “<strong>#adid</strong>” and “<strong>#remote_port</strong>” will be replaced with values received from the <strong>C2</strong>.</p>
+
+<p>The plugins folder contains an extension called <strong>messagefilter.appex</strong>, according to <strong>Group-IB</strong> due to Apple restrictions, this extension can only intercept SMS received from numbers that are not in the contact list</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img7.png" alt="Screenshot">
+<em></em></p><center><em>Figure 7 - messagefilter.appex Content</em></center><p></p>
+
+<p>In the extension <strong>Info.plist</strong> we can find the URL used to exfiltrate the intercepted sms.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img8.png" alt="Screenshot">
+<em></em></p><center><em>Figure 8 - C2 SMS Url</em></center><p></p>
+
+<p>The <strong>mach-o</strong> file contains chinese language strings used in logs and thai language strings that are shown to the user, this confirms that the app is developed by a Chinese-speaking group targetting thai users.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img9.png" alt="Screenshot">
+<em></em></p><center><em>Figure 9 - Chinese and Thai Strings</em></center><p></p>
+
+<h1 id="reverse-engineering">Reverse Engineering<a class="header-link" href="#reverse-engineering" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h1>
+
+<h2 id="identify-the-device">Identify The Device<a class="header-link" href="#identify-the-device" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>The malware identifies each victim using an <strong>Identifiers for Advertisers</strong> (<strong>IDFA</strong>), the <strong>IDFA</strong> is sent in every <strong>HTTP</strong> request in order to identify the device.
+The <strong>+[commonUtils getAdid]</strong> method is executed to obtain the <strong>IDFA</strong>, it is just a wrapper for the <strong>+[SimulateIDFA createSimulateIDFA]</strong> method as shown in the image below.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img10.png" alt="Screenshot">
+<em></em></p><center><em>Figure 10 - getAdid method</em></center><p></p>
+
+<p>The <a href="https://github.com/youmi/SimulateIDFA">SimulateIDFA</a> project is publicly available on github, the <strong>createSimulateIDFA</strong> method is the same of the github project.</p>
+
+<p>It is possible to recognize the entire method in the disassembler; for example, in the following image, we can see the <strong>carrierInfo</strong> function.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img11.png" alt="Screenshot">
+<em></em></p><center><em>Figure 11 - carrierInfo Function</em></center><p></p>
+
+<h2 id="http-requests">HTTP Requests<a class="header-link" href="#http-requests" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>The Malware sends data and information to the <strong>C2</strong> using the <strong>HTTP</strong> protocol, it uses the <strong>AFHTTPSessionManager</strong> class to execute a <strong>HTTP Post</strong> Request via the <a href="https://asciidoxy.org/examples/objc/example-objc.html#objc-interfaceAFHTTPSessionManager_1af5ad6a2e3df65803070fcb6418b7e0fc">POST:parameters:headers:constructingBodyWithBlock:progress:success:failure:</a> method.</p>
+
+<p>We can see the method details below.</p>
+
+<div class="language-objective_c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLSessionDataTask</span> <span class="o">*</span><span class="p">)</span><span class="nf">POST</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">URLString</span>
+                             <span class="nf">parameters</span><span class="p">:(</span><span class="n">nullable</span> <span class="n">id</span><span class="p">)</span><span class="nv">parameters</span>
+                                <span class="nf">headers</span><span class="p">:(</span><span class="n">nullable</span> <span class="n">NSDictionary</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="p">,</span> <span class="n">NSString</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="p">)</span><span class="nv">headers</span>
+              <span class="nf">constructingBodyWithBlock</span><span class="p">:(</span><span class="n">nullable</span> <span class="kt">void</span><span class="p">(</span><span class="n">id</span><span class="o">&lt;</span><span class="n">AFMultipartFormData</span><span class="o">&gt;</span> <span class="n">formData</span><span class="p">))</span><span class="nv">block</span>
+                               <span class="nf">progress</span><span class="p">:(</span><span class="n">nullable</span> <span class="kt">void</span><span class="p">(</span><span class="n">NSProgress</span> <span class="o">*</span> <span class="n">uploadProgress</span><span class="p">))</span><span class="nv">uploadProgress</span>
+                                <span class="nf">success</span><span class="p">:(</span><span class="n">nullable</span> <span class="kt">void</span><span class="p">(</span><span class="n">NSURLSessionDataTask</span> <span class="o">*</span> <span class="n">task</span><span class="p">,</span> <span class="n">id</span> <span class="n">_Nullable</span> <span class="n">responseObject</span><span class="p">))</span><span class="nv">success</span>
+                                <span class="nf">failure</span><span class="p">:(</span><span class="n">nullable</span> <span class="kt">void</span><span class="p">(</span><span class="n">NSURLSessionDataTask</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="n">task</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span> <span class="n">error</span><span class="p">))</span><span class="nv">failure</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Parameters:</p>
+
+<ul>
+  <li><strong>POST</strong>: the URL string used to create the request URL</li>
+  <li><strong>parameters</strong>: the parameters to be encoded according to the client request serializer</li>
+  <li><strong>headers</strong>: the headers appended to the default headers for this request</li>
+  <li><strong>constructingBodyWithBlock</strong>: a block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the AFMultipartFormData protocol</li>
+  <li><strong>progress</strong>: a block object to be executed when the upload progress is updated. Note this block is called on the session queue, not the main queue</li>
+  <li><strong>success</strong>: a block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the data task, and the response object created by the client response serializer</li>
+  <li><strong>failure</strong>: a block object to be executed when the task finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the data task and the error describing the network or parsing error that occurred</li>
+</ul>
+
+<p>Based on the specific API used by the malware some parameters can be set or not and in some case they can be different.</p>
+
+<p>For example <strong>(nullable id)parameters</strong> is a Dictionary contains the parameters that are send to the <strong>C2</strong> , each parameter is a key-value pair. The <strong>adid</strong> key with the <strong>IDFA</strong> value is send in each request, other parameters depends on the specific API purpose (for example the API used to send crash information has another parameter contains a string representing the crash details). 
+Some API can set or not the <strong>block</strong>, <strong>success</strong> and <strong>failure</strong> params in order to execute specific function if the request succeeds or fails.
+A generic snippet of the <strong>HTTP</strong> request is the following.</p>
+
+<div class="language-objective_c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">AFHTTPSessionManager</span> <span class="o">*</span><span class="n">manager</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFHTTPSessionManager</span> <span class="nf">manager</span><span class="p">];</span>
+
+<span class="p">[</span><span class="n">manager</span> <span class="nf">setResponseSerializer</span><span class="p">:[</span><span class="n">AFHTTPResponseSerializer</span> <span class="nf">serializer</span><span class="p">]];</span>
+
+<span class="n">NSString</span> <span class="o">*</span><span class="n">urlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSString</span> <span class="nf">stringWithFormat</span><span class="p">:</span><span class="s">@"%@%@"</span><span class="p">,</span> <span class="s">@"http://hzc5[.]xyz"</span><span class="p">,</span> <span class="s">@"/api/apple/xxxx"</span><span class="p">];</span>
+
+<span class="n">NSString</span> <span class="o">*</span><span class="n">keys</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="s">@"adid"</span><span class="p">,</span> <span class="p">...</span> <span class="cm">/* keys */</span><span class="p">};</span>
+
+<span class="n">NSString</span> <span class="o">*</span><span class="n">objects</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{[</span><span class="n">CommonUtils</span> <span class="nf">getAdid</span><span class="p">],</span> <span class="p">...,</span> <span class="cm">/* values */</span><span class="p">};</span>
+
+<span class="n">NSDictionary</span> <span class="o">*</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDictionary</span> <span class="nf">dictionaryWithObjects</span><span class="p">:</span><span class="n">objects</span>
+                                             <span class="nl">forKeys:</span><span class="n">keys</span>
+                                             <span class="nl">count:</span> <span class="cm">/* number of parameters */</span>
+                           <span class="p">];</span>
+
+<span class="p">[</span><span class="n">manager</span> <span class="nf">POST</span><span class="p">:</span><span class="n">urlString</span>
+      <span class="nl">parameters:</span><span class="n">parameters</span>
+      <span class="nl">headers:</span><span class="nb">nil</span>
+      <span class="nl">constructingBodyWithBlock:</span> <span class="cm">/* can be set or not */</span> 
+      <span class="nl">progress:</span><span class="nb">nil</span>
+      <span class="nl">success:</span><span class="nb">nil</span> <span class="cm">/* can be set or not */</span>
+      <span class="nl">failure:</span><span class="nb">nil</span> <span class="cm">/* can be set or not */</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<h2 id="application-startup">Application Startup<a class="header-link" href="#application-startup" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>When the application starts, the <strong>-[AppDelegate application:didFinishLaunchingWithOptions:]</strong> method is executed.
+If there were crashes, the malware gets the crash detail (<strong>getCrash</strong>), saves the crash detail in the <strong>standUserDefaults</strong> and sends it to the C2 (the two <strong>saveCrash</strong> method), after that, the malware checks if the application should be terminated (<strong>isDestory</strong>). If that’s the case the application exits (<strong>_exit</strong>), otherwise it sets the <strong>isStartFrp</strong> flag variable to <strong>0</strong> (this variable is used to determine if the <strong>fast reverse proxy</strong> is executed).</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img12.png" alt="Screenshot">
+<em></em></p><center><em>Figure 12 - GetCrash and isDestory Methods</em></center><p></p>
+
+<h3 id="getcrash">getCrash<a class="header-link" href="#getcrash" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>+[UserDefaultsManager getCrash:]</strong> method is responsible to get the crashes details, we are not going to show its details.</p>
+
+<h3 id="savecrash">saveCrash<a class="header-link" href="#savecrash" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>+[HttpUtils saveCrash:]</strong> method executes a <strong>HTTP</strong> Post request to “<strong>/api/apple/savecrash</strong>”, it sends two parameters:</p>
+<ul>
+  <li><strong>adid</strong> with the <strong>IDFA</strong> value</li>
+  <li><strong>content</strong> with the crash details
+If the request succeeds the malware executes a function that print a log message, otherwise the malware executes another function that do a <strong>RET</strong> instruction.</li>
+</ul>
+
+<p>In the screenshow below we can see the <strong>saveCrash</strong> method.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img13.png" alt="Screenshot">
+<em></em></p><center><em>Figure 13 - HttpUtils saveCrash Method</em></center><p></p>
+
+<p>The <strong>+[UserDefaultsManager saveCrash:]</strong> method is responsible to save the crashes details into the <strong>standUserDefaults</strong>, we are not going to show its details.</p>
+
+<h3 id="isdestory">isDestory<a class="header-link" href="#isdestory" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>+[UserDefaultsManager isDestory]</strong> method is responsible to check if the application should be terminated, this is done by checks if the key “<strong>isDestory</strong>” in the standardUserDefaults is set to <strong>1</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img14.png" alt="Screenshot">
+<em></em></p><center><em>Figure 14 - UserDefaultsManager isDestory Method</em></center><p></p>
+
+<h3 id="websocket-connection">Websocket Connection<a class="header-link" href="#websocket-connection" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>After all these checks, the malware tries to connect to the <strong>websocket</strong> server using the <a href="https://github.com/acmacalister/jetfire">JetFire library</a> from github. In the disassembler we can recognize the code snipet from the github readme.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img15.png" alt="Screenshot">
+<em></em></p><center><em>Figure 15 - Websocket Connection</em></center><p></p>
+
+<h2 id="scheduled-tasks">Scheduled Tasks<a class="header-link" href="#scheduled-tasks" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>At this point the malware uses the <strong>NSTimer</strong> class to invoke the <a href="https://developer.apple.com/documentation/foundation/nstimer/1412416-scheduledtimerwithtimeinterval">scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:</a> method to schedule fours tasks. We can see the method details below.</p>
+
+<div class="language-objective_c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">+</span> <span class="p">(</span><span class="n">NSTimer</span> <span class="o">*</span><span class="p">)</span><span class="nf">scheduledTimerWithTimeInterval</span><span class="p">:(</span><span class="n">NSTimeInterval</span><span class="p">)</span><span class="nv">ti</span> 
+                                     <span class="nf">target</span><span class="p">:(</span><span class="n">id</span><span class="p">)</span><span class="nv">aTarget</span> 
+                                   <span class="nf">selector</span><span class="p">:(</span><span class="n">SEL</span><span class="p">)</span><span class="nv">aSelector</span> 
+                                   <span class="nf">userInfo</span><span class="p">:(</span><span class="n">id</span><span class="p">)</span><span class="nv">userInfo</span> 
+                                    <span class="nf">repeats</span><span class="p">:(</span><span class="n">BOOL</span><span class="p">)</span><span class="nv">yesOrNo</span><span class="p">;</span>
+
+</code></pre></div></div>
+
+<p>Parameters:</p>
+<ul>
+  <li><strong>timeinterval</strong>: the number of seconds between firings of the timer. If it is less than or equal to 0.0, this method chooses the nonnegative value of 0.0001 seconds instead</li>
+  <li><strong>target</strong>: the object to which to send the message specified by aSelector when the timer fires. The timer maintains a strong reference to target until it (the timer) is invalidated</li>
+  <li><strong>selector</strong>: the message to send to target when the timer fires</li>
+  <li><strong>userInfo</strong>: the user info for the timer. The timer maintains a strong reference to this object until it (the timer) is invalidated</li>
+  <li><strong>repeats</strong>: if YES, the timer will repeatedly reschedule itself until invalidated. If NO, the timer will be invalidated after it fires</li>
+</ul>
+
+<p>The malware schedules the execution of four tasks: <strong>sendHeartbeat</strong>, <strong>checkAuth</strong>, <strong>checkWifi</strong>, and <strong>testSpeed</strong>.</p>
+
+<h3 id="sendheartbeat">sendHeartbeat<a class="header-link" href="#sendheartbeat" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>-[AppDelegate sendHeartbeat]</strong> methods is used to let the C2 know that the malware is alive on the victim’s phone. It writes che strings “<strong>heartbeat</strong>” on the <strong>websocket</strong> connection.</p>
+
+<p>Let’s see how it is executed and how it works.</p>
+
+<p>Before schedule the task, the malware saves the value <strong>10</strong> (<strong>0x40A00000</strong>) in a <strong>float</strong> variable called “<strong>heartTime</strong>”, after that it schedules the task to execute the <strong>sendHeartbeat</strong> method after a Time Interval of <strong>5.0</strong> ms, the repeats param is set to <strong>1</strong>, this means that the task will reschedule itself.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img16.png" alt="Screenshot">
+<em></em></p><center><em>Figure 16 - sendHeartbeat Task</em></center><p></p>
+
+<p>The <strong>sendHeartbeat</strong> method checks if the <strong>websocket</strong> connection is up, if not it tries to reconnect, otherwise if the value of the “<strong>heartTime</strong>” is not equal to <strong>5.0</strong>, it invalidates and reschedules the task again with a Time Interval of <strong>104</strong> ms ( <strong>0x41A00000</strong>). Then the method writes the string “<strong>Heartbeat</strong>” on the <strong>websocket</strong> connection.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img17.png" alt="Screenshot">
+<em></em></p><center><em>Figure 17 - sendHeartbeat Method</em></center><p></p>
+
+<h3 id="checkauth">checkAuth<a class="header-link" href="#checkauth" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>-[AppDelegate checkAuth]</strong> method checks if the user has given the application permission to access the photo library.</p>
+
+<p>The malware schedules the <strong>checkAuth</strong> method with a Time Interval of <strong>34.5</strong> ms (<strong>0x404E000000000000</strong>), as for the previous task, the <strong>repeats</strong> param is set to <strong>1</strong>, this means that this task will reschedule itself.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img18.png" alt="Screenshot">
+<em></em></p><center><em>Figure 18 - checkAuth Task</em></center><p></p>
+
+<p>The <strong>checkAuth</strong> method executes the <strong>hasPicAuth</strong> method that it just a wrapper for the <strong>+[PHPhotoLibrary authorizationStatus]</strong> method used to check if the user has given the application permission related to the photo library.</p>
+
+<p>If the permission is enabled, the malware executes the <strong>+[HttpUtils updateAuth:auth:]</strong> method with two arguments, the strings “<strong>2</strong>” and “<strong>1</strong>”.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img19.png" alt="Screenshot">
+<em></em></p><center><em>Figure 19 - checkAuth Method</em></center><p></p>
+
+<p>The <strong>updateAuth:auth:</strong> method performs a <strong>HTTP Post</strong> request to “<strong>/api/apple/applyauth</strong>”, it sends three parameters:</p>
+<ul>
+  <li><strong>adid</strong> with the IDFA value</li>
+  <li><strong>type</strong> with the value <strong>2</strong></li>
+  <li><strong>auth</strong> with the value <strong>1</strong></li>
+</ul>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img20.png" alt="Screenshot">
+<em></em></p><center><em>Figure 20 - updateAuth:auth: Method</em></center><p></p>
+
+<h3 id="checkwifi">checkWifi<a class="header-link" href="#checkwifi" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>-[AppDelegate checkWifi]</strong> method is used to check if the phone is connected via WiFi.</p>
+
+<p>The malware schedules the <strong>checkWifi</strong> method with a Time Interval of <strong>30</strong> ms , the repeats param is set to <strong>1</strong> in this case too.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img21.png" alt="Screenshot">
+<em></em></p><center><em>Figure 21 - checkWifi Task</em></center><p></p>
+
+<p>The <strong>checkWifi</strong> method is just a wrapper for the <strong>+[HttpUtils changeWifiStatus]</strong> method that performs a <strong>HTTP Post</strong> request to “<strong>/api/apple/changewifistatus</strong>”, it sends two parameters:</p>
+<ul>
+  <li><strong>adid</strong> with the <strong>IDFA</strong> value</li>
+  <li><strong>is_wifi</strong> with the value returned from the <strong>+[HttpUtils isWifi]</strong> method</li>
+</ul>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img22.png" alt="Screenshot">
+<em></em></p><center><em>Figure 22 - changeWifiStatus Method</em></center><p></p>
+
+<p>The <strong>isWiFi</strong> method compares the return value of the <a href="https://github.com/tonymillion/Reachability/">opensource</a> <strong>-[Reachability currentReachabilityStatus]</strong> method, if the returned value is <strong>2</strong> (it means that the WiFi is used) it returns <strong>1</strong> otherwise it returns <strong>0</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img23.png" alt="Screenshot">
+<em></em></p><center><em>Figure 23 - isWiFi Method</em></center><p></p>
+
+<p>We can recognize the <strong>currentReachabilityStatus</strong> method in the disassembler.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img24.png" alt="Screenshot">
+<em></em></p><center><em>Figure 24 - currentReachabilityStatus Method</em></center><p></p>
+
+<h3 id="testspeed">testSpeed<a class="header-link" href="#testspeed" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>-[AppDelegate testSpeed]</strong> method is used to calculate information related to the connection speed.</p>
+
+<p>The malware execute the <strong>-[AppDelegate testSpeed]</strong> method, and then schedules the execution of the same method with a Time Interval of <strong>34.5</strong> ms , the repeats param is set to <strong>1</strong> in this case too.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img25.png" alt="Screenshot">
+<em></em></p><center><em>Figure 25 - testSpeed Task</em></center><p></p>
+
+<p>The <strong>testSpeed</strong> method executes the ping command to “www.google.com” using the <strong>PPSPing</strong> <a href="https://github.com/yangqian111/PPSPing/">open source project</a>. It uses two variable to calculate the connection speed:</p>
+<ul>
+  <li><strong>integer pingCount</strong> contains the number of pings</li>
+  <li><strong>double pingTime</strong> contains the ping ms result</li>
+</ul>
+
+<p>In the following screenshot we can see that the two variable are initialize to <strong>0</strong>, and then we can recognize the <strong>PPSPing startWithCallbackHandler</strong> method.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img26.png" alt="Screenshot">
+<em></em></p><center><em>Figure 26 - testSpeed Method</em></center><p></p>
+
+<p>The <strong>callback</strong> function checks the value of the <strong>pingCount</strong> variable and perform the following actions:</p>
+
+<ul>
+  <li>if <strong>pingCount&lt;= 9</strong>: it updates the the <strong>pingTime</strong> and the <strong>pingCount</strong> variables</li>
+  <li>if <strong>pingCount&gt; 9</strong>: it calculates the signal value (<strong>pingTime/pingCount</strong>), stops the ping execution, and call the <strong>+[HttpUtils changeSigna:]</strong> with the calculated signal values as parameter</li>
+</ul>
+
+<p>The <strong>changeSigna</strong>: method performs a <strong>HTTP Post</strong> request to “<strong>/api/apple/changesignal</strong>” with two parameters:</p>
+<ul>
+  <li><strong>adid</strong> with the <strong>IDFA</strong> value</li>
+  <li><strong>signal</strong> with the calculated value (<strong>pingTime/pingCount</strong>)</li>
+</ul>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img27.png" alt="Screenshot">
+<em></em></p><center><em>Figure 27 - changeSigna Method</em></center><p></p>
+
+<h2 id="websocket-callback">Websocket Callback<a class="header-link" href="#websocket-callback" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h2>
+
+<p>When the <strong>JetFire</strong> library websocket connection succeeds, the delegate method <strong>-[AppDelegate websocketDidConnect:]</strong> is executed.</p>
+
+<p>It calls the <strong>-[AppDelegate checkDestruction]</strong> method responsible to ask the C2 if the application should be terminated.</p>
+
+<p>If the application is not terminated, the <strong>isStartFrp</strong> flag variable is checked, if the value of the variable is <strong>1</strong>, the method exits because the <strong>fast reverse proxy</strong> is already running, otherwise it executes the <strong>-[AppDelegate getFrpConfigStart]</strong> method via <strong>dispatch_after</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img28.png" alt="Screenshot">
+<em></em></p><center><em>Figure 28 - websocketDidConnect Method</em></center><p></p>
+
+<h3 id="checkdestruction">checkDestruction<a class="header-link" href="#checkdestruction" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>checkDestruction</strong> method performs a <strong>HTTP Post</strong> request to “<strong>/api/apple/checkdestruction</strong>” by sending the <strong>adid</strong> with the <strong>IDFA</strong> value as parameter, it also sets a function to be execute if the request succeeds.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img29.png" alt="Screenshot">
+<em></em></p><center><em>Figure 29 - checkDestruction Method</em></center><p></p>
+
+<p>The executed function (if the request suceeds) checks if the received value from the C2 is the string “<strong>1</strong>” and in this case it executes the <strong>setDestory</strong> method that is responsible to add the key <strong>isDestroy</strong> with value “<strong>1</strong>” in the <strong>standardUserDefaults</strong> (if you remember the <strong>+[UserDefaultsManager isDestory]</strong> method checks this value), then it executes a wrapper for the <strong>exit</strong> function via <strong>dispatch_time</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img30.png" alt="Screenshot">
+<em></em></p><center><em>Figure 30 - Succes Executed Function</em></center><p></p>
+
+<h3 id="getfrpconfigstart">getFrpConfigStart<a class="header-link" href="#getfrpconfigstart" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h3>
+
+<p>The <strong>-[AppDelegate getFrpConfigStart]</strong> method, performs a <strong>HTTP Post</strong> request to “<strong>/api/apple/getfrpconfig</strong>” by sending the <strong>adid</strong> with the <strong>IDFA</strong> value as parameter, if the request succeeds, the <strong>sub_10001340C</strong> function is executed.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img31.png" alt="Screenshot">
+<em></em></p><center><em>Figure 31 - getFrpConfigStart Method</em></center><p></p>
+
+<p>The <strong>sub_10001340C</strong> function parses the server response in order to get the configuration values for the <strong>fast reverse proxy</strong>.</p>
+
+<p>It reads the <strong>config.ini</strong> file, and replace each value for the <strong>server_addr</strong>, <strong>server_port</strong>, <strong>token</strong> and <strong>remote_port</strong> keys with the ones received from the C2 server.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img32.png" alt="Screenshot">
+<em></em></p><center><em>Figure 32 - sub_10001340C Method</em></center><p></p>
+
+<p>After replaced each value, it writes the new configuration in a new file called <strong>newconfig.ini</strong> then it executes the <strong>-[AppDelegate setIsStartFrp:]</strong> responsible for setting the variable <strong>isStartFrp</strong> to <strong>1</strong>.</p>
+
+<p>At this point it executes two <strong>dispatch_async</strong> function to set up the <strong>socks5</strong> server and the <strong>fast reverse proxy</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img33.png" alt="Screenshot">
+<em></em></p><center><em>Figure 33 - sock5 and fast reverse proxy Methods</em></center><p></p>
+
+<p>The <strong>sock5</strong> server is implemented using the <a href="https://github.com/rofl0r/microsocks">open source portable socks5 server</a> <strong>microsocks</strong> we can recognize it in the disassembler.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img34.png" alt="Screenshot">
+<em></em></p><center><em>Figure 34 - microsocks</em></center><p></p>
+
+<p>The fast reverse proxy, is implemented using the <a href="https://github.com/fatedier/frp">open source project</a> <strong>FRP</strong>.</p>
+
+<p><img src="/assets/images/2024-04-19-goldpickaxe-technical-analysis-ipa-c2/img35.png" alt="Screenshot">
+<em></em></p><center><em>Figure 35 - FRP</em></center><p></p>
+
+<h1 id="conclusion">Conclusion<a class="header-link" href="#conclusion" title="Permalink"><span class="sr-only">Permalink</span><i class="fas fa-link"></i></a></h1>
+
+<p>The opportunity to analyze iOS malware is very rare, so diving into the <strong>Gold Pickaxe</strong> sample was an interesting experience.</p>
+
+<p>We examined the <strong>IPA</strong> content and observed how the malware connects to the C2 using the <strong>webSocket</strong>  and the <strong>HTTP</strong> protocols to establish the connection and send data.</p>
+
+<p>Analyzing the entire malware would provide valuable insights into how the received commands are processed.</p>
+
+<p>Due to the European <strong>Digital Market Act</strong>, Apple will be required to permit the use of external markets, which could potentially be used by cybercriminals to introduce iOS malware.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#ios" class="page__taxonomy-item p-category" rel="tag">iOS</a><span class="sep">, </span>
+    
+      <a href="/categories/#malware" class="page__taxonomy-item p-category" rel="tag">Malware</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2024-04-19T00:00:00+02:00">April 19, 2024</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Gold+Pickaxe+iOS+Technical+Analysis%3A+IPA+Overview+and+C2+Communication+Start+up%20https%3A%2F%2Fsyrion.me%2Fgoldpickaxe-technical-analysis-ipa-c2%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fsyrion.me%2Fgoldpickaxe-technical-analysis-ipa-c2%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fsyrion.me%2Fgoldpickaxe-technical-analysis-ipa-c2%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/atomic-macos-stealer-amos-analysis/" class="pagination--pager" title="Atomic macOS Stealer (AMOS) Analysis
+">Previous</a>
+    
+    
+      <a href="/CVE-2024-34456-trend-micro-antivirus-one-dylib-injection/" class="pagination--pager" title="CVE-2024-34456: Trend Micro Antivirus One Dylib Injection
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">You may also enjoy</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap" rel="stylesheet">
+
+<a href="/CVE-2024-34456-trend-micro-antivirus-one-dylib-injection/" class="post-blog-card" style="text-decoration: none; 
+    --image-url: url(/assets/images/2024-05-06-CVE-2024-34456-trend-micro-antivirus-one-dylib-injection/img0.png);
+    --ribbon: darkgrey;">
+
+  <div class="post-meta">
+    <div class="post-ribbon">
+      <span class="post-ribbon4">MacOS</span>
+    </div>
+  </div>
+
+  <div class="post-description">
+    <h1>CVE-2024-34456: Trend Micro Antivirus One Dylib Injection
+</h1>
+    <p>  During a red teaming activity, we gained access to a company MacBook; the Trend Micro Antivirus One software was runn...</p>
+    
+    <p class="post-date page__meta">
+      06 May 2024
+    </p>
+  
+    
+      <p class="post-time page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+
+</p>
+    
+    
+   
+
+  </div>
+</a>
+
+
+
+<!-- <div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/2024-05-06-CVE-2024-34456-trend-micro-antivirus-one-dylib-injection/img0.png" alt="">
+      </div>
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/CVE-2024-34456-trend-micro-antivirus-one-dylib-injection/" rel="permalink">CVE-2024-34456: Trend Micro Antivirus One Dylib Injection
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">During a red teaming activity, we gained access to a company MacBook; the Trend Micro Antivirus One software was running and prevented us from running our to...</p>
+    
+
+  </article>
+</div> -->
+
+        
+          
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap" rel="stylesheet">
+
+<a href="/atomic-macos-stealer-amos-analysis/" class="post-blog-card" style="text-decoration: none; 
+    --image-url: url(/assets/images/2024-03-08-atomic-macos-stealer-amos-analysis/img0.png);
+    --ribbon: darkgrey;">
+
+  <div class="post-meta">
+    <div class="post-ribbon">
+      <span class="post-ribbon4">Malware</span>
+    </div>
+  </div>
+
+  <div class="post-description">
+    <h1>Atomic macOS Stealer (AMOS) Analysis
+</h1>
+    <p>  Hello everybody, this is my first macOS malware analysis, I took a sample from malwarebazaar and tried to reverse it,...</p>
+    
+    <p class="post-date page__meta">
+      08 Mar 2024
+    </p>
+  
+    
+      <p class="post-time page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    
+   
+
+  </div>
+</a>
+
+
+
+<!-- <div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/2024-03-08-atomic-macos-stealer-amos-analysis/img0.png" alt="">
+      </div>
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/atomic-macos-stealer-amos-analysis/" rel="permalink">Atomic macOS Stealer (AMOS) Analysis
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Hello everybody, this is my first macOS malware analysis, I took a sample from malwarebazaar and tried to reverse it, the sample was uploaded by Cryptolaemus...</p>
+    
+
+  </article>
+</div> -->
+
+        
+          
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap" rel="stylesheet">
+
+<a href="/rustware-part-3-dynamic-api-resolution/" class="post-blog-card" style="text-decoration: none; 
+    --image-url: url(/assets/images/2023-11-20-rustware-part-3-dynamic-api-resolution/img0.png);
+    --ribbon: darkgrey;">
+
+  <div class="post-meta">
+    <div class="post-ribbon">
+      <span class="post-ribbon4">Malware</span>
+    </div>
+  </div>
+
+  <div class="post-description">
+    <h1>Rustware Part 3: Dynamic API resolution (Windows)
+</h1>
+    <p>  In the previous blog post we have seen how to perform a shellcode process injection by finding a target process PID u...</p>
+    
+    <p class="post-date page__meta">
+      20 Nov 2023
+    </p>
+  
+    
+      <p class="post-time page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    
+   
+
+  </div>
+</a>
+
+
+
+<!-- <div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/2023-11-20-rustware-part-3-dynamic-api-resolution/img0.png" alt="">
+      </div>
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/rustware-part-3-dynamic-api-resolution/" rel="permalink">Rustware Part 3: Dynamic API resolution (Windows)
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  12 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">In the previous blog post we have seen how to perform a shellcode process injection by finding a target process PID using several WinAPIs, in that case all t...</p>
+    
+
+  </article>
+</div> -->
+
+        
+          
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap" rel="stylesheet">
+
+<a href="/rustware-part-2-process-enumeration-development/" class="post-blog-card" style="text-decoration: none; 
+    --image-url: url(/assets/images/2023-11-06-rustware-part-2-process-enumeration-development/img0.png);
+    --ribbon: darkgrey;">
+
+  <div class="post-meta">
+    <div class="post-ribbon">
+      <span class="post-ribbon4">Malware</span>
+    </div>
+  </div>
+
+  <div class="post-description">
+    <h1>Rustware Part 2: Process Enumeration Development (Windows)
+</h1>
+    <p>  In the previous blog post we have seen how to develop a Shellcode Process Injection in Rust; the described Process In...</p>
+    
+    <p class="post-date page__meta">
+      06 Nov 2023
+    </p>
+  
+    
+      <p class="post-time page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  10 minute read
+
+</p>
+    
+    
+   
+
+  </div>
+</a>
+
+
+
+<!-- <div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/2023-11-06-rustware-part-2-process-enumeration-development/img0.png" alt="">
+      </div>
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/rustware-part-2-process-enumeration-development/" rel="permalink">Rustware Part 2: Process Enumeration Development (Windows)
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  10 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">In the previous blog post we have seen how to develop a Shellcode Process Injection in Rust; the described Process Injection flow relies on several WinAPIs: ...</p>
+    
+
+  </article>
+</div> -->
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/syrion89" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://www.linkedin.com/in/raffaelesabato" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> Linkedin</a></li>
+        
+      
+        
+          <li><a href="https://github.com/Syrion89" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">© 2024 Syrion. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>. Customization by <a href="https://muha2xmad.github.io" rel="nofollow">muha2xmad</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'G-LY6S3JXL3Z']);
+  
+    _gaq.push(['_gat._anonymizeIp']);
+  
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+</body></html>

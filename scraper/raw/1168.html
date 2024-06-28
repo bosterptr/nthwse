@@ -1,0 +1,1749 @@
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Active directory pentesting: cheatsheet and beginner guide</title>
+
+<link href="https://p.typekit.net" rel="preconnect" crossorigin="">
+<link href="https://use.typekit.net" rel="preconnect" crossorigin="">
+<link href="https://use.typekit.net/ryt3opf.css" rel="preload" as="style">
+<link href="/assets/css/blog_article.min.css" rel="preload" as="style">
+<link href="/assets/js/blog_article.min.js" rel="preload" as="script">
+<link href="/landingV3Fonts/hack-the-box.woff" rel="preload" as="font" crossorigin="anonymous">
+
+<link href="/landingV3Fonts/permanent-marker-latin-400-normal.woff2" rel="preload" as="font" crossorigin="anonymous">
+<link href="/landingV3Fonts/modak-all-400-normal.woff" rel="preload" as="font" crossorigin="anonymous">
+<link href="/landingV3Fonts/monda-all-400-normal.woff" rel="preload" as="font" crossorigin="anonymous">
+
+
+<link type="image/png" href="/images/landingv3/favicon.png" rel="icon">
+
+<link href="/images/landingv3/favicon.png" rel="apple-touch-icon">
+
+<link href="https://use.typekit.net/ryt3opf.css" rel="stylesheet">
+
+<link href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css" rel="stylesheet">
+
+<link href="/assets/css/blog_article.min.css" rel="stylesheet">
+
+<link href="https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide" rel="canonical">
+
+<meta name="author" content="">
+<meta name="description" content="Our Head of Security shares how he’d start an attack path with the goal of obtaining a foothold in AD, alongside essential AD commands and tools for beginner pentesters to master.">
+<meta name="robots" content="index, follow">
+
+<meta property="og:site_name" content="Hack The Box">
+<meta property="og:title" content="Active directory pentesting: Cheatsheet and beginner guide">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://www.hackthebox.com/storage/blog/UygLJkzAMONF9kLSiyzflI0Esn8CSuOZ.jpg">
+<meta property="og:url" content="https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide">
+<meta property="og:description" content="Our Head of Security shares how he’d start an attack path with the goal of obtaining a foothold in AD, alongside essential AD commands and tools for beginner pentesters to master.">
+<meta property="og:locale" content="en_US">
+
+
+<script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/releases/TqxSU0dsOd2Q9IbI7CpFnJLD/recaptcha__pl.js" crossorigin="anonymous" integrity="sha384-EtuwsrUt4o3rjKbOIgbMlrdETicyC7YJiOMF4S2kRPR2c6EcUDPrB1OFkiSEO3IC"></script><script type="text/javascript" charset="UTF-8" async="" src="https://consent.cookiebot.com/ee54d4ba-9660-4515-a764-a6ec3109f2a5/cc.js?renew=false&amp;referer=www.hackthebox.com&amp;dnt=false&amp;init=false"></script><script type="text/javascript" charset="UTF-8" src="https://consentcdn.cookiebot.com/consentconfig/ee54d4ba-9660-4515-a764-a6ec3109f2a5/hackthebox.com/configuration.js"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org/",
+    	"@type": "BlogPosting",
+	"mainEntityOfPage": {
+	"@type": "WebPage",
+	"@id": "https://www.hackthebox.com/blog"
+	},
+	"headline": "Active directory pentesting: cheatsheet and beginner guide",
+	"description": "Our Head of Security shares how he’d start an attack path with the goal of obtaining a foothold in AD, alongside essential AD commands and tools for beginner pentesters to master.",
+	"url": "https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide",
+	"image": "https://www.hackthebox.com/storage/blog/UygLJkzAMONF9kLSiyzflI0Esn8CSuOZ.jpg",
+	"datePublished": "2022-03-21",
+	"author":
+			[
+					{"@type": "Person", "name": "mrb3n"}
+				]
+		,
+	"publisher": {
+	"@type": "Corporation",
+    "name": "Hack The Box",
+    "url": "https://www.hackthebox.com/",
+    "logo": "https://www.hackthebox.com/images/logo-htb.svg",
+    "sameAs": [
+        "https://hackthebox.store",
+        "https://ctf.hackthebox.com",
+        "https://academy.hackthebox.com",
+        "https://forum.hackthebox.com",
+        "https://help.hackthebox.com",
+        "https://app.hackthebox.com",
+        "https://enterprise.hackthebox.com",
+        "https://status.hackthebox.com",
+        "https://sso.hackthebox.com/login",
+        "https://github.com/hackthebox",
+        "https://apply.workable.com/hack-the-box-ltd",
+        "https://www.facebook.com/hackthebox.eu",
+        "https://twitter.com/hackthebox_eu",
+        "https://www.linkedin.com/company/hackthebox",
+        "https://www.linkedin.com/showcase/hack-the-box-for-business",
+        "https://www.instagram.com/hackthebox",
+        "https://www.youtube.com/c/HackTheBox/featured",
+        "https://www.twitch.tv/hackthebox",
+        "https://www.meetup.com/pro/hack-the-box",
+        "https://discord.com/invite/hackthebox",
+        "https://www.glassdoor.com/Overview/Working-at-Hack-The-Box-EI_IE3278909.11,23.htm",
+        "https://www.crunchbase.com/organization/hack-the-box"
+    ]	}
+}
+</script> 
+
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="ee54d4ba-9660-4515-a764-a6ec3109f2a5" data-blockingmode="auto" type="text/javascript"></script><style type="text/css" id="CookieConsentStateDisplayStyles">.cookieconsent-optin-preferences,.cookieconsent-optin-statistics,.cookieconsent-optin-marketing,.cookieconsent-optin{display:none;}.cookieconsent-optout-preferences,.cookieconsent-optout-statistics,.cookieconsent-optout-marketing,.cookieconsent-optout{display:block;display:initial;}</style>
+
+
+<script type="text/plain" data-cookieconsent="statistics">
+    ! function() {
+        var analytics = window.analytics = window.analytics || [];
+        if (!analytics.initialize)
+            if (analytics.invoked) window.console && console.error && console.error("Segment snippet included twice.");
+            else {
+                analytics.invoked = !0;
+                analytics.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"];
+                analytics.factory = function(e) {
+                    return function() {
+                        var t = Array.prototype.slice.call(arguments);
+                        t.unshift(e);
+                        analytics.push(t);
+                        return analytics
+                    }
+                };
+                for (var e = 0; e < analytics.methods.length; e++) {
+                    var key = analytics.methods[e];
+                    analytics[key] = analytics.factory(key)
+                }
+                analytics.load = function(key, e) {
+                    var t = document.createElement("script");
+                    t.type = "text/javascript";
+                    t.async = !0;
+                    t.src = "https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";
+                    var n = document.getElementsByTagName("script")[0];
+                    n.parentNode.insertBefore(t, n);
+                    analytics._loadOptions = e
+                };
+                analytics._writeKey = "897ZUJzEmt1RCzOiBwsvWNdp3d2l5tae";
+                analytics.SNIPPET_VERSION = "4.13.2";
+                analytics.load("897ZUJzEmt1RCzOiBwsvWNdp3d2l5tae");
+                                    properties = {"platform":"Marketing","platform_version":"V3"};
+                                analytics.page(
+                    "",
+                    "Blog Article",
+                    properties
+                );
+            }
+    }();
+</script>
+
+
+
+<script type="text/plain" data-cookieconsent="preferences,statistics,marketing">
+	(function(w, d, s, l, i) {
+		w[l] = w[l] || [];
+		w[l].push({
+			'gtm.start': new Date().getTime(),
+			event: 'gtm.js'
+		});
+		var f = d.getElementsByTagName(s)[0],
+			j = d.createElement(s),
+			dl = l != 'dataLayer' ? '&l=' + l : '';
+		j.async = true;
+		j.src =
+			'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+		f.parentNode.insertBefore(j, f);
+	})(window, document, 'script', 'dataLayer', 'GTM-N6XD42V');
+</script>
+
+
+<script src="https://www.google.com/recaptcha/api.js?hl=&amp;render=6LfsC98ZAAAAALiRx9c6ab62VUSh8OTADXpF50hr" type="text/javascript"></script>
+
+</head>
+<body class="preload">
+
+
+
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6XD42V"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+ 
+
+<div class="sticky-header sticky-header-responsive nav-down " id="sticky-header" style="background: #111927">
+<section class="  d-block ">
+<div class="nav-menu-container container">
+<nav class="navbar nav-b2c tk-neue-haas-unica py-3" style="max-width: 1200px;margin:auto;">
+<a class="navbar-brand" href="/blog">
+<img class=" " src="/images/landingv3/logo-htb-blog.svg" alt="Hack The Box: Cybersecurity Training" title="">
+</a>
+<div class="d-flex align-items-center">
+<ul class="navbar-nav navbar-menu-actions my-2 ml-5 my-lg-0 font-weight500 d-none d-lg-block">
+<li class="nav-item">
+<a class="btn btn-htb-hollow btn-htb-green btn-htb-border-green  " href="/invite" target="_blank">JOIN NOW</a>
+</li>
+</ul>
+</div>
+</nav>
+</div>
+</section>
+</div>
+<div style="background: #111927;          padding-top: 81px; ">
+<style>
+        .featured-img-container {
+            max-width: 1170px;
+        }
+
+        .blog-template h1 {
+            font-size: 42px;
+            line-height: 54px;
+        }
+
+        .blog-template h2 {
+            font-size: 28px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .blog-template h1 {
+                font-size: 32px;
+                line-height: 48px;
+            }
+        }
+
+        .blog-template blockquote p {
+            font-size: 22px;
+        }
+
+        [data-ephox-embed-iri] {
+            width: 100%;
+            max-width: 1200px !important;
+            margin: auto;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        [data-ephox-embed-iri] img {
+            max-width: 100%;
+            display: block;
+            margin: auto;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+        }
+
+        [data-ephox-embed-iri] iframe {
+            max-width: 1200px;
+            left: 0;
+            right: 0;
+            display: block;
+            margin: auto;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+        }
+
+        .slider {
+            max-width: 1200px;
+            display: block;
+            margin: auto;
+        }
+
+        .slider .inner-slider img {
+            border-radius: 10px;
+        }
+
+        .slider .inner-slider .caption {
+            font-size: 14px;
+            line-height: 20px;
+            color: #A4B1CD !important;
+            font-weight: 600;
+        }
+
+        .slider-box {
+            position: relative;
+            max-width: 1200px;
+            margin: auto;
+            padding: 10px;
+        }
+
+        .slider-box .arrow {
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            background: #1A2332;
+            border-radius: 100%;
+            top: 40%;
+            position: absolute;
+            z-index: 999;
+            cursor: pointer;
+        }
+
+        .slider-box .prev {
+            left: 30px;
+            transform: scaleX(-1);
+            padding-top: 16px;
+        }
+
+        .slider-box .prev i {
+            text-align: center;
+            margin-left: 25px;
+        }
+
+        .slider-box .next {
+            right: 30px;
+            padding-top: 15px;
+        }
+
+        .slider-box .next i {
+            text-align: center;
+            margin-left: 25px;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            color: #A4B1CD;
+            background-color: #A4B1CD;
+            opacity: 0.2;
+        }
+
+        .social-icon-btn {
+            width: 18px;
+            margin-left: 9px;
+            margin-right: 9px;
+        }
+
+        .social-icon-btn:hover path {
+            fill: #9FEF00;
+        }
+
+        .tooltip-inner {
+            background: #000;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        iframe {
+            max-width: 1200px;
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .blog-body ol li {
+            position: relative;
+            counter-increment: li;
+        }
+
+        .blog-body ol {
+            max-width: 760px;
+            margin: auto;
+            list-style: none;
+            counter-reset: li
+        }
+
+        .blog-body ol li::before {
+            content: counter(li);
+            color: #9FEF00;
+            font-size: 18px !important;
+            position: absolute;
+            left: -22px;
+            top: 22px;
+        }
+
+        .article .article-image {
+            border-radius: 10px;
+        }
+
+        .article .article-image img {
+            transition: all .5s;
+            transform: scale(1);
+        }
+
+        .article:hover .article-image img {
+            transform: scale(1.05);
+        }
+
+        @media screen and (max-width: 600px) {
+            [data-ephox-embed-iri] {
+                transform: translateX(-50px);
+                width: 100vw !important;
+            }
+
+            [data-ephox-embed-iri] img {
+                border-radius: 0;
+            }
+
+            .blog-body p {
+                font-size: 16px !important;
+            }
+        }
+
+        table {
+            width: 100% !important;
+        }
+
+        table td {
+            padding: 10px;
+            border: 1px solid #1a2332;
+        }
+
+        .btn {
+            text-decoration: none !important;
+        }
+
+        tr:nth-child(even) {
+            background-color: #101723;
+        }
+
+        .products-list {
+            list-style: none;
+        }
+
+        /* purgecss start ignore */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            color: #a4b1cd;
+            font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+            text-align: left;
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+            line-height: 1.5;
+            -moz-tab-size: 4;
+            -o-tab-size: 4;
+            tab-size: 4;
+            -webkit-hyphens: none;
+            -moz-hyphens: none;
+            -ms-hyphens: none;
+            hyphens: none;
+        }
+
+        pre[class*="language-"]::-moz-selection,
+        pre[class*="language-"] ::-moz-selection,
+        code[class*="language-"]::-moz-selection,
+        code[class*="language-"] ::-moz-selection {
+            text-shadow: none;
+            background: #060f20;
+        }
+
+        pre[class*="language-"]::selection,
+        pre[class*="language-"] ::selection,
+        code[class*="language-"]::selection,
+        code[class*="language-"] ::selection {
+            text-shadow: none;
+            background: #060f20;
+        }
+
+        pre[class*="language-"]::-webkit-selection,
+        pre[class*="language-"] ::-webkit-selection,
+        code[class*="language-"]::-webkit-selection,
+        code[class*="language-"] ::-webkit-selection {
+            text-shadow: none;
+            background: #060f20;
+        }
+
+        @media print {
+
+            code[class*="language-"],
+            pre[class*="language-"] {
+                text-shadow: none;
+            }
+        }
+
+        /* Code blocks */
+        pre[class*="language-"] {
+            padding: 1em;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+
+        :not(pre)>code[class*="language-"],
+        pre[class*="language-"] {
+            color: white;
+            background: #141d2b;
+        }
+
+        :not(pre)>code[class*="language-"] {
+            padding: 0.1em;
+            border-radius: 0.3em;
+            white-space: normal;
+        }
+
+        .token.comment {
+            color: #D7E4FF46;
+            font-style: italic
+        }
+
+        .token.punctuation {
+            color: #2ee7b6;
+        }
+
+        .token.variable {
+            color: #A4B1CD;
+        }
+
+        .token.hexcode {
+            color: #FFFFFF;
+        }
+
+        .token.keyword {
+            color: #5CB2FF;
+        }
+
+        .token.builtin {
+            color: #5CB2FF;
+        }
+
+        .token.number {
+            color: #5CB2FF;
+        }
+
+        .token.value.css {
+            .number {
+                color: #C5F467;
+            }
+        }
+
+        .token.char {
+            color: #5CB2FF;
+        }
+
+        .token.constant {
+            color: #5CB2FF;
+        }
+
+        .token.attr-name {
+            color: #5CB2FF;
+        }
+
+        .token.selector {
+            color: #5CB2FF;
+        }
+
+        .token.regex {
+            color: #5CB2FF;
+        }
+
+        .token.deleted {
+            color: #C5D1EB;
+        }
+
+        .token.tag {
+            color: #FF8484;
+        }
+
+        .token.string {
+            color: #C5F467;
+        }
+
+        .token.changed {
+            color: #FF8484;
+        }
+
+        .token.function {
+            color: #FFCC5C;
+        }
+
+        .token.symbol {
+            color: #C5F467;
+        }
+
+        .token.inserted {
+            color: #C5F467;
+        }
+
+        .token.important,
+        .token.bold {
+            font-weight: bold;
+        }
+
+        .token.italic {
+            font-style: italic;
+        }
+
+        .token.attr-value {
+            color: #C5F467;
+        }
+
+        /** Line Numbers **/
+        pre[class*="language-"].line-numbers {
+            position: relative;
+            padding-left: 3.8em;
+            counter-reset: linenumber;
+        }
+
+        pre[class*="language-"].line-numbers>code {
+            position: relative;
+            white-space: inherit;
+        }
+
+        .line-numbers .line-numbers-rows {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            font-size: 100%;
+            left: -3.8em;
+            width: 3em;
+            /* works for line-numbers below 1000 lines */
+            letter-spacing: -1px;
+            border-right: 1px solid #A4B1CD;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .line-numbers-rows>span {
+            display: block;
+            counter-increment: linenumber;
+        }
+
+        .line-numbers-rows>span:before {
+            content: counter(linenumber);
+            color: #A4B1CD;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+        /** PHP **/
+        code.language-php .token.delimiter {
+            color: #2ee7b6;
+        }
+
+        code.language-php .token.package {
+            color: #FF8484;
+        }
+
+        code.language-php .token.class-name-definition {
+            color: #FF8484;
+        }
+
+        code.language-php .token.this {
+            color: #FF8484;
+        }
+
+        code.language-php .token.operator {
+            color: #FF8484;
+        }
+
+        code.language-php .token.scope {
+            color: #FF8484;
+        }
+
+        code.language-php .token.scope .punctuation {
+            color: #FF8484;
+        }
+
+        code.language-php .token.keyword {
+            color: #FF8484;
+        }
+
+        code.language-php .token.keyword.return {
+            color: #b971e4;
+        }
+
+        code.language-php .token.keyword.class,
+        code.language-php .token.keyword.use,
+        code.language-php .token.keyword.namespace {
+            color: #5CB2FF;
+        }
+
+        /*HTML*/
+        code.language-html .token.attr-value .value.css .punctuation,
+        code.language-html .token.attr-value .value.language-css .punctuation,
+        code.language-html .token.attr-value .value.language-css .number {
+            color: #C5F467;
+        }
+
+        /*Scss*/
+        code.language-scss {
+            color: #5CB2FF;
+        }
+
+        code.language-scss .token.keyword,
+        code.language-scss .token.rule {
+            color: #b971e4;
+        }
+
+        code.language-scss .token.property {
+            color: #A4B1CD;
+        }
+
+        code.language-scss .token.selector .parent.important {
+            color: #FF8484;
+        }
+
+        code.language-scss .token.hexcode,
+        code.language-scss .token.color {
+            color: #2ee7b6;
+        }
+
+        /** Javascript **/
+        code.language-javascript .token.keyword {
+            color: #FF8484;
+        }
+
+        code.language-javascript .token.module {
+            color: #b971e4;
+        }
+
+        code.language-javascript .token.control-flow {
+            color: #b971e4;
+        }
+
+        code.language-javascript .token.boolean {
+            color: #5CB2FF;
+        }
+
+        code.language-javascript .token.operator {
+            color: #FF8484;
+        }
+
+        code.language-javascript .token.parameter {
+            color: #5CB2FF;
+        }
+
+        /* purgecss end ignore */
+        /** Toolbar Plugin Css **/
+        div.code-toolbar {
+            position: relative;
+        }
+
+        div.code-toolbar>.toolbar {
+            position: absolute;
+            top: .3em;
+            right: .2em;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+
+        div.code-toolbar:hover>.toolbar {
+            opacity: 1;
+        }
+
+        /* Separate line b/c rules are thrown out if selector is invalid.
+                                                                                                                                                                           IE11 and old Edge versions don't support :focus-within. */
+        div.code-toolbar:focus-within>.toolbar {
+            opacity: 1;
+        }
+
+        div.code-toolbar>.toolbar>.toolbar-item {
+            display: inline-block;
+        }
+
+        div.code-toolbar>.toolbar>.toolbar-item>a {
+            cursor: pointer;
+        }
+
+        div.code-toolbar>.toolbar>.toolbar-item>button {
+            background: none;
+            border: 0;
+            color: inherit;
+            font: inherit;
+            line-height: normal;
+            overflow: visible;
+            padding: 0;
+            -webkit-user-select: none;
+            /* for button */
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        div.code-toolbar>.toolbar>.toolbar-item>a,
+        div.code-toolbar>.toolbar>.toolbar-item>button,
+        div.code-toolbar>.toolbar>.toolbar-item>span {
+            color: #bbb;
+            font-size: .8em;
+            padding: 0 .5em;
+            background: #f5f2f0;
+            background: rgba(224, 224, 224, 0.2);
+            box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+            border-radius: .5em;
+        }
+
+        div.code-toolbar>.toolbar>.toolbar-item>a:hover,
+        div.code-toolbar>.toolbar>.toolbar-item>a:focus,
+        div.code-toolbar>.toolbar>.toolbar-item>button:hover,
+        div.code-toolbar>.toolbar>.toolbar-item>button:focus,
+        div.code-toolbar>.toolbar>.toolbar-item>span:hover,
+        div.code-toolbar>.toolbar>.toolbar-item>span:focus {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /** Copy To ClipBoard CSS **/
+    </style>
+<section class="blog-template ">
+<section class="post-header">
+<div class="container mt-7 mb-5 max-w-760">
+<div class="row pb-3">
+<div class="col-12 d-flex mb-3">
+<p class="font-size13 text-uppercase letter-spacing-2 mb-0">Red Teaming</p>
+<div class="reading-time color-main font-size13 text-uppercase letter-spacing-2 d-flex align-items-center pl-2">
+<span class="reading-time__minutes pr-1">18</span> min read
+</div> </div>
+<div class="col-12">
+<h1 class="color-white font-weight600">
+Active directory pentesting: cheatsheet and beginner guide</h1>
+<h2 class="color-main font-size20 mt-3 font-weight400 line-height-32 mb-3">
+Our Head of Security shares how he’d start an attack path with the goal of obtaining a foothold in AD, alongside essential AD commands and tools for beginner pentesters to master.</h2>
+</div>
+</div>
+<div class="row align-items-center">
+<div class="col-12">
+<div class="d-inline-flex align-items-center">
+<a href="https://www.hackthebox.com/blog/author/mrb3n">
+<img class="border-radius-50pc mr-3 author-avatar" src="/images/landingv3/blog/authors/mrb3n.png" alt="mrb3n avatar">
+</a>
+<p class="color-white font-size15 line-height-18 m-0 font-weight100"><a class="color-green" href="https://www.hackthebox.com/blog/author/mrb3n">mrb3n</a>,
+<br class="d-none">
+<span class="color-main">Mar 29<br class="d-none">
+2023</span>
+</p>
+</div>
+</div>
+</div>
+<div class="row align-items-center mt-4">
+<div class="col-12">
+<div class="d-inline-flex align-items-center">
+</div>
+</div>
+</div>
+</div>
+<div class="container featured-img-container ">
+<div class="row ">
+<div class="col-12">
+<div class="article">
+<div class="bg-image-responsive hero-image article-image embed-responsive embed-responsive-16by9">
+<img class="embed-responsive-item" src="https://www.hackthebox.com/storage/blog/UygLJkzAMONF9kLSiyzflI0Esn8CSuOZ.jpg" alt="Hack The Box Article">
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="blog-body">
+<div class="container max-w-760 ">
+<div class="row justify-content-center line-numbers" data-prismjs-copy="Copy">
+<div class="col-12 blog-post-container">
+<div class="mce-toc">
+<h4>Table of Contents</h4>
+<ul>
+<li><a href="#mcetoc_1gsmucpi7bo7">Learning Active Directory for beginners&nbsp;</a>
+<ul>
+<li><a href="#mcetoc_1gsmucpi7bo8">Definition of key components&nbsp;</a></li>
+</ul>
+</li>
+<li><a href="#mcetoc_1gsmucpi7boh">15 important tools for Active Directory Pentesting</a>
+<ul>
+<li><a href="#mcetoc_1gsmucpi7boi">Base Linux machine toolkit:&nbsp;</a></li>
+<li><a href="#mcetoc_1gsmucpi7boj">Windows box tools:</a></li>
+</ul>
+</li>
+<li><a href="#mcetoc_1gsmucpi7bok">An overview of the Active Directory enumeration and pentesting process</a>
+<ul>
+<li><a href="#mcetoc_1gsmucpi7bol">Starting out (uncredentialed)</a></li>
+<li><a href="#mcetoc_1gsmucpi7bom">Starting out (with credentials)</a></li>
+</ul>
+</li>
+<li><a href="#mcetoc_1gsmucpi7bon">Active directory cheat sheet of commands and tips&nbsp;</a></li>
+<li><a href="#mcetoc_1gsmucpi7boo">Final word on reporting and documentation&nbsp;</a></li>
+</ul>
+</div>
+<p>Often organizations that utilize Active Directory (AD) think that they are secure because of a strong vulnerability management program and patching new threats/vulnerabilities constantly. Their vulnerability scans may come up clean week after week, but are they truly secure? If they are neglecting AD security, then most likely not.&nbsp;</p>
+<p>I have performed penetration tests against many organizations where I was unable to find any directly exploitable services or applications but was able to gain a foothold in Active Directory, take over the domain (or domains), and issue 10 or more high-risk findings related to AD in their penetration test report.&nbsp;</p>
+<p>As a penetration tester, ignoring AD typically results in leaving a massive attack surface on the table. At the same time, organizations not implementing (or with weak) AD security also open themselves up to a plethora of attacks.</p>
+<h2 id="mcetoc_1gsmucpi7bo7">Learning Active Directory for beginners&nbsp;</h2>
+<p>AD is a vast topic and can be overwhelming when first approaching it. My number one tip for anyone starting with AD is to gain an understanding of the fundamental key components that are present in an AD environment and how they fit together.</p>
+<p>Until you understand these key components and can recall from memory the most important ones to enumerate during a penetration test (users, groups, computers, Organizational Units (OUs), Access Control Lists (ACLs), Group Policy Objects (GPOs), local administrator access, etc.), it will be challenging to follow along with any AD training course.&nbsp;</p>
+<p>Below is a list of key components we recommend learning about in-depth before diving deeper into AD and the key focuses for enumeration. If you are starting out, we recommend the <a href="https://academy.hackthebox.com/course/preview/introduction-to-active-directory">Introduction to Active Directory module</a> on HTB Academy. It will take you from zero knowledge of AD to a decent, well-rounded understanding of the fundamentals.</p>
+<p>Once you have this core knowledge under your belt, you can move into our other specialized modules, such as <a href="https://academy.hackthebox.com/course/preview/active-directory-enumeration--attacks">Active Directory Enumeration and Attacks</a>. If you are not yet conformable with the Windows Command Line, we recommend the <a href="https://academy.hackthebox.com/course/preview/introduction-to-windows-command-line">Introduction to Windows Command Line</a> module as will teach you the necessary fundamentals needed to navigate Windows systems from the command line.</p>
+<p><em>Recommended read: <a href="../../../blog/introduction-to-active-directory">What is Active Directory?</a>&nbsp;</em></p>
+<h3 id="mcetoc_1gsmucpi7bo8">Definition of key components&nbsp;</h3>
+<p id="mcetoc_1gsmucpi7bo9"><strong>Object</strong></p>
+<p>An object can be defined as ANY resource present within an Active Directory environment such as OUs, printers, users, domain controllers, etc.</p>
+<p id="mcetoc_1gsmucpi7boa"><strong>Attributes</strong></p>
+<p>Every object in Active Directory has an associated set of attributes used to define its characteristics. A computer object contains attributes such as the hostname and DNS name.</p>
+<p>All attributes in AD have an associated LDAP name that can be used when performing LDAP queries, such as displayName for Full Name and given name for First Name.</p>
+<p id="mcetoc_1gsmucpi7bob"><strong>Schema</strong></p>
+<p>The Active Directory schema is essentially the blueprint of any enterprise environment. It defines what types of objects can exist in the AD database and their associated attributes. It lists definitions corresponding to AD objects and holds information about each object. For example, users in AD belong to the class "user," and computer objects to "computer," and so on.&nbsp;</p>
+<p>Each object has its own information (some required to be set and others optional) that are stored in Attributes. When an object is created from a class, this is called instantiation, and an object created from a specific class is called an instance of that class. For example, if we take a computer named RDS01. This computer object is an instance of the "computer" class in AD.</p>
+<p id="mcetoc_1gsmucpi7boc"><strong>Domain</strong></p>
+<p>A domain is a logical group of objects such as computers, users, OUs, groups, etc. We can think of each domain as a different city within a state or country. Domains can operate entirely independently of one another or be connected via trust relationships.</p>
+<div data-ephox-embed-iri="/storage/blog/lkFJozVuHGfUZ5fwTlIJAmgNRDO3L37r.png"><img src="../../../storage/blog/lkFJozVuHGfUZ5fwTlIJAmgNRDO3L37r.png" alt="Active directory forest diagram | HTB"></div>
+<p id="mcetoc_1gsmucpi7bod"><strong>Forest</strong></p>
+<p>A forest is a collection of Active Directory domains. It is the topmost container and contains all AD objects, including but not limited to domains, users, groups, computers, and Group Policy Objects (GPOs). A forest can contain one or multiple domains and be thought of as a state in the US or a country within the EU. Each forest operates independently but may have various trust relationships with other forests.</p>
+<p id="mcetoc_1gsmucpi7boe"><strong>Tree</strong></p>
+<p>A tree is a collection of Active Directory domains that begins at a single root domain. A forest is a collection of AD trees. Each domain in a tree shares a boundary with the other domains. A parent-child trust relationship is formed when a domain is added under another domain in a tree. Two trees in the same forest cannot share a name (namespace).&nbsp;</p>
+<p>Let's say we have two trees in an AD forest: inlanefreight.local and ilfreight.local. A child domain of the first would be corp.inlanefreight.local while a child domain of the second could be corp.ilfreight.local. All domains in a tree share a standard Global Catalog which contains all information about objects that belong to the tree.</p>
+<p>💡If you're interested in learning how to defend active directory, check out our guide on <a href="../../../blog/active-directory-hardening-pentester-vs-soc" target="_blank" rel="noopener">Active Directory hardening</a>, in which a SOC analyst defends AD from our Head of Security's attempts to perform a Golden Ticket attack.&nbsp;</p>
+<div data-ephox-embed-iri="/storage/blog/PvClbEXz3B8Rtxr3itl2eYTV2F3qqvCX.png"><img src="../../../storage/blog/PvClbEXz3B8Rtxr3itl2eYTV2F3qqvCX.png" alt="Active directory pentesting forests"></div>
+<p id="mcetoc_1gsmucpi7bof">Container</p>
+<p>Container objects hold other objects and have a defined place in the directory subtree hierarchy.</p>
+<p id="mcetoc_1gsmucpi7bog">Leaf</p>
+<p>Leaf objects do not contain other objects and are found at the end of the subtree hierarchy.</p>
+<p><em>Note:💡Get the <a href="../../../blog/active-directory-hardening-checklist-and-best-practices" target="_blank" rel="noopener">Active Directory hardening checklist</a> if you're in a rush!&nbsp;&nbsp;</em></p>
+<div data-ephox-embed-iri="/storage/blog/VYcNKHs3A899YeiU1Z2G2fkRqxaoHgxm.jpg"><img src="../../../storage/blog/VYcNKHs3A899YeiU1Z2G2fkRqxaoHgxm.jpg" alt="Active directory security best practices for hardening"></div>
+<h2 id="mcetoc_1gsmucpi7boh">15 important tools for Active Directory Pentesting</h2>
+<p>There are a plethora of tools for enumerating and attacking Active Directory environments, both from a Linux and a Windows testing machine. Below is a list of what I consider to be the top ten necessary tools to have present on a Linux testing machine and five more that I would have ready for once I get access to a Windows host in the environment.&nbsp;</p>
+<p>There are many, many other tools (an extensive list can be seen in the Active Directory Enumeration &amp; Attacks module) that we may need depending on what we run into during the assessment, but this list is what I use on pretty much any Active Directory-focused penetration testing engagement from start to finish.</p>
+<h3 id="mcetoc_1gsmucpi7boi">Base Linux machine toolkit:&nbsp;</h3>
+<ol>
+<li>
+<p><a href="https://github.com/fox-it/BloodHound.py">BloodHound.py</a> &amp; <a href="https://github.com/BloodHoundAD/BloodHound">BloodHound GUI</a> - Tool for enumerating Active Directory and creating graphical representations of possible attack paths. Check out the <a href="https://academy.hackthebox.com/course/preview/active-directory-bloodhound">Active Directory BloodHound</a> module for more on these tools.</p>
+</li>
+<li>
+<p><a href="https://github.com/fortra/impacket">Impacket Toolkit</a> - Various scripts for interacting with Active Directory, from enumeration and attacks to remote access and everything in between.</p>
+</li>
+<li>
+<p><a href="https://github.com/ropnop/kerbrute">Kerbrute</a> - Tool for enumerating valid Active Directory usernames and performing password spraying attacks.</p>
+</li>
+<li>
+<p><a href="https://github.com/lgandx/Responder">Responder</a>/<a href="https://github.com/RedTeamPentesting/pretender">Pretender</a> - Tools for performing poisoning attacks against various network protocols to gather password hashes for relaying attacks or offline password cracking.</p>
+</li>
+<li>
+<p><a href="https://github.com/Porchetta-Industries/CrackMapExec">CrackMapExec</a> - A multi-use Active Directory enumeration and attack tool that can be used with various protocols, including SMB, WinRM, LDAP, RDP, and more. It contains many modules for enumerating and attacking individual Windows hosts and Active Directory environments. There is an excellent module, <a href="https://academy.hackthebox.com/course/preview/using-crackmapexec">Using CrackMapExec</a>, on HTB Academy for practicing with this tool.&nbsp;</p>
+</li>
+<li>
+<p><a href="https://github.com/GhostPack/Rubeus">Rubeus</a> - A C# toolkit for interacting with and abusing the Kerberos protocol.</p>
+</li>
+<li>
+<p><a href="https://github.com/ly4k/Certipy">Certipy</a> - A tool for enumerating and attacking Active Directory Certificate Services (AD CS).</p>
+</li>
+<li>
+<p><a href="https://github.com/dirkjanm/PKINITtools/">PKINITtools </a>- Various small tools for working with PKINIT (a pre-authentication mechanism for Kerberos 5). They are handy when performing attacks against AD CS.</p>
+</li>
+<li>
+<p><a href="https://hashcat.net/hashcat/">Hashcat </a>- A tool for performing offline password cracking. Very useful for the various types of password hashes we will collect during an AD pentesting engagement. Practice this powerful tool via the <a href="https://academy.hackthebox.com/course/preview/cracking-passwords-with-hashcat">Cracking Password with Hashcat</a> module on HTB Academy.</p>
+</li>
+<li>
+<p><a href="https://github.com/Hackplayers/evil-winrm">Evil-winrm</a> - A powerful tool for remotely authenticating to hosts via WinRM using an NTLM password hash, cleartext password, or Kerberos authentication.</p>
+</li>
+</ol>
+<h3 id="mcetoc_1gsmucpi7boj">Windows box tools:</h3>
+<ol>
+<li>
+<p><a href="https://github.com/gentilkiwi/mimikatz">Mimikatz</a> - A very powerful tool for extracting password hashes and other credential information from Windows hosts. It can be used in various AD attacks.&nbsp;</p>
+</li>
+<li>
+<p><a href="https://www.pingcastle.com/">PingCastle</a> - An excellent tool for auditing Active Directory security from the top down. Sometimes finds issues that other tools miss. Useful for recommending further AD hardening steps for customers in their pentest report.&nbsp;</p>
+</li>
+<li>
+<p><a href="https://github.com/GhostPack/Certify">Certify</a> - A C# tool for enumerating and attacking AD CS, similar to Certipy.</p>
+</li>
+<li>
+<p><a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1">PowerView</a> - A powerful PowerShell tool for enumerating and attacking AD. It can be used to dig very deep into various AD objects and for some attacks (i.e., Keberoasting). This tool is no longer supported by the authors in favor of C# tradecraft but remains a powerful and extremely handy tool to keep in your arsenal. A <a href="https://exploit.ph/powerview.html">fork</a> of the tool was made to add additional features, and it is worth checking out. Dig deep into this tool with the <a href="https://academy.hackthebox.com/course/preview/active-directory-powerview">Active Directory PowerView</a> module on HTB Academy.&nbsp;</p>
+</li>
+<li>
+<p><a href="https://github.com/BloodHoundAD/SharpHound">SharpHound</a> - The C# data collector for the BloodHound tool. There is also a <a href="https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/SharpHound.ps1">PowerShell version</a> and <a href="https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/AzureHound.md">AzureHound</a> for enumerating Azure environments. Check out the <a href="https://academy.hackthebox.com/course/preview/active-directory-bloodhound">Active Directory BloodHound</a> module for in-depth training on these collectors and the BloodHound GUI tool.&nbsp;</p>
+</li>
+</ol>
+<p>As mentioned in the descriptions, some of these tools have dedicated modules on HTB Academy; others are covered in-depth in modules such as <a href="https://academy.hackthebox.com/course/preview/active-directory-enumeration--attacks">Active Directory Enumeration &amp; Attacks</a>. Stay tuned for many more AD-focused modules on HTB Academy as well!</p>
+<p>We will discuss the “why” behind each of these tools in the next section, where we will see several sample approaches for starting a penetration test in an AD environment with and without being provided credentials by the client. Every environment is different, so certain tools may not be necessary, and everyone has their own style/approach, but these can be thought of as “high percentage” tools and techniques that will be employed more often than not.</p>
+<h2 id="mcetoc_1gsmucpi7bok">An overview of the Active Directory enumeration and pentesting process</h2>
+<p>Methodologies for attacking Active Directory will vary from pentester to pentester, but one thing that will be true across all internal assessments is that we will start from either:&nbsp;</p>
+<ul>
+<li>
+<p>An uncredentialed standpoint: No AD user account and just an internal network connection.</p>
+</li>
+<li>
+<p>A credentialed standpoint: Typically a low privileged, standard AD user account.&nbsp;</p>
+</li>
+</ul>
+<p>So depending on how the client wants us to start the assessment, our initial steps will differ. Beginning with an AD user account is generally “easier” because we can move right into enumerating the vast attack surface that is AD. But, lucky for us, there are multiple ways to obtain a valid AD user account.</p>
+<div align="left">
+<div class="row story-card pt-3">
+<div class="col-12 mt-3">
+<div class="card bg-color-blue-nav-active border-radius-10">
+<div class="card-body">
+<p class="color-white font-size26 font-weight600" style="text-align: center;">Hone your AD enumeration and exploitation skills</p>
+<div data-ephox-embed-iri="/storage/blog/sHC2UBeYyw5C5BlRnp1zzbL08RpY3Qkc.jpg"><img src="../../../storage/blog/sHC2UBeYyw5C5BlRnp1zzbL08RpY3Qkc.jpg" alt="offshore labs pentesting active directory"></div>
+<p>Offshore is a real-world enterprise environment that features a wide range of modern Active Directory flaws and misconfigurations. We challenge you to breach the perimeter, gain a foothold, explore the corporate environment and pivot across trust boundaries, and ultimately, <strong>compromise all </strong>Offshore Corp entities.</p>
+<p><em>Upon completion, players will earn <strong>40 (ISC)² CPE</strong> credits and learn essential aspects of AD penetration testing.&nbsp;</em></p>
+<div class="mb-2" style="text-align: center;"><a class="btn btn-htb-green btn-htb-filled no-preview letter-spacing-1-2 px-7" href="../../../hacker/pro-labs" target="_blank" rel="noopener">Practice AD pentesting</a></div>
+</div>
+</div>
+</div>
+</div>
+&nbsp;</div>
+<p>&nbsp;</p>
+<h3 id="mcetoc_1gsmucpi7bol">Starting out (uncredentialed)</h3>
+<p>In my experience, the customer will usually ask the tester to start from an anonymous position on the network to see how far an attacker who can gain internal network access can move laterally and vertically. There are several ways we can obtain a valid AD user account. Let’s look at a few. <br><br><em>💡Note: The examples here also assume that stealth is not a consideration for the assessment, but rather we are helping the customer to identify as many issues as possible across their AD environment.&nbsp;</em></p>
+<ol>
+<li>
+<p>A quick win is often running a tool such as Responder or Pretender to perform either LLMNR/NBT-NS Response Spoofing or DNS Spoofing over IPv6 to obtain NTLMv1 or NTLMv2 (more common nowadays) password hashes to either crack offline using Hashcat or perform an SMB Relay attack to dump domain data or gain local admin access to a host.&nbsp;</p>
+</li>
+<li>
+<p>If we find that one or more domain controllers are configured to allow SMB NULL sessions or LDAP anonymous binds, we can dump a list of all AD users along with the domain password policy and mount a password spraying attack using a tool such as Kerbrute. If we are fortunate enough to obtain the domain password policy, we are generally safe with multiple password spray attempts, provided that we are operating within the bounds of the password policy and not locking accounts out. We only need one hit (successful password spray) to begin our AD enumeration/attacks.</p>
+</li>
+<li>
+<p>If the first two options are not working, we can build our own user list to enumerate valid AD user accounts with Kerbrute. I typically start by scraping the target company’s LinkedIn page using linkedin2username and testing for valid accounts against that list. I will usually get some hits here. Once I know the username format (i.e., jsmith or john.smith), I can proceed to perform further enumeration using one of the lists, such as jsmith.txt, from the statistically-likely-usernames GitHub repo. Armed with this list, I can perform 1-2 password spray attempts with a common password such as Welcome1 and then the season + year or month + year (i.e., Spring2023 or March2023). Not knowing the password policy, I usually would not go any further, so I will sometimes ask the client if they are willing to provide it. If not, then I will move on to not risk locking out one or many AD user accounts.</p>
+</li>
+<li>
+<p>If none of the above work, perhaps we can find a system vulnerable to a known exploit that we can land a SYSTEM shell on. If the machine is domain-joined, then this is just as good as any AD user account to start performing our enumeration.</p>
+</li>
+<li>
+<p>Any number of attacks that can be used to coerce NTLM authentication. One example is PetitPotam which sometimes can be used to perform an NTLM relaying attack without requiring valid AD user credentials if AD CS is present and configured on a domain controller instead of a separate server.</p>
+</li>
+</ol>
+<p>There are many other ways that we may obtain a foothold in AD. We won’t cover all of them here; the above are some of the most common “easy wins” and “low-hanging fruit”. Now let’s look at how we can start if we’re given a valid AD user account. The following steps would also typically be how I would proceed after obtaining a valid AD user account.&nbsp;</p>
+<p><em>💡Note: </em><em>Even if the client has you start with credentials, it is worth running through the steps above to show them any additional attack vectors in their network (such as weak credentials, unpatched systems, or network protocols that allow for credential theft).</em></p>
+<h3 id="mcetoc_1gsmucpi7bom">Starting out (with credentials)</h3>
+<ol>
+<li>
+<p>When we have a valid AD user account, the first step is typically to get a lay of the land. We can do this very effectively with BloodHound and begin to map out attack paths, such as hosts we may have local admin on or potential users/computers to target. We could also use PowerView or many other tools to enumerate information about key AD objects and their permissions.&nbsp;</p>
+</li>
+<li>
+<p>Active Directory Certificate Services (AD CS) presents a vast attack surface, so it's always worth checking to see if it is present and then enumerating for possible misconfigurations using Certipy or Certify. When present, a misconfiguration could quickly lead to Domain Admin level access, or complete administrative control over the AD domain.</p>
+</li>
+<li>
+<p>We could also perform “roasting” attacks such as Kerberoasting or ASREPRoasting. The success of these attacks depends on an account having a weak password set, but if we can obtain and crack a password hash, we may gain access to an account that can help us move further toward our goal or even go direct to Domain Admin. (<em>Related read: <a href="what-is-kerberos-authentication" target="_blank" rel="noopener">What is Kerberos security and authentication?</a></em>)</p>
+</li>
+<li>
+<p>We could potentially perform a DACL attack, exploit a misconfigured GPO, leverage group membership that allows for Remote Desktop (RDP) access to a host and then escalate privileges, find a password in a user or computer’s description field, or find a password in a Group Policy preferences file.</p>
+</li>
+<li>
+<p>Often we can pull off more advanced Kerberos delegation attacks such as Resource- Based Constrained Delegation (RBCD), relaying to AD CS using PetiPotam, the Shadow Credentials attack, and others that are outside the scope of this post. <strong>Recommended read:</strong> <a href="../../../blog/8-powerful-kerberos-attacks" target="_blank" rel="noopener">8 Powerful Kerberos attacks (that analysts hate).</a></p>
+</li>
+<li>
+<p>Sometimes we are getting nowhere and must resort to digging around shares for juicy data, such as a user that keeps all their passwords in a .txt file or spreadsheet; a web.config file with an MSSQL service account password; a VMDK backup of a host that we can pull the local administrator password hash from and re-use across other systems, and more. PowerView or CrackMapExec can be used for this purpose, but one of my favorite tools for digging in shares is <a href="https://github.com/SnaffCon/Snaffler">Snaffler</a>. Another excellent tool for digging into shares and performing a permissions audit on shares is <a href="https://github.com/NetSPI/PowerHuntShares">PowerHuntShares</a>. Similar to how we mentioned PingCastle earlier, we can use this tool to provide extra, more granular data for our clients so they can work on their file share permissions which can be very difficult to maintain correctly, especially in large environments.&nbsp;</p>
+</li>
+</ol>
+<p>We’ve seen multiple ways to gain a foothold in AD from an anonymous perspective on the network and what steps we can take if we are given a valid AD user (or after obtaining a foothold). The approaches in these lists are not exhaustive, as the paths we take will vary from assessment to assessment, but the examples should be a great starting point for anyone looking to get a leg up during their AD-focused pentests. Any organization running Active Directory can also use these examples as a sort of “self checkup” to see how well they are protected against common and less common tactics used by penetration testers and malicious actors.</p>
+<h2 id="mcetoc_1gsmucpi7bon">Active directory cheat sheet of commands and tips&nbsp;</h2>
+<p>Putting together a cheat sheet for AD commands is a complex task, as there are so many important commands to be aware of! In the cheat sheet below, I’ve picked a small sample of commands that follow a logical flow from the beginning to the end of an assessment and also fit the (credential and uncredentialed) attack methodology examples I gave earlier in the blog post. The commands we run during an assessment vary based on the target environment and personal style, but these are a small subset of “high percentage” commands/variations of commands that I see run on most internal network assessments where AD is in play.&nbsp;&nbsp;</p>
+<div align="left">
+<table><colgroup><col style="width: 275px;"><col style="width: 215px;"><col style="width: 111px;"></colgroup>
+<tbody>
+<tr style="height: 25pt;">
+<td>
+<p>Command</p>
+</td>
+<td>
+<p>Description</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 38.5pt;">
+<td>
+<p>sudo responder -I ens224 -A</p>
+</td>
+<td>
+<p>Start Responder in analysis mode</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 66.25pt;">
+<td>
+<p>sudo responder -I ens224 -w -d</p>
+</td>
+<td>
+<p>Start network traffic response spoofing with Responder to gather NTLMv2 password hashes</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 51.75pt;">
+<td>
+<p>kerbrute userenum -d INLANEFREIGHT.LOCAL --dc 172.16.5.5 jsmith.txt -o kerb-results</p>
+</td>
+<td>
+<p>Enumerate valid Active Directory users for password spraying</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 66.25pt;">
+<td>
+<p>hashcat -m 5600 bsmith_ntlmv2 /usr/share/wordlists/rockyou.txt</p>
+</td>
+<td>
+<p>Attempt to crack an NTLMv2 password hash gathered with Responder using the Hashcat tool</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>crackmapexec smb 172.16.5.5 -u avazquez -p Password123 --pass-pol</p>
+</td>
+<td>
+<p>Enumerate the domain password policy using CrackMapExec</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>crackmapexec smb 10.129.203.121 -u '' -p '' --users --export $(pwd)/users.txt</p>
+</td>
+<td>
+<p>Check for SMB NULL sessions on a domain controller host and enumerate valid users</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 66.25pt;">
+<td>
+<p>enum4linux -P 172.16.5.5</p>
+</td>
+<td>
+<p>Leverage an SMB NULL session on a domain controller host to verify the domain password policy</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>kerbrute passwordspray -d inlanefreight.local --dc 172.16.5.5 valid_users.txt Welcome1</p>
+</td>
+<td>
+<p>Perform a password spraying attack using the Kerbrute tool</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>Import-Module ActiveDirectory</p>
+</td>
+<td>
+<p>Load the built-in Active Directory PowerShell module on a Windows host</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 134.5pt;">
+<td>
+<p>Get-ADUser -Filter * | select Name</p>
+</td>
+<td>
+<p>List all domain users using the Active Directory PowerShell module Get-ADUser cmdlet and filter by the username</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 106.75pt;">
+<td>
+<p>Get-DomainUser * | Select-Object samaccountname,description</p>
+</td>
+<td>
+<p>Check the description field of all domain users for sensitive data such as passwords</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 38.5pt;">
+<td>
+<p>GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/mholliday</p>
+</td>
+<td>
+<p>Kerberoast from a Linux attack host</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 66.25pt;">
+<td>
+<p>bloodhound-python -d INLANEFREIGHT.LOCAL -dc ACADEMY-EA-DC01 -c All -u bsmith -p Welcome1</p>
+</td>
+<td>
+<p>Run the BloodHound Python version from a Linux attack host to map out the domain</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>SharpHound.exe -c all --zipfilename inlanefreight_bloodhound</p>
+</td>
+<td>
+<p>Run the SharpHound C# ingestor from a Windows attack host to map out the domain</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 66.25pt;">
+<td>
+<p>Invoke-BloodHound -CollectionMethod all -ZipFileName ilfreight_bloodhound</p>
+</td>
+<td>
+<p>Run the SharpHound PowerShell ingestor from a Windows attack host to map out the domain</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 52.75pt;">
+<td>
+<p>Rubeus.exe kerberoast /ldapfilter:'admincount=1' /nowrap</p>
+</td>
+<td>
+<p>Kerberoast admin accounts using the Rubeus tool from a Windows attack host</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr style="height: 91.5pt;">
+<td>
+<p>secretsdump.py -outputfile inlanefreight_hashes -just-dc INLANEFREIGHT/adunn@172.16.5.5 -use-vss</p>
+</td>
+<td>
+<p>Dump the NTDS Active Directory database to retrieve NTLM password hashes for all domain users for offline cracking</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;</p>
+<div data-ephox-embed-iri="/storage/blog/aBEL2cL4q8MRRcCfs1wJkcME9DtRqvNJ.jpg"><img src="../../../storage/blog/aBEL2cL4q8MRRcCfs1wJkcME9DtRqvNJ.jpg" alt="Active directory pentesting cheatsheet"></div>
+<p>&nbsp;</p>
+<div align="left">&nbsp;</div>
+<h2 id="mcetoc_1gsmucpi7boo">Final word on reporting and documentation&nbsp;</h2>
+<p>During an internal penetration test at a client's headquarters, a particularly hostile network administrator was skeptical of our abilities since the kickoff call. He stated that previous penetration tests from other companies had slowed the network down massively due to inexperienced and reckless testers.</p>
+<p>Less than 20 minutes into testing, this network admin had sent emails to the entire distribution list and came over to my desk telling me that our scans had slowed the network to a halt. Eventually, we discovered that this was caused by the debug mode being enabled on every network device, which combined with normal Nmap scans, caused slowdowns. Once this was disabled, testing proceeded without issues.</p>
+<p>In this case, our documentation backed up our actions and forced the customer to investigate further. If we didn’t have any (or had poor) documentation, the blame could have easily been placed on us, and it could have greatly impacted the client relationship and our firm’s reputation.</p>
+<p>Decimating a network’s defenses alongside our team members is fun. But it’s not the core reason why customers hire us to hack them. When undergoing penetration tests, what clients really want is an assessment or penetration testing report to provide them with a snapshot of their environment, its defenses, and their preparedness to deal with threats at that moment in time.</p>
+<p>That information (the good and the bad) will be used to determine:</p>
+<ul>
+<li>
+<p>Remediations they need to apply.</p>
+</li>
+<li>
+<p>Hiring and resource budgets for their security team.&nbsp;</p>
+</li>
+<li>
+<p>The new defensive tools and processes they can invest in.</p>
+</li>
+<li>
+<p>Cybersecurity training they should acquire for the coming year.</p>
+</li>
+</ul>
+<p>So whether you lean towards internal or external testing or are looking to become a penetration tester, <a href="../../../blog/penetration-testing-reports-template-and-guide#the_importance_of_a_good_penetration_testing_report_for_security_and_for_your_career_">strong reporting and documentation skills</a> are critical throughout any engagement.&nbsp;Staying organized from the beginning of an assessment (especially when it involves a large AD environment) is vital.</p>
+<p>This will make it easier to go back and find enumeration data when in the attack phase, assist with the iterative testing process, help with answering client questions, and be highly worth it once it comes time for reporting. Hone your Active Directory penetration testing chops and combine them with strong organization, documentation, and reporting skills, and you will go far!<br><br></p>
+<table style="border-collapse: collapse; width: 99.9792%; border-color: #9FEF00;" border="2">
+<tbody>
+<tr>
+<td style="width: 99.73%;">
+<p><strong>Author bio: Ben Rollin (mrb3n), Head of Information Security, Hack The Box</strong></p>
+<p>Ben Rollin has over 13 years of information security consulting experience focusing on technical IT Audits, risk assessments, web application security assessments, and network penetration testing against large enterprise environments. He has a strong interest in Active Directory security and focuses time on research in this area as well as remaining current with the latest tactics, techniques, and procedures (TTPs). Ben has a bachelor's degree in Business Administration, as well as several industry certifications including Certified Information Systems Security Professional (CISSP), Certified Information Systems Auditor (CISA), Offensive Security Certified Expert (OSCE), and Offensive Security Certified Professional (OSCP).</p>
+<p style="text-align: left;">Feel free to connect with him on <a href="https://www.linkedin.com/in/ben-rollin/" target="_blank" rel="noopener">LinkedIn.</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div align="left">&nbsp;</div>
+</div>
+</div>
+</div>
+</section>
+<section class="social-bar fixed bg-color-blue-nav" id="social-bar">
+<div class="container mb-2 m-auto max-w-1200">
+<div class="row">
+<div class="col-12">
+<div class="divider d-flex justify-content-end justify-content-md-center py-3 text-decoration-none" id="social-bar-content">
+<a class="facebook popup px-2" href="https://www.facebook.com/sharer/sharer.php?u=https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.84325 24C10.6382 24 11.6445 24 13.4394 24C13.4394 19.7302 13.4394 13.0666 13.4394 13.0666H17.2704L17.8416 8.79077H13.4394V6.06861C13.4394 4.8318 13.7981 3.98253 15.6405 3.98253H18V0.166086C17.5922 0.114258 16.1932 0 14.5658 0C11.1696 0 8.84325 1.98596 8.84325 5.63632V8.78724H5V13.0525H8.84325C8.84325 13.0525 8.84325 19.7247 8.84325 24Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="linkedin popup px-2 text-decoration-none" href="https://www.linkedin.com/sharing/share-offsite?url=https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16061_17644)">
+<path d="M22.2234 0H1.77187C0.792187 0 0 0.773438 0 1.72969V22.2656C0 23.2219 0.792187 24 1.77187 24H22.2234C23.2031 24 24 23.2219 24 22.2703V1.72969C24 0.773438 23.2031 0 22.2234 0ZM7.12031 20.4516H3.55781V8.99531H7.12031V20.4516ZM5.33906 7.43438C4.19531 7.43438 3.27188 6.51094 3.27188 5.37187C3.27188 4.23281 4.19531 3.30937 5.33906 3.30937C6.47813 3.30937 7.40156 4.23281 7.40156 5.37187C7.40156 6.50625 6.47813 7.43438 5.33906 7.43438ZM20.4516 20.4516H16.8937V14.8828C16.8937 13.5562 16.8703 11.8453 15.0422 11.8453C13.1906 11.8453 12.9094 13.2937 12.9094 14.7891V20.4516H9.35625V8.99531H12.7687V10.5609H12.8156C13.2891 9.66094 14.4516 8.70938 16.1813 8.70938C19.7859 8.70938 20.4516 11.0813 20.4516 14.1656V20.4516Z" fill="#8799B5"></path>
+</g>
+<defs>
+<clipPath id="clip0_16061_17644">
+<rect width="24" height="24" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+</a>
+<a class="twitter popup px-2 text-decoration-none" href="https://twitter.com/intent/tweet?url=https://www.hackthebox.com/blog/active-directory-penetration-testing-cheatsheet-and-guide">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.3043 8.83908C13.2522 8.83908 11.843 7.06896 10.1739 4.91954L7.1473 1H3.57391C1.60383 1 0 1.0129 0 1.03743C0 1.06322 2.08696 3.78161 4.63043 7.06896C7.17391 10.369 9.24783 13.1121 9.23426 13.1637C9.20896 13.2011 7.122 15.4138 4.60383 18.0563C2.07391 20.6983 0 22.8994 0 22.9368C0 22.9742 0.456522 23 1.01687 23H2.02174L6 18.8149C8.19078 16.5143 10.0435 14.5793 10.1217 14.5161C10.2261 14.4395 11.2957 15.7172 13.5783 18.6885L16.8913 22.9874L20.4517 23C22.3962 23 24 22.9626 24 22.8994C24 22.8478 21.7957 19.9655 19.1087 16.4885L14.2174 10.1793L14.843 9.53448C15.1957 9.19259 16.9696 7.33448 18.7826 5.42529C20.5957 3.51584 22.2913 1.73283 22.5522 1.46832L23.0087 1H20.8826L17.1391 4.91954C15.0918 7.06896 13.3565 8.83908 13.3043 8.83908ZM10.443 12.1728C6.42234 6.78667 2.5 2 2.5 2H4.57256H6.22267L13.5984 11.8667C17.6449 17.2939 21.5 22 21.5 22L19.4012 22L18 22L10.443 12.1728Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="rss popup px-2 text-decoration-none" href="https://www.hackthebox.com/rss" target="_blank">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.92712 17.1364C2.31441 17.1364 1 18.4508 1 20.0636C1 21.6763 2.31441 22.9814 3.92712 22.9814C5.54915 22.9814 6.86356 21.6763 6.86356 20.0636C6.86356 18.4508 5.54915 17.1364 3.92712 17.1364ZM1 8.47627V12.6898C3.75 12.6898 6.32288 13.7619 8.27119 15.7102C10.2102 17.6492 11.2822 20.2407 11.2822 23H15.5144C15.5237 14.9924 9.00763 8.47627 1 8.47627ZM1.00932 1V5.21356C10.7975 5.21356 18.7678 13.1932 18.7678 23H23C23 10.872 13.1373 1 1.00932 1Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="pt-2">
+<div class="container m-auto max-w-1200" style="margin-top: 100px;">
+<div class="row">
+<div class="col-12">
+<div class=""></div>
+</div>
+</div>
+</div>
+<div class="container max-w-1200" style="margin-top: 80px;">
+<div style=" margin:auto;">
+<div class="row">
+<div class="col-12 pb-4">
+<h2 class="color-white font-size32 font-weight600 line-height-48">Latest News</h2>
+</div>
+</div>
+<div class="row">
+<div class="col-md-6 col-lg-4 pb-6 article-card animated animatedFadeInUp fadeInUp">
+<a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/nist-csf-2.0-skill-sets" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="bg-image-responsive border-radius-t-10 article-image embed-responsive embed-responsive-16by9">
+<img class="embed-responsive-item" src="/storage/blog/jTLDQ4U89vw38HpHV8MvBqCalGkCIgv7.jpg" alt="Hack the Box Blog">
+</div>
+</a><div class="d-flex flex-column bg-color-blue-nav-active border-radius-b-10 pt-2 pb-4 px-4 position-relative" style="min-height: 240px;"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/nist-csf-2.0-skill-sets" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="d-flex align-items-center my-2">
+<p class="font-size11 letter-spacing-1-2 text-uppercase mb-0">Cyber Teams
+</p>
+<div class="reading-time color-main font-size11 text-uppercase letter-spacing-2 d-flex align-items-center pl-2">
+<span class="reading-time__minutes pr-1">6</span> min read
+</div> </div>
+<h2 class="color-white font-size20 line-height-32 flex-grow-1">
+Building new skill sets for NIST CSF 2.0</h2>
+</a><div class="d-flex justify-content-between2"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/nist-csf-2.0-skill-sets" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><p class="color-white font-size15 line-height-18 m-0"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/nist-csf-2.0-skill-sets" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><a href="https://www.hackthebox.com/blog/author/Howard%20Poston">
+<img class="author-avatar border-radius-50pc mr-2" src="/images/landingv3/blog/authors/placeholder.webp" alt="Howard Poston avatar">
+</a>
+<span>
+<a class="color-green" href="https://www.hackthebox.com/blog/author/Howard%20Poston">Howard Poston</a>,<span class="color-main"> Jun 13,
+2024</span>
+</span>
+</p>
+</div>
+</div>
+
+</div>
+<div class="col-md-6 col-lg-4 pb-6 article-card animated animatedFadeInUp fadeInUp">
+<a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/cybersecurity-statistics" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="bg-image-responsive border-radius-t-10 article-image embed-responsive embed-responsive-16by9">
+<img class="embed-responsive-item" src="/storage/blog/VMde3QyKHR5RrhueEnYIBKhSx3NooyEU.jpg" alt="Hack the Box Blog">
+</div>
+</a><div class="d-flex flex-column bg-color-blue-nav-active border-radius-b-10 pt-2 pb-4 px-4 position-relative" style="min-height: 240px;"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/cybersecurity-statistics" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="d-flex align-items-center my-2">
+<p class="font-size11 letter-spacing-1-2 text-uppercase mb-0">Cyber Teams
+</p>
+<div class="reading-time color-main font-size11 text-uppercase letter-spacing-2 d-flex align-items-center pl-2">
+<span class="reading-time__minutes pr-1">12</span> min read
+</div> </div>
+<h2 class="color-white font-size20 line-height-32 flex-grow-1">
+18 cybersecurity statistics from HTB (AI threats to career worries)</h2>
+</a><div class="d-flex justify-content-between2"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/cybersecurity-statistics" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><div class="d-inline-flex align-items-center pt-4 authors-avatars-container" style="width:3rem"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/cybersecurity-statistics" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><a href="https://www.hackthebox.com/blog/author/Hassassin">
+<img class="author-avatar border-radius-50pc " src="/images/landingv3/blog/authors/Hassassin.png" alt="Hassassin avatar">
+</a>
+<a href="https://www.hackthebox.com/blog/author/fileake">
+<img class="author-avatar border-radius-50pc push-left position-relative" src="/images/landingv3/blog/authors/fileake.png" alt="fileake avatar">
+</a>
+</div>
+<div class="d-inline-flex align-items-center pt-4 authors-names-container pl-md-2">
+<p class="color-white font-size15 line-height-18 m-0">
+<span><a class="color-green" href="https://www.hackthebox.com/blog/author/Hassassin">Hassassin</a>
+&amp;
+</span>
+<span><a class="color-green" href="https://www.hackthebox.com/blog/author/fileake">fileake</a>
+,<span class="color-main">
+Jun 11,
+2024</span>
+</span>
+</p>
+</div>
+</div>
+</div>
+
+</div>
+<div class="col-md-6 col-lg-4 pb-6 article-card animated animatedFadeInUp fadeInUp">
+<a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/business-ctf-2024-the-vault-of-hope-recap" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="bg-image-responsive border-radius-t-10 article-image embed-responsive embed-responsive-16by9">
+<img class="embed-responsive-item" src="/storage/blog/gXP0B2V7d2fIIy7RzKOk6OB56EyeDhNT.jpg" alt="Hack the Box Blog">
+</div>
+</a><div class="d-flex flex-column bg-color-blue-nav-active border-radius-b-10 pt-2 pb-4 px-4 position-relative" style="min-height: 240px;"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/business-ctf-2024-the-vault-of-hope-recap" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+<div class="d-flex align-items-center my-2">
+<p class="font-size11 letter-spacing-1-2 text-uppercase mb-0">Cyber Teams
+</p>
+<div class="reading-time color-main font-size11 text-uppercase letter-spacing-2 d-flex align-items-center pl-2">
+<span class="reading-time__minutes pr-1">4</span> min read
+</div> </div>
+<h2 class="color-white font-size20 line-height-32 flex-grow-1">
+HTB Business CTF 2024: The Vault of Hope recap</h2>
+</a><div class="d-flex justify-content-between2"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/business-ctf-2024-the-vault-of-hope-recap" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><p class="color-white font-size15 line-height-18 m-0"><a class="article border-radius-10 text-decoration-none" href="https://www.hackthebox.com/blog/business-ctf-2024-the-vault-of-hope-recap" onclick="analytics.track('Clicked Blog Article', {position: 'body', platform: 'Marketing', platform_version: 'V3'})">
+</a><a href="https://www.hackthebox.com/blog/author/fileake">
+<img class="author-avatar border-radius-50pc mr-2" src="/images/landingv3/blog/authors/fileake.png" alt="fileake avatar">
+</a>
+<span>
+<a class="color-green" href="https://www.hackthebox.com/blog/author/fileake">fileake</a>,<span class="color-main"> Jun 07,
+2024</span>
+</span>
+</p>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="container-fluid bg-color-blue-nav-active" style="padding: 50px; margin-top: 50px;">
+<div class="row no-gutters justify-content-center">
+<div col="auto">
+<div class="row no-gutters">
+<div class="col">
+<img src="/images/landingv3/logo-htb-blog.svg" alt="Hack The Blog" style="width: 200px; margin-bottom: 15px;">
+</div>
+</div>
+<h2 class="color-white font-weight600 font-size22" style="margin-bottom: 15px;">The latest
+news and updates, direct from Hack The Box</h2>
+<a href="https://www.hackthebox.com/blog" class="text-none" target="_blank">
+<div class="menu-link-header-2">
+<span class="letter-spacing-02">Read More</span>
+</div>
+</a>
+</div>
+</div>
+</div>
+</section>
+</section>
+</div>
+<section class="footer desktop_version">
+<div class="container">
+<div class="row justify-content-between pb-9">
+<div class="col-lg-2">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0">
+Products
+</div>
+<div>
+<p class="color-white mb-6px font-size14">Individuals</p>
+<a class="link mb-6px mt-0  mt-0 " href="https://academy.hackthebox.com">HTB Academy</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/hacking-labs">HTB Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/pro-labs">Elite Red Team Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/ctf">Capture The Flag</a>
+<a class="link mb-6px mt-0 pb-5  " href="https://academy.hackthebox.com/preview/certifications">Certifications</a>
+<p class="color-white mb-6px font-size14">Teams</p>
+<a class="link mb-6px mt-0  mt-0 " href="https://academy.hackthebox.com/academy-for-business">Academy for Business</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/dedicated-labs">Dedicated Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/professional-labs">Professional Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/professional-labs/cloud-labs-blacksky">BlackSky: Cloud Labs</a>
+<a class="link mb-6px mt-0 pb-5  " href="https://enterprise.hackthebox.com/create-company">Start a free trial</a>
+</div>
+</div>
+<div class="col-lg-2">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0">
+Solutions
+</div>
+<div>
+<p class="color-white mb-6px font-size14">Industries</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://resources.hackthebox.com/government">Government</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/finance">Finance</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/manufacturing">Manufacturing</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/healthcare">Healthcare</a>
+</div>
+</div>
+<div class="col-lg-2">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0">Pricing
+</div>
+<div>
+<a class="link mb-6px mt-0 
+                        " href="https://www.hackthebox.com/hacker/pricing">
+For Individuals</a>
+<a class="link mb-6px mt-0 
+                        " href="https://www.hackthebox.com/business/pricing">
+For Teams</a>
+</div>
+</div>
+<div class="col-lg-2">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0">
+Resources
+</div>
+<div>
+<p class="color-white mb-6px font-size14">Community</p>
+<a class="link mb-6px mt-0  mt-0  mt-0" href="https://www.hackthebox.com/blog">Blog</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/events">Upcoming Events</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/meetups">Meetups</a>
+<a class="link mb-6px mt-0    mt-0" href="https://forum.hackthebox.com">Forum</a>
+<a class="link mb-6px mt-0    mt-0" href="https://resources.hackthebox.com/affiliates">Affiliate Program</a>
+<a class="link mb-6px mt-0 pb-5   mt-0" href="https://resources.hackthebox.com/become-an-htb-subject-matter-expert">SME Program</a>
+<p class="color-white mb-6px font-size14">Get Help</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://help.hackthebox.com">Help Center</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/contact-us">Contact Support</a>
+</div>
+</div>
+<div class="col-lg-2">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0">Company
+</div>
+<div>
+<a class="link mb-6px mt-0  mt-0  mt-0" href="https://www.hackthebox.com/about-us">About us</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/join-us">Careers</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/certificates">Certificate Validation</a>
+<a class="link mb-6px mt-0 pb-5   mt-0" href="https://www.hackthebox.com/legal">Legal</a>
+<p class="color-white mb-6px font-size14">Contact us</p>
+<a class="link mb-6px mt-0  mt-0" href="https://www.hackthebox.com/blog/category/news">Press</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/channel-partners">Partners</a>
+<a class="link mb-6px mt-0 pb-5 " href="https://www.hackthebox.com/business-cyber-security-training">Enterprise Sales</a>
+<p class="color-white mb-6px font-size14">Store</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://hackthebox.store" target="&quot;_blank&quot;">HTB Swag</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/giftcards">Buy Gift Cards</a>
+</div>
+</div>
+</div>
+<div class="row copyrights-wrapper">
+<div class="col-lg-5 d-flex align-items-center pb-5 pb-lg-0">
+<div class="social-icons d-flex justify-content-between justify-content-xs-start flex-wrap">
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.facebook.com/hackthebox.eu" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.84325 24C10.6382 24 11.6445 24 13.4394 24C13.4394 19.7302 13.4394 13.0666 13.4394 13.0666H17.2704L17.8416 8.79077H13.4394V6.06861C13.4394 4.8318 13.7981 3.98253 15.6405 3.98253H18V0.166086C17.5922 0.114258 16.1932 0 14.5658 0C11.1696 0 8.84325 1.98596 8.84325 5.63632V8.78724H5V13.0525H8.84325C8.84325 13.0525 8.84325 19.7247 8.84325 24Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.instagram.com/hackthebox/" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16061_17639)">
+<path d="M12 2.16094C15.2063 2.16094 15.5859 2.175 16.8469 2.23125C18.0188 2.28281 18.6516 2.47969 19.0734 2.64375C19.6313 2.85938 20.0344 3.12188 20.4516 3.53906C20.8734 3.96094 21.1313 4.35938 21.3469 4.91719C21.5109 5.33906 21.7078 5.97656 21.7594 7.14375C21.8156 8.40937 21.8297 8.78906 21.8297 11.9906C21.8297 15.1969 21.8156 15.5766 21.7594 16.8375C21.7078 18.0094 21.5109 18.6422 21.3469 19.0641C21.1313 19.6219 20.8687 20.025 20.4516 20.4422C20.0297 20.8641 19.6313 21.1219 19.0734 21.3375C18.6516 21.5016 18.0141 21.6984 16.8469 21.75C15.5813 21.8062 15.2016 21.8203 12 21.8203C8.79375 21.8203 8.41406 21.8062 7.15313 21.75C5.98125 21.6984 5.34844 21.5016 4.92656 21.3375C4.36875 21.1219 3.96563 20.8594 3.54844 20.4422C3.12656 20.0203 2.86875 19.6219 2.65313 19.0641C2.48906 18.6422 2.29219 18.0047 2.24063 16.8375C2.18438 15.5719 2.17031 15.1922 2.17031 11.9906C2.17031 8.78438 2.18438 8.40469 2.24063 7.14375C2.29219 5.97187 2.48906 5.33906 2.65313 4.91719C2.86875 4.35938 3.13125 3.95625 3.54844 3.53906C3.97031 3.11719 4.36875 2.85938 4.92656 2.64375C5.34844 2.47969 5.98594 2.28281 7.15313 2.23125C8.41406 2.175 8.79375 2.16094 12 2.16094ZM12 0C8.74219 0 8.33438 0.0140625 7.05469 0.0703125C5.77969 0.126563 4.90313 0.332812 4.14375 0.628125C3.35156 0.9375 2.68125 1.34531 2.01563 2.01562C1.34531 2.68125 0.9375 3.35156 0.628125 4.13906C0.332812 4.90313 0.126563 5.775 0.0703125 7.05C0.0140625 8.33437 0 8.74219 0 12C0 15.2578 0.0140625 15.6656 0.0703125 16.9453C0.126563 18.2203 0.332812 19.0969 0.628125 19.8563C0.9375 20.6484 1.34531 21.3188 2.01563 21.9844C2.68125 22.65 3.35156 23.0625 4.13906 23.3672C4.90313 23.6625 5.775 23.8687 7.05 23.925C8.32969 23.9812 8.7375 23.9953 11.9953 23.9953C15.2531 23.9953 15.6609 23.9812 16.9406 23.925C18.2156 23.8687 19.0922 23.6625 19.8516 23.3672C20.6391 23.0625 21.3094 22.65 21.975 21.9844C22.6406 21.3188 23.0531 20.6484 23.3578 19.8609C23.6531 19.0969 23.8594 18.225 23.9156 16.95C23.9719 15.6703 23.9859 15.2625 23.9859 12.0047C23.9859 8.74688 23.9719 8.33906 23.9156 7.05938C23.8594 5.78438 23.6531 4.90781 23.3578 4.14844C23.0625 3.35156 22.6547 2.68125 21.9844 2.01562C21.3188 1.35 20.6484 0.9375 19.8609 0.632812C19.0969 0.3375 18.225 0.13125 16.95 0.075C15.6656 0.0140625 15.2578 0 12 0Z" fill="#8799B5"></path>
+<path d="M12 5.83594C8.59688 5.83594 5.83594 8.59688 5.83594 12C5.83594 15.4031 8.59688 18.1641 12 18.1641C15.4031 18.1641 18.1641 15.4031 18.1641 12C18.1641 8.59688 15.4031 5.83594 12 5.83594ZM12 15.9984C9.79219 15.9984 8.00156 14.2078 8.00156 12C8.00156 9.79219 9.79219 8.00156 12 8.00156C14.2078 8.00156 15.9984 9.79219 15.9984 12C15.9984 14.2078 14.2078 15.9984 12 15.9984Z" fill="#8799B5"></path>
+<path d="M19.8469 5.59214C19.8469 6.38902 19.2 7.0312 18.4078 7.0312C17.6109 7.0312 16.9688 6.38433 16.9688 5.59214C16.9688 4.79526 17.6156 4.15308 18.4078 4.15308C19.2 4.15308 19.8469 4.79995 19.8469 5.59214Z" fill="#8799B5"></path>
+</g>
+<defs>
+<clipPath id="clip0_16061_17639">
+<rect width="24" height="24" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://twitter.com/hackthebox_eu" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.3043 8.83908C13.2522 8.83908 11.843 7.06896 10.1739 4.91954L7.1473 1H3.57391C1.60383 1 0 1.0129 0 1.03743C0 1.06322 2.08696 3.78161 4.63043 7.06896C7.17391 10.369 9.24783 13.1121 9.23426 13.1637C9.20896 13.2011 7.122 15.4138 4.60383 18.0563C2.07391 20.6983 0 22.8994 0 22.9368C0 22.9742 0.456522 23 1.01687 23H2.02174L6 18.8149C8.19078 16.5143 10.0435 14.5793 10.1217 14.5161C10.2261 14.4395 11.2957 15.7172 13.5783 18.6885L16.8913 22.9874L20.4517 23C22.3962 23 24 22.9626 24 22.8994C24 22.8478 21.7957 19.9655 19.1087 16.4885L14.2174 10.1793L14.843 9.53448C15.1957 9.19259 16.9696 7.33448 18.7826 5.42529C20.5957 3.51584 22.2913 1.73283 22.5522 1.46832L23.0087 1H20.8826L17.1391 4.91954C15.0918 7.06896 13.3565 8.83908 13.3043 8.83908ZM10.443 12.1728C6.42234 6.78667 2.5 2 2.5 2H4.57256H6.22267L13.5984 11.8667C17.6449 17.2939 21.5 22 21.5 22L19.4012 22L18 22L10.443 12.1728Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.linkedin.com/company/hackthebox/" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16061_17644)">
+<path d="M22.2234 0H1.77187C0.792187 0 0 0.773438 0 1.72969V22.2656C0 23.2219 0.792187 24 1.77187 24H22.2234C23.2031 24 24 23.2219 24 22.2703V1.72969C24 0.773438 23.2031 0 22.2234 0ZM7.12031 20.4516H3.55781V8.99531H7.12031V20.4516ZM5.33906 7.43438C4.19531 7.43438 3.27188 6.51094 3.27188 5.37187C3.27188 4.23281 4.19531 3.30937 5.33906 3.30937C6.47813 3.30937 7.40156 4.23281 7.40156 5.37187C7.40156 6.50625 6.47813 7.43438 5.33906 7.43438ZM20.4516 20.4516H16.8937V14.8828C16.8937 13.5562 16.8703 11.8453 15.0422 11.8453C13.1906 11.8453 12.9094 13.2937 12.9094 14.7891V20.4516H9.35625V8.99531H12.7687V10.5609H12.8156C13.2891 9.66094 14.4516 8.70938 16.1813 8.70938C19.7859 8.70938 20.4516 11.0813 20.4516 14.1656V20.4516Z" fill="#8799B5"></path>
+</g>
+<defs>
+<clipPath id="clip0_16061_17644">
+<rect width="24" height="24" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.tiktok.com/@hackthebox_official" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.0725 0H13.0278V16.3478C13.0278 18.2957 11.4722 19.8957 9.53626 19.8957C7.60034 19.8957 6.04469 18.2957 6.04469 16.3478C6.04469 14.4348 7.56577 12.8695 9.43257 12.8V8.69567C5.31872 8.7652 2 12.1391 2 16.3478C2 20.5913 5.38786 24 9.57085 24C13.7538 24 17.1416 20.5565 17.1416 16.3478V7.9652C18.6627 9.07827 20.5295 9.73913 22.5 9.77393V5.66957C19.4579 5.56522 17.0725 3.06087 17.0725 0Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.youtube.com/c/HackTheBox/featured" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path d="M23.7609 7.20005C23.7609 7.20005 23.5266 5.54536 22.8047 4.8188C21.8906 3.86255 20.8688 3.85786 20.4 3.80161C17.0438 3.55786 12.0047 3.55786 12.0047 3.55786H11.9953C11.9953 3.55786 6.95625 3.55786 3.6 3.80161C3.13125 3.85786 2.10938 3.86255 1.19531 4.8188C0.473438 5.54536 0.24375 7.20005 0.24375 7.20005C0.24375 7.20005 0 9.14536 0 11.086V12.9047C0 14.8454 0.239062 16.7907 0.239062 16.7907C0.239062 16.7907 0.473437 18.4454 1.19062 19.1719C2.10469 20.1282 3.30469 20.0954 3.83906 20.1985C5.76094 20.3813 12 20.4375 12 20.4375C12 20.4375 17.0438 20.4282 20.4 20.1891C20.8688 20.1329 21.8906 20.1282 22.8047 19.1719C23.5266 18.4454 23.7609 16.7907 23.7609 16.7907C23.7609 16.7907 24 14.85 24 12.9047V11.086C24 9.14536 23.7609 7.20005 23.7609 7.20005ZM9.52031 15.1125V8.36724L16.0031 11.7516L9.52031 15.1125Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.twitch.tv/hackthebox" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path d="M1.5634 0L0 4.16919V20.8439H5.72978V23.9723H8.85801L11.9831 20.8439H16.6721L22.9254 14.5929V0H1.5634ZM3.64627 2.08327H20.8416V13.5485L17.1933 17.197H11.4627L8.33845 20.3211V17.197H3.64627V2.08327ZM9.37836 12.5076H11.4627V6.25468H9.37836V12.5076ZM15.1094 12.5076H17.1933V6.25468H15.1094V12.5076Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://discord.com/invite/hackthebox" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path d="M20.3303 4.22781C18.7767 3.50093 17.1156 2.97267 15.3789 2.67188C15.1656 3.05749 14.9164 3.57614 14.7446 3.98873C12.8985 3.71109 11.0693 3.71109 9.25716 3.98873C9.08539 3.57614 8.83055 3.05749 8.61536 2.67188C6.87681 2.97267 5.21376 3.50287 3.66019 4.23166C0.526643 8.96686 -0.322811 13.5845 0.101917 18.1365C2.18025 19.6885 4.19441 20.6313 6.17457 21.2483C6.66349 20.5754 7.09953 19.8601 7.47518 19.1063C6.75975 18.8344 6.07453 18.499 5.42707 18.1095C5.59884 17.9822 5.76686 17.8492 5.92918 17.7123C9.87819 19.5594 14.1689 19.5594 18.0707 17.7123C18.235 17.8492 18.403 17.9822 18.5728 18.1095C17.9235 18.5009 17.2364 18.8363 16.521 19.1082C16.8966 19.8601 17.3308 20.5774 17.8216 21.2502C19.8036 20.6333 21.8197 19.6905 23.898 18.1365C24.3964 12.8595 23.0467 8.28434 20.3303 4.22781ZM8.01318 15.337C6.82772 15.337 5.85555 14.2303 5.85555 12.8826C5.85555 11.535 6.80696 10.4264 8.01318 10.4264C9.21942 10.4264 10.1916 11.533 10.1708 12.8826C10.1727 14.2303 9.21942 15.337 8.01318 15.337ZM15.9867 15.337C14.8013 15.337 13.8291 14.2303 13.8291 12.8826C13.8291 11.535 14.7805 10.4264 15.9867 10.4264C17.193 10.4264 18.1651 11.533 18.1444 12.8826C18.1444 14.2303 17.193 15.337 15.9867 15.337Z" fill="#8799B5"></path>
+</svg>
+</a>
+<a class="no-hover-decoration color-forever-blue mr-3" href="https://www.hackthebox.com/rss" aria-label="social media">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.92712 17.1364C2.31441 17.1364 1 18.4508 1 20.0636C1 21.6763 2.31441 22.9814 3.92712 22.9814C5.54915 22.9814 6.86356 21.6763 6.86356 20.0636C6.86356 18.4508 5.54915 17.1364 3.92712 17.1364ZM1 8.47627V12.6898C3.75 12.6898 6.32288 13.7619 8.27119 15.7102C10.2102 17.6492 11.2822 20.2407 11.2822 23H15.5144C15.5237 14.9924 9.00763 8.47627 1 8.47627ZM1.00932 1V5.21356C10.7975 5.21356 18.7678 13.1932 18.7678 23H23C23 10.872 13.1373 1 1.00932 1Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+</div>
+<div class="col-lg-7 d-flex flex-column flex-md-row justify-content-end justify-content-md-between justify-content-xxl-end">
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="link color-main" href="javascript:void(0);" onclick="Cookiebot.renew();">Cookie
+Settings</a></div>
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="link color-main" href="https://resources.hackthebox.com/hubfs/Legal/PN.pdf" target="_blank">Privacy Policy</a>
+</div>
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="color-main link" href="https://resources.hackthebox.com/hubfs/Legal/UA.pdf" target="_blank">User Agreement</a>
+
+</div>
+<div class="mx-4 mx-md-0 mx-xxl-4 copyright">© 2024 Hack The Box</div>
+</div>
+</div>
+</div>
+</section>
+<section class="footer mobile_version">
+<div class="container">
+<div class="row justify-content-between pb-9 the-footer-mobile">
+<div class="col-lg-2 accordian border-to-bottom border-to-bottom-lg">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0 accordian_title position-relative">
+Products
+</div>
+<div class="accordian_content">
+<p class="color-white mb-6px font-size14">Individuals</p>
+<a class="link mb-6px mt-0  mt-0 " href="https://academy.hackthebox.com">HTB Academy</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/hacking-labs">HTB Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/pro-labs">Elite Red Team Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/hacker/ctf">Capture The Flag</a>
+<a class="link mb-6px mt-0 pb-5  " href="https://academy.hackthebox.com/preview/certifications">Certifications</a>
+<p class="color-white mb-6px font-size14">Teams</p>
+<a class="link mb-6px mt-0  mt-0 " href="https://academy.hackthebox.com/academy-for-business">Academy for Business</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/dedicated-labs">Dedicated Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/professional-labs">Professional Labs</a>
+<a class="link mb-6px mt-0   " href="https://www.hackthebox.com/business/professional-labs/cloud-labs-blacksky">BlackSky: Cloud Labs</a>
+<a class="link mb-6px mt-0 pb-5  " href="https://enterprise.hackthebox.com/create-company">Start a free trial</a>
+</div>
+</div>
+<div class="col-lg-2 accordian border-to-bottom border-to-bottom-lg">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0 accordian_title position-relative">
+Solutions
+</div>
+<div class="accordian_content">
+<p class="color-white mb-6px font-size14">Industries</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://resources.hackthebox.com/government">Government</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/finance">Finance</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/manufacturing">Manufacturing</a>
+<a class="link mb-6px mt-0  " href="https://resources.hackthebox.com/healthcare">Healthcare</a>
+</div>
+</div>
+<div class="col-lg-2 accordian border-to-bottom border-to-bottom-lg">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0 accordian_title position-relative">Pricing
+</div>
+<div class="accordian_content">
+<a class="link mb-6px mt-0 
+                        " href="https://www.hackthebox.com/hacker/pricing">
+For Individuals</a>
+<a class="link mb-6px mt-0 
+                        " href="https://www.hackthebox.com/business/pricing">
+For Teams</a>
+</div>
+</div>
+<div class="col-lg-2 accordian border-to-bottom border-to-bottom-lg">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0 accordian_title position-relative">
+Resources
+</div>
+<div class="accordian_content">
+<p class="color-white mb-6px font-size14">Community</p>
+<a class="link mb-6px mt-0  mt-0  mt-0" href="https://www.hackthebox.com/blog">Blog</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/events">Upcoming Events</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/meetups">Meetups</a>
+<a class="link mb-6px mt-0    mt-0" href="https://forum.hackthebox.com">Forum</a>
+<a class="link mb-6px mt-0    mt-0" href="https://resources.hackthebox.com/affiliates">Affiliate Program</a>
+<a class="link mb-6px mt-0 pb-5   mt-0" href="https://resources.hackthebox.com/become-an-htb-subject-matter-expert">SME Program</a>
+<p class="color-white mb-6px font-size14">Get Help</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://help.hackthebox.com">Help Center</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/contact-us">Contact Support</a>
+</div>
+</div>
+<div class="col-lg-2 accordian border-to-bottom border-to-bottom-lg">
+<div class="font-size18 color-white py-3 pb-xl-5 pt-xl-0 accordian_title position-relative">Company
+</div>
+<div class="accordian_content">
+<a class="link mb-6px mt-0  mt-0  mt-0" href="https://www.hackthebox.com/about-us">About us</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/join-us">Careers</a>
+<a class="link mb-6px mt-0    mt-0" href="https://www.hackthebox.com/certificates">Certificate Validation</a>
+<a class="link mb-6px mt-0 pb-5   mt-0" href="https://www.hackthebox.com/legal">Legal</a>
+<p class="color-white mb-6px font-size14">Contact us</p>
+<a class="link mb-6px mt-0  mt-0" href="https://www.hackthebox.com/blog/category/news">Press</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/channel-partners">Partners</a>
+<a class="link mb-6px mt-0 pb-5 " href="https://www.hackthebox.com/business-cyber-security-training">Enterprise Sales</a>
+<p class="color-white mb-6px font-size14">Store</p>
+<a class="link mb-6px mt-0 mt-0 " href="https://hackthebox.store" target="&quot;_blank&quot;">HTB Swag</a>
+<a class="link mb-6px mt-0  " href="https://www.hackthebox.com/giftcards">Buy Gift Cards</a>
+</div>
+</div>
+</div>
+<div class="row copyrights-wrapper">
+<div class="col-lg-5 d-flex align-items-center px-0">
+<div class="row social-icons d-flex mx-0">
+<div class="col-4 col-md-auto d-flex justify-content-start pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.facebook.com/hackthebox.eu" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.84325 24C10.6382 24 11.6445 24 13.4394 24C13.4394 19.7302 13.4394 13.0666 13.4394 13.0666H17.2704L17.8416 8.79077H13.4394V6.06861C13.4394 4.8318 13.7981 3.98253 15.6405 3.98253H18V0.166086C17.5922 0.114258 16.1932 0 14.5658 0C11.1696 0 8.84325 1.98596 8.84325 5.63632V8.78724H5V13.0525H8.84325C8.84325 13.0525 8.84325 19.7247 8.84325 24Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-center pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.instagram.com/hackthebox/" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16061_17639)">
+<path d="M12 2.16094C15.2063 2.16094 15.5859 2.175 16.8469 2.23125C18.0188 2.28281 18.6516 2.47969 19.0734 2.64375C19.6313 2.85938 20.0344 3.12188 20.4516 3.53906C20.8734 3.96094 21.1313 4.35938 21.3469 4.91719C21.5109 5.33906 21.7078 5.97656 21.7594 7.14375C21.8156 8.40937 21.8297 8.78906 21.8297 11.9906C21.8297 15.1969 21.8156 15.5766 21.7594 16.8375C21.7078 18.0094 21.5109 18.6422 21.3469 19.0641C21.1313 19.6219 20.8687 20.025 20.4516 20.4422C20.0297 20.8641 19.6313 21.1219 19.0734 21.3375C18.6516 21.5016 18.0141 21.6984 16.8469 21.75C15.5813 21.8062 15.2016 21.8203 12 21.8203C8.79375 21.8203 8.41406 21.8062 7.15313 21.75C5.98125 21.6984 5.34844 21.5016 4.92656 21.3375C4.36875 21.1219 3.96563 20.8594 3.54844 20.4422C3.12656 20.0203 2.86875 19.6219 2.65313 19.0641C2.48906 18.6422 2.29219 18.0047 2.24063 16.8375C2.18438 15.5719 2.17031 15.1922 2.17031 11.9906C2.17031 8.78438 2.18438 8.40469 2.24063 7.14375C2.29219 5.97187 2.48906 5.33906 2.65313 4.91719C2.86875 4.35938 3.13125 3.95625 3.54844 3.53906C3.97031 3.11719 4.36875 2.85938 4.92656 2.64375C5.34844 2.47969 5.98594 2.28281 7.15313 2.23125C8.41406 2.175 8.79375 2.16094 12 2.16094ZM12 0C8.74219 0 8.33438 0.0140625 7.05469 0.0703125C5.77969 0.126563 4.90313 0.332812 4.14375 0.628125C3.35156 0.9375 2.68125 1.34531 2.01563 2.01562C1.34531 2.68125 0.9375 3.35156 0.628125 4.13906C0.332812 4.90313 0.126563 5.775 0.0703125 7.05C0.0140625 8.33437 0 8.74219 0 12C0 15.2578 0.0140625 15.6656 0.0703125 16.9453C0.126563 18.2203 0.332812 19.0969 0.628125 19.8563C0.9375 20.6484 1.34531 21.3188 2.01563 21.9844C2.68125 22.65 3.35156 23.0625 4.13906 23.3672C4.90313 23.6625 5.775 23.8687 7.05 23.925C8.32969 23.9812 8.7375 23.9953 11.9953 23.9953C15.2531 23.9953 15.6609 23.9812 16.9406 23.925C18.2156 23.8687 19.0922 23.6625 19.8516 23.3672C20.6391 23.0625 21.3094 22.65 21.975 21.9844C22.6406 21.3188 23.0531 20.6484 23.3578 19.8609C23.6531 19.0969 23.8594 18.225 23.9156 16.95C23.9719 15.6703 23.9859 15.2625 23.9859 12.0047C23.9859 8.74688 23.9719 8.33906 23.9156 7.05938C23.8594 5.78438 23.6531 4.90781 23.3578 4.14844C23.0625 3.35156 22.6547 2.68125 21.9844 2.01562C21.3188 1.35 20.6484 0.9375 19.8609 0.632812C19.0969 0.3375 18.225 0.13125 16.95 0.075C15.6656 0.0140625 15.2578 0 12 0Z" fill="#8799B5"></path>
+<path d="M12 5.83594C8.59688 5.83594 5.83594 8.59688 5.83594 12C5.83594 15.4031 8.59688 18.1641 12 18.1641C15.4031 18.1641 18.1641 15.4031 18.1641 12C18.1641 8.59688 15.4031 5.83594 12 5.83594ZM12 15.9984C9.79219 15.9984 8.00156 14.2078 8.00156 12C8.00156 9.79219 9.79219 8.00156 12 8.00156C14.2078 8.00156 15.9984 9.79219 15.9984 12C15.9984 14.2078 14.2078 15.9984 12 15.9984Z" fill="#8799B5"></path>
+<path d="M19.8469 5.59214C19.8469 6.38902 19.2 7.0312 18.4078 7.0312C17.6109 7.0312 16.9688 6.38433 16.9688 5.59214C16.9688 4.79526 17.6156 4.15308 18.4078 4.15308C19.2 4.15308 19.8469 4.79995 19.8469 5.59214Z" fill="#8799B5"></path>
+</g>
+<defs>
+<clipPath id="clip0_16061_17639">
+<rect width="24" height="24" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-end pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://twitter.com/hackthebox_eu" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.3043 8.83908C13.2522 8.83908 11.843 7.06896 10.1739 4.91954L7.1473 1H3.57391C1.60383 1 0 1.0129 0 1.03743C0 1.06322 2.08696 3.78161 4.63043 7.06896C7.17391 10.369 9.24783 13.1121 9.23426 13.1637C9.20896 13.2011 7.122 15.4138 4.60383 18.0563C2.07391 20.6983 0 22.8994 0 22.9368C0 22.9742 0.456522 23 1.01687 23H2.02174L6 18.8149C8.19078 16.5143 10.0435 14.5793 10.1217 14.5161C10.2261 14.4395 11.2957 15.7172 13.5783 18.6885L16.8913 22.9874L20.4517 23C22.3962 23 24 22.9626 24 22.8994C24 22.8478 21.7957 19.9655 19.1087 16.4885L14.2174 10.1793L14.843 9.53448C15.1957 9.19259 16.9696 7.33448 18.7826 5.42529C20.5957 3.51584 22.2913 1.73283 22.5522 1.46832L23.0087 1H20.8826L17.1391 4.91954C15.0918 7.06896 13.3565 8.83908 13.3043 8.83908ZM10.443 12.1728C6.42234 6.78667 2.5 2 2.5 2H4.57256H6.22267L13.5984 11.8667C17.6449 17.2939 21.5 22 21.5 22L19.4012 22L18 22L10.443 12.1728Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-start pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.linkedin.com/company/hackthebox/" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16061_17644)">
+<path d="M22.2234 0H1.77187C0.792187 0 0 0.773438 0 1.72969V22.2656C0 23.2219 0.792187 24 1.77187 24H22.2234C23.2031 24 24 23.2219 24 22.2703V1.72969C24 0.773438 23.2031 0 22.2234 0ZM7.12031 20.4516H3.55781V8.99531H7.12031V20.4516ZM5.33906 7.43438C4.19531 7.43438 3.27188 6.51094 3.27188 5.37187C3.27188 4.23281 4.19531 3.30937 5.33906 3.30937C6.47813 3.30937 7.40156 4.23281 7.40156 5.37187C7.40156 6.50625 6.47813 7.43438 5.33906 7.43438ZM20.4516 20.4516H16.8937V14.8828C16.8937 13.5562 16.8703 11.8453 15.0422 11.8453C13.1906 11.8453 12.9094 13.2937 12.9094 14.7891V20.4516H9.35625V8.99531H12.7687V10.5609H12.8156C13.2891 9.66094 14.4516 8.70938 16.1813 8.70938C19.7859 8.70938 20.4516 11.0813 20.4516 14.1656V20.4516Z" fill="#8799B5"></path>
+</g>
+<defs>
+<clipPath id="clip0_16061_17644">
+<rect width="24" height="24" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-center pb-5 pb-md-6">
+<a class="no-hover-decoration color-forever-blue" href="https://www.tiktok.com/@hackthebox_official" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.0725 0H13.0278V16.3478C13.0278 18.2957 11.4722 19.8957 9.53626 19.8957C7.60034 19.8957 6.04469 18.2957 6.04469 16.3478C6.04469 14.4348 7.56577 12.8695 9.43257 12.8V8.69567C5.31872 8.7652 2 12.1391 2 16.3478C2 20.5913 5.38786 24 9.57085 24C13.7538 24 17.1416 20.5565 17.1416 16.3478V7.9652C18.6627 9.07827 20.5295 9.73913 22.5 9.77393V5.66957C19.4579 5.56522 17.0725 3.06087 17.0725 0Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-end pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.youtube.com/c/HackTheBox/featured" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path d="M23.7609 7.20005C23.7609 7.20005 23.5266 5.54536 22.8047 4.8188C21.8906 3.86255 20.8688 3.85786 20.4 3.80161C17.0438 3.55786 12.0047 3.55786 12.0047 3.55786H11.9953C11.9953 3.55786 6.95625 3.55786 3.6 3.80161C3.13125 3.85786 2.10938 3.86255 1.19531 4.8188C0.473438 5.54536 0.24375 7.20005 0.24375 7.20005C0.24375 7.20005 0 9.14536 0 11.086V12.9047C0 14.8454 0.239062 16.7907 0.239062 16.7907C0.239062 16.7907 0.473437 18.4454 1.19062 19.1719C2.10469 20.1282 3.30469 20.0954 3.83906 20.1985C5.76094 20.3813 12 20.4375 12 20.4375C12 20.4375 17.0438 20.4282 20.4 20.1891C20.8688 20.1329 21.8906 20.1282 22.8047 19.1719C23.5266 18.4454 23.7609 16.7907 23.7609 16.7907C23.7609 16.7907 24 14.85 24 12.9047V11.086C24 9.14536 23.7609 7.20005 23.7609 7.20005ZM9.52031 15.1125V8.36724L16.0031 11.7516L9.52031 15.1125Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-start pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.twitch.tv/hackthebox" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path d="M1.5634 0L0 4.16919V20.8439H5.72978V23.9723H8.85801L11.9831 20.8439H16.6721L22.9254 14.5929V0H1.5634ZM3.64627 2.08327H20.8416V13.5485L17.1933 17.197H11.4627L8.33845 20.3211V17.197H3.64627V2.08327ZM9.37836 12.5076H11.4627V6.25468H9.37836V12.5076ZM15.1094 12.5076H17.1933V6.25468H15.1094V12.5076Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-center pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://discord.com/invite/hackthebox" aria-label="social media" target="_blank">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path d="M20.3303 4.22781C18.7767 3.50093 17.1156 2.97267 15.3789 2.67188C15.1656 3.05749 14.9164 3.57614 14.7446 3.98873C12.8985 3.71109 11.0693 3.71109 9.25716 3.98873C9.08539 3.57614 8.83055 3.05749 8.61536 2.67188C6.87681 2.97267 5.21376 3.50287 3.66019 4.23166C0.526643 8.96686 -0.322811 13.5845 0.101917 18.1365C2.18025 19.6885 4.19441 20.6313 6.17457 21.2483C6.66349 20.5754 7.09953 19.8601 7.47518 19.1063C6.75975 18.8344 6.07453 18.499 5.42707 18.1095C5.59884 17.9822 5.76686 17.8492 5.92918 17.7123C9.87819 19.5594 14.1689 19.5594 18.0707 17.7123C18.235 17.8492 18.403 17.9822 18.5728 18.1095C17.9235 18.5009 17.2364 18.8363 16.521 19.1082C16.8966 19.8601 17.3308 20.5774 17.8216 21.2502C19.8036 20.6333 21.8197 19.6905 23.898 18.1365C24.3964 12.8595 23.0467 8.28434 20.3303 4.22781ZM8.01318 15.337C6.82772 15.337 5.85555 14.2303 5.85555 12.8826C5.85555 11.535 6.80696 10.4264 8.01318 10.4264C9.21942 10.4264 10.1916 11.533 10.1708 12.8826C10.1727 14.2303 9.21942 15.337 8.01318 15.337ZM15.9867 15.337C14.8013 15.337 13.8291 14.2303 13.8291 12.8826C13.8291 11.535 14.7805 10.4264 15.9867 10.4264C17.193 10.4264 18.1651 11.533 18.1444 12.8826C18.1444 14.2303 17.193 15.337 15.9867 15.337Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+<div class="col-4 col-md-auto d-flex justify-content-end pb-5 pb-md-6 mr-md-10">
+<a class="no-hover-decoration color-forever-blue" href="https://www.hackthebox.com/rss" aria-label="social media">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="social-icon social-icon-size" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.92712 17.1364C2.31441 17.1364 1 18.4508 1 20.0636C1 21.6763 2.31441 22.9814 3.92712 22.9814C5.54915 22.9814 6.86356 21.6763 6.86356 20.0636C6.86356 18.4508 5.54915 17.1364 3.92712 17.1364ZM1 8.47627V12.6898C3.75 12.6898 6.32288 13.7619 8.27119 15.7102C10.2102 17.6492 11.2822 20.2407 11.2822 23H15.5144C15.5237 14.9924 9.00763 8.47627 1 8.47627ZM1.00932 1V5.21356C10.7975 5.21356 18.7678 13.1932 18.7678 23H23C23 10.872 13.1373 1 1.00932 1Z" fill="#8799B5"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="col-lg-7 d-flex flex-column flex-md-row justify-content-end justify-content-md-between justify-content-xxl-end">
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="link color-main" href="javascript:void(0);" onclick="Cookiebot.renew();">Cookie
+Settings</a></div>
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="link color-main" href="https://resources.hackthebox.com/hubfs/Legal/PN.pdf" target="_blank">Privacy Policy</a>
+</div>
+<div class="mx-4 mx-md-0 mx-xxl-4"><a class="link color-main" href="https://resources.hackthebox.com/hubfs/Legal/UA.pdf" target="_blank">User Agreement</a>
+</div>
+<div class="mx-4 mx-md-0 mx-xxl-4 copyright">© 2024 Hack The Box</div>
+</div>
+</div>
+</div>
+</section>
+<script src="/assets/js/blog_article.min.js" type="text/plain" data-cookieconsent="preferences"></script>
+
+
+
+<script type="text/plain" data-cookieconsent="statistics"> (function(h,o,t,j,a,r){ h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)}; h._hjSettings={hjid:2732698,hjsv:6}; a=o.getElementsByTagName('head')[0]; r=o.createElement('script');r.async=1; r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv; a.appendChild(r); })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv='); </script> 
+
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;894269b3ddaeb379&quot;,&quot;version&quot;:&quot;2024.4.1&quot;,&quot;token&quot;:&quot;9d8cb854dbf443df9a649c27660a2bb6&quot;}" crossorigin="anonymous" type="text/javascript"></script>
+
+
+<img id="CookiebotSessionPixel" src="https://imgsct.cookiebot.com/1.gif?dgi=ee54d4ba-9660-4515-a764-a6ec3109f2a5" alt="Cookiebot session tracker icon loaded" data-cookieconsent="ignore" style="display: none;"><div><div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; display: block; transition: right 0.3s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;"><div class="grecaptcha-logo"><iframe title="reCAPTCHA" width="256" height="60" role="presentation" name="a-kqpso9xj3g3" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LfsC98ZAAAAALiRx9c6ab62VUSh8OTADXpF50hr&amp;co=aHR0cHM6Ly93d3cuaGFja3RoZWJveC5jb206NDQz&amp;hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;size=invisible&amp;cb=bcez8rnu6i1t"></iframe></div><div class="grecaptcha-error"></div><textarea id="g-recaptcha-response-100000" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div><iframe style="display: none; position: absolute; width: 1px; height: 1px; top: -9999px;" name="__uspapiLocator" tabindex="-1" role="presentation" aria-hidden="true" title="Blank"></iframe><iframe style="position: absolute; width: 1px; height: 1px; top: -9999px;" tabindex="-1" role="presentation" aria-hidden="true" title="Blank" src="https://consentcdn.cookiebot.com/sdk/bc-v4.min.html"></iframe></body></html>

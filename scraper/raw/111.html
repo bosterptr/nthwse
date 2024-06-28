@@ -1,0 +1,957 @@
+<html lang="en-US" data-useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="https://www.tarlogic.com/bsam/assets/css/just-the-docs-default.css">
+<link rel="stylesheet" href="https://www.tarlogic.com/bsam/assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet" disabled="">
+<style id="jtd-nav-activation"> .site-nav > ul.nav-list:first-child > li:not(:nth-child(1)) > a, .site-nav > ul.nav-list:first-child > li > ul > li > a, .site-nav > ul.nav-list:first-child > li > ul > li > ul > li > a { background-image: none; } .site-nav > ul.nav-list:not(:first-child) a, .site-nav li.external a { background-image: none; } .site-nav > ul.nav-list:first-child > li:nth-child(1) > a { font-weight: 600; text-decoration: none; }.site-nav > ul.nav-list:first-child > li:nth-child(1) > button svg { transform: rotate(-90deg); }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(1) > ul.nav-list { display: block; } </style>
+<script src="https://www.tarlogic.com/bsam/assets/js/just-the-docs.js">
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="https://www.tarlogic.com/bsam/favicon.png" type="image/x-icon">
+<meta property="og:title" content="Bluetooth Security Assessment Methodology">
+<meta property="og:locale" content="en">
+<meta name="description" content="The BSAM methodology is a guide for security evaluation in devices with Bluetooth capabilities.">
+<meta property="og:description" content="The BSAM methodology is a guide for security evaluation in devices with Bluetooth capabilities.">
+<meta property="og:site_name" content="BSAM">
+<meta property="og:image" content="https://www.tarlogic.com/bsam/assets/img/BSAM.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:image" content="https://www.tarlogic.com/bsam/assets/img/BSAM.png">
+<meta property="twitter:title" content="Bluetooth Security Assessment Methodology">
+<script type="application/ld+json"> {"@context":"https://schema.org","@type":"WebSite","description":"The BSAM methodology is a guide for security evaluation in devices with Bluetooth capabilities.","headline":"Bluetooth Security Assessment Methodology","image":"/assets/img/BSAM.png","name":"BSAM","url":"/"}</script>
+<title>Bluetooth Security Assessment Methodology - BSAM</title>
+<link rel="alternate" hreflang="en" href="https://www.tarlogic.com/bsam/">
+<link rel="alternate" hreflang="x-default" href="https://www.tarlogic.com/bsam/">
+<link rel="canonical" href="https://www.tarlogic.com/bsam/">
+<link rel="alternate" hreflang="es" href="https://www.tarlogic.com/bsam/es/">
+<link rel="preload" href="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/BigJohn.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="alternate" type="application/rss+xml" title="Tarlogic Security » Feed" href="https://www.tarlogic.com/feed/">
+<link rel="shortcut icon" href="https://www.tarlogic.com/wp-content/uploads/2016/11/FAVICON-01.png" type="image/x-icon">
+
+<link rel="apple-touch-icon" href="https://www.tarlogic.com/wp-content/uploads/2016/11/FAVICON-01.png">
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://www.tarlogic.com/wp-content/uploads/2016/11/FAVICON-01.png">
+
+<link rel="apple-touch-icon" sizes="152x152" href="https://www.tarlogic.com/wp-content/uploads/2016/11/FAVICON-01.png">
+
+<link rel="apple-touch-icon" sizes="167x167" href="https://www.tarlogic.com/wp-content/uploads/2016/11/FAVICON-01.png">
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 11.25px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 22.5px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 15px;--wp--preset--font-size--xlarge: 30px;--wp--preset--font-size--huge: 45px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="wpml-blocks-css" href="https://www.tarlogic.com/wp-content/plugins/sitepress-multilingual-cms/dist/css/blocks/styles.css?ver=4.6.6" type="text/css" media="all">
+<style type="text/css">@font-face{font-family:'Helvetica-light';src:local("Helvetica Light"),local("Helvetica-Light"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica-Light.woff2") format("woff2"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica-Light.woff") format("woff");font-display:swap;font-weight:300;font-style:normal;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@font-face{font-family:'Helvetica-bold';src:local("Helvetica Bold"),local("Helvetica-Bold"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica-Bold.woff2") format("woff2"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica-Bold.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@font-face{font-family:Helvetica;src:local("Helvetica"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica.woff2") format("woff2"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/Helvetica.woff") format("woff");font-display:swap;font-weight:normal;font-style:normal;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@font-face{font-family:Jonh;src:local("BigJohn"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/BigJohn.woff2") format("woff2"),url("//www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/fonts/BigJohn.woff") format("woff");font-display:swap;font-weight:normal;font-style:normal;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}:root{--global-font-family-01: Helvetica,Arial,Roboto,sans-serif;--global-font-family-02: Jonh,Sans-serif;--global-font-weight-light: 300;--global-font-weight-regular: 500;--global-font-weight-bold: 700;--global-gray-lightest: #f9fafb;--specific-brand-color-primary-02: #00bfb3;--specific-brand-color-primary-02-light: #d1f5f2;--specific-font-color-01: #333;--specific-menu-font-height: 2;--specific-menu-mega-title-font-weight-mobile: 700;--specific-menu-mega-title-font-weight: 400}
+html{line-height:1.15;-webkit-text-size-adjust:100%}:focus{outline:none}body{margin:0}main{display:block}h1{font-size:2em;margin:0.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace, monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace, monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:65%;line-height:0;position:relative;vertical-align:baseline;padding-left:0.1rem}sub{bottom:-0.25em}sup{top:-0.6em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}button,[type="button"],[type="reset"],[type="submit"]{-webkit-appearance:button}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:0.35em 0.75em 0.625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px}[type="search"]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}.tar_wrapper{width:100%;padding:1rem;margin:0 auto}.tar_wrapper--menu{margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between}.tar_wrapper--center{text-align:center}[class*='tar_column-']{margin:.9375rem;width:100%}@media only screen and (min-width: 56.25em){.tar_wrapper{display:flex;flex-wrap:wrap;justify-content:center;padding:0}.tar_wrapper--align-left{justify-content:flex-start}.tar_wrapper--menu{justify-content:space-between;align-items:center}.tar_wrapper--justify-between{justify-content:space-between}.tar_wrapper--md-around{justify-content:space-around}.tar_wrapper--md-row-reverse{flex-direction:row-reverse}.tar_wrapper--vert_center{align-items:center}[class*='tar_column-']{width:calc(100% - 1.875rem)}.tar_column-1{width:calc(8.33333% - 1.875rem)}.tar_column-md-1{width:calc(8.33333% - 1.875rem)}.tar_column-2{width:calc(16.66667% - 1.875rem)}.tar_column-md-2{width:calc(16.66667% - 1.875rem)}.tar_column-3{width:calc(25% - 1.875rem)}.tar_column-md-3{width:calc(25% - 1.875rem)}.tar_column-4{width:calc(33.33333% - 1.875rem)}.tar_column-md-4{width:calc(33.33333% - 1.875rem)}.tar_column-5{width:calc(41.66667% - 1.875rem)}.tar_column-md-5{width:calc(41.66667% - 1.875rem)}.tar_column-6{width:calc(50% - 1.875rem)}.tar_column-md-6{width:calc(50% - 1.875rem)}.tar_column-7{width:calc(58.33333% - 1.875rem)}.tar_column-md-7{width:calc(58.33333% - 1.875rem)}.tar_column-8{width:calc(66.66667% - 1.875rem)}.tar_column-md-8{width:calc(66.66667% - 1.875rem)}.tar_column-9{width:calc(75% - 1.875rem)}.tar_column-md-9{width:calc(75% - 1.875rem)}.tar_column-10{width:calc(83.33333% - 1.875rem)}.tar_column-md-10{width:calc(83.33333% - 1.875rem)}.tar_column-11{width:calc(91.66667% - 1.875rem)}.tar_column-md-11{width:calc(91.66667% - 1.875rem)}.tar_column-12{width:calc(100% - 1.875rem)}.tar_column-md-12{width:calc(100% - 1.875rem)}}@media only screen and (min-width: 56.25em){.tar_wrapper:not(.tar_wrapper--full-width){max-width:91.125em}.tar_column-sm-1{width:calc(8.33333% - 1.875rem)}.tar_column-sm-2{width:calc(16.66667% - 1.875rem)}.tar_column-sm-3{width:calc(25% - 1.875rem)}.tar_column-sm-4{width:calc(33.33333% - 1.875rem)}.tar_column-sm-5{width:calc(41.66667% - 1.875rem)}.tar_column-sm-6{width:calc(50% - 1.875rem)}.tar_column-sm-7{width:calc(58.33333% - 1.875rem)}.tar_column-sm-8{width:calc(66.66667% - 1.875rem)}.tar_column-sm-9{width:calc(75% - 1.875rem)}.tar_column-sm-10{width:calc(83.33333% - 1.875rem)}.tar_column-sm-11{width:calc(91.66667% - 1.875rem)}.tar_column-sm-12{width:calc(100% - 1.875rem)}}@media only screen and (min-width: 75em){.tar_wrapper:not(.tar_wrapper--full-width){max-width:91.125em}.tar_column-md-1{width:calc(8.33333% - 1.875rem)}.tar_column-md-2{width:calc(16.66667% - 1.875rem)}.tar_column-md-3{width:calc(25% - 1.875rem)}.tar_column-md-4{width:calc(33.33333% - 1.875rem)}.tar_column-md-5{width:calc(41.66667% - 1.875rem)}.tar_column-md-6{width:calc(50% - 1.875rem)}.tar_column-md-7{width:calc(58.33333% - 1.875rem)}.tar_column-md-8{width:calc(66.66667% - 1.875rem)}.tar_column-md-9{width:calc(75% - 1.875rem)}.tar_column-md-10{width:calc(83.33333% - 1.875rem)}.tar_column-md-11{width:calc(91.66667% - 1.875rem)}.tar_column-md-12{width:calc(100% - 1.875rem)}}@media only screen and (min-width: 91.125em){.tar_wrapper:not(.tar_wrapper--full-width){max-width:91.125em}.tar_column-lg-1{width:calc(8.33333% - 1.875rem)}.tar_column-lg-2{width:calc(16.66667% - 1.875rem)}.tar_column-lg-3{width:calc(25% - 1.875rem)}.tar_column-lg-4{width:calc(33.33333% - 1.875rem)}.tar_column-lg-5{width:calc(41.66667% - 1.875rem)}.tar_column-lg-6{width:calc(50% - 1.875rem)}.tar_column-lg-7{width:calc(58.33333% - 1.875rem)}.tar_column-lg-8{width:calc(66.66667% - 1.875rem)}.tar_column-lg-9{width:calc(75% - 1.875rem)}.tar_column-lg-10{width:calc(83.33333% - 1.875rem)}.tar_column-lg-11{width:calc(91.66667% - 1.875rem)}.tar_column-lg-12{width:calc(100% - 1.875rem)}}html{font-size:100% !important}body{font-family:var(--global-font-family-01);font-weight:var(--global-font-weight-regular);text-rendering:optimizeLegibility;color:#333}div{box-sizing:border-box}a{text-decoration:none;color:var(--specific-brand-color-primary-02);transition:all 0.15s ease}ul li{margin-bottom:1.25rem}p{margin:0;margin-bottom:1.25rem;letter-spacing:0.3px}img{max-width:100%}button{display:inline-block;font-size:0.875rem;line-height:1.3;padding:0.625rem 2rem;transition:all 0.15s ease;font-weight:var(--global-font-weight-regular);color:#fff !important;background:var(--specific-brand-color-primary-02);border:1px solid var(--specific-brand-color-primary-02);cursor:pointer}button:hover{color:var(--specific-brand-color-primary-02) !important;background:#fff}strong{font-weight:700}pre{color:#333;font-weight:var(--global-font-weight-regular);padding:0.5rem 0.75rem;border:1px solid #ddd;font-size:1rem;display:block;border-radius:4px;overflow:auto;white-space:pre-wrap}sup a{font-weight:var(--global-font-weight-bold)}@media only screen and (max-width: 100em){html{font-size:85% !important}}.tar-align-center{text-align:center}.tar-align-left{text-align:left}.tar-align-right{text-align:right}@media only screen and (min-width: 37.5em){.tar-align-center-xs{text-align:center}.tar-align-left-xs{text-align:left}.tar-align-right-xs{text-align:right}}@media only screen and (min-width: 56.25em){.tar-align-center-s{text-align:center}.tar-align-left-s{text-align:left}.tar-align-right-s{text-align:right}}@media only screen and (min-width: 75em){.tar-align-center-m{text-align:center}.tar-align-left-m{text-align:left}.tar-align-right-m{text-align:right}}@media only screen and (min-width: 91.125em){.tar-align-center-l{text-align:center}.tar-align-left-l{text-align:left}.tar-align-right-l{text-align:right}}.wrapper{max-width:91.125em;margin:0 auto;padding:1rem}.wrapper--full{max-width:100%}.teaser{opacity:0;transition:opacity 220ms ease 300ms}.teaser.lazyloaded{opacity:1}.header .header__bars .menu-item-language{display:none}.fusion-secondary-header .lang_sel_list_horizontal{text-align:right}.fusion-secondary-header .lang_sel_list_horizontal .wpml-ls-item{background-color:transparent}.fusion-secondary-header .lang_sel_list_horizontal .wpml-ls-item a{background-color:transparent;color:#fff;font-family:var(--global-font-family-01);font-size:16px;transform:translateY(3px);display:inline-block}.fusion-secondary-header .lang_sel_list_horizontal .wpml-ls-item a:hover{background-color:transparent;color:#fff}.wpml-ls-item.icl-def{display:none}.grecaptcha-badge{display:none}
+.bar_menu a:not([class]) { text-decoration: none; }
+.site-title {display: none}
+.site-button, .site-button:hover {background-image:none; background: none}
+</style>
+<style type="text/css" id="css-fb-visibility">@media screen and (max-width: 640px){body:not(.fusion-builder-ui-wireframe) .fusion-no-small-visibility{display:none !important;}body:not(.fusion-builder-ui-wireframe) .sm-text-align-center{text-align:center !important;}body:not(.fusion-builder-ui-wireframe) .sm-text-align-left{text-align:left !important;}body:not(.fusion-builder-ui-wireframe) .sm-text-align-right{text-align:right !important;}body:not(.fusion-builder-ui-wireframe) .fusion-absolute-position-small{position:absolute;top:auto;width:100%;}}@media screen and (min-width: 641px) and (max-width: 1024px){body:not(.fusion-builder-ui-wireframe) .fusion-no-medium-visibility{display:none !important;}body:not(.fusion-builder-ui-wireframe) .md-text-align-center{text-align:center !important;}body:not(.fusion-builder-ui-wireframe) .md-text-align-left{text-align:left !important;}body:not(.fusion-builder-ui-wireframe) .md-text-align-right{text-align:right !important;}body:not(.fusion-builder-ui-wireframe) .fusion-absolute-position-medium{position:absolute;top:auto;width:100%;}}@media screen and (min-width: 1025px){body:not(.fusion-builder-ui-wireframe) .fusion-no-large-visibility{display:none !important;}body:not(.fusion-builder-ui-wireframe) .lg-text-align-center{text-align:center !important;}body:not(.fusion-builder-ui-wireframe) .lg-text-align-left{text-align:left !important;}body:not(.fusion-builder-ui-wireframe) .lg-text-align-right{text-align:right !important;}body:not(.fusion-builder-ui-wireframe) .fusion-absolute-position-large{position:absolute;top:auto;width:100%;}}</style>
+<script type="application/ld+json" class="saswp-schema-markup-output">
+
+[{"@context":"https://schema.org/","@graph":[{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Home","url":"/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Cybersecurity services","url":"https://www.tarlogic.com/cybersecurity-services/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Red Team services","url":"https://www.tarlogic.com/red-team-services/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"External & internal pentesting","url":"https://www.tarlogic.com/penetration-testing-services/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Social Engineering","url":"https://www.tarlogic.com/social-engineering/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Wi-Fi Pentest","url":"https://www.tarlogic.com/wifi-pentest/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Threat Intelligence","url":"https://www.tarlogic.com/threat-intelligence/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Digital surveillance","url":"https://www.tarlogic.com/digital-surveillance/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Fraud investigation and analysis","url":"https://www.tarlogic.com/fraud-investigation/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Strategic Cyber-Intelligence","url":"https://www.tarlogic.com/strategic-cyber-intelligence/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Web Security Audit","url":"https://www.tarlogic.com/website-security-audit/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Mobile Application Security Test Audit","url":"https://www.tarlogic.com/mobile-app-audit/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"IOT Security testing","url":"https://www.tarlogic.com/iot-security-testing/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Cloud Infrastructures security audit","url":"https://www.tarlogic.com/cloud-security-assessment/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Reverse Engineering &#038; Hardware Hacking","url":"https://www.tarlogic.com/hardware-hacking-and-reverse-engineering-services/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Code Security Audit","url":"https://www.tarlogic.com/code-security-audit/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Technologies and Operating Systems Hardening","url":"https://www.tarlogic.com/operating-system-hardening/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Advanced Bank Infrastructures Security Assessment","url":"https://www.tarlogic.com/advanced-bank-security-assessment/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Vulnerability Management","url":"https://www.tarlogic.com/vulnerability-management/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Emerging vulnerabilities 24x7","url":"https://www.tarlogic.com/emerging-vulnerabilities/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Denial of service simulation (DoS)","url":"https://www.tarlogic.com/dos-test/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Managed Bug Bounty program","url":"https://www.tarlogic.com/bug-bounty/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Dynamic Risk Assessment and Threat Prioritization","url":"https://www.tarlogic.com/threat-priorization/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Threat Hunting services","url":"https://www.tarlogic.com/threat-hunting/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Incident Response Services","url":"https://www.tarlogic.com/blackarrow/incident-response/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"BlackArrow","url":"https://www.tarlogic.com/blackarrow/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Blog","url":"https://www.tarlogic.com/blog/"},{"@context":"https://schema.org/","@type":"SiteNavigationElement","@id":"https://www.tarlogic.com/#Principal 2 - EN-2","name":"Contact","url":"https://www.tarlogic.com/contact/"}]}]
+</script>
+<style type="text/css">:root{--bar-top-bg: var(--specific-brand-color-primary-01);--bar-headers-bg: #fff;--hero-bg: var(--specific-brand-color-primary-01);--hero-title-color: #fff;--hero-form-title-color: var(--specific-brand-color-primary-01)}:root.blackarrow{--bar-top-bg: #337ab7;--hero-bg: #337ab7;--hero-title-color: #337ab7;--hero-form-title-color: var(--specific-font-color-01)}.bar_menu{position:relative;z-index:2;display:flex;justify-content:space-between;flex-wrap:wrap;transition:ease-out 150ms}.header__bars.sticky .bar_menu,.page-template-thankyou-page .header__bars .bar_menu,.error404 .header__bars .bar_menu,.search .header__bars .bar_menu{height:4.0625rem;box-shadow:0 .0625rem .375rem rgba(0,0,0,0.16)}.bar_menu__logo{max-width:8.25rem;padding:.5rem}.bar_menu__logo svg{width:100%;height:auto}.bar_menu__logo svg path[id='logo_trazado1']{fill:#002e5d;stroke:none}.bar_menu__logo svg g[id='logo_trazado3'] path{fill:#002e5d;stroke:none}.bar_menu__logo svg g[id='Letras'] *{fill:#00bfb3}.menu__hamburger{position:relative;margin:0 .9375rem;background:white !important;border:0 !important}.menu{background:var(--global-gray-lightest);max-height:0;opacity:0;overflow:hidden;transition:max-height 0.4s ease 0s;width:100%;position:absolute;top:100%;left:0}.menu.active{opacity:1;max-height:calc(100vh - 100%) !important;overflow:auto}.main_menu,.wpml-ls ul{list-style:none;padding:0;margin:0}.main_menu .menu-item,.main_menu .wpml-ls-item,.wpml-ls ul .menu-item,.wpml-ls ul .wpml-ls-item{margin-bottom:0;border-top:.0625rem solid #ddd}.main_menu .menu-item a,.main_menu .wpml-ls-item a,.wpml-ls ul .menu-item a,.wpml-ls ul .wpml-ls-item a{color:#333;letter-spacing:0.4px;font-weight:400;font-size:1.3rem;padding:1.175rem 2rem;font-family:'Helvetica', sans-serif;display:flex;align-items:center;line-height:var(--specific-menu-font-height)}.main_menu .menu-item.current-page-ancestor a,.main_menu .wpml-ls-item.current-page-ancestor a,.wpml-ls ul .menu-item.current-page-ancestor a,.wpml-ls ul .wpml-ls-item.current-page-ancestor a{color:#000 !important}.main_menu .menu-item .sub-menu,.main_menu .wpml-ls-item .sub-menu,.wpml-ls ul .menu-item .sub-menu,.wpml-ls ul .wpml-ls-item .sub-menu{padding:0}.main_menu .menu-item .sub-menu .menu-item,.main_menu .wpml-ls-item .sub-menu .menu-item,.wpml-ls ul .menu-item .sub-menu .menu-item,.wpml-ls ul .wpml-ls-item .sub-menu .menu-item{padding-left:1.25rem}.main_menu>.menu-item:last-child,.wpml-ls ul>.menu-item:last-child{border-bottom:.0625rem solid #ddd}.main_menu .fusion-main-menu-search,.wpml-ls ul .fusion-main-menu-search{display:none}.single-post .hero{position:relative;overflow:hidden;min-height:11rem;max-width:100%}.single-post .hero .header__background{object-fit:cover}.tax-topics .hero,.single-actualidad .hero,.single-glosario .hero{position:relative;overflow:hidden;aspect-ratio:65 / 5;min-height:4rem;max-width:100%}.tax-topics .hero .header__background,.single-actualidad .hero .header__background,.single-glosario .hero .header__background{object-fit:cover;aspect-ratio:65 / 5}.hero{position:relative;overflow:hidden;background-color:var(--hero-bg)}.hero__background{position:absolute;margin-top:0;width:100%;height:100%;object-fit:cover}.hero__content{margin-top:3rem;margin-bottom:4rem;position:relative;color:#fff}.hero__content .hero__title{font-size:2.9rem;line-height:1.25;font-weight:var(--global-font-weight-bold);margin:0}@media only screen and (min-width: 56.25em){.hero__content .hero__title{font-size:5rem;line-height:1.15}}@media only screen and (min-width: 75em){.hero__content .hero__title{font-size:6.2rem}}.hero__content .hero__subtitle{line-height:1.4;font-size:1.65rem;letter-spacing:0.8px;font-weight:500;margin:0;margin-bottom:0.5rem;font-weight:var(--global-font-weight-regular)}.hero__content .hero__text{font-size:1.45rem;line-height:1.6;letter-spacing:0.2px;font-weight:500;display:inline-block;border:1px solid white;padding:2rem 2.5rem;margin-top:1rem;margin-bottom:0;margin-left:0;margin-right:0;width:100%}@media only screen and (min-width: 75em){.hero__content .hero__text{font-size:1.65rem;line-height:1.4;letter-spacing:0.8px}}.hero__content .hero__text p{margin:0}.hero__content .hero__text_container{position:relative;z-index:1;margin:.9375rem 0}.hero__content .hero__text_container--blackarrow{max-width:100%}.hero__content--homepage .hero__text{max-width:51rem;margin-top:2rem;margin-bottom:0;border:none;padding:0}.hero__content--aboutus{padding-bottom:4rem}.hero__content--blackarrow{display:flex;justify-content:space-between;flex-direction:column}.hero__content--blackarrow .ba_logo{max-width:19.375rem;margin-top:1.5rem;position:static}.hero__content--blackarrow .hero__title{color:var(--hero-title-color)}@supports (backdrop-filter: blur(1.25rem)){.hero__content:not(.hero__content--homepage) .hero__text{backdrop-filter:blur(1.25rem) brightness(1.1) !important;background-image:none !important}}.hero__specialities{position:relative;display:flex;justify-content:flex-end}.cybersecurity_shield{position:relative;margin:0 auto;top:0;right:0;max-width:17rem}.cybersecurity_shield img{height:auto}.hero__btn{display:inline-block;font-size:0.875rem;line-height:1.3;padding:0.625rem 2rem;transition:all 0.15s ease;font-weight:var(--global-font-weight-regular);color:#fff !important;background:var(--specific-brand-color-primary-02);border:1px solid var(--specific-brand-color-primary-02);font-size:1.2rem;padding:0.875rem 3rem;margin-top:1rem}.hero__btn:hover{color:var(--specific-brand-color-primary-02) !important;background:#fff}.hero_form{padding:1.5rem 1.5rem 0 !important;margin:0;background:white;text-align:center;color:var(--specific-font-color-01)}.hero_form__title{color:var(--hero-form-title-color)}@media only screen and (min-width: 37.5em){.hero__content--homepage{margin-top:5.5rem}.hero__content .hero__text{margin-top:1rem}}@media only screen and (min-width: 56.25em){.hero__text_container:not(.hero__text_container--homepage){text-align:center}.hero__content .hero__text_container{margin:.9375rem}.hero__content{margin-top:6rem}.hero__content .hero__text{max-width:56rem;width:auto}.hero__content--homepage .hero__text{margin-top:3rem;max-width:51rem}.hero__content .hero__subtitle{line-height:1.2;font-size:3rem;font-weight:var(--global-font-weight-bold)}}@media only screen and (min-width: 75em){.hero__text_container:not(.hero__text_container--homepage){text-align:left}.hero__content_w_form{padding:0}.hero__content_w_form .hero__text_container{margin:-1.25rem 0 0 0.5rem}.single-post .hero{aspect-ratio:64 / 5;max-width:100%;min-height:12rem}.tax-topics .hero,.single-actualidad .hero,.single-glosario .hero{aspect-ratio:960 / 259;max-width:100%;min-height:12rem}.single-post .header__background{width:100%;height:100%;aspect-ratio:65 / 5}.tax-topics .header__background,.single-actualidad .header__background,.single-glosario .header__background{width:100%;height:100%;aspect-ratio:960 / 259}.header{margin-top:0rem}.bar_menu{height:7.24rem;align-items:center}.bar_menu__logo{padding:0;top:.3125rem}.menu__hamburger{display:none}.menu{background:transparent;position:static;display:inline-flex;justify-content:flex-end;align-items:center;max-height:none;opacity:1;height:100%;width:auto;overflow:visible;flex:1}.menu.active{max-height:none !important;overflow:visible}.wpml-ls.wpml-ls-legacy-dropdown ul li.wpml-ls-item a.lang_sel_sel{padding-right:0.75rem}.wpml-ls-legacy-dropdown a.wpml-ls-item-toggle:after{content:'';vertical-align:middle;display:inline-block;border:0.35em solid transparent;border-top:0.5em solid;position:absolute;right:0;top:calc(50% - 0.2rem)}.main_menu,.wpml-ls ul{display:inline-flex;height:100%;justify-content:flex-end;align-items:center}.main_menu .menu-item,.main_menu .wpml-ls-item,.wpml-ls ul .menu-item,.wpml-ls ul .wpml-ls-item{padding:0 .625rem;height:100%;display:flex;align-items:center;background-color:transparent;position:relative;border-top:.25rem solid transparent}.main_menu .menu-item:hover,.main_menu .wpml-ls-item:hover,.wpml-ls ul .menu-item:hover,.wpml-ls ul .wpml-ls-item:hover{border-color:#fff;color:#fff}.main_menu .menu-item a,.main_menu .wpml-ls-item a,.wpml-ls ul .menu-item a,.wpml-ls ul .wpml-ls-item a{padding:1.96rem 0;font-family:var(--global-font-family-02);color:var(--global-gray-lightest);font-size:.9375rem;transition:120ms linear}.main_menu .menu-item.current-menu-ancestor a,.main_menu .wpml-ls-item.current-menu-ancestor a,.wpml-ls ul .menu-item.current-menu-ancestor a,.wpml-ls ul .wpml-ls-item.current-menu-ancestor a{border-color:#fff;color:#fff}.main_menu .menu-item .sub-menu,.main_menu .menu-item .wpml-ls-sub-menu,.main_menu .wpml-ls-item .sub-menu,.main_menu .wpml-ls-item .wpml-ls-sub-menu,.wpml-ls ul .menu-item .sub-menu,.wpml-ls ul .menu-item .wpml-ls-sub-menu,.wpml-ls ul .wpml-ls-item .sub-menu,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu{display:inline;position:absolute;top:calc(100% - 2px);left:0;height:auto;background:#fff;padding:0;opacity:0;pointer-events:none;transition:opacity 100ms linear 5ms}.main_menu .menu-item .sub-menu li.menu-item,.main_menu .menu-item .sub-menu li.wpml-ls-item,.main_menu .menu-item .wpml-ls-sub-menu li.menu-item,.main_menu .menu-item .wpml-ls-sub-menu li.wpml-ls-item,.main_menu .wpml-ls-item .sub-menu li.menu-item,.main_menu .wpml-ls-item .sub-menu li.wpml-ls-item,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.menu-item,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item,.wpml-ls ul .menu-item .sub-menu li.menu-item,.wpml-ls ul .menu-item .sub-menu li.wpml-ls-item,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.menu-item,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.wpml-ls-item,.wpml-ls ul .wpml-ls-item .sub-menu li.menu-item,.wpml-ls ul .wpml-ls-item .sub-menu li.wpml-ls-item,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.menu-item,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item{padding:0;display:block;height:auto}.main_menu .menu-item .sub-menu li.menu-item a,.main_menu .menu-item .sub-menu li.wpml-ls-item a,.main_menu .menu-item .wpml-ls-sub-menu li.menu-item a,.main_menu .menu-item .wpml-ls-sub-menu li.wpml-ls-item a,.main_menu .wpml-ls-item .sub-menu li.menu-item a,.main_menu .wpml-ls-item .sub-menu li.wpml-ls-item a,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.menu-item a,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a,.wpml-ls ul .menu-item .sub-menu li.menu-item a,.wpml-ls ul .menu-item .sub-menu li.wpml-ls-item a,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.menu-item a,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.wpml-ls-item a,.wpml-ls ul .wpml-ls-item .sub-menu li.menu-item a,.wpml-ls ul .wpml-ls-item .sub-menu li.wpml-ls-item a,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.menu-item a,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a{color:#333;border:0px;height:auto;padding:0.9rem 0.625rem;font-weight:400;width:100%;box-sizing:border-box}.main_menu .menu-item .sub-menu li.menu-item a:hover,.main_menu .menu-item .sub-menu li.wpml-ls-item a:hover,.main_menu .menu-item .wpml-ls-sub-menu li.menu-item a:hover,.main_menu .menu-item .wpml-ls-sub-menu li.wpml-ls-item a:hover,.main_menu .wpml-ls-item .sub-menu li.menu-item a:hover,.main_menu .wpml-ls-item .sub-menu li.wpml-ls-item a:hover,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.menu-item a:hover,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a:hover,.wpml-ls ul .menu-item .sub-menu li.menu-item a:hover,.wpml-ls ul .menu-item .sub-menu li.wpml-ls-item a:hover,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.menu-item a:hover,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.wpml-ls-item a:hover,.wpml-ls ul .wpml-ls-item .sub-menu li.menu-item a:hover,.wpml-ls ul .wpml-ls-item .sub-menu li.wpml-ls-item a:hover,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.menu-item a:hover,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a:hover{background-color:var(--global-gray-lightest)}.main_menu .menu-item .wpml-ls-sub-menu,.main_menu .wpml-ls-item .wpml-ls-sub-menu,.wpml-ls ul .menu-item .wpml-ls-sub-menu,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu{width:100%}.main_menu .menu-item .wpml-ls-sub-menu li.wpml-ls-item a,.main_menu .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a,.wpml-ls ul .menu-item .wpml-ls-sub-menu li.wpml-ls-item a,.wpml-ls ul .wpml-ls-item .wpml-ls-sub-menu li.wpml-ls-item a{padding:0.1rem 1rem}.main_menu .menu-item:hover .sub-menu,.main_menu .menu-item:hover .wpml-ls-sub-menu,.main_menu .menu-item:focus .sub-menu,.main_menu .menu-item:focus .wpml-ls-sub-menu,.main_menu .wpml-ls-item:hover .sub-menu,.main_menu .wpml-ls-item:hover .wpml-ls-sub-menu,.main_menu .wpml-ls-item:focus .sub-menu,.main_menu .wpml-ls-item:focus .wpml-ls-sub-menu,.wpml-ls ul .menu-item:hover .sub-menu,.wpml-ls ul .menu-item:hover .wpml-ls-sub-menu,.wpml-ls ul .menu-item:focus .sub-menu,.wpml-ls ul .menu-item:focus .wpml-ls-sub-menu,.wpml-ls ul .wpml-ls-item:hover .sub-menu,.wpml-ls ul .wpml-ls-item:hover .wpml-ls-sub-menu,.wpml-ls ul .wpml-ls-item:focus .sub-menu,.wpml-ls ul .wpml-ls-item:focus .wpml-ls-sub-menu{opacity:1;pointer-events:all}.main_menu>.menu-item:last-child,.wpml-ls ul>.menu-item:last-child{border-bottom:0}body:not(.error404):not(.search) .header__bars{position:fixed;top:0}.header__bars,.error404 .header__bars,.search .header__bars{width:100%;display:block;z-index:21;background-color:transparent}.header__bars:not(.sticky) .bar_menu__logo{max-width:13.125rem}.header__bars:not(.sticky) .bar_menu__logo svg path[id='logo_trazado1']{fill:transparent;stroke:#fff}.header__bars:not(.sticky) .bar_menu__logo svg g[id='logo_trazado3'] path{fill:transparent;stroke:#fff}.header__bars:not(.sticky) .bar_menu__logo svg g[id='Letras'] *{fill:#fff}.header__bars.sticky,.error404 .header__bars,.page-template-thankyou-page .header__bars,.search .header__bars{background-color:#fff}.header__bars.sticky .bar_menu__logo,.error404 .header__bars .bar_menu__logo,.page-template-thankyou-page .header__bars .bar_menu__logo,.search .header__bars .bar_menu__logo{max-width:9.25rem;height:auto}.header__bars.sticky .bar_menu__logo svg path[id='logo_trazado1'],.error404 .header__bars .bar_menu__logo svg path[id='logo_trazado1'],.page-template-thankyou-page .header__bars .bar_menu__logo svg path[id='logo_trazado1'],.search .header__bars .bar_menu__logo svg path[id='logo_trazado1']{fill:#002e5d;stroke:transparent}.header__bars.sticky .bar_menu__logo svg g[id='logo_trazado3'] path,.error404 .header__bars .bar_menu__logo svg g[id='logo_trazado3'] path,.page-template-thankyou-page .header__bars .bar_menu__logo svg g[id='logo_trazado3'] path,.search .header__bars .bar_menu__logo svg g[id='logo_trazado3'] path{fill:#002e5d;stroke:transparent}.header__bars.sticky .bar_menu__logo svg g[id='Letras'] *,.error404 .header__bars .bar_menu__logo svg g[id='Letras'] *,.page-template-thankyou-page .header__bars .bar_menu__logo svg g[id='Letras'] *,.search .header__bars .bar_menu__logo svg g[id='Letras'] *{fill:#00bfb3}.header__bars.sticky .main_menu .menu-item,.header__bars.sticky .main_menu .wpml-ls-item,.header__bars.sticky .wpml-ls ul .menu-item,.header__bars.sticky .wpml-ls ul .wpml-ls-item,.error404 .header__bars .main_menu .menu-item,.error404 .header__bars .main_menu .wpml-ls-item,.error404 .header__bars .wpml-ls ul .menu-item,.error404 .header__bars .wpml-ls ul .wpml-ls-item,.page-template-thankyou-page .header__bars .main_menu .menu-item,.page-template-thankyou-page .header__bars .main_menu .wpml-ls-item,.page-template-thankyou-page .header__bars .wpml-ls ul .menu-item,.page-template-thankyou-page .header__bars .wpml-ls ul .wpml-ls-item,.search .header__bars .main_menu .menu-item,.search .header__bars .main_menu .wpml-ls-item,.search .header__bars .wpml-ls ul .menu-item,.search .header__bars .wpml-ls ul .wpml-ls-item{margin-top:0;border-top:0}.header__bars.sticky .main_menu .menu-item a,.header__bars.sticky .main_menu .wpml-ls-item a,.header__bars.sticky .wpml-ls ul .menu-item a,.header__bars.sticky .wpml-ls ul .wpml-ls-item a,.error404 .header__bars .main_menu .menu-item a,.error404 .header__bars .main_menu .wpml-ls-item a,.error404 .header__bars .wpml-ls ul .menu-item a,.error404 .header__bars .wpml-ls ul .wpml-ls-item a,.page-template-thankyou-page .header__bars .main_menu .menu-item a,.page-template-thankyou-page .header__bars .main_menu .wpml-ls-item a,.page-template-thankyou-page .header__bars .wpml-ls ul .menu-ite a,.page-template-thankyou-page .header__bars .wpml-ls ul .wpml-ls-item a,.search .header__bars .main_menu .menu-item a,.search .header__bars .main_menu .wpml-ls-item a,.search .header__bars .wpml-ls ul .menu-item a,.search .header__bars .wpml-ls ul .wpml-ls-item a{color:#666;padding:1.075rem 0}.header__bars.sticky .main_menu .menu-item a:hover,.header__bars.sticky .main_menu .wpml-ls-item a:hover,.header__bars.sticky .wpml-ls ul .menu-item a:hover,.header__bars.sticky .wpml-ls ul .wpml-ls-item a:hover,.error404 .header__bars .main_menu .menu-item a:hover,.error404 .header__bars .main_menu .wpml-ls-item a:hover,.error404 .header__bars .wpml-ls ul .menu-item a:hover,.error404 .header__bars .wpml-ls ul .wpml-ls-item a:hover,.page-template-thankyou-page .header__bars .main_menu .menu-item a:hover,.page-template-thankyou-page .header__bars .main_menu .wpml-ls-item a:hover,.page-template-thankyou-page .header__bars .wpml-ls ul .menu-item a:hover,.page-template-thankyou-page .header__bars .wpml-ls ul .wpml-ls-item a:hover,.search .header__bars .main_menu .menu-item a:hover,.search .header__bars .main_menu .wpml-ls-item a:hover,.search .header__bars .wpml-ls ul .menu-item a:hover,.search .header__bars .wpml-ls ul .wpml-ls-item a:hover{color:#333}.hero__content{margin-top:14.5rem}.hero__content--blackarrow .ba_logo{position:absolute;right:0;bottom:4rem}.cybersecurity_shield{position:absolute;top:2rem;max-width:26rem}}@media only screen and (min-width: 91.125em){.hero__content--aboutus{padding-bottom:8rem}.hero__content .hero__title{max-width:65rem}}:root{--specific-menu-mega-title-font-family: var(--global-font-family-02);--specific-menu-mega-title-font-family-mobile: var(--global-font-family-01)}:root.blackarrow{--specific-menu-mega-title-font-family:  var(--global-font-family-02);--specific-menu-mega-title-font-family-mobile: var(--global-font-family-02)}.has-mega-menu>a:after{content:'';vertical-align:middle;display:inline;border:0.35em solid transparent;border-top:0.5em solid;position:relative;transform:translateY(0.3rem);float:right;margin-left:0.5rem}.has-mega-menu li{border:0}.has-mega-menu.active>.sub-menu{opacity:1 !important;pointer-events:all !important;height:auto !important;box-shadow:0 5px 8px -5px rgba(0,0,0,0.16)}.has-mega-menu>.sub-menu{text-align:left;list-style:none;padding:0;background:#fff;opacity:0 !important;pointer-events:none !important;height:0 !important;overflow:hidden !important}.has-mega-menu>.sub-menu li{border:0}.has-mega-menu>.sub-menu .mega-menu-column{padding:1rem 1rem 2rem !important;border:0}.has-mega-menu>.sub-menu .mega-menu-column a{font-size:1rem}.has-mega-menu>.sub-menu .mega-menu-column .megamenu-category{color:#333;padding:1.175rem 0 1.175rem 0;font-size:1rem;display:block;text-align:center;border-bottom:0.0625rem solid #ddd;font-family:var(--specific-menu-mega-title-font-family-mobile);font-weight:var(--specific-menu-mega-title-font-weight-mobile)}.has-mega-menu>.sub-menu .mega-menu-column .sub-menu{list-style:none;padding:0;opacity:1 !important;pointer-events:all !important;height:auto !important}.has-mega-menu>.sub-menu .mega-menu-column .sub-menu li{padding-left:0}.has-mega-menu>.sub-menu .mega-menu-column .sub-menu li.title_link a{font-family:var(--specific-menu-mega-title-font-family-mobile);font-weight:var(--specific-menu-mega-title-font-weight-mobile);display:flex;justify-content:center;border-bottom:0.0625rem solid #ddd}.has-mega-menu>.sub-menu .mega-menu-column .sub-menu li a{font-family:var(--global-font-family-01)}.service-icon a{position:relative !important;padding-left:3.5rem !important;line-height:2 !important;display:flex;align-items:center}.service-icon a:before{content:'';display:block;position:absolute;left:1rem;width:2rem;height:2rem;background-repeat:no-repeat;background-size:contain}.service-icon.visible.pentest a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/auditoria-seguridad-darkblue.png)}.service-icon.visible.wifi-pentest a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/owisam-darkblue.png)}.service-icon.visible.social-engineering a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/02/social-engineering-pentest-darkblue.png)}.service-icon.visible.apt a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/apt-darkblue.png)}.service-icon.visible.advisors a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/10/cybersecurity-advisors-darkblue.png)}.service-icon.visible.web-security-audit a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/owasp-darkblue.png)}.service-icon.visible.mobile-app-security a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/aplicaciones-moviles-darkblue.png)}.service-icon.visible.bank-infraestructures a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/02/psd2-swift-security-analysis-darkblue.png)}.service-icon.visible.iot-security a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/10/iot-analysis-darkblue-1.png)}.service-icon.visible.dos-attacks a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/11/dos-tests-darkblue.png)}.service-icon.visible.reverse-engineering a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/ingenieria-inversa-darkblue.png)}.service-icon.visible.cloud-infraestructures a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/10/revisiones-cloud-darkblue-1.png)}.service-icon.visible.code-security-audit a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/auditoria_codigo_fuente-darkblue.png)}.service-icon.visible.hardening a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/hardening-darkblue.png)}.service-icon.visible.dast a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/11/it-infrastructure-darkblue.png)}.service-icon.visible.sast a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/auditoria_codigo_fuente-darkblue.png)}.service-icon.visible.compliance-security a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/11/compliance-security-darkblue.png)}.service-icon.visible.dynamic-risk a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2021/10/dynamic-risks-darkblue.png)}.service-icon.visible.bug-bounty a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2019/07/bug-bounty-darkblue.png)}.service-icon.visible.blackarrow a:before{background-image:url(https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/images/blackarrow-small.webp)}.service-icon.visible.threat-hunting a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/06/threat-hunting-dark.webp)}.service-icon.visible.red-team a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/06/red-team-icon-dark.webp)}.service-icon.visible.blue-team a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/06/blue-team-dark.webp)}.service-icon.visible.compromise-assesment a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/06/compromise_assesment_dark.webp)}.service-icon.visible.digital-surveillance a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/09/digital_surveillance.png)}.service-icon.visible.fraud-investigation a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/09/fraud-analysis-darkblue-1.png)}.service-icon.visible.threat-intelligence a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/09/Threat_intelligence_azul.png)}.service-icon.visible.strategic-cyberintelligence a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/09/strategic_cyber_intelligence_azul.png)}.service-icon.visible.training-cyberintelligence a:before{background-image:url(https://www.tarlogic.com/wp-content/uploads/2022/09/TRAINNING_ICONO_AZUL.png)}@media only screen and (min-width: 75em){.has-mega-menu>.sub-menu .mega-menu-column .sub-menu li.title_link a,.has-mega-menu ul.sub-menu .mega-menu-column .megamenu-category{font-family:var(--specific-menu-mega-title-font-family);font-weight:var(--specific-menu-mega-title-font-weight);border-bottom:0;text-align:left;justify-content:flex-start;width:100%}.has-mega-menu ul.sub-menu .mega-menu-column a{text-align:left;border-bottom:0}li.mega-menu-column{width:100%;max-width:100%;min-height:1px;padding:10px 25px;flex:1 0 calc(33% - 2rem);max-width:calc(33% - 2rem);margin:0 auto}.has-mega-menu{position:static !important}li.has-mega-menu .sub-menu{width:100%;position:absolute;top:116px;z-index:100;left:0px;right:0px}li.has-mega-menu>.sub-menu{display:flex !important;flex-wrap:wrap}li.has-mega-menu .sub-menu .sub-menu{position:static;display:inline-block}}
+</style>
+<script type="text/javascript">
+			var doc = document.documentElement;
+			doc.setAttribute( 'data-useragent', navigator.userAgent );
+		</script>
+</head>
+<body style="color: rgb(230, 225, 232);">
+<header class="header">
+<div class="header__bars">
+<div class="bar_menu">
+<div class="tar_wrapper tar_wrapper--menu">
+<a href="https://www.tarlogic.com" class="bar_menu__logo" aria-label="Home">
+<svg xmlns="http://www.w3.org/2000/svg" width="234.414" height="85.941" viewBox="0 0 234.414 85.941">
+<g id="logo_tarlogic" transform="translate(-6607.973 -1591.521)">
+<path id="logo_trazado1" d="M6631.7,1593.145v17.087l-23.184,19.34v-15.241Z" transform="translate(0 -0.49)" fill="none" stroke="#fff" stroke-width="1"></path>
+<path id="logo_trazado2" d="M6656.361,1620.785l-24.191-20.208v-.007l0,0,0,0v.007l-24.19,20.208,9.79,3.584,14.405-12.033,14.217,12.1Z" transform="translate(0 9.359)" fill="#00bfb3"></path>
+<g id="logo_trazado3" transform="translate(3.511 15.46)" fill="none">
+<path d="M6628.657,1606.137V1662l-18.169-40.542Z" stroke="none"></path>
+</g>
+<g id="Letras" transform="translate(6668.482 1616.902)">
+<path id="letra1" d="M6635.342,1603.724h18.609v6.173h-6.266v17.47h-6.2V1609.9h-6.143Z" transform="translate(-6635.342 -1603.724)" fill="#fff"></path>
+<path id="letra2" d="M6644.2,1627.35l11.018-23.612h2.8l11.114,23.612h-6.205l-1.446-3.084h-9.669l-1.416,3.084Zm10.046-8.311h4.813l-2.39-5.2Z" transform="translate(-6624.614 -1603.707)" fill="#fff"></path>
+<path id="letra3" d="M6670.6,1627.35l-3.651-6.266h-3.843v6.266h-6.2v-23.612h9.949a8.668,8.668,0,0,1,5.89,15.05l5.006,8.563Zm-7.494-11.618h3.843a3.384,3.384,0,1,0,0-6.768h-3.843Z" transform="translate(-6609.231 -1603.707)" fill="#fff"></path>
+<path id="letra4" d="M6667.714,1603.738h6.2v17.378h8.5v6.234h-14.706Z" transform="translate(-6596.142 -1603.707)" fill="#fff"></path>
+<path id="letra5" d="M6687.5,1603.738a11.806,11.806,0,1,1-11.772,11.837A11.84,11.84,0,0,1,6687.5,1603.738Zm0,6.173a5.635,5.635,0,1,0,5.643,5.633A5.62,5.62,0,0,0,6687.5,1609.911Z" transform="translate(-6586.432 -1603.707)" fill="#fff"></path>
+<path id="letra6" d="M6711.565,1614.664v.88a11.831,11.831,0,1,1-3.5-8.375l-4.374,4.344a5.649,5.649,0,0,0-3.937-1.574,5.6,5.6,0,1,0,4.566,8.881h-4.566v-4.157Z" transform="translate(-6571.602 -1603.707)" fill="#fff"></path>
+<path id="letra7" d="M6700.172,1603.738h6.206v23.612h-6.206Z" transform="translate(-6556.839 -1603.707)" fill="#fff"></path>
+<path id="letra8" d="M6720.646,1611.544a5.513,5.513,0,0,0-3.969-1.541,5.541,5.541,0,1,0,3.969,9.507l4.408,4.345a11.8,11.8,0,1,1-8.377-20.117,11.69,11.69,0,0,1,8.313,3.431Z" transform="translate(-6551.15 -1603.707)" fill="#fff"></path>
+</g>
+<g id="Grupo_1945" data-name="Grupo 1945" transform="translate(6674.934 1649.252)">
+<path id="Trazado_4822" data-name="Trazado 4822" d="M6642.365,1620.282a2.1,2.1,0,0,0-.175-.449,1.236,1.236,0,0,0-.283-.356,1.286,1.286,0,0,0-.406-.232,1.622,1.622,0,0,0-.542-.084,1.584,1.584,0,0,0-.778.184,1.515,1.515,0,0,0-.533.484,2.216,2.216,0,0,0-.3.692,3.178,3.178,0,0,0,0,1.579,2.178,2.178,0,0,0,.3.69,1.54,1.54,0,0,0,.533.487,1.583,1.583,0,0,0,.778.181,1.373,1.373,0,0,0,.583-.115,1.276,1.276,0,0,0,.436-.316,1.479,1.479,0,0,0,.284-.469,2.233,2.233,0,0,0,.134-.577h.964a2.626,2.626,0,0,1-.219.924,2.247,2.247,0,0,1-.5.723,2.212,2.212,0,0,1-.744.469,2.565,2.565,0,0,1-.938.166,2.656,2.656,0,0,1-1.131-.232,2.443,2.443,0,0,1-.85-.635,2.838,2.838,0,0,1-.532-.942,3.576,3.576,0,0,1,0-2.28,2.815,2.815,0,0,1,.532-.942,2.513,2.513,0,0,1,.85-.639,2.621,2.621,0,0,1,1.131-.237,3.016,3.016,0,0,1,.894.131,2.3,2.3,0,0,1,.735.378,1.923,1.923,0,0,1,.519.606,2.064,2.064,0,0,1,.244.811Z" transform="translate(-6638.26 -1618.356)" fill="#00bfb3"></path>
+<path id="Trazado_4823" data-name="Trazado 4823" d="M6643.567,1621.844l-2.115-3.427h1.145l1.492,2.527,1.469-2.527h1.1l-2.107,3.427v2.211h-.987Z" transform="translate(-6634.394 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4824" data-name="Trazado 4824" d="M6644.83,1618.417h2.741a1.972,1.972,0,0,1,1.217.347,1.4,1.4,0,0,1,.246,1.78,1.339,1.339,0,0,1-.6.471v.015a1.233,1.233,0,0,1,.791.493,1.793,1.793,0,0,1,.149,1.579,1.269,1.269,0,0,1-.369.5,1.93,1.93,0,0,1-.65.332,3.18,3.18,0,0,1-.938.124h-2.591Zm.987,2.359h1.61a.875.875,0,0,0,.592-.2.708.708,0,0,0,.236-.579.728.728,0,0,0-.212-.6.942.942,0,0,0-.616-.175h-1.61Zm0,2.472h1.744a.981.981,0,0,0,.7-.232.859.859,0,0,0,.251-.659.825.825,0,0,0-.251-.644,1,1,0,0,0-.7-.225h-1.744Z" transform="translate(-6630.304 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4825" data-name="Trazado 4825" d="M6648.116,1618.417h4.056v.853H6649.1v1.475h2.845v.807H6649.1v1.65h3.127v.853h-4.111Z" transform="translate(-6626.324 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4826" data-name="Trazado 4826" d="M6651.138,1618.417h2.692a2.083,2.083,0,0,1,1.4.4,1.4,1.4,0,0,1,.464,1.121,1.625,1.625,0,0,1-.117.667,1.472,1.472,0,0,1-.276.425,1.081,1.081,0,0,1-.312.235c-.1.046-.18.079-.225.095v.016a1.027,1.027,0,0,1,.271.08.774.774,0,0,1,.272.2,1.079,1.079,0,0,1,.21.358,1.579,1.579,0,0,1,.083.552,4.936,4.936,0,0,0,.076.9,1.174,1.174,0,0,0,.232.582h-1.06a.968.968,0,0,1-.13-.4c-.014-.146-.02-.288-.02-.425a3.99,3.99,0,0,0-.047-.668,1.145,1.145,0,0,0-.176-.467.716.716,0,0,0-.341-.271,1.525,1.525,0,0,0-.558-.086h-1.453v2.321h-.984Zm.984,2.564h1.619a1.038,1.038,0,0,0,.719-.223.879.879,0,0,0,.245-.676,1.038,1.038,0,0,0-.08-.438.622.622,0,0,0-.216-.263.807.807,0,0,0-.316-.128,2.253,2.253,0,0,0-.367-.031h-1.6Z" transform="translate(-6622.667 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4827" data-name="Trazado 4827" d="M6655.255,1622.249a1.271,1.271,0,0,0,.11.553.993.993,0,0,0,.307.374,1.368,1.368,0,0,0,.455.214,2.234,2.234,0,0,0,.556.066,1.753,1.753,0,0,0,.552-.075,1.1,1.1,0,0,0,.372-.192.713.713,0,0,0,.206-.274.812.812,0,0,0,.063-.312.681.681,0,0,0-.145-.478.866.866,0,0,0-.321-.217,7.121,7.121,0,0,0-.7-.21c-.266-.064-.6-.15-.984-.257a2.137,2.137,0,0,1-.6-.248,1.451,1.451,0,0,1-.382-.345,1.2,1.2,0,0,1-.2-.4,1.582,1.582,0,0,1-.06-.434,1.487,1.487,0,0,1,.176-.738,1.6,1.6,0,0,1,.472-.518,2.031,2.031,0,0,1,.662-.3,2.883,2.883,0,0,1,.75-.1,2.929,2.929,0,0,1,.833.115,2.029,2.029,0,0,1,.688.343,1.654,1.654,0,0,1,.469.564,1.675,1.675,0,0,1,.176.779h-.988a.95.95,0,0,0-.371-.77,1.473,1.473,0,0,0-.847-.226,1.759,1.759,0,0,0-.353.038,1.054,1.054,0,0,0-.331.117.73.73,0,0,0-.251.225.612.612,0,0,0-.1.354.6.6,0,0,0,.187.471,1.218,1.218,0,0,0,.487.257l.247.066c.146.04.308.084.485.13s.354.095.527.139l.366.1a1.627,1.627,0,0,1,.479.239,1.445,1.445,0,0,1,.551.756,1.555,1.555,0,0,1,.067.442,1.594,1.594,0,0,1-.193.809,1.651,1.651,0,0,1-.512.551,2.2,2.2,0,0,1-.718.312,3.515,3.515,0,0,1-.819.1,3.446,3.446,0,0,1-.909-.117,2.153,2.153,0,0,1-.742-.365,1.784,1.784,0,0,1-.5-.625,2.081,2.081,0,0,1-.2-.9Z" transform="translate(-6618.874 -1618.356)" fill="#00bfb3"></path>
+<path id="Trazado_4828" data-name="Trazado 4828" d="M6657.507,1618.417h4.058v.853h-3.07v1.475h2.844v.807h-2.844v1.65h3.127v.853h-4.114Z" transform="translate(-6614.952 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4829" data-name="Trazado 4829" d="M6664.5,1620.282a2,2,0,0,0-.173-.449,1.234,1.234,0,0,0-.691-.588,1.605,1.605,0,0,0-.542-.084,1.567,1.567,0,0,0-.775.184,1.471,1.471,0,0,0-.532.484,2.2,2.2,0,0,0-.306.692,3.24,3.24,0,0,0,0,1.579,2.161,2.161,0,0,0,.306.69,1.5,1.5,0,0,0,.532.487,1.567,1.567,0,0,0,.775.181,1.378,1.378,0,0,0,.584-.115,1.279,1.279,0,0,0,.437-.316,1.51,1.51,0,0,0,.282-.469,2.317,2.317,0,0,0,.136-.577h.964a2.668,2.668,0,0,1-.218.924,2.286,2.286,0,0,1-.5.723,2.184,2.184,0,0,1-.742.469,2.579,2.579,0,0,1-.94.166,2.659,2.659,0,0,1-1.131-.232,2.531,2.531,0,0,1-.851-.635,2.853,2.853,0,0,1-.531-.942,3.576,3.576,0,0,1,0-2.28,2.83,2.83,0,0,1,.531-.942,2.555,2.555,0,0,1,1.981-.876,3,3,0,0,1,.894.131,2.346,2.346,0,0,1,.738.378,1.971,1.971,0,0,1,.518.606,2.08,2.08,0,0,1,.243.811Z" transform="translate(-6611.458 -1618.356)" fill="#00bfb3"></path>
+<path id="Trazado_4830" data-name="Trazado 4830" d="M6663.85,1618.417h.985v3.285a5.487,5.487,0,0,0,.029.575,1.3,1.3,0,0,0,.157.524,1,1,0,0,0,.394.384,1.543,1.543,0,0,0,.748.15,1.514,1.514,0,0,0,.743-.15,1,1,0,0,0,.4-.384,1.346,1.346,0,0,0,.159-.524c.018-.195.026-.387.026-.575v-3.285h.985v3.608a2.475,2.475,0,0,1-.163.946,1.845,1.845,0,0,1-.472.677,1.994,1.994,0,0,1-.729.407,3.46,3.46,0,0,1-1.9,0,1.971,1.971,0,0,1-.73-.407,1.818,1.818,0,0,1-.47-.677,2.455,2.455,0,0,1-.166-.946Z" transform="translate(-6607.271 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4831" data-name="Trazado 4831" d="M6667.228,1618.417h2.692a2.081,2.081,0,0,1,1.4.4,1.4,1.4,0,0,1,.465,1.121,1.625,1.625,0,0,1-.117.667,1.415,1.415,0,0,1-.277.425,1.053,1.053,0,0,1-.311.235c-.105.046-.177.079-.226.095v.016a1.049,1.049,0,0,1,.272.08.792.792,0,0,1,.272.2,1.1,1.1,0,0,1,.209.358,1.6,1.6,0,0,1,.084.552,4.855,4.855,0,0,0,.075.9,1.165,1.165,0,0,0,.231.582h-1.059a.915.915,0,0,1-.13-.4c-.013-.146-.019-.288-.019-.425a4.2,4.2,0,0,0-.048-.668,1.1,1.1,0,0,0-.176-.467.714.714,0,0,0-.342-.271,1.521,1.521,0,0,0-.558-.086h-1.453v2.321h-.985Zm.985,2.564h1.618a1.035,1.035,0,0,0,.719-.223.869.869,0,0,0,.245-.676,1.024,1.024,0,0,0-.079-.438.6.6,0,0,0-.216-.263.79.79,0,0,0-.316-.128,2.238,2.238,0,0,0-.368-.031h-1.6Z" transform="translate(-6603.182 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4832" data-name="Trazado 4832" d="M6670.514,1618.417h.987v5.638h-.987Z" transform="translate(-6599.205 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4833" data-name="Trazado 4833" d="M6672.035,1618.417h4.563v.853H6674.8v4.785h-.986v-4.785h-1.783Z" transform="translate(-6597.361 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4834" data-name="Trazado 4834" d="M6676.989,1621.844l-2.115-3.427h1.145l1.492,2.527,1.469-2.527h1.1l-2.108,3.427v2.211h-.986Z" transform="translate(-6593.923 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4835" data-name="Trazado 4835" d="M6680.015,1618.417h4.061v.853H6681v1.475h2.84v.807H6681v1.65h3.126v.853h-4.115Z" transform="translate(-6587.696 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4836" data-name="Trazado 4836" d="M6682.891,1618.417h1.177l1.279,1.99,1.333-1.99h1.1l-1.862,2.715,2,2.923h-1.2l-1.406-2.156-1.428,2.156h-1.131l2-2.923Z" transform="translate(-6584.381 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4837" data-name="Trazado 4837" d="M6686.122,1618.417h2.486a2.381,2.381,0,0,1,.979.172,1.522,1.522,0,0,1,.583.436,1.447,1.447,0,0,1,.281.568,2.389,2.389,0,0,1,.076.568,2.313,2.313,0,0,1-.076.564,1.473,1.473,0,0,1-.281.566,1.491,1.491,0,0,1-.583.429,2.379,2.379,0,0,1-.979.17h-1.5v2.165h-.986Zm.986,2.668h1.445a1.255,1.255,0,0,0,.34-.048,1,1,0,0,0,.319-.153.78.78,0,0,0,.236-.285.986.986,0,0,0,.092-.447,1.119,1.119,0,0,0-.081-.458.741.741,0,0,0-.211-.287.766.766,0,0,0-.31-.146,1.657,1.657,0,0,0-.371-.04h-1.46Z" transform="translate(-6580.301 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4838" data-name="Trazado 4838" d="M6689.275,1618.417h4.057v.853h-3.069v1.475h2.842v.807h-2.842v1.65h3.126v.853h-4.113Z" transform="translate(-6576.484 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4839" data-name="Trazado 4839" d="M6692.3,1618.417h2.693a2.085,2.085,0,0,1,1.4.4,1.4,1.4,0,0,1,.465,1.121,1.643,1.643,0,0,1-.116.667,1.472,1.472,0,0,1-.276.425,1.084,1.084,0,0,1-.312.235c-.1.046-.179.079-.226.095v.016a1.008,1.008,0,0,1,.272.08.792.792,0,0,1,.272.2,1.112,1.112,0,0,1,.209.358,1.583,1.583,0,0,1,.081.552,5.208,5.208,0,0,0,.076.9,1.2,1.2,0,0,0,.234.582h-1.059a.916.916,0,0,1-.131-.4c-.013-.146-.02-.288-.02-.425a4.21,4.21,0,0,0-.047-.668,1.144,1.144,0,0,0-.174-.467.733.733,0,0,0-.344-.271,1.519,1.519,0,0,0-.557-.086h-1.452v2.321h-.987Zm.987,2.564h1.618a1.034,1.034,0,0,0,.718-.223.873.873,0,0,0,.246-.676,1.039,1.039,0,0,0-.079-.438.624.624,0,0,0-.217-.263.794.794,0,0,0-.317-.128,2.226,2.226,0,0,0-.367-.031h-1.6Z" transform="translate(-6572.827 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4840" data-name="Trazado 4840" d="M6695.275,1618.417h4.563v.853h-1.79v4.785h-.989v-4.785h-1.783Z" transform="translate(-6569.221 -1618.282)" fill="#00bfb3"></path>
+<path id="Trazado_4841" data-name="Trazado 4841" d="M6699.242,1622.249a1.231,1.231,0,0,0,.11.553,1,1,0,0,0,.307.374,1.363,1.363,0,0,0,.454.214,2.236,2.236,0,0,0,.557.066,1.778,1.778,0,0,0,.554-.075,1.112,1.112,0,0,0,.37-.192.7.7,0,0,0,.206-.274.808.808,0,0,0,.061-.312.681.681,0,0,0-.145-.478.837.837,0,0,0-.319-.217,7.121,7.121,0,0,0-.7-.21q-.4-.1-.983-.257a2.1,2.1,0,0,1-.6-.248,1.4,1.4,0,0,1-.383-.345,1.168,1.168,0,0,1-.2-.4,1.659,1.659,0,0,1-.059-.434,1.457,1.457,0,0,1,.178-.738,1.58,1.58,0,0,1,.471-.518,2,2,0,0,1,.661-.3,2.9,2.9,0,0,1,.752-.1,2.927,2.927,0,0,1,.832.115,2.06,2.06,0,0,1,.687.343,1.717,1.717,0,0,1,.471.564,1.7,1.7,0,0,1,.172.779h-.986a.956.956,0,0,0-.371-.77,1.469,1.469,0,0,0-.844-.226,1.814,1.814,0,0,0-.357.038,1.048,1.048,0,0,0-.33.117.733.733,0,0,0-.249.225.6.6,0,0,0-.1.354.607.607,0,0,0,.187.471,1.192,1.192,0,0,0,.487.257l.246.066c.146.04.309.084.486.13l.524.139c.173.044.293.078.368.1a1.681,1.681,0,0,1,.482.239,1.562,1.562,0,0,1,.344.343,1.466,1.466,0,0,1,.271.856,1.614,1.614,0,0,1-.193.809,1.673,1.673,0,0,1-.509.551,2.253,2.253,0,0,1-.72.312,3.533,3.533,0,0,1-.819.1,3.419,3.419,0,0,1-.909-.117,2.146,2.146,0,0,1-.744-.365,1.842,1.842,0,0,1-.506-.625,2.153,2.153,0,0,1-.2-.9Z" transform="translate(-6565.614 -1618.356)" fill="#00bfb3"></path>
+</g>
+</g>
+</svg>
+</a>
+<button id="menu__hamburger" class="menu__hamburger" role="button" aria-label="Menu">
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
+<g id="Grupo_2152" data-name="Grupo 2152" transform="translate(-2130 -48)">
+<rect id="Rectángulo_284" data-name="Rectángulo 284" width="25" height="25" transform="translate(2130 48)" fill="none"></rect>
+<path id="Icon_material-menu" data-name="Icon material-menu" d="M4.5,25.667h25V22.889H4.5Zm0-6.944h25V15.944H4.5ZM4.5,9v2.778h25V9Z" transform="translate(2125.5 43)" fill="#666"></path>
+</g>
+</svg>
+</button>
+<nav id="menu" class="menu">
+<ul class="main_menu">
+<li id="menu-item-22163" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-22163">
+<a href="/">Home</a>
+</li>
+<li id="menu-item-20092" class="has-mega-menu menu-item menu-item-type-post_type menu-item-object-page current-menu-ancestor current_page_ancestor menu-item-has-children menu-item-20092">
+<a href="https://www.tarlogic.com/cybersecurity-services/">Cybersecurity services</a>
+<ul class="sub-menu">
+<li id="menu-item-32094" class="mega-menu-column title_link menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-32094">
+<div class="megamenu-category">Advanced penetration testing services</div>
+<ul class="sub-menu">
+<li id="menu-item-32116" class="lazy-bg service-icon red-team menu-item menu-item-type-post_type menu-item-object-page menu-item-32116">
+<a title="Red Team services" href="https://www.tarlogic.com/red-team-services/">Red Team services</a>
+</li>
+<li id="menu-item-32095" class="lazy-bg service-icon pentest menu-item menu-item-type-post_type menu-item-object-page menu-item-32095">
+<a title="Penetration Testing services" href="https://www.tarlogic.com/penetration-testing-services/">External &amp; internal pentesting</a>
+</li>
+<li id="menu-item-32097" class="lazy-bg service-icon social-engineering menu-item menu-item-type-post_type menu-item-object-page menu-item-32097">
+<a title="Social Engineering" href="https://www.tarlogic.com/social-engineering/">Social Engineering</a>
+</li>
+<li id="menu-item-32098" class="lazy-bg service-icon wifi-pentest menu-item menu-item-type-post_type menu-item-object-page menu-item-32098">
+<a title="Wi-Fi Pentest" href="https://www.tarlogic.com/wifi-pentest/">Wi-Fi Pentest</a>
+</li>
+<li id="menu-item-35204" class="menu-item title_link menu-item-type-custom menu-item-object-custom menu-item-35204">
+<div class="megamenu-category">Cyber intelligence services</div>
+</li>
+<li id="menu-item-33837" class="lazy-bg service-icon threat-intelligence menu-item menu-item-type-post_type menu-item-object-page menu-item-33837">
+<a title="Threat Intelligence" href="https://www.tarlogic.com/threat-intelligence/">Threat Intelligence</a>
+</li>
+<li id="menu-item-33847" class="lazy-bg service-icon digital-surveillance menu-item menu-item-type-post_type menu-item-object-page menu-item-33847">
+<a title="Digital surveillance" href="https://www.tarlogic.com/digital-surveillance/">Digital surveillance</a>
+</li>
+<li id="menu-item-33846" class="lazy-bg service-icon fraud-investigation menu-item menu-item-type-post_type menu-item-object-page menu-item-33846">
+<a title="Fraud investigation " href="https://www.tarlogic.com/fraud-investigation/">Fraud investigation and analysis</a>
+</li>
+<li id="menu-item-33836" class="lazy-bg service-icon strategic-cyberintelligence menu-item menu-item-type-post_type menu-item-object-page menu-item-33836">
+<a title="Strategic Cyber Intelligence" href="https://www.tarlogic.com/strategic-cyber-intelligence/">Strategic Cyber-Intelligence</a>
+</li>
+</ul>
+</li>
+<li id="menu-item-32099" class="mega-menu-column menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-32099">
+<div class="megamenu-category">Security assessment services</div>
+<ul class="sub-menu">
+<li id="menu-item-32108" class="lazy-bg service-icon web-security-audit menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-15916 current_page_item menu-item-32108">
+<a title="Website security audit" href="https://www.tarlogic.com/website-security-audit/" aria-current="page">Web Security Audit</a>
+</li>
+<li id="menu-item-32105" class="lazy-bg service-icon mobile-app-security menu-item menu-item-type-post_type menu-item-object-page menu-item-32105">
+<a title="Mobile application security audits" href="https://www.tarlogic.com/mobile-app-audit/">Mobile Application Security Test Audit</a>
+</li>
+<li id="menu-item-32104" class="lazy-bg service-icon iot-security menu-item menu-item-type-post_type menu-item-object-page menu-item-32104">
+<a title="IoT Security assessment" href="https://www.tarlogic.com/iot-security-testing/">IOT Security testing</a>
+</li>
+<li id="menu-item-32101" class="lazy-bg service-icon cloud-infraestructures menu-item menu-item-type-post_type menu-item-object-page menu-item-32101">
+<a title="Cloud security assessment" href="https://www.tarlogic.com/cloud-security-assessment/">Cloud Infrastructures security audit</a>
+</li>
+<li id="menu-item-32106" class="lazy-bg service-icon reverse-engineering menu-item menu-item-type-post_type menu-item-object-page menu-item-32106">
+<a title="Reverse Engineering" href="https://www.tarlogic.com/hardware-hacking-and-reverse-engineering-services/">Reverse Engineering &amp; Hardware Hacking</a>
+</li>
+<li id="menu-item-32102" class="lazy-bg service-icon code-security-audit menu-item menu-item-type-post_type menu-item-object-page menu-item-32102">
+<a title="Code Security Audit" href="https://www.tarlogic.com/code-security-audit/">Code Security Audit</a>
+</li>
+<li id="menu-item-32107" class="lazy-bg service-icon hardening menu-item menu-item-type-post_type menu-item-object-page menu-item-32107">
+<a title="Hardening" href="https://www.tarlogic.com/operating-system-hardening/">Technologies and Operating Systems Hardening</a>
+</li>
+<li id="menu-item-32100" class="lazy-bg service-icon bank-infraestructures menu-item menu-item-type-post_type menu-item-object-page menu-item-32100">
+<a title="Bank Infrastructures Security Assessment" href="https://www.tarlogic.com/advanced-bank-security-assessment/">Advanced Bank Infrastructures Security Assessment</a>
+</li>
+</ul>
+</li>
+<li id="menu-item-32109" class="mega-menu-column menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-32109">
+<div class="megamenu-category">Attack Surface Reduction services</div>
+<ul class="sub-menu">
+<li id="menu-item-32112" class="lazy-bg service-icon dast menu-item menu-item-type-post_type menu-item-object-page menu-item-32112">
+<a title="Vulnerability management service" href="https://www.tarlogic.com/vulnerability-management/">Vulnerability Management</a>
+</li>
+<li id="menu-item-75076" class="lazy-bg service-icon apt menu-item menu-item-type-post_type menu-item-object-page menu-item-75076">
+<a title="Emerging vulnerability management service" href="https://www.tarlogic.com/emerging-vulnerabilities/">Emerging vulnerabilities 24×7</a>
+</li>
+<li id="menu-item-32103" class="lazy-bg service-icon dos-attacks menu-item menu-item-type-post_type menu-item-object-page menu-item-32103">
+<a title="Denial of service test" href="https://www.tarlogic.com/dos-test/">Denial of service simulation (DoS)</a>
+</li>
+<li id="menu-item-32110" class="lazy-bg service-icon bug-bounty menu-item menu-item-type-post_type menu-item-object-page menu-item-32110">
+<a title="Bug bounty service" href="https://www.tarlogic.com/bug-bounty/">Managed Bug Bounty program</a>
+</li>
+<li id="menu-item-35009" class="lazy-bg service-icon dynamic-risk menu-item menu-item-type-custom menu-item-object-custom menu-item-35009">
+<a title="Threat Priorization" href="https://www.tarlogic.com/threat-priorization/">Dynamic Risk Assessment and Threat Prioritization</a>
+</li>
+<li id="menu-item-35205" class="title_link menu-item menu-item-type-custom menu-item-object-custom menu-item-35205">
+<div class="megamenu-category">Protection and response</div>
+</li>
+<li id="menu-item-32117" class="lazy-bg service-icon threat-hunting menu-item menu-item-type-post_type menu-item-object-page menu-item-32117">
+<a title="Threat Hunting" href="https://www.tarlogic.com/threat-hunting/">Threat Hunting services</a>
+</li>
+<li id="menu-item-76463" class="lazy-bg service-icon compromise-assesment menu-item menu-item-type-custom menu-item-object-custom menu-item-76463">
+<a title="Incident Response" href="https://www.tarlogic.com/incident-response/">Incident Response Services</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-20630" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20630">
+<a href="https://www.tarlogic.com/blackarrow/">BlackArrow</a>
+</li>
+<li id="menu-item-25594" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-25594">
+<a href="https://www.tarlogic.com/blog/">Blog</a>
+</li>
+<li id="menu-item-22169" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22169">
+<a title="Contactar con tarlogic" href="https://www.tarlogic.com/contact/">Contact</a>
+</li>
+<li id="menu-item-wpml-ls-277-en" class="menu-item-language menu-item-language-current menu-item wpml-ls-slot-277 wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-has-children menu-item-wpml-ls-277-en">
+<a title="EN" href="" class="wpml-ls-link">
+<span class="wpml-ls-native" lang="en">EN</span>
+</a>
+<ul class="sub-menu">
+<li id="menu-item-wpml-ls-277-es" class="menu-item-language menu-item wpml-ls-slot-277 wpml-ls-item wpml-ls-item-es wpml-ls-menu-item wpml-ls-first-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-277-es">
+<a title="ES" href="https://www.tarlogic.com/bsam/es/" class="wpml-ls-link">
+<span class="wpml-ls-native" lang="es">ES</span>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<div class="wpml-ls-statics-shortcode_actions wpml-ls wpml-ls-legacy-dropdown js-wpml-ls-legacy-dropdown" id="lang_sel">
+<ul>
+<li tabindex="0" class="wpml-ls-slot-shortcode_actions wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-item-legacy-dropdown">
+<a href="#" class="js-wpml-ls-item-toggle wpml-ls-item-toggle lang_sel_sel icl-en">
+<span class="wpml-ls-native icl_lang_sel_native">EN</span>
+</a>
+<ul class="wpml-ls-sub-menu">
+<li class="icl-es wpml-ls-slot-shortcode_actions wpml-ls-item wpml-ls-item-es wpml-ls-first-item">
+<a href="https://www.tarlogic.com/bsam/es/" class="wpml-ls-link">
+<span class="wpml-ls-native icl_lang_sel_native" lang="es">ES</span>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+</div>
+</div>
+</div>
+</header>
+<a class="skip-to-main" href="#main-content">Skip to main content</a>
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+<symbol id="svg-link" viewBox="0 0 24 24">
+<title>Link</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71">
+</path>
+<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71">
+</path>
+</svg>
+</symbol>
+<symbol id="svg-menu" viewBox="0 0 24 24">
+<title>Menu</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+<line x1="3" y1="12" x2="21" y2="12">
+</line>
+<line x1="3" y1="6" x2="21" y2="6">
+</line>
+<line x1="3" y1="18" x2="21" y2="18">
+</line>
+</svg>
+</symbol>
+<symbol id="svg-arrow-right" viewBox="0 0 24 24">
+<title>Expand</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+<polyline points="9 18 15 12 9 6">
+</polyline>
+</svg>
+</symbol>
+
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+<title id="svg-external-link-title">(external link)</title>
+<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6">
+</path>
+<polyline points="15 3 21 3 21 9">
+</polyline>
+<line x1="10" y1="14" x2="21" y2="3">
+</line>
+</symbol>
+
+<symbol id="svg-copy" viewBox="0 0 16 16">
+<title>Copy</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+<path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path>
+<path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path>
+</svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+<title>Copied</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+<path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"></path>
+<path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"></path>
+</svg>
+</symbol>
+</svg>
+<div class="side-bar">
+<div class="site-header" role="banner">
+<a href="https://www.tarlogic.com/bsam/" class="site-title lh-tight">
+</a>
+<button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" class="" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 11l8 3l8 -3"></path>
+</svg></button>
+</div>
+<nav aria-label="Main" id="site-nav" class="site-nav">
+<ul class="nav-list">
+<li class="nav-list-item active">
+<a class="nav-list-link active">Bluetooth Security Assessment Methodology</a>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Documentation category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/documentation/" class="nav-list-link">Documentation</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/bluetooth-core-specification/" class="nav-list-link">Bluetooth Core Specification</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/physical-architecture/" class="nav-list-link">Physical architecture</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/baseband-link-layer/" class="nav-list-link">Baseband Link Layer: LMP and LL</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/logical-transport/" class="nav-list-link">Logical Transport: ACL and SCO</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/data-link-layer/" class="nav-list-link">Data Link Layer: L2CAP</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/documentation/bluetooth-le-connection-mode/" class="nav-list-link">Bluetooth LE connection mode</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/preliminary-considerations/" class="nav-list-link">Preliminary considerations</a>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Controls category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/" class="nav-list-link">Controls</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Information gathering category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-information-gathering/" class="nav-list-link">Information gathering</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-controller-lifecycle-status/" class="nav-list-link">BSAM-IG-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-controller-vulnerabilities/" class="nav-list-link">BSAM-IG-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-host-stack-vulnerabilities/" class="nav-list-link">BSAM-IG-03</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-standard-vulnerabilities/" class="nav-list-link">BSAM-IG-04</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Discovery category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-discovery/" class="nav-list-link">Discovery</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-operation-mode/" class="nav-list-link">BSAM-DI-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-signal-strenght/" class="nav-list-link">BSAM-DI-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-device-name/" class="nav-list-link">BSAM-DI-03</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-data-exposure/" class="nav-list-link">BSAM-DI-04</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-device-discovery/" class="nav-list-link">BSAM-DI-05</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-random-mac/" class="nav-list-link">BSAM-DI-06</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Pairing category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-pairing/" class="nav-list-link">Pairing</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-device-pairing-mode/" class="nav-list-link">BSAM-PA-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-input-output-capabilities/" class="nav-list-link">BSAM-PA-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-oob-channels/" class="nav-list-link">BSAM-PA-03</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-rejection-legacy-pairing/" class="nav-list-link">BSAM-PA-04</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-pairing-without-interaction/" class="nav-list-link">BSAM-PA-05</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-known-pin-codes/" class="nav-list-link">BSAM-PA-06</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-pin-code-predictable/" class="nav-list-link">BSAM-PA-07</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/remove-bluetooth-link-keys/" class="nav-list-link">BSAM-PA-08</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-pin-code-lenght/" class="nav-list-link">BSAM-PA-09</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/storage-bluetooth-link-keys/" class="nav-list-link">BSAM-PA-10</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Authentication category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-authentication/" class="nav-list-link">Authentication</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-role-switch-authentication/" class="nav-list-link">BSAM-AU-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-mutual-authentication/" class="nav-list-link">BSAM-AU-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-forced-disconnection/" class="nav-list-link">BSAM-AU-03</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Encryption category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-encryption/" class="nav-list-link">Encryption</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/role-switch-before-bluetooth-encryption/" class="nav-list-link">BSAM-EN-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/force-use-encryption-bluetooth/" class="nav-list-link">BSAM-EN-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/minimum-size-bluetooth-encryption-key/" class="nav-list-link">BSAM-EN-03</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Services category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-services/" class="nav-list-link">Services</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/hidden-bluetooth-sdp-services/" class="nav-list-link">BSAM-SE-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/hidden-gatt-bluetooth-services/" class="nav-list-link">BSAM-SE-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-service-access-control/" class="nav-list-link">BSAM-SE-03</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Application category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-application/" class="nav-list-link">Application</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-controller-firmware-update/" class="nav-list-link">BSAM-AP-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-stack-update/" class="nav-list-link">BSAM-AP-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-software-update/" class="nav-list-link">BSAM-AP-03</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/digital-signature-bluetooth-updates/" class="nav-list-link">BSAM-AP-04</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-replay-attacks/" class="nav-list-link">BSAM-AP-05</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/bluetooth-packet-injection/" class="nav-list-link">BSAM-AP-06</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/controls/secure-bluetooth-services/" class="nav-list-link">BSAM-AP-07</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Resources category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/resources/" class="nav-list-link">Resources</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/identify-bluetooth-controller-physically/" class="nav-list-link">BSAM-RES-01</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/identify-controller-reports/" class="nav-list-link">BSAM-RES-02</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/bluetooth-vulnerability-database-search/" class="nav-list-link">BSAM-RES-03</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/bluetooth-connection-sniffing/" class="nav-list-link">BSAM-RES-04</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/capture-bluetooth-connection/" class="nav-list-link">BSAM-RES-05</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/enable-bluetooth-debug-mode/" class="nav-list-link">BSAM-RES-06</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/send-receive-hci-messages/" class="nav-list-link">BSAM-RES-07</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/device-discovery/" class="nav-list-link">BSAM-RES-08</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/change-controller-attributes/" class="nav-list-link">BSAM-RES-09</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/resources/link-key-management/" class="nav-list-link">BSAM-RES-10</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<button class="nav-list-expander btn-reset" aria-label="toggle items in Annexes category" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<use xlink:href="#svg-arrow-right">
+</use>
+</svg>
+</button>
+<a href="https://www.tarlogic.com/bsam/annex/" class="nav-list-link">Annexes</a>
+<ul class="nav-list">
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/annex/eol-controllers/" class="nav-list-link">End of life Bluetooth controllers</a>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/annex/external-resources/" class="nav-list-link">External resources</a>
+</li>
+</ul>
+</li>
+<li class="nav-list-item">
+<a href="https://www.tarlogic.com/bsam/contributors/" class="nav-list-link">Contributors</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="main" id="top">
+<div id="main-header" class="main-header">
+<div>
+</div>
+</div>
+<div class="main-content-wrap">
+<div id="main-content" class="main-content" style="padding-top: 40px;">
+<main>
+<p>
+<img src="https://www.tarlogic.com/bsam/assets/img/BSAM.png" alt="BSAM - Bluetooth security assessment methodology logo">
+</p>
+<h1 id="bsam-bluetooth-security-assessment-methodology">BSAM: Bluetooth Security Assessment Methodology</h1>
+<p>
+<strong>BSAM</strong> is the acronym for <strong>Bluetooth Security Assessment Methodology</strong>. BSAM is an open and collaborative methodology developed to standardize the security evaluation of devices using Bluetooth technology.</p>
+<p>The BSAM methodology defines all the necessary <a href="https://www.tarlogic.com/bsam/controls/">Bluetooth security controls</a> to provide manufacturers, security researchers, software developers, enthusiasts, and cybersecurity professionals with a guide for conducting security assessments on devices with Bluetooth communications.</p>
+<p>BSAM is a fundamental pillar for assessing the security of communications in IoT devices with Bluetooth and Bluetooth LE capabilities and to help plan <strong>penetration testing</strong>.</p>
+<h2 id="impact-of-bluetooth-on-security">Impact of Bluetooth on security</h2>
+<p>The Bluetooth standard is constantly evolving, and Bluetooth technology is today integrated into a wide range of devices, such as:</p>
+<ul>
+<li>
+<strong>Personal devices:</strong> Laptops, smartphones, or tablets use Bluetooth to connect to input devices such as keyboards, headphones, watches, VR headsets, or gaming consoles.</li>
+<li>
+<strong>Transportation devices:</strong> Onboard entertainment and vehicle control systems, autonomous vehicles, or traffic control systems.</li>
+<li>
+<strong>Home devices:</strong> Smart locks, smart speakers, smart lights, smart thermostats, appliances, and other smart home sensors.</li>
+<li>
+<strong>Health and fitness devices:</strong> Fitness trackers, heart rate monitors, and medical devices to collect and transmit data about users’ health and fitness.</li>
+<li>
+<strong>Industrial devices:</strong> Industrial robots, sensors, and controllers that use Bluetooth to communicate with each other.</li>
+</ul>
+<p>Bluetooth is widely used in devices that impact cybersecurity, safety, and privacy. The complexity of the Bluetooth standard and the variability in its configuration make it difficult to implement effective security measures. BSAM standardizes <strong>Bluetooth security testing</strong> to ensure that Bluetooth devices are secure and private.</p>
+<h2 id="structure-of-the-bsam-methodology">Structure of the BSAM methodology</h2>
+<p>To familiarize yourself with the Bluetooth standard, you can check out the <a href="https://www.tarlogic.com/bsam/documentation/">Documentation section</a>. This section contains basic information about where to obtain additional technical details and summaries of the technology behind Bluetooth.</p>
+<p>Before starting a security audit, it is important to know the list of <a href="https://www.tarlogic.com/bsam/preliminary-considerations/">preliminary considerations</a> of the methodology in order to understand the advantages and disadvantages of the proposed analysis, as well as to make sure that the law is abided at all times.</p>
+<p>The proposed methodology consists of multiple <a href="https://www.tarlogic.com/bsam/controls/">controls</a> to be evaluated individually to verify that the device is secure from a Bluetooth communications point of view.</p>
+<p>The controls in this methodology focus on the checks to be performed but not on how they are to be performed. To facilitate the work, some <a href="https://www.tarlogic.com/bsam/resources/">resources</a> are listed to enable the execution of the checks.</p>
+<h2 id="status-of-the-bluetooth-security-guide">Status of the Bluetooth security guide</h2>
+<p>The BSAM project aims to create a complete <strong>Bluetooth security guide</strong>, and is therefore in constant development. This Bluetooth methodology is not considered finished and is in a state where it could be subject to major modifications affecting its content and even its structure!</p>
+<p>Listed below are some of the major tasks to be carried out in the future:</p>
+<ul>
+<li>Expand the documentation section.</li>
+<li>Expand the resources section.</li>
+<li>Relate controls to security standards and regulations like GSMA IoT Security Assessment, IEC 62443 industrial cybersecurity standard, ETSI EN 303645 .</li>
+</ul>
+<p>This methodology has been developed by <a href="https://www.tarlogic.com/">Tarlogic</a> under the <a href="https://creativecommons.org/licenses/by/4.0/">CC BY</a> license.</p>
+<p>
+<a href="https://github.com/TarlogicSecurity/BSAM" class="btn btn-primary">View it on GitHub</a>
+</p>
+</main>
+</div>
+</div>
+</div>
+<link rel="stylesheet" id="tar-footer-new-css" href="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/css/3_layouts/footer-new.css?ver=2.3.4" type="text/css" media="all">
+<div class="footer_info">
+<picture>
+<source data-srcset="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/images/footer_bg_l.webp" media="(min-width: 75rem)">
+<source data-srcset="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/images/footer_bg_m.webp" media="(min-width: 56.25rem)">
+<img width="1920" height="751" src="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/images/footer_bg_blur.webp" data-src="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/images/footer_bg_s.webp" class="footer_info__background lazyload" alt="world">
+</picture>
+<div class="footer_info__container">
+<div class="wrapper footer_info__columns">
+<div>
+<svg xmlns="https://www.w3.org/2000/svg" width="229.662" height="83.558" viewBox="0 0 229.662 83.558">
+<g id="tarlogic_logo_white" transform="translate(-6607.973 -1592.841)">
+<path id="Sustracción_1" data-name="Sustracción 1" d="M6199.223,1844.162v-14.839l23.562-21.481v16.639l-23.56,19.681Zm22.3-33.119-21.055,18.8v11.719l21.055-17.707v-12.811Z" transform="translate(408.75 -215)" fill="#fff">
+</path>
+<path id="Trazado_4812" data-name="Trazado 4812" d="M6655.089,1620.253l-23.555-19.677v-.007l0,0,0,0v.007l-23.555,19.677,9.532,3.49,14.026-11.717,13.843,11.784Z" transform="translate(0 9.053)" fill="#00bfb3">
+</path>
+<path id="Sustracción_2" data-name="Sustracción 2" d="M6217.37,1862.231,6199.224,1823l18.148-15.159v54.39Zm-1.053-52.123-15.688,13.322,15.688,33.933v-47.255Z" transform="translate(414.163 -186.395)" fill="#fff" stroke="rgba(0,0,0,0)" stroke-miterlimit="10" stroke-width="1">
+</path>
+<g id="Grupo_1944" data-name="Grupo 1944" transform="translate(6668.303 1616.47)">
+<path id="Trazado_4814" data-name="Trazado 4814" d="M6635.342,1603.724h18.12v6.01h-6.1v17.011h-6.038v-17.011h-5.981Z" transform="translate(-6635.342 -1603.724)" fill="#fff">
+</path>
+<path id="Trazado_4815" data-name="Trazado 4815" d="M6644.2,1626.729l10.729-22.991h2.73l10.821,22.991h-6.041l-1.408-3h-9.415l-1.378,3Zm9.782-8.092h4.686l-2.326-5.059Z" transform="translate(-6625.129 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4816" data-name="Trazado 4816" d="M6670.242,1626.729l-3.557-6.1h-3.741v6.1h-6.039v-22.991h9.688a8.44,8.44,0,0,1,5.734,14.654l4.874,8.337Zm-7.3-11.312h3.741a3.295,3.295,0,1,0,0-6.59h-3.741Z" transform="translate(-6610.485 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4817" data-name="Trazado 4817" d="M6667.714,1603.738h6.041v16.921h8.278v6.07h-14.319Z" transform="translate(-6598.025 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4818" data-name="Trazado 4818" d="M6687.2,1603.738a11.5,11.5,0,1,1-11.464,11.526A11.528,11.528,0,0,1,6687.2,1603.738Zm0,6.01a5.486,5.486,0,1,0,5.493,5.485A5.473,5.473,0,0,0,6687.2,1609.749Z" transform="translate(-6588.78 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4819" data-name="Trazado 4819" d="M6710.945,1614.377v.857a11.52,11.52,0,1,1-3.407-8.154l-4.259,4.23a5.5,5.5,0,0,0-3.834-1.533,5.457,5.457,0,1,0,4.446,8.648h-4.446v-4.047Z" transform="translate(-6574.662 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4820" data-name="Trazado 4820" d="M6700.172,1603.738h6.043v22.991h-6.043Z" transform="translate(-6560.609 -1603.708)" fill="#fff">
+</path>
+<path id="Trazado_4821" data-name="Trazado 4821" d="M6720.231,1611.339a5.368,5.368,0,0,0-3.864-1.5,5.4,5.4,0,1,0,3.864,9.257l4.293,4.23a11.494,11.494,0,1,1-8.157-19.588,11.381,11.381,0,0,1,8.095,3.341Z" transform="translate(-6555.192 -1603.708)" fill="#fff">
+</path>
+</g>
+<g id="Grupo_1945" data-name="Grupo 1945" transform="translate(6674.585 1648.134)">
+<path id="Trazado_4822" data-name="Trazado 4822" d="M6642.257,1620.231a2.044,2.044,0,0,0-.169-.437,1.217,1.217,0,0,0-.276-.347,1.253,1.253,0,0,0-.4-.226,1.588,1.588,0,0,0-.528-.082,1.542,1.542,0,0,0-.758.179,1.472,1.472,0,0,0-.519.472,2.156,2.156,0,0,0-.295.674,3.1,3.1,0,0,0,0,1.537,2.121,2.121,0,0,0,.295.672,1.494,1.494,0,0,0,.519.474,1.541,1.541,0,0,0,.758.176,1.341,1.341,0,0,0,.568-.112,1.249,1.249,0,0,0,.424-.308,1.453,1.453,0,0,0,.276-.457,2.164,2.164,0,0,0,.131-.562h.938a2.581,2.581,0,0,1-.213.9,2.2,2.2,0,0,1-.486.7,2.144,2.144,0,0,1-.725.457,2.492,2.492,0,0,1-.914.161,2.6,2.6,0,0,1-1.1-.226,2.384,2.384,0,0,1-.826-.618,2.769,2.769,0,0,1-.519-.917,3.482,3.482,0,0,1,0-2.22,2.745,2.745,0,0,1,.519-.917,2.447,2.447,0,0,1,.826-.622,2.56,2.56,0,0,1,1.1-.231,2.938,2.938,0,0,1,.87.127,2.239,2.239,0,0,1,.716.368,1.868,1.868,0,0,1,.5.59,2,2,0,0,1,.238.79Z" transform="translate(-6638.26 -1618.356)" fill="#00bfb3">
+</path>
+<path id="Trazado_4823" data-name="Trazado 4823" d="M6643.512,1621.754l-2.06-3.337h1.115l1.452,2.461,1.431-2.461h1.075l-2.052,3.337v2.153h-.962Z" transform="translate(-6634.58 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4824" data-name="Trazado 4824" d="M6644.831,1618.417h2.669a1.921,1.921,0,0,1,1.185.338,1.369,1.369,0,0,1,.239,1.733,1.3,1.3,0,0,1-.58.459v.015a1.2,1.2,0,0,1,.771.48,1.6,1.6,0,0,1,.26.935,1.583,1.583,0,0,1-.114.6,1.235,1.235,0,0,1-.36.484,1.862,1.862,0,0,1-.633.323,3.088,3.088,0,0,1-.914.121h-2.521Zm.961,2.3h1.567a.852.852,0,0,0,.576-.2.689.689,0,0,0,.23-.564.71.71,0,0,0-.206-.583.921.921,0,0,0-.6-.17h-1.567Zm0,2.407h1.7a.961.961,0,0,0,.682-.226.838.838,0,0,0,.243-.642.8.8,0,0,0-.243-.626.981.981,0,0,0-.682-.219h-1.7Z" transform="translate(-6630.687 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4825" data-name="Trazado 4825" d="M6648.116,1618.417h3.949v.831h-2.99v1.436h2.77v.786h-2.77v1.606h3.044v.831h-4Z" transform="translate(-6626.897 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4826" data-name="Trazado 4826" d="M6651.139,1618.417h2.621a2.028,2.028,0,0,1,1.36.392,1.367,1.367,0,0,1,.452,1.091,1.579,1.579,0,0,1-.114.65,1.439,1.439,0,0,1-.27.413,1.063,1.063,0,0,1-.3.229c-.1.045-.176.077-.22.092v.015a.99.99,0,0,1,.264.077.765.765,0,0,1,.266.2,1.052,1.052,0,0,1,.2.349,1.524,1.524,0,0,1,.081.538,4.776,4.776,0,0,0,.074.881,1.13,1.13,0,0,0,.227.566h-1.032a.949.949,0,0,1-.126-.394c-.014-.142-.019-.28-.019-.413a4.007,4.007,0,0,0-.046-.65,1.136,1.136,0,0,0-.171-.454.7.7,0,0,0-.333-.265,1.488,1.488,0,0,0-.543-.084H6652.1v2.26h-.958Zm.958,2.5h1.577a1.014,1.014,0,0,0,.7-.218.858.858,0,0,0,.238-.658,1.019,1.019,0,0,0-.078-.427.613.613,0,0,0-.21-.256.786.786,0,0,0-.309-.125,2.176,2.176,0,0,0-.356-.03H6652.1Z" transform="translate(-6623.417 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4827" data-name="Trazado 4827" d="M6655.229,1622.147a1.24,1.24,0,0,0,.107.538.962.962,0,0,0,.3.364,1.322,1.322,0,0,0,.443.209,2.174,2.174,0,0,0,.541.064,1.707,1.707,0,0,0,.537-.073,1.088,1.088,0,0,0,.362-.187.691.691,0,0,0,.2-.267.788.788,0,0,0,.063-.3.66.66,0,0,0-.142-.465.835.835,0,0,0-.312-.211,6.886,6.886,0,0,0-.68-.2c-.259-.062-.58-.146-.959-.25a2.068,2.068,0,0,1-.588-.241,1.405,1.405,0,0,1-.372-.336,1.16,1.16,0,0,1-.2-.392,1.537,1.537,0,0,1-.058-.422,1.448,1.448,0,0,1,.171-.719,1.571,1.571,0,0,1,.459-.5,1.993,1.993,0,0,1,.646-.295,2.809,2.809,0,0,1,.729-.1,2.848,2.848,0,0,1,.812.112,1.992,1.992,0,0,1,.67.334,1.6,1.6,0,0,1,.627,1.307h-.963a.927.927,0,0,0-.36-.749,1.436,1.436,0,0,0-.824-.22,1.724,1.724,0,0,0-.344.037,1.04,1.04,0,0,0-.323.114.7.7,0,0,0-.243.219.666.666,0,0,0,.085.8,1.175,1.175,0,0,0,.474.25l.241.065c.142.039.3.082.473.127s.345.093.513.136.284.075.356.094a1.583,1.583,0,0,1,.468.233,1.528,1.528,0,0,1,.337.333,1.439,1.439,0,0,1,.265.833,1.555,1.555,0,0,1-.188.788,1.606,1.606,0,0,1-.5.536,2.138,2.138,0,0,1-.7.3,3.422,3.422,0,0,1-.8.094,3.358,3.358,0,0,1-.885-.114,2.084,2.084,0,0,1-.723-.355,1.736,1.736,0,0,1-.492-.609,2.037,2.037,0,0,1-.19-.881Z" transform="translate(-6619.805 -1618.356)" fill="#00bfb3">
+</path>
+<path id="Trazado_4828" data-name="Trazado 4828" d="M6657.508,1618.417h3.951v.831h-2.989v1.436h2.768v.786h-2.768v1.606h3.044v.831h-4.006Z" transform="translate(-6616.071 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4829" data-name="Trazado 4829" d="M6664.391,1620.231a1.994,1.994,0,0,0-.169-.437,1.2,1.2,0,0,0-.277-.347,1.242,1.242,0,0,0-.4-.226,1.572,1.572,0,0,0-.528-.082,1.527,1.527,0,0,0-.755.179,1.44,1.44,0,0,0-.519.472,2.184,2.184,0,0,0-.3.674,3.2,3.2,0,0,0,0,1.537,2.147,2.147,0,0,0,.3.672,1.461,1.461,0,0,0,.519.474,1.527,1.527,0,0,0,.755.176,1.341,1.341,0,0,0,.568-.112,1.248,1.248,0,0,0,.426-.308,1.467,1.467,0,0,0,.274-.457,2.164,2.164,0,0,0,.132-.562h.938a2.6,2.6,0,0,1-.211.9,2.237,2.237,0,0,1-.489.7,2.127,2.127,0,0,1-.723.457,2.51,2.51,0,0,1-.916.161,2.587,2.587,0,0,1-1.1-.226,2.457,2.457,0,0,1-.828-.618,2.784,2.784,0,0,1-.518-.917,3.482,3.482,0,0,1,0-2.22,2.76,2.76,0,0,1,.518-.917,2.524,2.524,0,0,1,.828-.622,2.552,2.552,0,0,1,1.1-.231,2.924,2.924,0,0,1,.87.127,2.265,2.265,0,0,1,.719.368,1.9,1.9,0,0,1,.5.59,2.03,2.03,0,0,1,.237.79Z" transform="translate(-6612.745 -1618.356)" fill="#00bfb3">
+</path>
+<path id="Trazado_4830" data-name="Trazado 4830" d="M6663.85,1618.417h.96v3.2a5.2,5.2,0,0,0,.028.56,1.263,1.263,0,0,0,.153.51.973.973,0,0,0,.383.375,1.507,1.507,0,0,0,.729.146,1.473,1.473,0,0,0,.724-.146.972.972,0,0,0,.387-.375,1.312,1.312,0,0,0,.155-.51c.018-.189.025-.377.025-.56v-3.2h.96v3.513a2.393,2.393,0,0,1-.159.921,1.792,1.792,0,0,1-.459.659,1.944,1.944,0,0,1-.71.4,3.368,3.368,0,0,1-1.846,0,1.917,1.917,0,0,1-.711-.4,1.79,1.79,0,0,1-.458-.659,2.41,2.41,0,0,1-.161-.921Z" transform="translate(-6608.76 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4831" data-name="Trazado 4831" d="M6667.228,1618.417h2.622a2.025,2.025,0,0,1,1.36.392,1.365,1.365,0,0,1,.453,1.091,1.579,1.579,0,0,1-.114.65,1.38,1.38,0,0,1-.27.413,1.037,1.037,0,0,1-.3.229c-.1.045-.173.077-.22.092v.015a1.006,1.006,0,0,1,.265.077.775.775,0,0,1,.266.2,1.051,1.051,0,0,1,.2.349,1.545,1.545,0,0,1,.082.538,4.781,4.781,0,0,0,.073.881,1.139,1.139,0,0,0,.226.566h-1.031a.9.9,0,0,1-.126-.394c-.013-.142-.018-.28-.018-.413a4.11,4.11,0,0,0-.047-.65,1.081,1.081,0,0,0-.172-.454.691.691,0,0,0-.332-.265,1.484,1.484,0,0,0-.543-.084h-1.415v2.26h-.96Zm.96,2.5h1.575a1.007,1.007,0,0,0,.7-.218.848.848,0,0,0,.238-.658.991.991,0,0,0-.076-.427.592.592,0,0,0-.21-.256.78.78,0,0,0-.309-.125,2.182,2.182,0,0,0-.358-.03h-1.561Z" transform="translate(-6604.866 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4832" data-name="Trazado 4832" d="M6670.514,1618.417h.961v5.49h-.961Z" transform="translate(-6601.081 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4833" data-name="Trazado 4833" d="M6672.036,1618.417h4.443v.831h-1.747v4.659h-.96v-4.659h-1.736Z" transform="translate(-6599.325 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4834" data-name="Trazado 4834" d="M6676.934,1621.754l-2.06-3.337h1.114l1.453,2.461,1.43-2.461h1.076l-2.054,3.337v2.153h-.96Z" transform="translate(-6596.052 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4835" data-name="Trazado 4835" d="M6680.016,1618.417h3.953v.831h-2.99v1.436h2.766v.786h-2.766v1.606h3.044v.831h-4.007Z" transform="translate(-6590.125 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4836" data-name="Trazado 4836" d="M6682.888,1618.417h1.146l1.245,1.938,1.3-1.937h1.076l-1.813,2.643,1.942,2.846h-1.166l-1.369-2.1-1.39,2.1h-1.1l1.947-2.846Z" transform="translate(-6586.968 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4837" data-name="Trazado 4837" d="M6686.123,1618.417h2.421a2.31,2.31,0,0,1,.953.168,1.475,1.475,0,0,1,.568.424,1.391,1.391,0,0,1,.273.553,2.31,2.31,0,0,1,.074.553,2.237,2.237,0,0,1-.074.549,1.416,1.416,0,0,1-.273.551,1.45,1.45,0,0,1-.568.417,2.313,2.313,0,0,1-.953.166h-1.461v2.108h-.96Zm.96,2.6h1.407a1.209,1.209,0,0,0,.331-.047.965.965,0,0,0,.312-.149.75.75,0,0,0,.229-.278.954.954,0,0,0,.089-.435,1.1,1.1,0,0,0-.078-.446.72.72,0,0,0-.205-.28.75.75,0,0,0-.3-.142,1.613,1.613,0,0,0-.361-.038h-1.422Z" transform="translate(-6583.085 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4838" data-name="Trazado 4838" d="M6689.275,1618.417h3.951v.831h-2.989v1.436H6693v.786h-2.767v1.606h3.044v.831h-4.006Z" transform="translate(-6579.45 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4839" data-name="Trazado 4839" d="M6692.3,1618.417h2.623a2.03,2.03,0,0,1,1.36.392,1.364,1.364,0,0,1,.452,1.091,1.6,1.6,0,0,1-.113.65,1.419,1.419,0,0,1-.27.413,1.053,1.053,0,0,1-.3.229c-.1.045-.174.077-.22.092v.015a1,1,0,0,1,.266.077.781.781,0,0,1,.265.2,1.086,1.086,0,0,1,.2.349,1.551,1.551,0,0,1,.079.538,4.952,4.952,0,0,0,.074.881,1.166,1.166,0,0,0,.228.566h-1.03a.886.886,0,0,1-.128-.394c-.012-.142-.019-.28-.019-.413a4.121,4.121,0,0,0-.046-.65,1.107,1.107,0,0,0-.17-.454.71.71,0,0,0-.334-.265,1.482,1.482,0,0,0-.542-.084h-1.414v2.26h-.962Zm.962,2.5h1.575a1.006,1.006,0,0,0,.7-.218.848.848,0,0,0,.239-.658,1,1,0,0,0-.077-.427.6.6,0,0,0-.211-.256.768.768,0,0,0-.309-.125,2.173,2.173,0,0,0-.358-.03h-1.559Z" transform="translate(-6575.968 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4840" data-name="Trazado 4840" d="M6695.276,1618.417h4.443v.831h-1.744v4.659h-.963v-4.659h-1.736Z" transform="translate(-6572.536 -1618.286)" fill="#00bfb3">
+</path>
+<path id="Trazado_4841" data-name="Trazado 4841" d="M6699.216,1622.147a1.2,1.2,0,0,0,.108.538.971.971,0,0,0,.3.364,1.321,1.321,0,0,0,.441.209,2.19,2.19,0,0,0,.543.064,1.718,1.718,0,0,0,.538-.073,1.083,1.083,0,0,0,.361-.187.691.691,0,0,0,.2-.267.8.8,0,0,0,.06-.3.664.664,0,0,0-.142-.465.817.817,0,0,0-.312-.211,6.807,6.807,0,0,0-.68-.2q-.39-.094-.957-.25a2.037,2.037,0,0,1-.587-.241,1.338,1.338,0,0,1-.373-.336,1.147,1.147,0,0,1-.2-.392,1.615,1.615,0,0,1-.058-.422,1.418,1.418,0,0,1,.174-.719,1.525,1.525,0,0,1,.458-.5,1.955,1.955,0,0,1,.644-.295,2.9,2.9,0,0,1,1.543.015,2,2,0,0,1,.668.334,1.57,1.57,0,0,1,.626,1.307h-.96a.931.931,0,0,0-.362-.749,1.431,1.431,0,0,0-.821-.22,1.77,1.77,0,0,0-.348.037,1.011,1.011,0,0,0-.321.114.7.7,0,0,0-.242.219.576.576,0,0,0-.1.344.594.594,0,0,0,.182.458,1.16,1.16,0,0,0,.475.25l.239.065c.143.039.3.082.474.127l.511.136c.168.043.285.075.358.094a1.618,1.618,0,0,1,.47.233,1.422,1.422,0,0,1,.6,1.167,1.566,1.566,0,0,1-.188.788,1.618,1.618,0,0,1-.5.536,2.18,2.18,0,0,1-.7.3,3.441,3.441,0,0,1-.8.094,3.331,3.331,0,0,1-.885-.114,2.077,2.077,0,0,1-.725-.355,1.783,1.783,0,0,1-.493-.609,2.1,2.1,0,0,1-.191-.881Z" transform="translate(-6569.102 -1618.356)" fill="#00bfb3">
+</path>
+</g>
+</g>
+</svg>
+<br>
+<h6 class="footer_info__title">BUSINESS UNITS</h6>
+<div class="footer_info__menu">
+<nav class="footer_info__menu">
+<ul class="footer__menu">
+<li class="menu-item menu-item-type-post_type menu-item-object-page ">
+<a href="https://www.tarlogic.com/cybersecurity-services/" title="CYBERSECURITY SERVICES">CYBERSECURITY</a>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page ">
+<a href="https://www.tarlogic.com/cyber-intelligence/" title="CYBER INTELLIGENCE SERVICES">CYBER INTELLIGENCE</a>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page ">
+<a href="https://www.tarlogic.com/blackarrow/" title="BLACKARROW SERVICES">BLACKARROW</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<div>
+<h6 class="footer_info__title">CONTACT INFO</h6>
+<div class="footer_info__contact">
+<p>
+<br>
+<br>
+</p>
+</div>
+<div class="footer_info__contact">
+<a style="color:white" href="https://www.google.com/maps?cid=15171011320439567448">
+</a><p><a style="color:white" href="https://www.google.com/maps?cid=15171011320439567448">EUROPE HQ:<br>Madrid<br> Quintanapalla 8,<br> Las Tablas, 28050<br>
+</a>
+<br>
+<a style="color:white" href="tel:+34912919319">(0034) 912 919 319</a>
+<br>
+<br>
+<a style="color:white" href="mailto:contact@tarlogic.com">contact@tarlogic.com</a>
+</p>
+</div>
+</div>
+<div>
+<h6 class="footer_info__title">LINKS</h6>
+<nav class="footer_info__menu">
+<ul class="footer__menu">
+<li id="menu-item-23197" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23197">
+<a href="https://www.tarlogic.com/cybersecurity-products/">Cybersecurity Products</a>
+</li>
+<li id="menu-item-32551" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-32551">
+<a href="https://www.tarlogic.com/cybersecurity-jobs-careers/">Cybersecurity Careers</a>
+</li>
+<li id="menu-item-32842" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-32842">
+<a href="https://www.tarlogic.com/cybersecurity-glossary/">Cybersecurity Glossary</a>
+</li>
+<li id="menu-item-23196" class="menu-item menu-item-type-post_type_archive menu-item-object-actualidad menu-item-23196">
+<a href="https://www.tarlogic.com/news/">Tarlogic News</a>
+</li>
+<li id="menu-item-23195" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23195">
+<a href="https://www.tarlogic.com/about-tarlogic/">Cybersecurity company (About us)</a>
+</li>
+<li id="menu-item-31337" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23195">
+<a href="https://www.tarlogic.com/bsam/">BSAM Bluetooth Security Methodology</a>
+</li>
+</ul>
+</nav>
+</div>
+<div>
+<div class="footer_info__social">
+<a href="https://www.linkedin.com/company/tarlogic" rel="nofollow noopener noreferrer" title="Linkedin" aria-label="Linkedin" target="_blank">
+<svg xmlns="http://www.w3.org/2000/svg" width="67.125" height="67.125" viewBox="0 0 67.125 67.125">
+<path d="M67.125,33.562A33.563,33.563,0,1,1,33.563,0,33.562,33.562,0,0,1,67.125,33.562Z" fill="#fafafa"></path>
+<path d="M11.635,20.779h0l-4.431,0q0-1.213,0-2.423c0-3.956.01-8.047-.106-12.086h3.844l.208,2.043h.07a5.177,5.177,0,0,1,4.431-2.355c3.21,0,5.126,2.343,5.126,6.266v8.553l-4.468,0V12.743c0-2.091-.757-3.151-2.25-3.151a2.481,2.481,0,0,0-2.287,1.7,3.286,3.286,0,0,0-.137,1.143v8.348Zm-7.1,0H.1V6.268H4.537v14.51ZM2.285,4.5A2.194,2.194,0,0,1,0,2.25,2.229,2.229,0,0,1,2.355,0a2.211,2.211,0,0,1,2.32,2.25A2.223,2.223,0,0,1,2.285,4.5Z" transform="translate(23.973 22.375)" fill="#002e5d"></path>
+</svg>
+</a>
+<a href="https://twitter.com/tarlogic" rel="nofollow noopener noreferrer" title="Twitter" aria-label="Twitter" target="_blank">
+<svg xmlns="http://www.w3.org/2000/svg" width="67" height="67" viewBox="0 0 67 67">
+<g transform="translate(0 0.001)">
+<circle cx="33.5" cy="33.5" r="33.5" transform="translate(0 -0.001)" fill="#fafafa"></circle>
+<path d="M16.523,2.249h0a3.171,3.171,0,0,0-2.781-.964h0A3.149,3.149,0,0,0,15.378.643c0-.161,0-.321-.164-.321a3.127,3.127,0,0,0-1.309.321C14.4.321,14.56.161,14.56,0a3.075,3.075,0,0,0-1.636.8c.164-.321.327-.482.164-.643A1.266,1.266,0,0,0,12.433.8a3.373,3.373,0,0,0-.982,1.285h0A14.04,14.04,0,0,0,9.979,5.3H9.816A3.839,3.839,0,0,0,8.343,4.016,16.776,16776,0,0,0,5.889,2.731,17.909,17.909,0,0,0,2.781,1.446,2.973,2.973,0,0,0,4.417,4.176h0a2.831,2.831,0,0,0-1.145.161c0,.964.818,1.767,2.29,2.088h0a2.672,2.672,0,0,0-1.472.482c.491.964,1.309,1.285,2.618,1.285a2.358,2.358,0,0,1-.491.321.7.7,0,0,0-.164.8c.327.482.654.643,1.472.643h0a5.267,5.267,0,0,1-4.254,1.606h0A5.32,5.32,0,0,1,0,10.12a10.817,10.817,0,0,0,4.744,3.695,11.951,11.951,0,0,0,6.707.161h0a11.687,11.687,0,0,0,5.562-3.695,7.577,7.577,0,0,0,1.309-2.891,2.9,2.9,0,0,0,2.454-.964h0a3.922,3.922,0,0,1-2.29-.161h0c1.145-.161,1.963-.482,2.127-1.124a3.245,3.245,0,0,1-2.454,0,4.388,4.388,0,0,0-1.636-2.891Z" transform="translate(22.247 27.169)" fill="#002e5d"></path>
+</g>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="wrapper copyright">
+<p>© 2024 all rights reserved <span>Tarlogic | Cyber security and Cyber intelligence experts</span>
+</p>
+<p>
+<a href="https://www.tarlogic.com/privacy-policy/" rel="nofollow">Privacy policy</a> - <a href="https://www.tarlogic.com/legal-notice/" rel="nofollow">Legal notice</a> - <a href="https://www.tarlogic.com/management-policy/" rel="nofollow">Management policy</a> - <a href="https://www.tarlogic.com/cookies-policy/" rel="nofollow">Cookies policy</a> - <a href="https://tarlogic-security.factorialhr.es/complaints" rel="nofollow">Whistle-blower channel</a>
+</p>
+</div>
+</div>
+</div>
+<script id="quicklink-js-before" type="text/javascript">
+var quicklinkOptions = {"el":"","urls":[],"timeout":2000,"timeoutFn":"requestIdleCallback","priority":false,"origins":["www.tarlogic.com"],"ignores":["feed\\=","\\\/feed\\\/","^https?:\\\/\\\/[^\\\/]+\\\/website\\-security\\-audit\\\/(#.*)?$","^https\\:\\\/\\\/www\\.tarlogic\\.com\\\/wp\\-admin\\\/","^https\\:\\\/\\\/www\\.tarlogic\\.com[^?#]+\\.php","\\\/wp\\-content",".*\\?.+"]};
+</script>
+<script type="text/javascript" src="https://www.tarlogic.com/wp-content/plugins/quicklink/quicklink.min.js?ver=0.10.0" id="quicklink-js" async="">
+</script>
+<script type="text/javascript" async="async" src="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/js/vendor/lazysizes.js?ver=2.3.4" id="tar-lazysizes-async-js">
+</script>
+<script type="text/javascript" async="async" src="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/js/lazy_background_images.js?ver=2.3.4" id="tar-lazy-background-images-async-js">
+</script>
+<script type="text/javascript" async="async" src="https://www.tarlogic.com/wp-content/plugins/info-cookies/public/assets/js/cookies_bar.js?ver=0.1.0" id="infocookies-bar-script-async-js">
+</script>
+<script type="text/javascript" async="async" src="https://www.tarlogic.com/wp-content/themes/Avada-Child-Theme/assets/js/menu_handler-new.js?ver=2.3.4" id="tar-menu-handler-async-js">
+</script>
+<link rel="stylesheet" href="https://www.tarlogic.com/wp-content/plugins/info-cookies/public/assets/css/cookies_bar.css" media="all">
+<div id="js-tar_cookiesBar" class="tar_cookiesBar" style="position: fixed; bottom: -100%; transform: translateY(-100vh);">
+<div class="tar_cookiesBar__container">
+<div class="tar_cookiesBar__text">
+<p>We are using cookies to give you the best experience on our website. You can find out more about which cookies we are using or switch them off in <a id="js-tarOpenModal" href="javascript://" class="tar_cookiesBar__link">Cookies Settings</a>
+</p>
+</div>
+<button id="js-tar_cookiesAccepted" class="tar_cookiesBar__btn">I agree</button>
+</div>
+</div>
+<div id="js-tarModal" class="tar_modal_cookies" style="pointer-events: none; opacity: 0;">
+<div class="tar_modal_cookies__container">
+<div id="js-tarCloseModal" class="tar_modal_cookies__close">
+<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor">
+<rect width="24" height="24" transform="rotate(180 12 12)" opacity="0">
+</rect>
+<path d="M13.41 12l4.3-4.29a1 1 0 1 0-1.42-1.42L12 10.59l-4.29-4.3a1 1 0 0 0-1.42 1.42l4.3 4.29-4.3 4.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4.29-4.3 4.29 4.3a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42z">
+</path>
+</svg>
+</div>
+<div class="tar_modal_cookies__content">
+<h6 class="tar_modal_cookies__subtitle">Necessary</h6>
+<p class="tar_cookies_info">Strictly Necessary Cookie should be enabled at all times so that we can save your preferences for cookie settings.</p>
+<label class="toggle" style="pointer-events:none;">
+<input id="js-necesary_cookies_chkbox" class="toggle-checkbox" type="checkbox" checked="">
+<div class="toggle-switch">
+</div>
+<span class="toggle-label">Necessary cookies</span>
+</label>
+<h6 class="tar_modal_cookies__subtitle">3rd Party Cookies</h6>
+<p class="tar_cookies_info">This website uses Google Analytics to collect anonymous information such as the number of visitors to the site, and the most popular pages.
+Keeping this cookie enabled helps us to improve our website.</p>
+<label class="toggle">
+<input id="js-third_party_cookies_chkbox" class="toggle-checkbox" type="checkbox">
+<div class="toggle-switch">
+</div>
+<span class="toggle-label">3rd party cookies</span>
+</label>
+</div>
+<div style="display: flex; justify-content: flex-start; flex-direction: row-reverse; align-items:center">
+<button class="tar_modal_cookies__btn" id="js-enable-all">Enable all</button>
+<button class="tar_modal_cookies__btn tar_modal_cookies__btn--secondary" id="js-save-settings">Save settings</button>
+<a style="margin: 0 10px;margin-right: auto;" href="https://www.tarlogic.com/cookies-policy/">Cookies policy</a>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Selecciona todos los elementos que coinciden con los selectores
+    let elementos = document.querySelectorAll('.side-bar, .site-header, #main-header');
+
+    // Itera sobre cada elemento y cambia su estilo
+    elementos.forEach(elemento => {
+//        elemento.style.border = 'none';
+    });
+    //Eliminamos el color del body #ccc
+    document.body.style.color = 'unset';
+    document.body.style.color = '#E6E1E8';
+    //document.body.style.removeProperty('color');
+
+    const elements = document.querySelectorAll(".breadcrumb-nav-list-item"); 
+    if (elements.length > 0) { 
+      document.getElementById('top').style.paddingTop = '40px';  // Ajusta '20px' según tus necesidades
+    } else {
+      document.getElementById('main-content').style.paddingTop = '40px';  // Ajusta '20px' según tus necesidades
+    }
+    document.querySelector('.site-button').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 11l8 3l8 -3"></path>
+</svg>`;
+
+  const sidebar = document.querySelector("body > div.side-bar");
+  const footer = document.querySelector("body > div.footer_info");
+
+  document.addEventListener('scroll', () => {
+    const scrollPos = document.querySelector("html").scrollTop;
+    const sidebarHeight = sidebar.getBoundingClientRect().height; // probar con offsetHeight
+    const footerPosTop = footer.getBoundingClientRect().top;
+
+    if(footerPosTop > sidebarHeight) {
+      sidebar.style.top = 0;
+    } else {
+      const diference = sidebarHeight - footerPosTop;
+      sidebar.style.top = "-" + diference + "px";
+    }
+  })
+
+});
+
+</script>
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;89424a2e39f4b33b&quot;,&quot;version&quot;:&quot;2024.4.1&quot;,&quot;token&quot;:&quot;bbccd33dc98545c9b5fdd6ea34fe3c2d&quot;}" crossorigin="anonymous"></script>
+
+
+</body></html>

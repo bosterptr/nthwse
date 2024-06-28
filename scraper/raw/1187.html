@@ -1,0 +1,805 @@
+<html lang="en-GB" class=" js flexbox flexboxlegacy canvas canvastext postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg"><!--<![endif]--><head>
+
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-B07BRS7JX2&amp;l=dataLayer&amp;cx=c"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/releases/TqxSU0dsOd2Q9IbI7CpFnJLD/recaptcha__pl.js" crossorigin="anonymous" integrity="sha384-EtuwsrUt4o3rjKbOIgbMlrdETicyC7YJiOMF4S2kRPR2c6EcUDPrB1OFkiSEO3IC"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-67981177-1" type="text/javascript"></script>
+<script type="text/javascript">
+	  		window.dataLayer = window.dataLayer || [];
+	  		function gtag(){dataLayer.push(arguments);}
+	  		gtag('js', new Date());
+
+	  		gtag('config', 'UA-67981177-1');
+		</script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Active Directory Enumeration for Red Teams - MDSec</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="apple-touch-icon" sizes="57x57" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/favicons/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<link rel="stylesheet" href="https://use.typekit.net/icv6vdt.css">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+<link rel="canonical" href="https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/">
+<meta property="og:locale" content="en_GB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Active Directory Enumeration for Red Teams - MDSec">
+<meta property="og:description" content="The Directory Service is the heart and soul of many organisations, and whether its Active Directory, OpenLDAP or something more exotic, as a source of much knowledge it often acts...">
+<meta property="og:url" content="https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/">
+<meta property="og:site_name" content="MDSec">
+<meta property="article:published_time" content="2024-02-12T09:49:42+00:00">
+<meta property="article:modified_time" content="2024-02-12T10:45:03+00:00">
+<meta property="og:image" content="https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg">
+<meta property="og:image:width" content="1000">
+<meta property="og:image:height" content="667">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="author" content="Admin">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@mdseclabs">
+<meta name="twitter:site" content="@mdseclabs">
+<meta name="twitter:label1" content="Written by">
+<meta name="twitter:data1" content="Admin">
+<meta name="twitter:label2" content="Estimated reading time">
+<meta name="twitter:data2" content="24 minutes">
+<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#article","isPartOf":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/"},"author":{"name":"Admin","@id":"https://www.mdsec.co.uk/#/schema/person/17b494d22ae189270c1e0e41b25fcae3"},"headline":"Active Directory Enumeration for Red Teams","datePublished":"2024-02-12T09:49:42+00:00","dateModified":"2024-02-12T10:45:03+00:00","mainEntityOfPage":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/"},"wordCount":3993,"publisher":{"@id":"https://www.mdsec.co.uk/#organization"},"image":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#primaryimage"},"thumbnailUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","articleSection":["ActiveBreach","Adversary Simulation","All","Penetration testing","Red Team"],"inLanguage":"en-GB"},{"@type":"WebPage","@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/","url":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/","name":"Active Directory Enumeration for Red Teams - MDSec","isPartOf":{"@id":"https://www.mdsec.co.uk/#website"},"primaryImageOfPage":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#primaryimage"},"image":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#primaryimage"},"thumbnailUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","datePublished":"2024-02-12T09:49:42+00:00","dateModified":"2024-02-12T10:45:03+00:00","breadcrumb":{"@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#breadcrumb"},"inLanguage":"en-GB","potentialAction":[{"@type":"ReadAction","target":["https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/"]}]},{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#primaryimage","url":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","contentUrl":"https://www.mdsec.co.uk/wp-content/uploads/2019/11/tim-van-der-kuip-CPs2X8JYmS8-unsplash.jpg","width":1000,"height":667},{"@type":"BreadcrumbList","@id":"https://www.mdsec.co.uk/2024/02/active-directory-enumeration-for-red-teams/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.mdsec.co.uk/"},{"@type":"ListItem","position":2,"name":"Active Directory Enumeration for Red Teams"}]},{"@type":"WebSite","@id":"https://www.mdsec.co.uk/#website","url":"https://www.mdsec.co.uk/","name":"MDSec","description":"Unrivalled Security Consulting &amp; Training","publisher":{"@id":"https://www.mdsec.co.uk/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://www.mdsec.co.uk/?s={search_term_string}"},"query-input":"required name=search_term_string"}],"inLanguage":"en-GB"},{"@type":"Organization","@id":"https://www.mdsec.co.uk/#organization","name":"MDSec","url":"https://www.mdsec.co.uk/","logo":{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/#/schema/logo/image/","url":"https://www.mdsec.co.uk/wp-content/uploads/2020/08/MDSec-Logo-Blue.png","contentUrl":"https://www.mdsec.co.uk/wp-content/uploads/2020/08/MDSec-Logo-Blue.png","width":1500,"height":1000,"caption":"MDSec"},"image":{"@id":"https://www.mdsec.co.uk/#/schema/logo/image/"},"sameAs":["https://x.com/mdseclabs"]},{"@type":"Person","@id":"https://www.mdsec.co.uk/#/schema/person/17b494d22ae189270c1e0e41b25fcae3","name":"Admin","image":{"@type":"ImageObject","inLanguage":"en-GB","@id":"https://www.mdsec.co.uk/#/schema/person/image/","url":"https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&d=wp_user_avatar&r=g","contentUrl":"https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&d=wp_user_avatar&r=g","caption":"Admin"},"sameAs":["https://x.com/mdseclabs"],"url":"https://www.mdsec.co.uk/author/dominic/"}]}</script>
+
+<link rel="stylesheet" id="wp-block-library-css" href="https://www.mdsec.co.uk/wp-includes/css/dist/block-library/style.min.css?ver=68eecf8b42fd190e040ecba89f2d6c70" type="text/css" media="all">
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id="global-styles-inline-css" type="text/css">
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel="stylesheet" id="taxonomy-image-plugin-public-css" href="https://www.mdsec.co.uk/wp-content/plugins/taxonomy-images/css/style.css?ver=0.9.6" type="text/css" media="screen">
+<link rel="stylesheet" id="style-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/style.css?ver=1.1.5" type="text/css" media="all">
+<link rel="stylesheet" id="prism-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/solarized_dark.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="flickity-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/flickity.min.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="hamburger-css-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/hamburgers.css?ver=1" type="text/css" media="all">
+<link rel="stylesheet" id="font-awesome-css" href="https://www.mdsec.co.uk/wp-content/themes/mdsec/css/font-awesome.min.css?ver=68eecf8b42fd190e040ecba89f2d6c70" type="text/css" media="all">
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/html5shiv.js?ver=3.7.3" id="html5js-js"></script>
+<![endif]-->
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/respond.js?ver=1.3.1" id="respond-script-js"></script>
+<![endif]-->
+<!--[if lt IE 9]>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/selectivizr-min.js?ver=1.0.2" id="selectivizr-script-js"></script>
+<![endif]-->
+<link rel="https://api.w.org/" href="https://www.mdsec.co.uk/wp-json/"><link rel="alternate" type="application/json" href="https://www.mdsec.co.uk/wp-json/wp/v2/posts/3370"><link rel="shortlink" href="https://www.mdsec.co.uk/?p=3370">
+<link rel="alternate" type="application/json+oembed" href="https://www.mdsec.co.uk/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.mdsec.co.uk%2F2024%2F02%2Factive-directory-enumeration-for-red-teams%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://www.mdsec.co.uk/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.mdsec.co.uk%2F2024%2F02%2Factive-directory-enumeration-for-red-teams%2F&amp;format=xml">
+<style type="text/css" id="wp-custom-css">
+			.insights-content p
+{
+	font-family: titling-gothic-fb,sans-serif;
+	color: #777a85;
+}
+
+.insights-content ul li
+{
+	font-family: titling-gothic-fb,sans-serif;
+color: #777a85;
+}
+
+
+.insights-content h2
+{
+	font-family: fabrikat_mono_regular;
+	font-weight: bold;
+}
+
+.insights-content figure
+{
+	justify-content: center;
+}
+
+.insights-content .wp-block-code code {
+    max-width: 1000px;
+    display: block;
+    overflow-x: auto;
+    color: #839496;
+    margin: 0 auto;
+    -webkit-text-size-adjust: none;
+    font-size: 1.3rem;
+    line-height: 20px;
+		padding: 2px 0px;
+}		</style>
+</head>
+<body class="post-template-default single single-post postid-3370 single-format-standard">
+<!--[if lt IE 7]>
+        <div class="browse-happy">
+        	 <a href="https://www.mdsec.co.uk">
+				<div id="logo">Logo</div>
+			</a>
+        	<p>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </div>    	
+    <![endif]-->
+
+<div class="site-wrapper">
+
+<header class="clearfix">
+<div class="logo">
+<a href="https://www.mdsec.co.uk" title="MDSec">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 188.3 50" style="enable-background:new 0 0 188.3 50;" xml:space="preserve">
+<g>
+<g>
+<path class="st0" d="M71.3,49.7V33.1l-7.7,16.5h-5.9l-7.5-16.5v16.5h-5.7V24.9h7.7l8.5,18.9l8.7-18.9H77v24.8H71.3z"></path>
+<path class="st0" d="M95.8,49.7H80V24.9h15.6c5.7,0,9,1.6,10.6,4.4c1.2,1.8,1.6,4,1.6,7.6c0,3.9-0.4,6.1-1.5,8
+							C104.7,47.9,101.4,49.7,95.8,49.7z M101.9,37c0-2.1-0.3-3.9-1-4.8c-1.1-1.7-2.9-2.5-6.2-2.5H86v15h8.6c3.4,0,5.3-0.8,6.4-2.4
+							C101.7,41.3,101.9,39.3,101.9,37z"></path>
+<path class="st0" d="M125.2,50c-8.7,0-13.1-2.8-13.4-7.9h2.8c0.2,3.7,4.1,5.4,10.6,5.4c6.9,0,9.3-1.8,9.3-4.5c0-2.9-2.1-4.1-9.9-5
+							c-5.9-0.7-12.3-1.4-12.3-6.8c0-3.6,3.1-6.7,11.8-6.7c8.5,0,11.9,3.5,12.7,7.3h-2.9c-0.7-2.9-3.5-4.8-9.9-4.8
+							c-6.3,0-8.9,1.7-8.9,4.1c0,3.4,4.9,3.9,10.1,4.4c7.5,0.8,12.1,2.1,12.1,7.2C137.3,47.2,133.8,50,125.2,50z"></path>
+<path class="st0" d="M151.9,50c-7.3,0-11.6-2.8-11.6-9.2c0-5.8,4.3-8.9,11.5-8.9c8.1,0,11.7,4,11.4,10h-20.3c0.1,3.8,3.5,6,9.2,6
+							c5.9,0,7.9-2.2,8.3-3.5h2.6C162.2,47.2,159.3,50,151.9,50z M151.7,34c-5.8,0-8.9,2.3-8.9,5.8h17.7C160.5,36.4,157.9,34,151.7,34z"></path>
+<path class="st0" d="M185.7,38.5c-0.1-0.8-0.3-1.4-0.9-2c-1.2-1.4-3.7-2.4-7.4-2.4c-3.8,0-6.4,0.9-7.9,2.7c-0.9,1-1.2,2.4-1.2,4.2
+							c0,1.9,0.4,3.3,1.3,4.3c1.4,1.7,4.1,2.5,7.9,2.5c3.7,0,5.9-0.7,7.2-1.9c0.6-0.6,1-1.5,1.1-2.2h2.6c-0.2,1.3-0.7,2.6-1.6,3.5
+							C185,49,182,50,177.3,50c-4.8,0-8.1-1.1-9.9-3.3c-1.2-1.4-1.8-3.3-1.8-5.8c0-2.3,0.6-4.2,1.7-5.6c1.9-2.2,5.3-3.5,9.9-3.5
+							c5.3,0,8.4,1.5,9.8,3.5c0.8,1,1,2.1,1.1,3.2H185.7z"></path>
+</g>
+<path class="st0" d="M31,44.1H2c-1.1,0-2,0.9-2,2v3.5h32.9V46C32.9,45,32,44.1,31,44.1z"></path>
+<path class="st0" d="M19.5,19.2l0.3,0c0.9-0.1,1.6-0.4,2.3-0.9l0,0l3,2.5c0.3,0.3,0.7,0.5,1.1,0.6c1.2,0.3,2.4-0.2,3-1.2l1.8-1.9
+						c0.3-0.3,0.3-0.7,0.1-1l-5.4-7.5C25.2,9.3,25,8.6,24.8,8c-0.2-1.1-0.9-2-1.9-2.5l-3.7-1.9l2.5-2.5l0,0c0,0-0.1-0.1-0.1-0.1
+						c-0.6-0.6-1.4-1-2.3-1c-0.6,0-1.1,0.1-1.6,0.4l0,0l-7.7,3.3l0,0c-4.7,2-8,6.7-8,12.1v2L5.9,14v2.7L2,20.5v2.7l3.8-3.8v2.7L2,25.9
+						v2.7l3.8-3.8v2.7L2,31.4v1.7h3.9L2,37V42H31v-0.7c0-7.7-3.2-12.2-6.5-14.4c-2.4-1.6-8.1-3.3-8.1-8.4c0.8,0.5,1.8,0.8,2.8,0.8
+						C19.3,19.2,19.4,19.2,19.5,19.2z"></path>
+</g>
+</svg>
+</a>
+</div>
+
+<nav role="navigation" class="main-navigation" id="main-navigation">
+<ul id="menu-main-navigation" class="clearfix"><li id="menu-item-367" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-367"><a href="#">Our Services</a></li>
+<li id="menu-item-368" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-368"><a href="#">Knowledge Centre</a></li>
+<li id="menu-item-19" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19"><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li id="menu-item-20" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+</ul> </nav>
+
+
+<nav role="navigation" class="mobile-navigation" id="mobile-navigation">
+<ul id="menu-mobile-navigation" class="clearfix"><li id="menu-item-373" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-373"><a href="#">Our Services</a>
+<ul class="sub-menu">
+<li id="menu-item-374" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-374"><a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">Adversary Simulation</a></li>
+<li id="menu-item-375" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-375"><a href="https://www.mdsec.co.uk/our-services/application-security/">Application Security</a></li>
+<li id="menu-item-376" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-376"><a href="https://www.mdsec.co.uk/our-services/penetration-testing/">Penetration Testing</a></li>
+<li id="menu-item-377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-377"><a href="https://www.mdsec.co.uk/our-services/response/">Response</a></li>
+</ul>
+</li>
+<li id="menu-item-378" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-378"><a href="#">Knowledge Centre</a>
+<ul class="sub-menu">
+<li id="menu-item-379" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-379"><a href="https://www.mdsec.co.uk/knowledge-centre/insights/">Insights</a></li>
+<li id="menu-item-380" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-380"><a href="https://www.mdsec.co.uk/knowledge-centre/research/">Research</a></li>
+<li id="menu-item-381" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-381"><a href="https://www.mdsec.co.uk/knowledge-centre/training/">Training</a></li>
+</ul>
+</li>
+<li id="menu-item-371" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-371"><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li id="menu-item-372" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-372"><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+</ul> </nav>
+
+<div class="menu-toggle">
+<button class="hamburger hamburger--slider" type="button">
+<span class="hamburger-box">
+<span class="hamburger-inner"></span>
+</span>
+</button>
+</div>
+</header>
+
+<div class="subnav">
+<section class="content-wrapper">
+<ul class="service-list clearfix">
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-adversary.svg" alt="Adversary">
+</div>
+<hgroup>
+<h2>
+Adversary Simulation
+</h2>
+</hgroup>
+<p>Our best in class red team can deliver a holistic cyber attack simulation to provide a true evaluation of your organisation’s cyber resilience.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/applicaton-security/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-application-security.svg" alt="Application Security">
+</div>
+<hgroup>
+<h2>
+Application <br>Security
+</h2>
+</hgroup>
+<p>Leverage the team behind the industry-leading Web Application and Mobile Hacker’s Handbook series.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/penetration-testing/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-penetration-testing.svg" alt="Penetration Testing">
+</div>
+<hgroup>
+<h2>
+Penetration <br>Testing
+</h2>
+</hgroup>
+<p>MDSec’s penetration testing team is trusted by companies from the world’s leading technology firms to global financial institutions.</p>
+</a>
+</li>
+<li class="item">
+<a href="https://www.mdsec.co.uk/our-services/response/">
+<div class="service-icon">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/icons/icon-response.svg" alt="Response">
+</div>
+<hgroup>
+<h2>
+Response
+</h2>
+</hgroup>
+<p>Our certified team work with customers at all stages of the Incident Response lifecycle through our range of proactive and reactive services.</p>
+</a>
+</li>
+</ul>
+</section>
+</div>
+<div class="subnav-kc">
+<section class="content-wrapper">
+<ul class="service-list clearfix">
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/research/">
+<hgroup>
+<h2>
+Research
+</h2>
+</hgroup>
+<p>MDSec’s dedicated research team periodically releases white papers, blog posts, and tooling.</p>
+</a>
+</li>
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/training/">
+<hgroup>
+<h2>
+Training
+</h2>
+</hgroup>
+<p>MDSec’s training courses are informed by our security consultancy and research functions, ensuring you benefit from the latest and most applicable trends in the field.</p>
+</a>
+</li>
+<li>
+<a href="https://www.mdsec.co.uk/knowledge-centre/insights/">
+<hgroup>
+<h2>
+Insights
+</h2>
+</hgroup>
+<p>View insights from MDSec’s consultancy and research teams.</p>
+</a>
+</li>
+</ul>
+</section>
+</div>
+<section class="insights-single-header">
+<div class="content-wrapper">
+<div class="the-category">
+<span class="category">ActiveBreach</span> </div>
+<h1>Active Directory Enumeration for Red Teams</h1>
+</div>
+</section>
+<section class="full-width-wrapper white pad20-120">
+<div class="content-wrapper">
+<div class="breadcrumb-wrapper">
+<div id="breadcrumbs">
+<span>
+<span><a href="https://www.mdsec.co.uk/">Home</a> &gt;
+<span>
+<a href="https://www.mdsec.co.uk/knowledge-centre/">Knowledge Centre</a> &gt;
+<a href="https://www.mdsec.co.uk/knowledge-centre/insights">Insights</a> &gt;
+<span class="breadcrumb_last" aria-current="page">Active Directory Enumeration for Red Teams</span>
+</span>
+</span>
+</span>
+</div>
+</div>
+</div>
+<div class="insights-content">
+<p>The Directory Service is the heart and soul of many organisations, and whether its Active Directory, OpenLDAP or something more exotic, as a source of much knowledge it often acts as a conduit for internal reconnaissance and other attacks during red team operations.</p>
+<p>With this in mind, it is common to see blue teams invest heavily in securing and monitoring access to the directory, whether this is through honey tokens, analysis of LDAP queries, anomalies within telemetry, or other similar defensive strategies.</p>
+<p>Therefore, this creates a challenge for red teams looking to tap in to this knowledge base for reconnaissance or privilege escalation attacks. Simply running automated tools such as BloodHound, StandIn, SharpView and equivalent without intimate knowledge of what they’re doing under the hood might leave you blindly navigating a minefield of potential detection points.</p>
+<p>In this post, we will explore how defenders can monitor for suspicious LDAP activity, as well as operational security approaches for red teams conducting LDAP reconnaissance.</p>
+<h1 class="wp-block-heading">Monitoring for LDAP Activity</h1>
+<p>Before we look at the part LDAP tradecraft can play in an operation, we need to understand how defenders can collect telemetry about our activities, and the telemetry that our tools might generate. This allows us to determine potential detection points and theorise strategies to circumvent them. There are typically two areas this telemetry is collected, the source (i.e. the endpoint) and the destination (i.e. the Directory server or domain controller); in some cases this may be both.</p>
+<h2 class="wp-block-heading">Endpoint Telemetry</h2>
+<p>Endpoint LDAP telemetry is typically collected through one of two approaches; API level hooking (often targeted at <code>wldap32.dll</code>) and Event Tracing for Windows (ETW) using the <code>Microsoft-Windows-LDAP-Client</code> provider.</p>
+<p>With respect to telemetry obtained through API level hooking, the content is of course dependent on the product making use of this approach and can almost always be trivially circumvented through unhooking of the relevant user mode DLLs. As such, we will not go in to any further details on this telemetry.</p>
+<p>In terms of the <code>Microsoft-Windows-LDAP-Client</code> ETW provider, we can subscribe to this telemetry to gain further insight on what the EDR might see using tools such as SilkETW:</p>
+<pre class="wp-block-code"><code class="hljs css"><span class="hljs-selector-tag">SilkETW</span><span class="hljs-selector-class">.exe</span> <span class="hljs-selector-tag">-t</span> <span class="hljs-selector-tag">user</span> <span class="hljs-selector-tag">-pn</span> <span class="hljs-selector-tag">Microsoft-Windows-LDAP-Client</span> <span class="hljs-selector-tag">-ot</span> <span class="hljs-selector-tag">eventlog</span>
+</code></pre>
+<p>With SilkETW running, let’s perform a basic custom LDAP query with the filter for SPNs, such as <code>(serviceprincipalname=*)</code>using <code>ADSearch.exe</code>:</p>
+<figure class="wp-block-image size-large is-style-default"><img fetchpriority="high" decoding="async" width="960" height="575" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-960x575.png" alt="" class="wp-image-3371" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-960x575.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-768x460.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1536x919.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1920x1149.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-375x224.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>As we note above, peeking in to the logs obtained from SilkETW for the <code>Microsoft-Windows-LDAP-Client</code> provider, we can see we now have a rich data set that details the search query filters, affected process, and more.</p>
+<p>With your red tinted glasses on, you might begin to think how you can use such telemetry to your advantage, particularly when trying to blend your Active Directory tradecraft with typical process behaviour. For example, even monitoring an endpoint for a short time, we can note processes like <code>Excel.exe</code>:</p>
+<figure class="wp-block-image size-large is-style-default"><img decoding="async" width="960" height="273" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-960x273.png" alt="" class="wp-image-3372" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-960x273.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-768x218.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-1536x437.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-1920x546.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1-375x107.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-1.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>and <code>taskhostw.exe</code>:</p>
+<figure class="wp-block-image size-large is-style-default"><img decoding="async" width="960" height="262" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-960x262.png" alt="" class="wp-image-3373" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-960x262.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-768x209.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-1536x419.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-1920x523.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2-375x102.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-2.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>These processes are frequently making LDAP queries and may offer potential candidates for surrogates in which to perform our LDAP post-exploitation. Making such informed decisions can assist red teamers in blending in with the noise. Equally, defenders can leverage such intelligence to baseline processes that are typically interacting with LDAP and use this to spot outliers in their estate.</p>
+<p>SilkETW, of course, supports Yara, meaning that defenders can build detection logic around LDAP filters that might be used for potential offensive tradecraft, such as privileged user enumeration or scanning of service principals. Using our previous example of <code>(serviceprincipalname=*)</code>we can build a simple Yara rule to flag any processes making this LDAP query:</p>
+<pre class="wp-block-code"><code class="hljs css"><span class="hljs-selector-tag">rule</span> <span class="hljs-selector-tag">spnscan</span> {
+<span class="hljs-attribute">strings</span>:
+		$s1 = /serviceprincipalname=\\*/
+condition:
+		any of ($s*)
+}
+</code></pre>
+<p>Rerunning SilkETW with the Yara rules option enabled, we now get hits for our <code>spnscan</code> rule:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="204" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-960x204.png" alt="" class="wp-image-3374" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-960x204.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-768x163.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-1536x326.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-1920x408.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3-375x80.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-3.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>The primary downside to this telemetry is, that it is very easy to circumvent through user mode ETW patching and any command-and-control framework that supports this feature is able to disable it for any post-exploitation tools that are executed in process. As an example, repeating the exact same LDAP query using Nighthawk, we can see there are now no events generated in our SilkETW capture:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="380" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-960x380.png" alt="" class="wp-image-3375" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-960x380.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-768x304.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-1536x608.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-1920x760.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4-375x149.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-4.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>The same approach can be applied to your EDR which typically will typically consume the same ETW telemetry. Using Microsoft Defender for Endpoint (MDE) as an example, we can identify any LDAP searches performed in the last hour from a specific endpoint using a hunt query of the <code>DeviceEvents</code> table similar to the following:</p>
+<pre class="wp-block-code"><code class="hljs cs"><span class="hljs-keyword">let</span> window = <span class="hljs-number">1</span>h;
+DeviceEvents
+| <span class="hljs-function"><span class="hljs-keyword">where</span> <span class="hljs-title">ingestion_time</span>(<span class="hljs-params"></span>) &gt;</span>= ago(window)
+| <span class="hljs-keyword">where</span> ActionType =~ <span class="hljs-string">"LdapSearch"</span>
+| <span class="hljs-keyword">where</span> DeviceName =~ <span class="hljs-string">"WS1.zone1.bossbank.local"</span>
+| extend AdditionalFields=parse_json(AdditionalFields)
+| extend SearchFilter=tostring(AdditionalFields.SearchFilter)
+| project-reorder DeviceName, InitiatingProcessCommandLine, SearchFilter
+</code></pre>
+<p>To understand if MDE is capable of capturing this telemetry, we can repeat the same LDAP search from both a beacon process (where an ETW hook is applied) and the command line:</p>
+<figure class="wp-block-image size-medium is-style-default"><img loading="lazy" decoding="async" width="768" height="632" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-768x632.png" alt="" class="wp-image-3376" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-768x632.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-960x791.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-1536x1265.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-1920x1581.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5-375x309.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-5.png 2000w" sizes="(max-width: 768px) 100vw, 768px"></figure>
+<p>Running the hunt query, we note that we only receive telemetry for the process where the ETW hooks are not applied, confirming our understanding that MDE is using the <code>Microsoft-Windows-LDAP-Client</code> ETW provider to capture its LDAP telemetry:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="526" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-960x526.png" alt="" class="wp-image-3377" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-960x526.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-768x420.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-1536x841.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-1920x1051.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6-375x205.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-6.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p></p><p>If we want to extend our hunts to search for suspicious activity, similar to how we did with the SilkETW Yara rules, we can modify the query to include detection of the <code>serviceprincipalname=*</code> filter, as follows:</p><p></p>
+<pre class="wp-block-code"><code class="hljs cs"><span class="hljs-keyword">let</span> window = <span class="hljs-number">1</span>h;
+<span class="hljs-keyword">let</span> dodgyfilters=<span class="hljs-keyword">dynamic</span>([
+    <span class="hljs-string">"serviceprincipalname=*"</span>
+]);
+DeviceEvents
+| <span class="hljs-function"><span class="hljs-keyword">where</span> <span class="hljs-title">ingestion_time</span>(<span class="hljs-params"></span>) &gt;</span>= ago(window)
+| <span class="hljs-keyword">where</span> ActionType =~ <span class="hljs-string">"LdapSearch"</span>
+| extend AdditionalFields=parse_json(AdditionalFields)
+|  extend SearchFilter=tostring(AdditionalFields.SearchFilter)
+| <span class="hljs-function"><span class="hljs-keyword">where</span> SearchFilter <span class="hljs-title">has_any</span>(<span class="hljs-params">dodgyfilters</span>)
+| project-reorder DeviceName, InitiatingProcessCommandLine, SearchFilter</span></code></pre>
+<p><span style="font-size: revert; color: initial; font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen-Sans, Ubuntu, Cantarell, &quot;Helvetica Neue&quot;, sans-serif;">As we can see, this quickly identifies our LDAP query when executed without the ETW hook:</span> </p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="488" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-960x488.png" alt="" class="wp-image-3378" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-960x488.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-768x391.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-1536x781.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-1920x976.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7-375x191.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-7.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<h2 class="wp-block-heading">Directory Server Telemetry</h2>
+<p>By default, Windows does not record LDAP events due to the performance impacts this might have in production environments. There are, of course, a number of third-party identity options to achieve this, but instead let’s first focus on how we can achieve this natively.</p>
+<p>To enable LDAP logging, there’s a number of registry settings we should alter on the domain controller. The first (<code>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Diagnostics\15 Field Engineering</code>) increases the logging level to level 5, which will enable the capture of Directory Service events (ID 1644):</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="357" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-960x357.png" alt="" class="wp-image-3379" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-960x357.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-768x286.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-1536x571.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-1920x714.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8-375x140.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-8.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Next, we need to modify the logging of expensive and <a href="https://docs.microsoft.com/en-us/previous-versions/ms808539(v=msdn.10)?redirectedfrom=MSDN#efficientadapps_topic04">efficient queries</a> such that the criteria for meeting the threshold is sufficiently low that we’re able to capture the log events. To do this, lower the values of the following registry keys so the threshold is effectively removed, by setting the values to 1:</p>
+<ul>
+<li><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters\Expensive Search Results Threshold</code></li>
+<li><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters\Inefficient Search Results Threshold</code></li>
+</ul>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="455" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-960x455.png" alt="" class="wp-image-3380" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-960x455.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-768x364.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-1536x727.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-1920x909.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9-375x178.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-9.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>From this point onwards, all Directory Service events (ID 1644) will be captured on the Domain Controllers event log. To test this, let’s send a simple LDAP query to retrieve domain computers:</p>
+<figure class="wp-block-image size-large is-resized is-style-default"><img loading="lazy" decoding="async" width="960" height="261" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-960x261.png" alt="" class="wp-image-3381" style="width:840px;height:auto" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-960x261.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-768x209.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-1536x417.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-1920x521.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10-375x102.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-10.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Reviewing the Domain Controllers event log we can now see that ID 1644 events (Directory Service) are now being captured:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="648" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-960x648.png" alt="" class="wp-image-3382" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-960x648.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-768x518.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-1536x1036.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-1920x1295.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11-375x253.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-11.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>This telemetry could of course, be collected on the domain controller side, so cannot trivially be evaded when operating from an endpoint. It does, however, give us sufficient insight in to understanding what defenders might be able to see from our tools, which we can, in turn, leverage to adapt our tradecraft.</p>
+<p>As an alternative, and perhaps more practical method of collecting LDAP telemetry from the domain controller, we can also turn to third-party identity solutions such as Microsoft Defender for Identity (MDI).</p>
+<p>Microsoft Defender for Identity will capture LDAP telemetry (for the most part) passing through the domain controller in the <code><a href="https://learn.microsoft.com/en-us/microsoft-365/security/defender/advanced-hunting-identityqueryevents-table?view=o365-worldwide">IdentityQueryEvents</a></code> events table. We can use the advanced hunting feature to query this table to view this telemetry data, as follows:</p>
+<pre class="wp-block-code"><code class="hljs cs"><span class="hljs-keyword">let</span> timeframe = <span class="hljs-number">24</span>h;
+IdentityQueryEvents
+| <span class="hljs-function"><span class="hljs-keyword">where</span> <span class="hljs-title">ingestion_time</span>(<span class="hljs-params"></span>) &gt;</span>= ago(timeframe)
+| <span class="hljs-keyword">where</span> ActionType =~ <span class="hljs-string">"LDAP query"</span>
+</code></pre>
+<p>As we can see, the Query field holds the full query details for our <code>serviceprincipalname=*</code> filter:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="430" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-960x430.png" alt="" class="wp-image-3383" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-960x430.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-768x344.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-1536x687.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-1920x859.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12-375x168.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-12.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>If you delve in to this telemetry, you’ll also note that the source process tree is not populated, with the source information being restricted only to the host (as far as I can tell). More on this later.</p>
+<p>Building on this telemetry, we can, of course, create custom detection and custom hunt rules, such as the following, which is taken from the MDI community queries section of the Defender portal:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="384" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-960x384.png" alt="" class="wp-image-3384" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-960x384.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-768x307.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-1536x614.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-1920x768.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13-375x150.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-13.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>This specific rule will detect our prior SPN reconnaissance, as it triggers on the <code>serviceprincipalname=*</code> filter:</p>
+<pre class="wp-block-code"><code class="hljs swift"><span class="hljs-comment">// Detect Active Directory LDAP queries that search for Kerberoasting (SPNs) or accounts with Kerberos preauthentication not required from Azure ATP, and try to get the process initiated the LDAP query from MDATP.</span>
+<span class="hljs-comment">// Replace 389 on line 5 with LDAP port in your environment</span>
+<span class="hljs-comment">// Replace true on line 6 to false if you want to include Nt Authority process</span>
+<span class="hljs-comment">// This LDAP query cover Rubeus, Kerberoast, BloodHound tools</span>
+<span class="hljs-comment">// This query was updated from &lt;https://github.com/Azure/Azure-Sentinel/tree/master/Hunting%20Queries/Microsoft%20365%20Defender/Discovery/Roasting.yaml&gt;</span>
+<span class="hljs-keyword">let</span> <span class="hljs-type">ASREP_ROASTING</span> = <span class="hljs-string">"userAccountControl:1.2.840.113556.1.4.803:=4194304"</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">ASREP_ROASTING1</span> = <span class="hljs-string">"userAccountControl|4194304"</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">ASREP_ROASTING2</span> = <span class="hljs-string">"userAccountControl&amp;4194304"</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">KERBEROASTING</span> = <span class="hljs-string">"serviceprincipalname=*"</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">LDAP_PORT</span> = <span class="hljs-number">389</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">ExcludeNtAuthorityProcess</span> = <span class="hljs-literal">true</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-type">AzureAtpLdap</span> = (
+<span class="hljs-type">IdentityQueryEvents</span>
+| <span class="hljs-keyword">where</span> <span class="hljs-type">ActionType</span> == <span class="hljs-string">"LDAP query"</span>
+| parse <span class="hljs-type">Query</span> with * <span class="hljs-string">"Search Scope: "</span> <span class="hljs-type">SearchScope</span> <span class="hljs-string">", Base Object:"</span> <span class="hljs-type">BaseObject</span> <span class="hljs-string">", Search Filter: "</span> <span class="hljs-type">SearchFilter</span>
+| <span class="hljs-keyword">where</span> <span class="hljs-type">SearchFilter</span> <span class="hljs-built_in">contains</span> <span class="hljs-type">ASREP_ROASTING</span> or
+<span class="hljs-type">SearchFilter</span> <span class="hljs-built_in">contains</span> <span class="hljs-type">ASREP_ROASTING1</span> or
+<span class="hljs-type">SearchFilter</span> <span class="hljs-built_in">contains</span> <span class="hljs-type">ASREP_ROASTING2</span> or
+<span class="hljs-type">SearchFilter</span> <span class="hljs-built_in">contains</span> <span class="hljs-type">KERBEROASTING</span>
+| extend <span class="hljs-type">Time</span> = bin(<span class="hljs-type">Timestamp</span>, 1s)
+| extend <span class="hljs-type">DeviceNameWithoutDomain</span> = tolower(tostring(<span class="hljs-built_in">split</span>(<span class="hljs-type">DeviceName</span>, '.')[<span class="hljs-number">0</span>])));
+<span class="hljs-keyword">let</span> <span class="hljs-type">MDAtpNetworkToProcess</span> = (
+<span class="hljs-type">DeviceNetworkEvents</span>
+| extend <span class="hljs-type">DeviceNameWithoutDomain</span> = tolower(tostring(<span class="hljs-built_in">split</span>(<span class="hljs-type">DeviceName</span>, '.')[<span class="hljs-number">0</span>]))
+| <span class="hljs-keyword">where</span> <span class="hljs-type">RemotePort</span> == <span class="hljs-type">LDAP_PORT</span>
+| extend <span class="hljs-type">Time</span> = bin(<span class="hljs-type">Timestamp</span>, 1s)
+| extend isExclude = iff( <span class="hljs-type">ExcludeNtAuthorityProcess</span> and <span class="hljs-type">InitiatingProcessAccountDomain</span> == <span class="hljs-string">"nt authority"</span> , <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>));
+<span class="hljs-type">AzureAtpLdap</span>
+| <span class="hljs-built_in">join</span> kind=leftouter (
+<span class="hljs-type">MDAtpNetworkToProcess</span> ) on <span class="hljs-type">DeviceNameWithoutDomain</span>, <span class="hljs-type">Time</span> 
+| <span class="hljs-keyword">where</span> isExclude == <span class="hljs-literal">false</span> or isnull(isExclude)
+</code></pre>
+<p>This can then, of course, be turned in to a custom detection rule in the Defender portal to run periodically.</p>
+<p>Other potential detection points where similar queries might prove effective in detecting offensive tradecraft could include:</p>
+<ul>
+<li>Detection of wildcard queries;</li>
+<li>Enumeration of sensitive principals;</li>
+<li>Signaturing of specific query tradecraft (e.g. filters containing “description=<em>pass</em>”);</li>
+<li>Number or size of LDAP queries made within a specific time window.</li>
+</ul>
+<p>These are left as an exercise for the reader, but we recommend consulting the Azure Sentinel community queries for more ideas.</p>
+<p>Now that we have sufficient sources of telemetry for our LDAP queries, let’s dive in to how this telemetry might affect red team operations.</p>
+<h1 class="wp-block-heading">Analysis of Red Team Tools</h1>
+<p>With sufficient details on how we can collect LDAP telemetry data from both the endpoint and domain controller, let’s turn our attention to how this might impact our use of offensive tools that target Active Directory enumeration.</p>
+<h3 class="wp-block-heading">SharpHound</h3>
+<p>Automated Active Directory enumeration is, of course, going to be noisy; therefore, it should come as no surprise that SharpHound will be detected out of the box by identity solutions, even in its most “stealthy” configuration.</p>
+<p>Running SharpHound with a limited collection set, such as the following, will at a minimum lead to a security principal reconnaissance alert in MDI:</p>
+<p><code>SharpHound.exe -c DCOnly -d zone1.bossbank.local --stealth --secureldap</code></p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="388" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-960x388.png" alt="" class="wp-image-3385" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-960x388.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-768x311.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-1536x621.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-1920x777.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14-375x152.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-14.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Of course, not everyone will have MDI, so let’s delve in to what SharpHound is doing here. This will not only assist us in building signatures for its behaviour, but also to understand what we might need to alter to evade detection.</p>
+<p>Retrieving the LDAP queries conducted for the period we ran SharpHound, we can see the following:</p>
+<figure class="wp-block-image size-medium is-style-default"><img loading="lazy" decoding="async" width="768" height="418" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-768x418.png" alt="" class="wp-image-3386" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-768x418.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-960x522.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-1536x836.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-1920x1044.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15-375x204.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-15.png 2000w" sizes="(max-width: 768px) 100vw, 768px"></figure>
+<p>Diving in to the results, we can note a number of queries, including the following:</p>
+<pre class="wp-block-code"><code class="hljs javascript">LDAP Search Scope: <span class="hljs-string">"WholeSubtree"</span>, Base <span class="hljs-built_in">Object</span>: <span class="hljs-string">"DC=zone1,DC=bossbank,DC=local"</span>, Search Filter: <span class="hljs-string">" ( | (sAMAccountType=805306369) (objectClass=container) (sAMAccountType=805306368) ( | (sAMAccountType=268435456) (sAMAccountType=268435457) (sAMAccountType=536870912) (sAMAccountType=536870913) ) (objectClass=domain) (objectCategory=CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=bossbank,DC=local) ( &amp; (objectCategory=CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=bossbank,DC=local) (flags=*) ) (primaryGroupID=*) ) "</span>
+</code></pre>
+<p>Tracing this back to the SharpHound source code, you’ll note the <code>SharpHoundCommon/src/CommonLib/LDAPQueries/LDAPFilter.cs</code> file with components of the file hardcoded:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="442" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-960x442.png" alt="" class="wp-image-3387" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-960x442.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-768x353.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-1536x707.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-1920x883.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16-375x173.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-16.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Now that we know what SharpHound is doing and why, we can think about potential methods to not only evade any signatures that might be reliant on these filters, but also to potentially take alternative approaches that might allow us to retrieve the same information in a more OpSec safe manner. We’ll leave this as an exercise for the reader.</p>
+<h3 class="wp-block-heading">ADExplorer</h3>
+<p>ADExplorer is an excellent tool for analysing Active Directory both offline and online and has become a useful weapon in the red team arsenal. ADExplorer snapshots are particularly useful to red teams as they can be converted to BloodHound using tools such as <a href="https://github.com/c3c/ADExplorerSnapshot.py">ADExplorerSnapshot</a> by <a href="https://twitter.com/c3c">c3c</a>.</p>
+<p>Running <code>ADExplorer</code> to capture a snapshot of our domain gives some interesting results in our Defender setup; querying the <code>IdentityQueryEvents</code> table to understand what MDI would see results in the following:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="495" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-960x495.png" alt="" class="wp-image-3388" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-960x495.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-768x396.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-1536x793.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-1920x991.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17-375x194.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-17.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>As you might have noticed, there are no results in the <code>IdentityQueryEvents</code> table for the LDAP queries that <code>ADExplorer</code> performed; this might seem a little odd, and and we certainly agree, but these queries do not appear to be stored by MDI.</p>
+<p>Delving in to the <code>DeviceEvents</code> table does, however, give us more information on what’s going on and we can see a series of queries being performed by <code>ADExplorer</code>:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="574" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-960x574.png" alt="" class="wp-image-3389" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-960x574.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-768x459.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-1536x918.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-1920x1147.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18-375x224.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-18.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>These queries are all relatively simplistic; however, the <code>(objectGUID=*)</code> does, at least from our assessment, appear to be somewhat rare in nature; it could therefore provide a useful detection point for identifying the use of <code>ADExplorer</code>, assuming sufficient ETW telemetry is at hand.</p>
+<h3 class="wp-block-heading">SharpView</h3>
+<p>With the above in mind, you’re probably thinking more targeted custom queries are a better approach to automated enumeration and, of course, you’re right. A popular tool amongst some red teams that wraps up some of these more targeted queries is SharpView.</p>
+<p>As an example, you might leverage the <code>Get-DomainGroupMember</code> command to recover group members for a given group:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="170" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-960x170.png" alt="" class="wp-image-3390" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-960x170.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-768x136.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-1536x273.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-1920x341.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19-375x67.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-19.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>These queries will be logged in MDI’s <code>IdentityQueryEvents</code> table, but there are no built-in alerts explicitly raised. We can, however, create a high-fidelity alert for the use of SharpView, as my colleague <a href="https://twitter.com/rbmaslen">@rbmaslen</a> <a href="https://twitter.com/rbmaslen/status/1321859647091970051">pointed out</a>, based on the use of the <a href="http://PCRE.net">PCRE.net</a> library which drops a DLL to disk in a fixed location inside <code>%TEMP%</code>.</p>
+<p>Building an MDE hunt rule allows us to trivially create a custom detection for SharpView based on the file creation events for <code>ba9ea7344a4a5f591d6e5dc32a13494b.dll</code>; a hunt may look similar to the following:</p>
+<pre class="wp-block-code"><code class="hljs swift"><span class="hljs-keyword">let</span> window = 1h;
+<span class="hljs-type">DeviceFileEvents</span>
+| <span class="hljs-keyword">where</span> ingestion_time() &gt;= ago(window)
+| <span class="hljs-keyword">where</span> <span class="hljs-type">DeviceName</span> <span class="hljs-built_in">contains</span> <span class="hljs-string">"WS1"</span>
+| <span class="hljs-keyword">where</span> <span class="hljs-type">FolderPath</span> <span class="hljs-built_in">contains</span> <span class="hljs-string">"ba9ea7344a4a5f591d6e5dc32a13494b"</span>
+</code></pre>
+<h1 class="wp-block-heading">Tradecraft Considerations for Red Teams</h1>
+<p>Having looked at various approaches to detect Active Directory enumeration through both the offensive techniques and the tools frequently used, let’s have a look at some approaches that red teams can take to minimise the opportunities for detection.</p>
+<h3 class="wp-block-heading">Blending In</h3>
+<p>As we briefly touched upon, one potential avenue for detection is through baselining the processes that would typically be performing LDAP interaction. It therefore stands to reason when looking to perform Active Directory post-exploitation, that we should consider the possibility of blending in with a suitable surrogate process.</p>
+<p>In order to find potentially suitable surrogates, let’s use the blue team’s tools against them by building a KQL query to find all processes that have recently performed an LDAP search:</p>
+<pre class="wp-block-code"><code class="hljs bash">DeviceEvents
+| <span class="hljs-built_in">where</span> ActionType =~ <span class="hljs-string">"LDAPSearch"</span>
+| extend AdditionalFields=parse_json(AdditionalFields)
+| extend SearchFilter=tostring(AdditionalFields.SearchFilter)
+| project InitiatingProcessFolderPath, InitiatingProcessCommandLine, SearchFilter, InitiatingProcessParentFileName
+</code></pre>
+<p>This gives us the following list of processes, alongside their parents, that might make potentially useful candidates for blending our LDAP tradecraft:</p>
+<figure class="wp-block-table"><table><thead><tr><th>InitiatingProcessFolderPath</th><th>InitiatingProcessCommandLine</th><th>SearchFilter</th><th>InitiatingProcessParentFileName</th></tr></thead><tbody><tr><td>c:\windows\system32\sppextcomobj.exe</td><td>SppExtComObj.exe -Embedding</td><td>(objectclass=*)</td><td>svchost.exe</td></tr><tr><td>c:\windows\system32\lsass.exe</td><td>lsass.exe</td><td>(&amp;(DnsDomain=seth\2Elocal\2E)(Host=WD1)(DomainGuid=1\21\C6\0F\2A\5D\3FE\88n\8F\9A\BA\01\BB\0E)(NtVer=\16\00\00\00)(DnsHostName=WD1\2Eseth\2Elocal))</td><td>wininit.exe</td></tr><tr><td>c:\windows\system32\svchost.exe</td><td>svchost.exe -k netsvcs -p -s gpsvc</td><td>(objectclass=*)</td><td>services.exe</td></tr><tr><td>c:\windows\system32\windowspowershell\v1.0\powershell.exe</td><td>powershell.exe -ExecutionPolicy AllSigned -NoProfile -NonInteractive -Command “&amp; {$OutputEncoding = [Console]::OutputEncoding =[System.Text.Encoding]::UTF8;$scriptFileStream = [System.IO.File]::Open(‘C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\DataCollection\8699.10157887.0.10157887-b7db1ed00ad748852a3572e55ed3350977567f27\9e137068-a631-45e6-81aa-4adda242796e.ps1’, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read);$calculatedHash = Microsoft.PowerShell.Utility\Get-FileHash ‘C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\DataCollection\8699.10157887.0.10157887-b7db1ed00ad748852a3572e55ed3350977567f27\9e137068-a631-45e6-81aa-4adda242796e.ps1’ -Algorithm SHA256;if (!($calculatedHash.Hash -eq ‘b10268615d74417598398ce57b5127e1aca9b4c6059d69bfe15200fd68689aee’)) { exit 323;}; . ‘C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\DataCollection\8699.10157887.0.10157887-b7db1ed00ad748852a3572e55ed3350977567f27\9e137068-a631-45e6-81aa-4adda242796e.ps1’ }”</td><td>(objectclass=*)</td><td>SenseIR.exe</td></tr><tr><td>c:\windows\system32\taskhostw.exe</td><td>taskhostw.exe SYSTEM</td><td>(objectclass=*)</td><td>svchost.exe</td></tr><tr><td>c:\windows\system32\backgroundtaskhost.exe</td><td>“BackgroundTaskHost.exe” -ServerName:BackgroundTaskHost.WebAccountProvider</td><td>(objectclass=*)</td><td>svchost.exe</td></tr><tr><td>c:\windows\system32\dns.exe</td><td>dns.exe</td><td>(&amp;(objectCategory=dnsNode)(uSNChanged&gt;=755011))</td><td>services.exe</td></tr><tr><td>c:\windows\system32\dfsrs.exe</td><td>DFSRs.exe</td><td>(objectCategory=msDFSR-ContentSet)</td><td>services.exe</td></tr><tr><td>c:\windows\adws\microsoft.activedirectory.webservices.exe</td><td>Microsoft.ActiveDirectory.WebServices.exe</td><td>(objectClass=*)</td><td>services.exe</td></tr><tr><td>c:\windows\system32\ismserv.exe</td><td>ismserv.exe</td><td>(objectClass=interSiteTransport)</td><td>services.exe</td></tr><tr><td>c:\windows\system32\spoolsv.exe</td><td>spoolsv.exe</td><td>(objectclass=*)</td><td>services.exe</td></tr><tr><td>c:\windows\system32\services.exe</td><td>services.exe</td><td>(objectclass=*)</td><td>wininit.exe</td></tr><tr><td>c:\windows\system32\certsrv.exe</td><td>certsrv.exe</td><td>(objectclass=*)</td><td>services.exe</td></tr><tr><td>c:\windows\system32\mmc.exe</td><td>“mmc.exe” “C:\Windows\system32\dsa.msc”</td><td>(objectclass=*)</td><td>svchost.exe</td></tr><tr><td>c:\windows\system32\wbem\wmiprvse.exe</td><td>wmiprvse.exe -secured -Embedding</td><td>(objectclass=*)</td><td>svchost.exe</td></tr></tbody></table></figure>
+<h3 class="wp-block-heading">Accessing the Directory</h3>
+<p>Hopefully based on the various detection points that we’ve look at so far, it stands to reason that when accessing the directory we should favour custom, targeted queries over automated, overly scoped retrievals of directory data.</p>
+<p>When accessing the directory directly, aside from preferring an encrypted transport such as LDAPS (which we assume is a given so will ignore here), there’s two things that we should bear in mind to limit the amount of data we’re extracting, and thus avoid an overly large LDAP data pull: the search base and the search scope.</p>
+<p>You can consider LDAP to take a hierarchical structure, much like a tree. This structure is composed of various entries, each representing objects like users, groups, or organisational units. Each entry is identified by a unique Distinguished Name (DN). The search base determines the starting point in the directory from where the search for entries begin.</p>
+<p>The search base, in combination with the search scope, determines which entries are considered during the search. The scope can be set to different levels such as:</p>
+<ul>
+<li><strong>Base</strong>: Searches only the entry defined as the search base;</li>
+<li><strong>One level</strong>: Searches all entries directly under the search base, but not including the base itself;</li>
+<li><strong>Subtree</strong>: Searches the base entry and all entries under it, traversing the entire subtree.</li>
+</ul>
+<p>Whilst at MDSec we almost exclusively use our own internal LDAP tooling, there are several public tools that allow you to perform custom LDAP queries, and I’m going to briefly consider three of what I think are the most popular: ADSearch by a former @MDSecLabs’er Tom Carver, StandIn by FuzzySec and the ldapsearch BOF from TrustedSec.</p>
+<p>Both ADSearch and StandIn are developed using .NET and use the <code>DirectorySearcher</code> APIs, which uses a <code>DirectoryEntry</code> object to determine the search base for the directory which by default will be the root of the directory. In both instances, neither of these tools allow the operator to control the search base nor the search scope.</p>
+<p>In the case of ADSearch, the distinguished name to use as the search base is derived from the current domain name <a href="https://github.com/tomcarver16/ADSearch/blob/1efc9d355971f46bb723d36387f048859cf63b90/ADSearch/ADWrapper.cs#L18">here</a>: </p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="198" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-960x198.png" alt="" class="wp-image-3391" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-960x198.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-768x159.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-1536x317.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-1920x396.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20-375x77.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-20.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Whilst in StandIn, this uses the default <code>DirectoryEntry</code> context of the root domain for its custom <a href="https://github.com/FuzzySecurity/StandIn/blob/ff3df906be4f1b8ff04f92f68a877cd7a1bc7f6e/StandIn/StandIn/hStandIn.cs#L446">queries</a>:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="317" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-960x317.png" alt="" class="wp-image-3392" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-960x317.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-768x254.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-1536x508.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-1920x635.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21-375x124.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-21.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Conversely, the ldapsearch BOF does offer the operator control over both the search base (ultimately passed as <code>distinguishedName</code> to <code>ExecuteLDAPQuery()</code>) and the search <a href="https://github.com/trustedsec/CS-Situational-Awareness-BOF/blob/64589eed3e9a54deae246547730b51edaaa430e4/src/SA/ldapsearch/entry.c#L311">scope</a>:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="132" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-960x132.png" alt="" class="wp-image-3393" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-960x132.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-768x105.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-1536x210.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-1920x263.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22-375x51.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-22.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Indeed, the <code>ldapsearch</code> BOF was the only public tool that I could explicitly identify as attempting to support this feature. However, from what I could tell, there is a bug in the tool when parsing arguments if a search scope is passed. This, combined with the absence of the feature in other tools would imply that this might be an area of tradecraft that is overlooked by some. It is also worth noting that this tool does not appear to support LDAPS, so this is something to be aware of from an OpSec perspective.</p>
+<p>If we’re looking to bring this functionality to ADSearch and StandIn, it’s a relatively straightforward task. For example, in the case of ADSearch, we can simply add an additional command line argument for whether we want to recurse the directory and if not, apply the relevant scope to the <code>DirectorySearcher</code> object (i.e. set to <code>OneLevel</code>):</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="188" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-960x188.png" alt="" class="wp-image-3394" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-960x188.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-768x151.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-1536x301.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-1920x376.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23-375x74.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-23.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Further, to add support for an arbitrary search base, we can again simply provide a user supplied argument for the distinguished name (<code>distinguishedName</code>) to our <code>DirectoryEntry</code> object:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="260" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-960x260.png" alt="" class="wp-image-3395" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-960x260.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-768x208.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-1536x416.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-1920x520.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24-375x102.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-24.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<h3 class="wp-block-heading">Custom Query Tradecraft</h3>
+<p>With ideas on the approach for how and where we should perform our LDAP post-exploitation from, let’s dive deeper in to the tradecraft for querying it.</p>
+<p>Hopefully, based on some what we’ve looked at so far, we have a better understanding at the potential detection pitfalls that we might want to avoid; to reiterate some of the common ones may include:</p>
+<ul>
+<li>Overly scoped wildcard queries;</li>
+<li>Access to sensitive principals;</li>
+<li>Signatures of specific queries or filters against techniques or tools;</li>
+<li>Volume or size of data retrieved in a short time window.</li>
+</ul>
+<p>The question then becomes: how do we operate with this in mind as much as possible? My approach, at least, is to try and generically tackle this by leveraging small, targeted queries to retrieve particular data sets from the directory that contain the information that I desire, without explicitly requesting that information. Let’s look at this in a little more detail.</p>
+<p>I typically start my directory reconnaissance using a technique I call “OU walking”; essentially, this involves slowly mapping out the organisational units in the directory. This hopefully provides sufficient information on identifying where the objects of interest might reside, assuming a tidily structured directory.</p>
+<p>Let’s imagine our domain root might look as follows, with a handful of organisational units:</p>
+<figure class="wp-block-image size-small is-style-default"><img loading="lazy" decoding="async" width="375" height="431" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-375x431.png" alt="" class="wp-image-3396" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-375x431.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-768x882.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-960x1103.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-1337x1536.png 1337w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-1782x2048.png 1782w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25-1920x2206.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-25.png 2000w" sizes="(max-width: 375px) 100vw, 375px"></figure>
+<p>We can extract a list of OUs using a simple query such as <code>“ou&gt;=’’”,</code> which returns the distinguished name for all objects with a non-empty OU property, from the domain root and without recursion:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="300" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-960x300.png" alt="" class="wp-image-3397" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-960x300.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-768x240.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-1536x480.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-1920x600.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26-375x117.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-26.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>If any of the OUs look like they might hold the information that we’re looking for, we can repeat the same thing to find any interesting OUs at the next level. For example, here we are likely to want to expand the <code>Production</code> OU, as it stands out as being potentially more interesting than the others:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="213" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-960x213.png" alt="" class="wp-image-3398" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-960x213.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-768x170.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-1536x340.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-1920x425.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27-375x83.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-27.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>If the purpose of our LDAP exploration was to identify potentially interesting accounts for roasting, we might want to investigate the <code>Accounts</code> OU, and rinse and repeat this process until there’s an OU we might want to fully explore the objects inside. When we find an OU that we want to retrieve the contents of (in the case of our test AD <code>OU=Database,OU=Service Accounts,OU=Accounts,OU=Production,DC=zone1,DC=bossbank,DC=local</code>), we can then retrieve all objects in the container using a suitable query that avoids sensitive attributes or wildcards:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="261" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-960x261.png" alt="" class="wp-image-3399" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-960x261.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-768x209.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-1536x417.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-1920x521.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28-375x102.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-28.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>We explicitly avoid requesting suspicious attributes such as <code>serviceprincipalname</code> in our filter and instead retrieve everything, allowing us to parse this information on the client side. This approach does marginally increase the size of the data were retrieving (although we can page), but with the combination of binding to a specific OU and preventing recursion, this should hopefully be limited whilst also restricting the opportunity for signatures.</p>
+<p>If we then try to hunt for this activity inside of MDI, we’ll find no events were stored:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="513" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-960x513.png" alt="" class="wp-image-3400" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-960x513.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-768x410.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-1536x820.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-1920x1025.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29-375x200.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-29.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>This approach, in combination with the other referenced tradecraft has served me well for some time and hopefully provides a platform on which to conduct further LDAP post-exploitation.</p>
+<h2 class="wp-block-heading">Active Directory Web Services (ADWS)</h2>
+<p>In October 2021, we were performing a product assessment for an Active Directory deception vendor. During the course of the assessment, we realised that the Active Directory modules for RSAT were not affected by the honey data. Investigating this led us down the path of Active Directory Web Services, and we were quick to recognise the potential added benefits that this might bring to red team engagements. After having some success with this, we decided it would not be in our interests to publicly document this technique at the time. However, after FalconForce published their research on <a href="https://falconforce.nl/soaphound-tool-to-collect-active-directory-data-via-adws/">SOAPHound</a>, we decided to dive in to our vault and reinvigorate it.</p>
+<p>One of the key benefits of using ADWS for LDAP post-exploitation was that it was relatively unknown, and therefore no one was monitoring for its use. ADWS operates an entirely different service to LDAP, available on TCP port 9389 and using a SOAP protocol for its interface.</p>
+<p>While investigating ADWS, we noted that because it was a SOAP web service, the actual LDAP queries being executed were being done on the domain controller. This provided a number of interesting side effects which turned out to be advantageous. Firstly, analysing the LDAP queries on the domain controller, you may note that the queries originate from <code>127.0.0.1</code> in the logs:</p>
+<figure class="wp-block-image size-medium is-style-default"><img loading="lazy" decoding="async" width="768" height="700" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-768x700.png" alt="" class="wp-image-3401" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-768x700.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-960x876.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-1536x1401.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-1920x1751.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30-375x342.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-30.png 2000w" sizes="(max-width: 768px) 100vw, 768px"></figure>
+<p>This became the cause of confusion during some operations where LDAP queries were spotted by the blue team, and in many cases led to them being overlooked or disregarded.</p>
+<p>A secondary benefit of this is that the activity does not show up in the <code>DeviceEvents</code> under the <code>LDAPSearch</code> action type, meaning that very little telemetry is available.</p>
+<p>In order to start building a client and gain an understanding of the functionality exposed by the service, we can add a service reference inside Visual Studio:</p>
+<figure class="wp-block-image size-medium is-style-default"><img loading="lazy" decoding="async" width="768" height="627" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-768x627.png" alt="" class="wp-image-3402" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-768x627.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-960x783.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-1536x1253.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-1920x1567.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31-375x306.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-31.png 2000w" sizes="(max-width: 768px) 100vw, 768px"></figure>
+<p>From the new namespace, you can then expose the various methods that can be called:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="403" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-960x403.png" alt="" class="wp-image-3403" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-960x403.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-768x322.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-1536x644.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-1920x805.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32-375x157.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-32.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Using the methods available on the service, it is then possible to start building ADWS features. For example, to retrieve group membership, we can bind to the relevant group and call the <code>GetADGroupMember</code> method, as shown below:</p>
+<pre class="wp-block-code"><code class="hljs cs">NetTcpBinding tcpBind = <span class="hljs-keyword">new</span> NetTcpBinding();
+ADWSService.AccountManagementClient acm = <span class="hljs-keyword">new</span> ADWSService.AccountManagementClient(tcpBind, <span class="hljs-keyword">new</span> EndpointAddress(<span class="hljs-string">"net.tcp://100.64.0.72:9389/ActiveDirectoryWebServices/Windows/AccountManagement"</span>));
+acm.ClientCredentials.Windows.AllowedImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.Impersonation;
+<span class="hljs-keyword">var</span> principal = acm.GetADGroupMember(<span class="hljs-string">"ldap:389"</span>, <span class="hljs-string">"CN=Domain Admins,CN=Users,DC=seth,DC=local"</span>,<span class="hljs-string">"DC=seth,DC=local"</span>, <span class="hljs-literal">true</span>);
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> attr <span class="hljs-keyword">in</span> principal)
+{
+    Console.WriteLine(attr.DistinguishedName);
+    Console.WriteLine(attr.SamAccountName);
+
+}
+</code></pre>
+<p>Executing this as a domain user will recover the members of the <code>Domain Admins</code> group:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="406" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-960x406.png" alt="" class="wp-image-3404" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-960x406.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-768x324.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-1536x649.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-1920x811.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33-375x158.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-33.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Building a fully functional ADWS search client is not immediately that trivial; however, the following <a href="https://www.artifex.co.il/en/?p=12">resource</a> proved useful to us.</p>
+<p>While performing ADWS post-exploitation, we discovered there was little telemetry available on the actions being performed stored in MDE or MDI. For example, performing a targeted ADWS query such as the following, resulted in almost nothing being visible in the telemetry:</p>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="452" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-960x452.png" alt="" class="wp-image-3405" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-960x452.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-768x361.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-1536x723.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-1920x903.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34-375x176.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-34.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>Indeed, the only way we found possible to positively detect the presence of ADWS post-exploitation was through baselining of network events. The <code>DeviceNetworkEvents</code> table in MDE provides details around process connectivity; using a hunt such as the following will assist in identifying processes that are connecting to ADWS:</p>
+<pre class="wp-block-code"><code class="hljs swift"><span class="hljs-type">DeviceNetworkEvents</span>
+| <span class="hljs-keyword">where</span> <span class="hljs-type">DeviceName</span> <span class="hljs-built_in">contains</span> <span class="hljs-string">"WS1"</span>
+| <span class="hljs-keyword">where</span> <span class="hljs-type">RemotePort</span> == <span class="hljs-number">9389</span>
+</code></pre>
+<figure class="wp-block-image size-large is-style-default"><img loading="lazy" decoding="async" width="960" height="453" src="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-960x453.png" alt="" class="wp-image-3406" srcset="https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-960x453.png 960w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-768x362.png 768w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-1536x724.png 1536w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-1920x905.png 1920w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35-375x177.png 375w, https://www.mdsec.co.uk/wp-content/uploads/2024/02/image-35.png 2000w" sizes="(max-width: 960px) 100vw, 960px"></figure>
+<p>On the whole, we found this to be relatively rare in an environment, so it might provide a high-fidelity point of detection.</p>
+<p>This blog post was written by <a href="https://www.twitter.com/domchell">@domchell</a></p>
+</div>
+<div class="author">
+<div class="content-wrapper clearfix">
+<div class="author-avatar">
+<img alt="" src="https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=96&amp;d=wp_user_avatar&amp;r=g" srcset="https://secure.gravatar.com/avatar/ea6be35ff31bf7eba02c999d1d41eff2?s=192&amp;d=wp_user_avatar&amp;r=g 2x" class="avatar avatar-96 photo" height="96" width="96" loading="lazy" decoding="async"> </div>
+<div class="author-meta">
+<div class="author-meta__content">
+<span>written by</span>
+<h4>MDSec Research</h4>
+</div>
+</div>
+</div>
+</div>
+<section class="testing">
+<div class="content-wrapper">
+<h2>Ready to engage<br>with MDSec?</h2>
+<div class="button">
+<a href="https://www.mdsec.co.uk/contact">
+Get in touch
+</a>
+</div>
+</div>
+</section>
+</section>
+<section class="newsletter">
+<div class="content-wrapper clearfix">
+<div class="newsletter-left">
+<p>
+Stay updated with the latest <br>news from MDSec.
+</p>
+</div>
+<div class="newsletter-right">
+<div class="frm_forms  with_frm_style frm_style_formidable-style" id="frm_form_2_container">
+<form enctype="multipart/form-data" method="post" class="frm-show-form  frm_js_validate " id="form_newslettersignupform">
+<div class="frm_form_fields ">
+<fieldset>
+<legend class="frm_screen_reader">Newsletter Signup Form</legend>
+<div class="frm_fields_container">
+<input type="hidden" name="frm_action" value="create">
+<input type="hidden" name="form_id" value="2">
+<input type="hidden" name="frm_hide_fields_2" id="frm_hide_fields_2" value="">
+<input type="hidden" name="form_key" value="newslettersignupform">
+<input type="hidden" name="item_meta[0]" value="">
+<input type="hidden" id="frm_submit_entry_2" name="frm_submit_entry_2" value="4431734a25"><input type="hidden" name="_wp_http_referer" value="/2024/02/active-directory-enumeration-for-red-teams/"><div id="frm_field_10_container" class="frm_form_field form-field  frm_none_container frm_full">
+<label for="field_nkjbj" id="field_nkjbj_label" class="frm_primary_label">Email
+<span class="frm_required"></span>
+</label>
+<input type="email" id="field_nkjbj" name="item_meta[10]" value="" placeholder="Enter your email for updates" data-invmsg="Email is invalid" aria-invalid="false">
+</div>
+<div id="frm_field_11_container" class="frm_form_field form-field  frm_none_container frm_first frm_full">
+<label for="g-recaptcha-response" id="field_ah4d8_label" class="frm_primary_label">
+<span class="frm_required"></span>
+</label>
+<div id="field_ah4d8" class="frm-g-recaptcha" data-sitekey="6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw" data-size="invisible" data-theme="light" data-rid="0"><div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; display: block; transition: right 0.3s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;"><div class="grecaptcha-logo"><iframe title="reCAPTCHA" width="256" height="60" role="presentation" name="a-r49i7ztnr0ou" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw&amp;co=aHR0cHM6Ly93d3cubWRzZWMuY28udWs6NDQz&amp;hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;theme=light&amp;size=invisible&amp;cb=m8145xh6fgej"></iframe></div><div class="grecaptcha-error"></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+</div>
+<input type="hidden" name="item_key" value="">
+<div class="frm__6539d1f4bfefd">
+<label for="frm_email_2" style="display:none;">
+If you are human, leave this field blank. </label>
+<input id="frm_email_2" type="text" class="frm_verify" name="frm__6539d1f4bfefd" value="" autocomplete="off" style="display:none;">
+</div>
+<div class="frm_submit">
+<button class="frm_button_submit" type="submit">Submit</button>
+</div></div>
+</fieldset>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+
+<footer>
+<div class="content-wrapper clearfix">
+<div class="footer-col">
+<div class="footer-logo">
+<a href="https://www.mdsec.co.uk" title="MDSec">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/mdsec-logo.svg" alt="MDsec">
+</a>
+</div>
+</div>
+<div class="footer-col">
+<h3>Services</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/our-services/adversary-simulation/">Adversary Simulation</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/applicaton-security/">Application Security</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/penetration-testing/">Penetration Testing</a></li>
+<li><a href="https://www.mdsec.co.uk/our-services/response/">Response</a></li>
+</ul>
+</nav>
+<h3>Resource Centre</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/research/">Research</a></li>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/training/">Training</a></li>
+<li><a href="https://www.mdsec.co.uk/knowledge-centre/insights/">Insights</a></li>
+</ul>
+</nav>
+</div>
+<div class="footer-col">
+<h3>Company</h3>
+<nav class="footer-nav">
+<ul>
+<li><a href="https://www.mdsec.co.uk/about/">About</a></li>
+<li><a href="https://www.mdsec.co.uk/contact/">Contact</a></li>
+<li><a href="https://www.mdsec.co.uk/careers/">Careers</a></li>
+<li><a href="https://www.mdsec.co.uk/privacy-policy/">Privacy</a></li>
+</ul>
+</nav>
+<p>
+t: +44 (0) 1625 263 503<br>
+e: <a href="mailto:contact@mdsec.co.uk">contact@mdsec.co.uk</a>
+</p>
+<p>
+32A Park Green<br>
+Macclesfield<br>
+Cheshire<br>
+SK11 7NA
+</p>
+</div>
+<div class="footer-col">
+<h3>Accreditations</h3>
+<div class="logo-list clearfix">
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/best.png" alt="Best">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/uploads/2019/11/check-whitetrans.png" alt="IT Health Check Service">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/crest-star.png" alt="Crest Star">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/crest.png" alt="Crest">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/cyber-essentials.png" alt="Cyber Essentials">
+</div>
+<div class="logo-list__item">
+<img src="https://www.mdsec.co.uk/wp-content/themes/mdsec/img/logos/british-assessment-bureau.png" alt="British Assessment Bureau">
+</div>
+</div>
+</div>
+</div>
+</footer>
+<div class="end clearfix">
+<div class="end__left">
+Copyright 2024 MDSec
+</div>
+<div class="end__right">
+
+</div>
+</div>
+
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-includes/js/jquery/jquery.js?ver=1.11.0" id="jquery-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/main.js?ver=1" id="main-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/highlight.min.js?ver=1" id="prism-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/isotope.pkgd.min.js?ver=1" id="isotope-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/jquery.matchHeight.js?ver=1.0.0" id="matchheight-js-js"></script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/themes/mdsec/js/modernizr.js?ver=2.8.3" id="modernizr-script-js"></script>
+<script type="text/javascript" id="formidable-js-extra">
+/* <![CDATA[ */
+var frm_js = {"ajax_url":"https:\/\/www.mdsec.co.uk\/wp-admin\/admin-ajax.php","images_url":"https:\/\/www.mdsec.co.uk\/wp-content\/plugins\/formidable\/images","loading":"Loading\u2026","remove":"Remove","offset":"4","nonce":"d6102c5e35","id":"ID","no_results":"No results match","file_spam":"That file looks like Spam.","calc_error":"There is an error in the calculation in the field with key","empty_fields":"Please complete the preceding required fields before uploading a file.","focus_first_error":"1","include_alert_role":"1","include_update_field":"","include_resend_email":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://www.mdsec.co.uk/wp-content/plugins/formidable/js/frm.min.js?ver=6.10" id="formidable-js"></script>
+<script async="async" type="text/javascript" defer="defer" src="https://www.google.com/recaptcha/api.js?onload=frmRecaptcha&amp;render=explicit&amp;ver=3" id="captcha-api-js"></script>
+<script type="text/javascript">
+		
+		$grid = jQuery('.grid').isotope({
+			itemSelector: '.grid-item',
+			percentPosition: true,
+			masonry: {
+			columnWidth: '.grid-sizer',
+			gutter: '.gutter-sizer',
+			}
+		});
+
+		jQuery('.filter-group').on( 'click', 'li', function() {
+			var filterValue = jQuery(this).attr('data-filter');
+			var filterName = jQuery(this).attr('data-name');
+			$grid.isotope({ filter: filterValue });
+			var elems = $grid.isotope('getFilteredItemElements');
+			jQuery(".sort-group-item").removeClass('active');
+
+		});	
+
+	</script>
+<script type="text/javascript" src="/wp-content/themes/mdsec/jquery.marquee.min.js"></script>
+<script type="text/javascript">
+	jQuery(window).load(function() {
+		jQuery('.message').marquee({
+			//speed in milliseconds of the marquee
+			duration: 12000,
+			//gap in pixels between the tickers
+			gap: 0,
+			//time in milliseconds before the marquee will start animating
+			delayBeforeStart: 500,
+			//'left' or 'right'
+			direction: 'left',
+			//true or false - should the marquee be duplicated to show an effect of continues flow
+			duplicated: true,
+			pauseOnHover: true,
+			startVisible: true
+		});
+		
+		jQuery('.message-item').css('opacity', '1');
+	});
+	</script>
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+
+
+<div style="visibility: hidden; position: absolute; width: 100%; top: -10000px; left: 0px; right: 0px; transition: visibility 0s linear 0.3s, opacity 0.3s linear; opacity: 0;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.5;"></div><div style="margin: 0px auto; top: 0px; left: 0px; right: 0px; position: fixed; border: 1px solid rgb(204, 204, 204); z-index: 2000000000; background-color: rgb(255, 255, 255);"><iframe title="Test reCAPTCHA wygaśnie za 2&nbsp;minuty" style="width: 100%; height: 100%;" name="c-r49i7ztnr0ou" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=pl&amp;v=TqxSU0dsOd2Q9IbI7CpFnJLD&amp;k=6Lc27L0ZAAAAAMV4QCtKwWRbT-Hm1FnY6IKqcSxw"></iframe></div></div></body></html>

@@ -1,0 +1,714 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inline Assembly</title>
+    <link rel="stylesheet" href="https://blog.malicious.group/assets/built/screen.css?v=446287c9b4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.css">
+    <style>
+        .gh-content {
+            position: relative;
+        }
+
+        .gh-toc > .toc-list {
+            position: relative;
+        }
+
+        .toc-list {
+            overflow: hidden;
+            list-style: none;
+        }
+
+        @media (min-width: 1300px) {
+            .gh-sidebar {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                margin-top: 4vmin;
+                grid-column: wide-start / main-start; /* Place the TOC to the left of the content */
+            }
+
+            .gh-toc {
+                position: sticky; /* On larger screens, TOC will stay in the same spot on the page */
+                top: 4vmin;
+            }
+        }
+
+        .gh-toc .is-active-link::before {
+            background-color: var(--ghost-accent-color); /* Defines TOC   accent color based on Accent color set in Ghost Admin */
+        }
+    </style>
+    <meta name="description" content="In this post, we will cover introductory concepts regarding the usage of inline assembly. We'll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.">
+    <link rel="icon" href="https://blog.malicious.group/content/images/size/w256h256/2022/09/logo-3.png" type="image/png">
+    <link rel="canonical" href="https://blog.malicious.group/inline-assembly/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="Malicious Group">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Inline Assembly">
+    <meta property="og:description" content="In this post, we will cover introductory concepts regarding the usage of inline assembly. We'll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.">
+    <meta property="og:url" content="https://blog.malicious.group/inline-assembly/">
+    <meta property="og:image" content="https://blog.malicious.group/content/images/size/w1200/2023/05/inline-assembly.png">
+    <meta property="article:published_time" content="2023-07-29T01:44:05.000Z">
+    <meta property="article:modified_time" content="2023-11-13T03:02:48.000Z">
+    <meta property="article:tag" content="Malware Development">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Inline Assembly">
+    <meta name="twitter:description" content="In this post, we will cover introductory concepts regarding the usage of inline assembly. We'll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.">
+    <meta name="twitter:url" content="https://blog.malicious.group/inline-assembly/">
+    <meta name="twitter:image" content="https://blog.malicious.group/content/images/size/w1200/2023/05/inline-assembly.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Steve S">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Malware Development">
+    <meta name="twitter:site" content="@deadvolvo">
+    <meta name="twitter:creator" content="@0xtriboulet">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="853">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Malicious Group",
+        "url": "https://blog.malicious.group/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://blog.malicious.group/content/images/2022/09/logo.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Steve S",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://blog.malicious.group/content/images/2023/04/2E882B1B-D311-4371-A827-99520420D9D6.jpeg",
+            "width": 828,
+            "height": 782
+        },
+        "url": "https://blog.malicious.group/author/0xtriboulet/",
+        "sameAs": [
+            "http://steve-s.gitbook.io",
+            "https://twitter.com/0xtriboulet"
+        ]
+    },
+    "headline": "Inline Assembly",
+    "url": "https://blog.malicious.group/inline-assembly/",
+    "datePublished": "2023-07-29T01:44:05.000Z",
+    "dateModified": "2023-11-13T03:02:48.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://blog.malicious.group/content/images/size/w1200/2023/05/inline-assembly.png",
+        "width": 1200,
+        "height": 853
+    },
+    "keywords": "Malware Development",
+    "description": "In this post, we will cover introductory concepts regarding the usage of inline assembly. We&#x27;ll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.",
+    "mainEntityOfPage": "https://blog.malicious.group/inline-assembly/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.85">
+    <link rel="alternate" type="application/rss+xml" title="Malicious Group" href="https://blog.malicious.group/rss/">
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/portal@~2.37/umd/portal.min.js" data-i18n="false" data-ghost="https://blog.malicious.group/" data-key="c6d4ec113710d11060a6072be3" data-api="https://malicious-group.ghost.io/ghost/api/content/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="c6d4ec113710d11060a6072be3" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://malicious-group.ghost.io/" crossorigin="anonymous"></script>
+    
+    <link href="https://blog.malicious.group/webmentions/receive/" rel="webmention">
+    <script defer="" src="/public/cards.min.js?v=446287c9b4"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=446287c9b4">
+    <script defer="" src="/public/comment-counts.min.js?v=446287c9b4" data-ghost-comments-counts-api="https://blog.malicious.group/members/api/comments/counts/"></script>
+    <script defer="" src="/public/member-attribution.min.js?v=446287c9b4"></script>
+    <!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-R7FL4B790J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R7FL4B790J');
+</script>
+
+<style>
+    @import url('https://cdn.rawgit.com/lonekorean/gist-syntax-themes/d49b91b3/stylesheets/one-dark.css');
+    
+.gh-topic-grid .gh-card-image img {
+    height: 100%;
+    left: 0;
+    -o-object-fit: cover;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+/*
+.gh-cover {
+    --cover-height: 50vh;
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: bottom;
+    margin-bottom: -16px;
+}
+*/
+    
+li.toc-list-item {
+    font-size: 0.75em;
+}
+    
+.gh-content li.toc-list-item a {
+     text-decoration: none;
+}
+    
+ol.toc-list {
+	padding-right:20px;
+}
+    
+body:not(.is-head-stacked) .gh-head-inner {
+    border-bottom: 0px solid var(--color-light-gray);
+}
+    
+    
+</style>
+
+<style>
+.reading-progress {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+  height: 5px; /* Progress bar height */
+  background: #c5d2d9; /* Progress bar background color */
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; /* Hide default progress bar */
+}
+
+.reading-progress::-webkit-progress-bar {
+  background-color: transparent;
+}
+
+.reading-progress::-webkit-progress-value {
+  background: var(--ghost-accent-color); /* Progress bar color */
+}
+
+
+.gh-topic-grid .gh-card.featured.large .gh-card-link {
+    background: none;
+}
+
+.gh-topic-grid .gh-card.large h3.gh-card-title {
+    display: none;
+}  
+</style>
+
+<style>:root {--ghost-accent-color: #f14668;}</style>
+<style>.gh-portal-account-header{display:flex;flex-direction:column;align-items:center;margin:0 0 32px}.gh-portal-account-header .gh-portal-avatar{margin:6px 0 8px!important}.gh-portal-account-data{margin-bottom:40px}footer.gh-portal-account-footer{display:flex}.gh-portal-account-footer.paid{margin-top:12px}.gh-portal-account-footermenu{display:flex;align-items:center;list-style:none;padding:0;margin:0}.gh-portal-account-footerright{display:flex;flex-grow:1;align-items:center;justify-content:flex-end}.gh-portal-account-footermenu li{margin-right:16px}.gh-portal-account-footermenu li:last-of-type{margin-right:0}.gh-portal-freeaccount-newsletter{display:flex;align-items:center;justify-content:space-between;margin-top:24px}.gh-portal-freeaccount-newsletter .label{display:flex;flex-direction:column;flex-grow:1}.gh-portal-free-ctatext{margin-top:-12px}.gh-portal-cancelcontinue-container{margin:24px 0 32px}.gh-portal-list-detail .gh-portal-email-notice{display:flex;align-items:center;gap:5px;margin-top:6px;color:var(--red);font-weight:500;font-size:1.25rem;letter-spacing:.2px}.gh-portal-email-notice-icon{width:20px;height:20px}.gh-portal-billing-button-loader{width:32px;height:32px;margin-right:-3px;opacity:.6}.gh-portal-product-icon{width:52px;margin-right:12px;border-radius:2px}.gh-portal-account-discountcontainer{position:relative;display:flex;align-items:center}.gh-portal-account-old-price{text-decoration:line-through;color:var(--grey9)!important}.gh-portal-account-tagicon{width:16px;height:16px;color:var(--brandcolor);margin-right:5px;z-index:999}@media (max-width: 390px){.gh-portal-account-footer{padding:0!important}}@media (max-width: 340px){.gh-portal-account-footer{padding:0!important;flex-wrap:wrap;gap:12px}.gh-portal-account-footer .gh-portal-account-footerright{justify-content:flex-start}}.gh-email-suppressed-page-title{margin-bottom:14px}.gh-email-suppressed-page-icon{display:block;width:38px;height:38px;margin:0 auto 18px}.gh-email-suppressed-page-text{padding:0 14px;text-align:center;color:var(--grey6)}.gh-email-faq-footer-text{color:var(--grey8)}.gh-portal-list-detail.email-newsletter .gh-email-faq-page-button{display:block;margin-top:3px}.gh-portal-action-footer .gh-email-faq-page-button{margin-left:4px}.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:calc(6vmin - 14px)}.emailReceivingFAQ .gh-portal-closeicon-container{right:calc(6vmin - 20px)}@media (max-width: 480px){.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:16px}.emailReceivingFAQ .gh-portal-closeicon-container{right:24px}}.gh-email-faq-page-button{color:var(--brandcolor);cursor:pointer;background:none;transition:color linear .1s;font-size:1.45rem}</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style></head>
+
+<body class="post-template tag-malware-development is-head-left-logo has-serif-body is-head-dark is-dropdown-loaded">
+<div class="gh-site">
+
+    <header id="gh-head" class="gh-head gh-outer">
+        <div class="gh-head-inner gh-inner">
+            <div class="gh-head-brand">
+                <div class="gh-head-brand-wrapper">
+                    
+                    <a class="gh-head-logo" href="https://blog.malicious.group">
+                            <img src="https://blog.malicious.group/content/images/2022/09/logo.png" alt="Malicious Group">
+                    </a>
+                    
+                </div>
+                <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <button class="gh-burger"></button>
+            </div>
+
+            <nav class="gh-head-menu">
+                <ul class="nav">
+    <li class="nav-home"><a href="https://blog.malicious.group/">Home</a></li>
+    <li class="nav-offensive-security"><a href="https://blog.malicious.group/tag/offensive-security/">Offensive Security</a></li>
+    <li class="nav-malware-development"><a href="https://blog.malicious.group/tag/malware-development/">Malware Development</a></li>
+    <li class="nav-author"><a href="https://blog.malicious.group/about/">Author</a></li>
+</ul>
+
+            </nav>
+
+            <div class="gh-head-actions">
+                    <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                    <div class="gh-head-members">
+                                <a class="gh-head-link gh-portal-close" href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-head-btn gh-btn gh-primary-btn gh-portal-close" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                    </div>
+            </div>
+        </div>
+    </header>
+
+    <progress class="reading-progress" value="0" max="100" aria-label="Reading progress"></progress>
+
+<main class="gh-main">
+        <article class="gh-article post tag-malware-development">
+
+            <header class="gh-article-header gh-canvas">
+                    <a class="gh-article-tag" href="https://blog.malicious.group/tag/malware-development/">Malware Development</a>
+
+                <h1 class="gh-article-title">Inline Assembly</h1>
+
+                    <aside class="gh-article-sidebar">
+
+        <div class="gh-author-image-list">
+                <a class="gh-author-image" href="/author/0xtriboulet/">
+                        <img src="https://blog.malicious.group/content/images/2023/04/2E882B1B-D311-4371-A827-99520420D9D6.jpeg" alt="Steve S">
+                </a>
+        </div>
+
+        <div class="gh-author-name-list">
+                <h4 class="gh-author-name">
+                    <a href="/author/0xtriboulet/">Steve S</a>
+                </h4>
+                
+        </div>
+
+        <div class="gh-article-meta">
+            <div class="gh-article-meta-inner">
+                <time class="gh-article-date" datetime="2023-07-28">Jul 28, 2023</time>
+                    <span class="gh-article-meta-sep"></span>
+                    <span class="gh-article-length">8 min</span>
+            </div>
+        </div>
+
+    </aside>
+
+                    <p class="gh-article-excerpt">In this post, we will cover introductory concepts regarding the usage of inline assembly. We'll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.</p>
+
+                    <figure class="gh-article-image">
+        <img srcset="/content/images/size/w300/2023/05/inline-assembly.png 300w,
+                    /content/images/size/w720/2023/05/inline-assembly.png 720w,
+                    /content/images/size/w960/2023/05/inline-assembly.png 960w,
+                    /content/images/size/w1200/2023/05/inline-assembly.png 1200w,
+                    /content/images/size/w2000/2023/05/inline-assembly.png 2000w" sizes="(max-width: 1200px) 100vw, 1200px" src="/content/images/size/w1200/2023/05/inline-assembly.png" alt="Inline Assembly">
+    </figure>
+            </header>
+
+            <section class="gh-content gh-canvas">
+                <aside class="gh-sidebar"><div class="gh-toc"><ol class="toc-list "><li class="toc-list-item is-active-li"><a href="#what-is-inline-assembly" class="toc-link node-name--H3  is-active-link">What is inline assembly?</a></li><li class="toc-list-item"><a href="#how-do-we-use-inline-assembly" class="toc-link node-name--H3 ">How do we use inline assembly?</a></li><li class="toc-list-item"><a href="#passing-in-variables-to-inline-assembly" class="toc-link node-name--H3 ">Passing in variables to inline assembly</a></li><li class="toc-list-item"><a href="#getting-values-out-of-inline-assembly" class="toc-link node-name--H3 ">Getting values out of inline assembly</a></li><li class="toc-list-item"><a href="#spoofing-a-return-address-with-inline-assembly" class="toc-link node-name--H3 ">Spoofing a return address with inline assembly</a></li><li class="toc-list-item"><a href="#alternatives-to-inline-assembly" class="toc-link node-name--H3 ">Alternatives to inline assembly</a></li><li class="toc-list-item"><a href="#references" class="toc-link node-name--H3 ">References</a></li></ol></div></aside> 
+                <p>This writeup will cover introductory concepts regarding the usage of inline assembly. We'll look at what we mean by inline assembly, how to use inline assembly and some examples of inline assembly usage.</p><hr><h3 id="what-is-inline-assembly">What is inline assembly?</h3><p><br>Inline assembly is a capability some compilers provide that allows programmers to specify the assembly instructions at points throughout a program's code. Up to this point, you have probably coded C programs like in the example below.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+    printf("Hello world!");  
+    return 0;
+}
+</code></pre>
+<p>We'll see the following if we open this program in x64dbg and set a breakpoint at the printf() function.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/04/image-22.png" class="kg-image" alt="" loading="lazy" width="994" height="146" srcset="https://blog.malicious.group/content/images/size/w600/2023/04/image-22.png 600w, https://blog.malicious.group/content/images/2023/04/image-22.png 994w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Note: __main is a function the build system provides that initializes library functions and the execution environment. You might see this in programs compiled with MingW.</span></figcaption></figure><p>The snippet of assembly is expected based on the C code we wrote, and it follows the following format:</p><blockquote>Function Prologue<br>Variable Setup<br>Call printf()<br>Function Epilogue<br>Return</blockquote><p>In the context of malware development in C, this standardization can be a negative feature of the programming language that often results in detection. However, inline assembly provides us a mechanism to directly interact with the operating system and a system's processor that would otherwise be significantly more difficult to achieve. </p><p>This ability for granular interaction allows us to modify the standard behaviors of our program, execute specific opcodes, and potentially bypass some detection engines and emulation environments.</p><p>Programmers that use Visual Studio know that the MSVC compiler only supports inline assembly for x86 executables, but CLion uses MingW by default. So in this course, we'll be able to use inline assembly in all cases.</p><h3 id="how-do-we-use-inline-assembly">How do we use inline assembly?</h3><p>Basic inline assembly can be inserted into a program by calling '__asm("OPERATION");' where 'OPERATION' is a single instruction or a ';' separated set of valid assembly instructions. Let's see what this looks like in implementation.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+    __asm("int3"); // this will set a breakpoint that we'll catch in x64dbg
+    printf("Hello world!");  
+    return 0;
+}
+</code></pre>
+<p>Looking at our program inside of x64dbg we'll see something like this.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/05/image-2.png" class="kg-image" alt="" loading="lazy" width="1331" height="171" srcset="https://blog.malicious.group/content/images/size/w600/2023/05/image-2.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/05/image-2.png 1000w, https://blog.malicious.group/content/images/2023/05/image-2.png 1331w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Note: x64dbg can get a little buggy with inlined int3 instructions</span></figcaption></figure><p>Looking at our int3 instruction to the left, you can see that x64dbg is interpreting the 0xcc opcode into assembly language for us. But if we wanted to directly inline opcodes, we can do so with the following format.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    __asm(".byte 0xcc");
+    printf("Hello, World!\n");
+    return 0;
+}
+</code></pre>
+<h3 id="passing-in-variables-to-inline-assembly">Passing in variables to inline assembly</h3><p>The inline assembly syntax supports an extended format allowing variables to be passed into (and out of) __asm() statements. The general syntax is as follows.</p><pre><code class="language-c">__asm(OPERATIONS
+    :OUTPUT
+    :INPUT
+    :CLOBBERS
+    );
+</code></pre>
+<p>Let's use this syntax to move a variable into an assembly statement. In the code below, we will pass a type int variable into an assembly statement and then move that variable into the ecx register. We'll know we succeeded if we see 0x13 in ecx before our printf statement, and in 0x13 in rcx from our debugger.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int i = 0x13;                   // we expect this to be on the stack
+    __asm(".intel_syntax noprefix;" // intel syntax is personal preference
+            "mov ecx, eax;"         // move i from eax into ecx
+            :                       // outputs, none in this case
+            :"a"(i)                 // the "a" so that i gets passed into eax
+            :                       // clobbered registers, none in this case
+            );
+    printf("Our value is: %d\n", i);
+    return 0;
+</code></pre>
+<p>And we succeeded!</p><figure class="kg-card kg-image-card"><img src="https://blog.malicious.group/content/images/2023/05/image-3.png" class="kg-image" alt="" loading="lazy" width="1393" height="199" srcset="https://blog.malicious.group/content/images/size/w600/2023/05/image-3.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/05/image-3.png 1000w, https://blog.malicious.group/content/images/2023/05/image-3.png 1393w" sizes="(min-width: 720px) 720px"></figure><h3 id="getting-values-out-of-inline-assembly"><br>Getting values out of inline assembly</h3><p>Now that we've practiced getting a value into an __asm() statement, lets practice manipulating that value and then passing it back out. If we take another look at our syntax, we can quickly implement it by configuring the line values preceding our input configuration.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int i = 0x13;                            // we expect this to be on the stack
+    int j = 0;
+
+    __asm(".intel_syntax noprefix;"           // intel syntax is my preference
+            "mov ecx, eax;"                   // move i from eax into ecx
+            "inc ecx;"
+            :"=c"(j)                          // outputs "c" -&gt; ecx into j
+            :"a"(i)                           // the "a" -&gt; i into eax
+            :                                 // clobbered registers, none
+            );
+    printf("Our i value is: %d\n", i);        // we expect decimal 19
+    printf("Our j value is: %d\n", j);        // we expect decimal 20
+    return 0;
+}
+
+</code></pre>
+<p>And if we execute our program, we see that it performs as we expect!</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/05/image-4.png" class="kg-image" alt="" loading="lazy" width="1218" height="278" srcset="https://blog.malicious.group/content/images/size/w600/2023/05/image-4.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/05/image-4.png 1000w, https://blog.malicious.group/content/images/2023/05/image-4.png 1218w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Rbp-relative addressing is visible on lines 0x7ff77dce13af, 0x7ff77dce13b6, 0x7ff77dce13bd</span></figcaption></figure><p>It's important to note that the compiler seems to implement local variables using rbp-relative addresses in this example. This is not always the case for every compiler/optimization, so be careful to implement the code in the next section appropriately based on your program's existing variable addressing.</p><h3 id="spoofing-a-return-address-with-inline-assembly">Spoofing a return address with inline assembly</h3><p>Now that we have a good handle on how to manipulate inline assembly calls in our program, we can modify our code to spoof our control flow at runtime. Let's try it out.</p><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void other_function();
+void other_function_2();
+
+void (*backup)();                            // backup address
+
+
+int main() {
+    int i = 0x13;                            // we expect this to be on the stack
+    int j = 0;
+
+    __asm(".intel_syntax noprefix;"           // intel syntax is my preference
+            "mov ecx, eax;"                   // move i from eax into ecx
+            "inc ecx;"
+            :"=c"(j)                          // outputs "c" -&gt; ecx into j
+            :"a"(i)                           // the "a" -&gt; i into eax
+            :                                 // clobbered registers, none
+            );
+            
+    printf("Our i value is: %d\n", i);        // we expect decimal 19
+    printf("Our j value is: %d\n\n", j);      // we expect decimal 20
+    
+    printf("Calling other_function...\n");
+    printf("-------------------------\n");
+    
+    other_function();                         // call other_function
+    
+    printf("-------------------------\n");
+    return 0;                                 
+}
+
+void other_function_2(){                       // this will NOT execute
+                                               // we'll set our return 
+                                               // here with inline assembly
+    
+    printf("THIS IS other_function_2!\n");
+
+
+}
+
+void other_function(){
+    
+    void (*p)();
+    p = other_function_2;                     // address of other_function_2
+    
+    printf("THIS IS other_function!\n");
+    
+    return;                                    
+}</code></pre><p>In this program, we're going to manipulate the printf() call inside of other_function(). The goal is going to be to make the call stack look like the printf() call came from other_function_2(). Let's take a look at the call stack before we implement inline assembly so we can tell the difference.</p><p>A normal call to printf() from other_function() looks like this.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-12.png" class="kg-image" alt="" loading="lazy" width="1189" height="151" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-12.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/06/image-12.png 1000w, https://blog.malicious.group/content/images/2023/06/image-12.png 1189w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Normal program call stack</span></figcaption></figure><p>If we follow the "To" address (00007FF7C0BB143C) , we'll be able to see that we're returning to other_function() after the call to printf() as we would expect. Combing through the call stack, we'll see that the calls go main() -&gt; other_function() -&gt; printf().</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-15.png" class="kg-image" alt="" loading="lazy" width="1128" height="107" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-15.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/06/image-15.png 1000w, https://blog.malicious.group/content/images/2023/06/image-15.png 1128w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Normal program control flow</span></figcaption></figure><p>But by implementing a couple of snippets of inline assembly, we can manipulate some pointer locations and point this return address to other_function_2().</p><pre><code class="language-c">void other_function(){
+    
+    void (*p)();
+    p = other_function_2;                     // address of other_function_2
+    
+    __asm(".intel_syntax noprefix;"           // spoof stack frame
+            "mov %0, [rbp+0x8];"
+            "mov [rbp+0x8], %1;"              // ..._2 stack frame
+            :"=c"(backup)
+            :"a"(p)
+            :
+            );
+    
+    printf("THIS IS other_function!\n");       // frame has other_function_2
+    
+    
+    __asm(".intel_syntax noprefix;"            // restore old address
+            "mov [rbp+0x8], %0;"
+            :
+            :"r"(backup)
+            :
+            );
+                        
+    return;                                    
+}</code></pre><p>Call stack before the spoof instruction. </p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-18.png" class="kg-image" alt="" loading="lazy" width="905" height="185" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-18.png 600w, https://blog.malicious.group/content/images/2023/06/image-18.png 905w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Note: Pay attention to the "To" value of 000000A3094FFD48 =&gt; 00007FF68BCA1315</span></figcaption></figure><p>Call stack after the spoof instructions</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-20.png" class="kg-image" alt="" loading="lazy" width="899" height="109" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-20.png 600w, https://blog.malicious.group/content/images/2023/06/image-20.png 899w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Note: The change in "To" value of 000000A3094FFD48 =&gt; 00007FF68BCA141F</span></figcaption></figure><p>If we follow our new "To" address, we see that it points to other_function_2 instead of other_function! We've successfully manipulated a return address in our call stack and validated that the call to printf() retains all functionality.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-22.png" class="kg-image" alt="" loading="lazy" width="1173" height="97" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-22.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/06/image-22.png 1000w, https://blog.malicious.group/content/images/2023/06/image-22.png 1173w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Note: These low-level manipulations can cause buggy debugger output in the call stack tab, so don't be surprised if things look a little weird there. Use the stack view in x64dbg to get an accurate view of the progam's stack values</span></figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/06/image-23.png" class="kg-image" alt="" loading="lazy" width="529" height="50"><figcaption><span style="white-space: pre-wrap;">Stack view showing the correct address 7FF68BCA1420 on the stack.</span></figcaption></figure><p>Now, if we carefully step into the printf() call inside of other_function(), we'll see that it will report to the debugger that it's supposed to return to other_function_2() even though it we never made any invocation to other_function_2()!</p><figure class="kg-card kg-image-card"><img src="https://blog.malicious.group/content/images/2023/06/image-25.png" class="kg-image" alt="" loading="lazy" width="1879" height="185" srcset="https://blog.malicious.group/content/images/size/w600/2023/06/image-25.png 600w, https://blog.malicious.group/content/images/size/w1000/2023/06/image-25.png 1000w, https://blog.malicious.group/content/images/size/w1600/2023/06/image-25.png 1600w, https://blog.malicious.group/content/images/2023/06/image-25.png 1879w" sizes="(min-width: 720px) 720px"></figure><p>Using what you now know, it's possible to implement additional granular modifications to your programs to obfuscate your implant's functionality .</p><p>Our final C code looks like this</p><pre><code class="language-c">//x86_64-w64-mingw32-gcc main.c -o inline.exe -masm=intel
+
+#include &lt;stdio.h&gt;
+
+void other_function();
+void other_function_2();
+
+void (*backup)();                            // backup address
+
+
+int main() {
+    int i = 0x13;                            // we expect this to be on the stack
+    int j = 0;
+
+    __asm(".intel_syntax noprefix;"           // intel is my preference
+            "mov ecx, eax;"                   // move i from eax into ecx
+            "inc ecx;"
+            :"=c"(j)                          // outputs "c" -&gt; ecx into j
+            :"a"(i)                           // the "a" -&gt; i into eax
+            :                                 // clobbered registers, none
+            );
+            
+    printf("Our i value is: %d\n", i);        // we expect decimal 19
+    printf("Our j value is: %d\n\n", j);      // we expect decimal 20
+    
+    printf("Calling other_function...\n");
+    printf("-------------------------\n");
+    
+    other_function();                         // call other_function
+    
+    printf("-------------------------\n");
+    return 0;                                 
+}
+
+void other_function_2(){                       // this will NOT execute
+                                               // we'll set our return 
+                                               // here with inline assembly
+    
+    printf("THIS IS other_function_2!\n");
+
+
+}
+
+
+
+void other_function(){
+    
+    void (*p)();
+    p = other_function_2;                     // address of other_function_2
+    
+    __asm(".intel_syntax noprefix;"           // spoof stack frame
+            "mov %0, [rbp+0x8];"
+            "mov [rbp+0x8], %1;"              // ..._2 stack frame
+            :"=c"(backup)
+            :"a"(p)
+            :
+            );
+    
+    printf("THIS IS other_function!\n");       // frame has other_function_2
+    
+    
+    __asm(".intel_syntax noprefix;"            // restore old address
+            "mov [rbp+0x8], %0;"
+            :
+            :"r"(backup)
+            :
+            );
+                        
+    return;                                    
+}
+
+</code></pre><h3 id="alternatives-to-inline-assembly">Alternatives to inline assembly</h3><p>C and C++ programmers that rely on the MSVC compiler often rely on intrinsics, essentially a set of macros implemented by Microsoft to allow a semblance of low-level access when programming. Compiler intrinsics are powerful, stable, and consistent implementations of some of the most useful inline assembly capabilities. A complete list of compiler intrinsics can be found in the <strong>References</strong> section at the end of this topic. </p><p>Malware developers using MSVC may also implement assembly in standalone .asm files linked to their program during building. You'll often see it implemented in the manner shown below.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://blog.malicious.group/content/images/2023/05/image-5.png" class="kg-image" alt="" loading="lazy" width="936" height="469" srcset="https://blog.malicious.group/content/images/size/w600/2023/05/image-5.png 600w, https://blog.malicious.group/content/images/2023/05/image-5.png 936w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Original Hell's Gate implementation that demonstrates standalone a .asm file (right) declared as external functions in main.c (left)</span></figcaption></figure><p>As you become more advanced in understanding and implementing the techniques covered in this course, you'll have to become familiar with assembly.  </p><h3 id="references">References</h3><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://learn.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics?view=msvc-170&amp;ref=blog.malicious.group"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Compiler intrinsics</div><div class="kg-bookmark-description">Learn more about: Compiler intrinsics</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://learn.microsoft.com/favicon.ico" alt=""><span class="kg-bookmark-author">Microsoft Learn</span><span class="kg-bookmark-publisher">TylerMSFT</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://learn.microsoft.com/en-us/media/logos/logo-ms-social.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html?ref=blog.malicious.group"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Extended Asm (Using the GNU Compiler Collection (GCC))</div><div class="kg-bookmark-description">Extended Asm (Using the GNU Compiler Collection (GCC))</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://gcc.gnu.org/favicon.ico" alt=""></div></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://www.amazon.com/Giant-Black-Book-Computer-Viruses/dp/164354313X/ref=sr_1_1?crid=3K7ULRSYWCC42&amp;keywords=black+virus+book&amp;qid=1683518973&amp;sprefix=black+virus+boo%2Caps%2C146&amp;sr=8-1&amp;ref=blog.malicious.group"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Amazon.com</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://www.amazon.com/favicon.ico" alt=""></div></div><div class="kg-bookmark-thumbnail"><img src="https://images-na.ssl-images-amazon.com/captcha/sgkknrsj/Captcha_ybzhvogatx.jpg" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/am0nsec/HellsGate/blob/master/HellsGate/hellsgate.asm?ref=blog.malicious.group"><div class="kg-bookmark-content"><div class="kg-bookmark-title">HellsGate/hellsgate.asm at master · am0nsec/HellsGate</div><div class="kg-bookmark-description">Original C Implementation of the Hell’s Gate VX Technique - HellsGate/hellsgate.asm at master · am0nsec/HellsGate</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://github.com/fluidicon.png" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">am0nsec</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://opengraph.githubassets.com/2bd004cec1cc9bbe5f687a68bd1dad1462f833c13b6fe0303bfc918240936908/am0nsec/HellsGate" alt=""></div></a></figure>
+            </section>
+
+        </article>
+
+                <div class="gh-read-next gh-canvas">
+                <section class="gh-pagehead">
+                    <h4 class="gh-pagehead-title">Read next</h4>
+                </section>
+
+                <div class="gh-topic gh-topic-grid">
+                    <div class="gh-topic-content">
+                            <article class="gh-card post">
+    <a class="gh-card-link" href="/writing-your-own-rdi-srdi-loader-using-c-and-asm/">
+            <figure class="gh-card-image">
+                <img srcset="/content/images/size/w300/2023/04/rdi-srdi.png 300w,
+                            /content/images/size/w720/2023/04/rdi-srdi.png 720w,
+                            /content/images/size/w960/2023/04/rdi-srdi.png 960w,
+                            /content/images/size/w1200/2023/04/rdi-srdi.png 1200w,
+                            /content/images/size/w2000/2023/04/rdi-srdi.png 2000w" sizes="(max-width: 1200px) 100vw, 1200px" src="/content/images/size/w720/2023/04/rdi-srdi.png" alt="Writing your own RDI /sRDI loader using C and ASM">
+            </figure>
+
+        <div class="gh-card-wrapper">
+            <header class="gh-card-header">
+                <h3 class="gh-card-title">Writing your own RDI /sRDI loader using C and ASM</h3>
+            </header>
+
+                    <div class="gh-card-excerpt">In this post, I am going to show the readers how to write their own RDI/sRDI loader in C, and then show how to optimize the code to make it fully position independent.</div>
+
+            <footer class="gh-card-footer">
+                <span class="gh-card-author">d3d</span>
+                <time class="gh-card-date" datetime="2023-04-07">Apr 7, 2023</time>
+                    <span class="gh-card-comments">2 comments</span>
+            </footer>
+        </div>
+    </a>
+</article>                    </div>
+                </div>
+            </div>
+
+                <div class="gh-comments gh-read-next gh-canvas">
+            <section class="gh-pagehead">
+                <h4 class="gh-pagehead-title">Comments (<span>0</span>)</h4>
+            </section>
+            
+        <div id="ghost-comments-root"><iframe srcdoc="<!DOCTYPE html>" innerref="[object Object]" frameborder="0" style="width: 100%; height: 400px;" title="comments-frame"></iframe></div><script defer="" src="https://cdn.jsdelivr.net/ghost/comments-ui@~0.16/umd/comments-ui.min.js" data-ghost-comments="https://blog.malicious.group/" data-api="https://malicious-group.ghost.io/ghost/api/content/" data-admin="https://malicious-group.ghost.io/ghost/" data-key="c6d4ec113710d11060a6072be3" data-title="" data-count="false" data-post-id="6449dd44234fa6003d8a64cd" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#f14668" data-comments-enabled="all" data-publication="Malicious Group" crossorigin="anonymous"></script>
+    
+        </div>
+</main>
+
+    <footer class="gh-foot gh-outer">
+        <div class="gh-foot-inner gh-inner">
+                <section class="gh-subscribe">
+                    <h3 class="gh-subscribe-title">Subscribe to Malicious Group</h3>
+                        <div class="gh-subscribe-description">Don't miss out on the latest news. Sign up now to get access to the library of members-only articles.</div>
+                    <button class="gh-subscribe-btn gh-btn gh-portal-close" data-portal="signup"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.33332 3.33334H16.6667C17.5833 3.33334 18.3333 4.08334 18.3333 5.00001V15C18.3333 15.9167 17.5833 16.6667 16.6667 16.6667H3.33332C2.41666 16.6667 1.66666 15.9167 1.66666 15V5.00001C1.66666 4.08334 2.41666 3.33334 3.33332 3.33334Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M18.3333 5L9.99999 10.8333L1.66666 5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg> Subscribe now</button>
+                </section>
+
+            <nav class="gh-foot-menu">
+                <ul class="nav">
+    <li class="nav-sign-up"><a href="#/portal/">Sign up</a></li>
+</ul>
+
+            </nav>
+
+            <div class="gh-copyright">
+                    Malicious Group © 2024. Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://blog.malicious.group/assets/built/main.min.js?v=446287c9b4"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+<script>
+    tocbot.init({
+        // Where to render the table of contents.
+        tocSelector: '.gh-toc',
+        // Where to grab the headings to build the table of contents.
+        contentSelector: '.gh-content',
+        // Which headings to grab inside of the contentSelector element.
+        headingSelector: 'h1, h2, h3, h4',
+        // Ensure correct positioning
+        hasInnerContainers: true,
+    });
+</script>
+    <script>
+        const progressBar = document.querySelector('.reading-progress');
+
+        function updateProgress() {
+            const totalHeight = document.body.clientHeight;
+            const windowHeight = document.documentElement.clientHeight;
+            const position = window.scrollY;
+            const progress = position / (totalHeight - windowHeight) * 100;
+            progressBar.setAttribute('value', progress);
+            requestAnimationFrame(updateProgress);
+        }
+
+        requestAnimationFrame(updateProgress);
+    </script>
+
+
+
+
+
+<div id="ghost-portal-root"><iframe srcdoc="<!DOCTYPE html>" data-testid="portal-trigger-frame" title="portal-trigger" style="z-index: 3999998; position: fixed; bottom: 0px; right: 0px; width: 185px; max-width: 500px; height: 98px; animation: 250ms animation-bhegco; transition: opacity 0.3s; overflow: hidden;" frameborder="0" class="gh-portal-triggerbtn-iframe"></iframe></div><div id="sodo-search-root"></div></body></html>

@@ -1,0 +1,236 @@
+<html lang="en" style="min-height:100%;"><head>
+
+  <title>ExoneraTor – Tor Metrics</title>
+
+  <meta charset="utf-8">
+  <link href="/images/favicon.ico" type="image/x-icon" rel="shortcut icon">
+
+  <!-- yes, we are handheld friendly :) -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!-- icons for mobile devices -->
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon-152x152.png">
+  <link rel="shortcut icon" href="/images/android-icon.png" sizes="196x196">
+  <meta name="msapplication-square70x70logo" content="/images/smalltile.png">
+  <meta name="msapplication-square150x150logo" content="/images/mediumtile.png">
+  <meta name="msapplication-wide310x150logo" content="/images/widetile.png">
+  <meta name="msapplication-square310x310logo" content="/images/largetile.png">
+
+  <!-- jQuery -->
+  <script src="/js/jquery-3.2.1.min.js"></script>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <script src="/js/bootstrap.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/fonts/source-sans-pro.css">
+
+  <!-- Prism -->
+  <link rel="stylesheet" href="/css/prism.css">
+  <script src="/js/prism.js"></script>
+
+  <!-- custom styles and javascript -->
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/script.js"></script>
+  
+
+</head>
+
+<body class="" style="background-image:url(images/ajax-loader.gif);background-repeat:no-repeat;background-position:center center;">
+
+<!-- Using evil inline stylesheets to hide the FOUC for slow connections... -->
+
+<div id="wrapper" style="display:none;">
+
+<!-- backToTop-Button and Anchor -->
+<noscript>
+<div class="topButton" style="display:block;"><a href="#top"><i class="fa fa-chevron-up" aria-hidden="true"></i></a></div>
+</noscript>
+<script type="text/javascript">
+document.write('<div class="topButton" style="display:none;"><a href="#top"><i class="fa fa-chevron-up" aria-hidden="true"></i></a></div>');
+</script><div class="topButton" style="display:none;"><a href="#top"><i class="fa fa-chevron-up" aria-hidden="true"></i></a></div>
+<a id="top"></a>
+
+<!-- secondary navigation -->
+<nav class="navbar navbar-default navbar-secondary">
+  <div class="container-fluid">
+    <input type="checkbox" id="navbar-toggle-checkbox">
+    <div class="navbar-header">
+      <label for="navbar-toggle-checkbox" type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-secondary" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </label>
+      <a class="navbar-brand visible-xs" href="/"><img src="/images/tor-metrics-white.png" width="232" height="50" alt="Tor Metrics"></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-secondary">
+      <ul class="nav navbar-nav navbar-right">
+
+        <!-- we have to copy the primary navigation items here for mobile accessibility -->
+        <li class="visible-xs section-header">Metrics</li>
+        <li class="visible-xs"><a href="/"><i class="fa fa-home fa-fw" aria-hidden="true"></i> Home</a></li>
+        
+        <li class="visible-xs"><a href="/userstats-relay-country.html"><i class="fa fa-users fa-fw" aria-hidden="true"></i> Users</a></li>
+        
+        <li class="visible-xs"><a href="/networksize.html"><i class="fa fa-server fa-fw" aria-hidden="true"></i> Servers</a></li>
+        
+        <li class="visible-xs"><a href="/bandwidth.html"><i class="fa fa-road fa-fw" aria-hidden="true"></i> Traffic</a></li>
+        
+        <li class="visible-xs"><a href="/torperf.html"><i class="fa fa-dashboard fa-fw" aria-hidden="true"></i> Performance</a></li>
+        
+        <li class="visible-xs"><a href="/hidserv-dir-onions-seen.html"><i class="fa fa-map-signs fa-fw" aria-hidden="true"></i> Onion Services</a></li>
+        
+        <li class="visible-xs"><a href="/webstats-tb.html"><i class="fa fa-download fa-fw" aria-hidden="true"></i> Applications</a></li>
+        
+        <!-- /end of primary copy -->
+
+        <!-- secondary navigation items -->
+        <li class="visible-xs section-header">More</li>
+        <li><a href="/news.html"><i class="fa fa-newspaper-o fa-fw hidden-sm" aria-hidden="true"></i> News</a></li>
+        <li><a href="/sources.html"><i class="fa fa-archive fa-fw hidden-sm" aria-hidden="true"></i> Sources</a></li>
+        <li class="active"><a href="/services.html"><i class="fa fa-cogs fa-fw hidden-sm" aria-hidden="true"></i> Services</a></li>
+        <li><a href="/development.html"><i class="fa fa-code fa-fw hidden-sm" aria-hidden="true"></i> Development</a></li>
+        <li><a href="/research.html"><i class="fa fa-university fa-fw hidden-sm" aria-hidden="true"></i> Research</a></li>
+        <li><a href="/about.html"><i class="fa fa-lightbulb-o fa-fw hidden-sm" aria-hidden="true"></i> About</a></li>
+        <!-- /secondary navigation items -->
+
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<!-- /secondary navigation -->
+
+<!-- page header for every single page -->
+<div class="page-header hidden-xs">
+  <a href="/"><img src="/images/tor-metrics-white@2x.png" width="232" height="50" alt="Tor Metrics" id="metrics-wordmark"></a>
+  <div class="clearfix"></div>
+</div>
+<!-- /page header -->
+
+<!-- primary navigation -->
+<nav class="navbar navbar-default hidden-xs">
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-primary">
+      <ul class="nav navbar-nav">
+        <li><a href="/"><i class="fa fa-home fa-fw hidden-sm" aria-hidden="true"></i> Home</a></li>
+        
+        <li class=""><a href="/userstats-relay-country.html"><i class="fa fa-users fa-fw hidden-sm" aria-hidden="true"></i> Users</a></li>
+        
+        <li class=""><a href="/networksize.html"><i class="fa fa-server fa-fw hidden-sm" aria-hidden="true"></i> Servers</a></li>
+        
+        <li class=""><a href="/bandwidth.html"><i class="fa fa-road fa-fw hidden-sm" aria-hidden="true"></i> Traffic</a></li>
+        
+        <li class=""><a href="/torperf.html"><i class="fa fa-dashboard fa-fw hidden-sm" aria-hidden="true"></i> Performance</a></li>
+        
+        <li class=""><a href="/hidserv-dir-onions-seen.html"><i class="fa fa-map-signs fa-fw hidden-sm" aria-hidden="true"></i> Onion Services</a></li>
+        
+        <li class=""><a href="/webstats-tb.html"><i class="fa fa-download fa-fw hidden-sm" aria-hidden="true"></i> Applications</a></li>
+        
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<!-- /primary navigation -->
+
+
+<div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/services.html">Services</a></li>
+    <li class="active">ExoneraTor</li>
+  </ul>
+</div>
+
+<div class="container">
+  <h1>ExoneraTor</h1>
+</div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="text-center">
+            <div class="row vbottom15">
+              <p>Enter an IP address and date to find out whether that address was used as a Tor relay:</p>
+            </div> <!-- row -->
+            <form class="form-inline">
+              <div class="form-group">
+                <label for="inputIp" class="control-label">IP address</label>
+                <input type="text" class="form-control" name="ip" id="inputIp" placeholder="86.59.21.38" required="">
+              </div><!-- form-group -->
+              <div class="form-group">
+                <label for="inputTimestamp" class="control-label">Date</label>
+                <input type="date" class="form-control" name="timestamp" id="inputTimestamp" placeholder="2010-01-01" value="2024-06-13" required="">
+              </div><!-- form-group -->
+              <input type="hidden" name="lang" value="en">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+          </div><!-- text-center -->
+        </div><!-- col -->
+      </div><!-- row -->
+    </div><!-- container -->
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-6">
+          <h3>About Tor</h3>
+          <p class="small">Tor is an international software project to anonymize Internet traffic by encrypting packets and sending them through a series of hops before they reach their destination.&nbsp; Therefore, if you see traffic from a Tor relay, this traffic usually originates from someone using Tor, rather than from the relay operator.&nbsp; The Tor Project and Tor relay operators have no records of the traffic that passes over the network and therefore cannot provide any information about its origin.&nbsp; Be sure to <a href="https://www.torproject.org/about">learn more about Tor</a>, and don't hesitate to <a href="https://www.torproject.org/contact">contact The Tor Project, Inc.</a> for more information.</p>
+        </div><!-- col -->
+        <div class="col-xs-6">
+          <h3>About ExoneraTor</h3>
+          <p class="small">The ExoneraTor service maintains a database of IP addresses that have been part of the Tor network.&nbsp; It answers the question whether there was a Tor relay running on a given IP address on a given date.&nbsp; ExoneraTor may store more than one IP address per relay if relays use a different IP address for exiting to the Internet than for registering in the Tor network, and it stores whether a relay permitted transit of Tor traffic to the open Internet at that time.</p>
+        </div><!-- col -->
+      </div><!-- row -->
+      <div class="row">
+        <div class="col-xs-12">
+          <p class="text-center small">This page is also available in the following languages: <a href="/exonerator.html?lang=de">Deutsch</a> <a href="/exonerator.html?lang=en">English</a> <a href="/exonerator.html?lang=fr">français</a> <a href="/exonerator.html?lang=ro">română</a> <a href="/exonerator.html?lang=sv">svenska</a></p>
+        </div><!-- col -->
+      </div><!-- row -->
+    </div><!-- container -->
+
+
+  <div class="container-fluid" id="footer">
+
+    <div class="container no-gutter">
+      <div class="col-xs-6">
+        <p>
+           © 2009–2023 <a href="https://www.torproject.org/" target="_blank">The Tor Project</a>
+        </p>
+      </div>
+      <div class="col-xs-6">
+        <p class="pull-right">
+
+           <a href="/about.html#contact">Contact</a>
+
+        </p>
+      </div>
+    </div>
+
+    <div class="container small">
+
+        <p>This material is supported in part by the National Science Foundation
+under Grant No. CNS-0959138. Any opinions, finding, and conclusions or
+recommendations expressed in this material are those of the author(s) and do not
+necessarily reflect the views of the National Science Foundation. "Tor" and the
+"Onion Logo" are <a href="https://www.torproject.org/docs/trademark-faq.html.en" target="_blank">registered trademarks</a> of The Tor Project, Inc.. Data on this
+site is freely available under a <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">CC0 no
+copyright declaration</a>: To the extent possible under law, the Tor Project has
+waived all copyright and related or neighboring rights in the data. Graphs are
+licensed under a <a href="https://creativecommons.org/licenses/by/3.0/us/" target="_blank">Creative Commons Attribution 3.0 United States License</a>.</p>
+
+    </div>
+
+  </div><!-- /footer -->
+
+</div><!-- /wrapper -->
+
+
+
+
+
+</body></html>

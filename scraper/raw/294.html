@@ -1,0 +1,463 @@
+<html lang="en"><head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#202020">
+
+  <title>Dangers of the Decompiler | RET2 Systems Blog </title>
+  <meta name="description" content="Traditional (assembly level) reverse engineering of software is a tedious process that has been made far more accessible by modern day decompilers. Operating...">
+  <meta name="keywords" content="vulnerability research, reverse engineering, binary exploitation, program analysis, computer security, cyber security, security education, wargames">
+
+  
+  
+  
+
+  <!-- Open Graph -->
+  <meta content="RET2 Systems Blog" property="og:site_name">
+  <meta content="Dangers of the Decompiler" property="og:title">
+  
+    <meta content="article" property="og:type">
+  
+  <meta content="Traditional (assembly level) reverse engineering of software is a tedious process that has been made far more accessible by modern day decompilers. Operating..." property="og:description">
+  
+    <meta content="https://blog.ret2.io/2017/11/16/dangers-of-the-decompiler/" property="og:url">
+  
+  
+    <meta content="2017-11-16T10:00:00+00:00" property="article:published_time">
+  
+  
+   <meta content="https://blog.ret2.io/assets/img/gadget.png" property="og:image">
+  
+    
+  
+  
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ret2systems">
+  <meta name="twitter:title" content="Dangers of the Decompiler">
+  <meta name="twitter:image" content="https://blog.ret2.io/assets/img/hexrays_ordinals.png">
+  
+
+  <style class="anchorjs"></style><link rel="stylesheet" href="/assets/css/lightbox.min.css">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://blog.ret2.io/2017/11/16/dangers-of-the-decompiler/">
+  <link rel="alternate" type="application/rss+xml" title="RET2 Systems Blog" href="/feed.xml">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+
+  
+  <script id="twitter-wjs" src="https://platform.twitter.com/widgets.js"></script><script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-RLC8PJ2KNC&amp;l=dataLayer&amp;cx=c"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-106594012-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-106594012-2');
+</script>
+  
+
+  
+
+  <!-- lightbox -->
+  <script src="/assets/js/lightbox-plus-jquery.min.js"></script>
+
+  <!-- title anchors -->
+  <script src="/assets/js/anchor.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+      anchors.add(".post-content > h2, h3, h4, h5, h6");
+    });
+  </script>
+  <script src="/assets/js/asciinema.js" defer=""></script>
+
+  <!-- embedded tweet styling -->
+  <script>
+    window.twttr = (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+      if (d.getElementById(id)) return t;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    
+      t._e = [];
+      t.ready = function(f) {
+        t._e.push(f);
+      };
+    
+      return t;
+    }(document, "script", "twitter-wjs"));
+
+    twttr.ready(function(twttr){
+    twttr.events.bind('rendered',function (event) { 
+      var widget = event.target, shadow;
+      widget.style.width = '600px';
+      if (!(shadow = widget.shadowRoot)) {
+          return;
+      }
+      //shadow.innerHTML += '<style>.EmbeddedTweet {background-color: #1b2836;}</style>';
+      shadow.innerHTML += '<style>.EmbeddedTweet {max-width: 600px; background-color: rgb(21, 24, 28);}</style>';
+      });
+    }); 
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    <h1 class="site-title">
+      <a href="/"><img class="brand-image" src="/assets/img/logo-full.svg"></a>
+      ENGINEERING BLOG
+    </h1>
+  
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <a href="/2017/11/16/dangers-of-the-decompiler/"><h1 class="post-title" itemprop="name headline">Dangers of the Decompiler</h1></a>
+    <h2 class="post-subtitle" itemprop="subtitle">A Sampling of Anti-Decompilation Techniques</h2>
+    <p class="post-meta">
+
+      <time datetime="2017-11-16T10:00:00+00:00" itemprop="datePublished">
+        
+        November 16, 2017
+      </time>
+    
+      
+        
+          /
+        <span itemprop="author" itemscope="" itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://twitter.com/gaasedelen" target="_blank">Markus Gaasedelen</a></span></span>
+
+    </p>
+  </header>
+  <hr class="post-break">
+  <div class="post-content" itemprop="articleBody">
+    <p>Traditional (assembly level) reverse engineering of software is a tedious process that has been made far more accessible by modern day decompilers. Operating only on compiled machine code, a <a href="https://en.wikipedia.org/wiki/Decompiler">decompiler</a> attempts to recover an approximate source level representation.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_decompiler_demo.gif" data-lightbox="hexrays_decompiler_demo.gif" data-title="'... and I resisted the temptation, for years. But, I knew that, if I just pressed that button ...' --Dr. Mann (Interstellar, 2014)">
+    
+      <img src="/assets/img/hexrays_decompiler_demo.gif" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">'... and I resisted the temptation, for years. But, I knew that, if I just pressed that button ...' --Dr. Mann (Interstellar, 2014)</p>
+    
+</div>
+
+<p>There’s no denying it: the science and convenience behind a <a href="https://www.hex-rays.com/products/decompiler/">decompiler-backed disassembler</a> is <em>awesome</em>. At the press of a button, a complete novice can translate obscure ‘machine code’ into human readable source and engage in the reverse engineering process.</p>
+
+<p>The reality is that researchers are growing dependent on these technologies too, leaving us quite exposed to their imperfections. In this post we’ll explore a few <em>anti-decompilation</em> techniques to disrupt or purposefully mislead decompiler-dependent reverse engineers.</p>
+
+<!--more-->
+
+<h2 id="positive-sp-value">Positive SP Value<a class="anchorjs-link " href="#positive-sp-value" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<p>The first technique is a classic, but ‘noisy’, method of disrupting the Hex-Rays decompiler. In IDA Pro, the decompiler will refuse to decompile a function if it does not clean up its stack allocations (balancing the stack pointer) prior to returning.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_positive_sp_static.png" data-lightbox="hexrays_positive_sp_static.png" data-title="The error message raised by IDA when a positive stack pointer is detected during decompilation">
+    
+      <img src="/assets/img/hexrays_positive_sp_static.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">The error message raised by IDA when a positive stack pointer is detected during decompilation</p>
+    
+</div>
+
+<p>This happens occasionally (innocently) when IDA cannot reasonably devise the type definition of certain function calls.</p>
+
+<p>As an anti-decompilation technique, a developer can elicit this behavior in a function they would like to ‘hide’ by using an <a href="https://reverseengineering.stackexchange.com/questions/1669/what-is-an-opaque-predicate">opaque predicate</a> that disrupts the balance of the stack pointer.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//</span>
+<span class="c1">// compiled on Ubuntu 16.04 with:</span>
+<span class="c1">//    gcc -o predicate predicate.c -masm=intel</span>
+<span class="c1">//</span>
+
+<span class="cp">#include &lt;stdio.h&gt;
+</span>
+<span class="cp">#define positive_sp_predicate \
+    __asm__ ("  push     rax      \n"\
+             "  xor      eax, eax \n"\
+             "  jz       opaque   \n"\
+             "  add      rsp, 4   \n"\
+             "opaque:             \n"\
+             "  pop      rax      \n");
+</span>
+<span class="kt">void</span> <span class="nf">protected</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">positive_sp_predicate</span><span class="p">;</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Can't decompile this function"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">protected</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The instruction <code class="highlighter-rouge">add rsp, 4</code> in the <code class="highlighter-rouge">positive_sp_predicate</code> macro defined above can never get executed at runtime, but it will trip up the static analysis that IDA performs for decompilation. Attempting to decompile the <code class="highlighter-rouge">protected()</code> function generated by the provided source yields the following result:</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_positive_sp_value.gif" data-lightbox="hexrays_positive_sp_value.gif" data-title="Using opaque predicates to unbalance the stack pointer as a means of anti-decompilation">
+    
+      <img src="/assets/img/hexrays_positive_sp_value.gif" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Using opaque predicates to unbalance the stack pointer as a means of anti-decompilation</p>
+    
+</div>
+
+<p>This technique is relatively well known. It can be fixed via patching, or <a href="https://stackoverflow.com/questions/10165511/ida-positive-sp-value-has-been-found-error">correcting</a> the stack offset by hand.</p>
+
+<p>In the <a href="https://github.com/RPISEC/MBE/blob/e3e718895fb2c52a8124719b4fb852a01d5caa2c/include/utils.h#L5">past</a> I’ve used this technique as a simple stopgap to thwart novice reverse engineers (eg, students) from skipping the disassembly and going straight to decompiler output.</p>
+
+<h2 id="return-hijacking">Return Hijacking<a class="anchorjs-link " href="#return-hijacking" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<p>An aspiration of modern decompilers is to accurately identify and abstract away low-level bookkeeping logic that compilers generate, such as function prologues/epilogues or control flow metadata.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_prologue.png" data-lightbox="hexrays_prologue.png" data-title="Compiler generated function prologues will typically save registers, allocate space for the stack frame, etc">
+    
+      <img src="/assets/img/hexrays_prologue.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Compiler generated function prologues will typically save registers, allocate space for the stack frame, etc</p>
+    
+</div>
+
+<p>Decompilers strive to omit this kind of information from their output because the concepts of saving registers, or managing stack frame allocation do not exist at the source level.</p>
+
+<p>An interesting artifact of these omissions (or perhaps a gap in the Hex-Rays decompiler heuristics) is that we can ‘pivot’ the stack just prior to returning from a function without the decompiler throwing a warning or presenting any indication of foul play.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_pivot.png" data-lightbox="hexrays_pivot.png" data-title="Pivoting the stack pointer (RSP) onto a ROP chain embedded into the binary">
+    
+      <img src="/assets/img/hexrays_pivot.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Pivoting the stack pointer (RSP) onto a ROP chain embedded into the binary</p>
+    
+</div>
+
+<p><a href="http://neilscomputerblog.blogspot.com/2012/06/stack-pivoting.html">Stack pivoting</a> is a technique commonly used in binary exploitation to achieve arbitrary <a href="https://en.wikipedia.org/wiki/Return-oriented_programming">ROP</a>. In this case, we (as developers) use it as a mechanism to hijack execution right out from underneath an unsuspecting reverse engineer. Those focused solely on decompiler output are guaranteed to miss it.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_return.gif" data-lightbox="hexrays_return.gif" data-title="Decompiling main, and a deceptive function ending with a stack pivot">
+    
+      <img src="/assets/img/hexrays_return.gif" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Decompiling main, and a deceptive function ending with a stack pivot</p>
+    
+</div>
+
+<p>We pivot the stack onto a tiny ROP chain that has been compiled into the binary for this exercise of misdirection. The end result is a function call that is ‘invisible’ to the decompiler. Our discretely called function simply prints out ‘Evil Code’ to prove that it was executed.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_pivot_exec.png" data-lightbox="hexrays_pivot_exec.png" data-title="Executing the compiled binary making use of the return hijacking anti-decompilation technique">
+    
+      <img src="/assets/img/hexrays_pivot_exec.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Executing the compiled binary making use of the return hijacking anti-decompilation technique</p>
+    
+</div>
+
+<p>The code used to demonstrate this technique of hiding code from the decompiler can be found below.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//</span>
+<span class="c1">// compiled on Ubuntu 16.04 with:</span>
+<span class="c1">//    gcc -o return return.c -masm=intel</span>
+<span class="c1">//</span>
+
+<span class="cp">#include &lt;stdio.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">evil</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Evil Code"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">gadget</span><span class="p">();</span>
+<span class="n">__asm__</span> <span class="p">(</span><span class="s">".global gadget        </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"gadget:               </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"  pop       rax       </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"  mov       rsp, rbp  </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"  call      rax       </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"  pop       rbp       </span><span class="se">\n</span><span class="s">"</span>
+         <span class="s">"  ret                 </span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="o">*</span> <span class="n">gadgets</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="n">gadget</span><span class="p">,</span> <span class="n">evil</span><span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">deceptive</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Hello World!"</span><span class="p">);</span>
+    <span class="n">__asm__</span><span class="p">(</span><span class="s">"mov rsp, %0;</span><span class="se">\n</span><span class="s">"</span>
+            <span class="s">"ret"</span>
+            <span class="o">:</span>
+            <span class="o">:</span><span class="s">"i"</span> <span class="p">(</span><span class="n">gadgets</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">deceptive</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="abusing-noreturn-functions">Abusing ‘noreturn’ Functions<a class="anchorjs-link " href="#abusing-noreturn-functions" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<p>The last technique we’ll cover exploits IDA’s perception of functions that are automatically labeled as <a href="https://gcc.gnu.org/onlinedocs/gcc-6.4.0/gcc/Common-Function-Attributes.html#Common-Function-Attributes"><code class="highlighter-rouge">noreturn</code></a>. Some everyday examples of <code class="highlighter-rouge">noreturn</code> functions would be <code class="highlighter-rouge">exit()</code>, or <code class="highlighter-rouge">abort()</code> from the standard libraries.</p>
+
+<p>While generating the pseudocode for a given function, the decompiler will discard any code after a call to a <code class="highlighter-rouge">noreturn</code> function. The expectation is that in no universe should a function like <code class="highlighter-rouge">exit()</code> ever return and continue executing code.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_exit.gif" data-lightbox="hexrays_exit.gif" data-title="The code directly following a call to a noreturn function is invisible to the decompiler.">
+    
+      <img src="/assets/img/hexrays_exit.gif" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">The code directly following a call to a noreturn function is invisible to the decompiler.</p>
+    
+</div>
+
+<p>If one can trick IDA into believing a function is <code class="highlighter-rouge">noreturn</code> when it actually isn’t, a malicious actor can quietly hide code behind any calls made to it. The following example demonstrates one of many ways we can achieve this result.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//</span>
+<span class="c1">// compiled on Ubuntu 16.04 with:</span>
+<span class="c1">//    gcc -o noreturn noreturn.c</span>
+<span class="c1">//</span>
+
+<span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">ignore</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>                  <span class="c1">// force a PLT/GOT entry for exit()</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">deceptive</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Hello World!"</span><span class="p">);</span>
+    <span class="n">srand</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>                 <span class="c1">// post-processing will swap srand() &lt;--&gt; exit()</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Evil Code"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">deceptive</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>By compiling the code above and running a short Binary Ninja based <a href="https://gist.github.com/gaasedelen/f318ca48e04b53542e40406a809be1b3">post-processing script</a> against the resulting binary, we can swap the pushed ordinal numbers in the <a href="https://www.technovelty.org/linux/plt-and-got-the-key-to-code-sharing-and-dynamic-libraries.html">Procedure Linkage Table</a>. These indexes are used to when resolving library imports at runtime.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_ordinals.png" data-lightbox="hexrays_ordinals.png" data-title="Swapping PLT ordinal numbers in the ELF header">
+    
+      <img src="/assets/img/hexrays_ordinals.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Swapping PLT ordinal numbers in the ELF header</p>
+    
+</div>
+
+<p>In this example we swap the ordinals for <code class="highlighter-rouge">srand()</code> with <code class="highlighter-rouge">exit()</code> and doctor some calls for compile-time convenience. As a result, IDA believes the <code class="highlighter-rouge">deceptive()</code> function in the modified binary is calling <code class="highlighter-rouge">exit()</code>, a <code class="highlighter-rouge">noreturn</code> function, instead of <code class="highlighter-rouge">srand()</code>.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_exit_full.gif" data-lightbox="hexrays_exit_full.gif" data-title="Decompiling main, and deceptive function concealing code behind a noreturn call">
+    
+      <img src="/assets/img/hexrays_exit_full.gif" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Decompiling main, and deceptive function concealing code behind a noreturn call</p>
+    
+</div>
+
+<p>The <code class="highlighter-rouge">exit()</code> call we see in IDA is in-fact <code class="highlighter-rouge">srand()</code> (effectively a no-op) at runtime. The effect on the decompiler is almost identical to the return hijacking technique covered in the previous section. Running the binary demonstrates that our ‘Evil Code’ is getting executed, unbeknownst to the decompiler.</p>
+
+<div class="image-wrapper">
+    
+    <a href="/assets/img/hexrays_noreturn.png" data-lightbox="hexrays_noreturn.png" data-title="Executing the compiled binary making use of the noreturn anti-decompilation technique">
+    
+      <img src="/assets/img/hexrays_noreturn.png" alt="">
+    
+    </a>
+    
+    
+        <p class="image-caption">Executing the compiled binary making use of the noreturn anti-decompilation technique</p>
+    
+</div>
+
+<p>While the presence of malicious code is blatant in these examples, hiding these techniques within larger functions and complex conditionals makes them exceptionally easy to glaze over.</p>
+
+<h2 id="conclusion">Conclusion<a class="anchorjs-link " href="#conclusion" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+
+<p>Decompilers are an impressive but imperfect technology. They operate on incomplete information and do their best to approximate for us humans. Malicious actors can (and will) leverage these asymmetries as a means of deception.</p>
+
+<p>As the industry grows more reliant on the luxuries of today’s decompilers, the adoption of anti-decompilation techniques will increase and evolve in the same vein as anti-debugging and anti-reversing have.</p>
+
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+  <div class="wrapper">
+      <div class="footerlinks">
+        <a href="https://github.com/ret2">GITHUB</a>
+        <span class="pipe">|</span>
+        <a href="https://twitter.com/ret2systems">TWITTER</a>
+        <span class="pipe">|</span>
+        <a href="https://blog.ret2.io">BLOG</a>
+        <span class="pipe">|</span>
+        <a href="https://ret2.io/contact">CONTACT</a>
+      </div>
+      <div class="copyright">(C) 2024 RET2 SYSTEMS, INC.</div>
+  </div>
+</footer>
+
+
+  
+
+
+<div id="lightboxOverlay" class="lightboxOverlay" style="display: none;"></div><div id="lightbox" class="lightbox" style="display: none;"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="><div class="lb-nav"><a class="lb-prev" href=""></a><a class="lb-next" href=""></a></div><div class="lb-loader"><a class="lb-cancel"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div><div class="lb-closeContainer"><a class="lb-close"></a></div></div></div></div><iframe scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/widget_iframe.2f70fb173b9000da126c79afe2098f02.html?origin=https%3A%2F%2Fblog.ret2.io" title="Twitter settings iframe" style="display: none;"></iframe><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: medium;"></iframe></body></html>

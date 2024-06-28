@@ -1,0 +1,339 @@
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-2N91E44ECD&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script src="/cdn-cgi/apps/head/Qceaeoga9a1C8wThDYgOaL8O9P0.js"></script><link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+<link href="./assets/css/custom.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
+<link rel="stylesheet" type="text/css" href="./theme/pygments/vim.min.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/fontawesome.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/brands.css">
+<link rel="stylesheet" type="text/css" href="./theme/font-awesome/css/solid.css">
+<script src="./assets/js/custom.js" type="text/javascript"></script>
+<link href="https://exploit.ph/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="eXploit Atom">
+<link href="https://exploit.ph/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="eXploit RSS">
+<link rel="shortcut icon" href="https://exploit.ph/favicon.ico" type="image/x-icon">
+<link rel="icon" href="https://exploit.ph/favicon.ico" type="image/x-icon">
+
+<meta name="theme-color" content="#0300a5">
+
+<meta name="msapplication-navbutton-color" content="#0300a5">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="msapplication-TileColor" content="#0300a5">
+<meta name="author" content="0xe7">
+<meta name="description" content="Breaking trust transitivity for fun and profit">
+<meta name="keywords" content="active directory, infrastructure, windows, kerberos">
+<meta property="og:site_name" content="eXploit">
+<meta property="og:title" content="External Trusts Are Evil">
+<meta property="og:description" content="Breaking trust transitivity for fun and profit">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="./external-trusts-are-evil.html">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2023-03-14 17:28:19+01:00">
+<meta property="article:modified_time" content="">
+<meta property="article:author" content="./author/0xe7.html">
+<meta property="article:section" content="Active Directory">
+<meta property="article:tag" content="active directory">
+<meta property="article:tag" content="infrastructure">
+<meta property="article:tag" content="windows">
+<meta property="article:tag" content="kerberos">
+<meta property="og:image" content="https://exploit.ph/assets/images/profile_standard.jpg">
+<title>eXploit – External Trusts Are Evil</title>
+<script type="text/javascript">
+    setcolours();
+  </script>
+</head>
+<body onload="setlogotext()">
+<aside>
+<div>
+<img id="logo" src="https://exploit.ph/assets/images/profile_standard.jpg" alt="Darkseid" title="Darkseid" onmouseover="if (!window.__cfRLUnblockHandlers) return false; rollover(this)" onmouseout="if (!window.__cfRLUnblockHandlers) return false; mouseaway(this)" onclick="if (!window.__cfRLUnblockHandlers) return false; flipcolours()">
+<a href=".">
+<h1><p>Something pVVn3|) this way comes.</p></h1>
+</a>
+<nav>
+<ul class="list">
+<li><a href="./category/active-directory.html">Active Directory</a> (13)</li>
+<li><a href="./category/linux-kernel-hacking.html">Linux Kernel Hacking</a> (4)</li>
+<li><a href="./category/mobile-hacking.html">Mobile Hacking</a> (1)</li>
+<li><a href="./category/reverse-engineering.html">Reverse Engineering</a> (5)</li>
+<li><a href="./category/web-hacking.html">Web Hacking</a> (8)</li>
+<li><a href="./category/x86-32-linux.html">x86-32 Linux</a> (7)</li>
+</ul>
+</nav>
+<nav>
+<h2><p>Recent</p></h2>
+<ul class="list">
+<li><a href="./des-is-useful.html">DES Is Useful... Sometimes</a></li>
+<li><a href="./external-trusts-are-evil.html">External Trusts Are Evil</a></li>
+<li><a href="./defending-the-three-headed-relay.html">Defending the Three Headed Relay</a></li>
+<li><a href="./more-samaccountname-impersonation.html">More sAMAccountName Impersonation</a></li>
+<li><a href="./cve-2021-42287-cve-2021-42278-weaponisation.html">CVE-2021-42287/CVE-2021-42278 Weaponisation</a></li>
+</ul>
+</nav>
+<nav>
+<ul class="list">
+<li><a target="_blank" href="feeds/rss.xml">RSS</a></li>
+<li><a target="_blank" href="foods/atom.xml">Atom</a></li>
+</ul>
+</nav>
+<ul class="social">
+<li>
+<a class="sc-twitter" href="https://twitter.com/exploitph" target="_blank">
+<i class="fab fa-twitter">
+</i>
+</a></li>
+<li>
+<a class="sc-github" href="https://github.com/0xe7" target="_blank">
+<i class="fab fa-github">
+</i>
+</a></li>
+</ul>
+</div>
+</aside>
+<main>
+<nav>
+<a href=".">Home</a>
+<a href="/archives.html">Archives</a>
+<a href="/categories.html">Categories</a>
+<a href="/tags.html">Tags</a>
+<a href="https://exploit.ph/feeds/all.atom.xml">Atom</a>
+<a href="https://exploit.ph/feeds/all.rss.xml">RSS</a>
+</nav>
+<article class="single">
+<header>
+<h1 id="external-trusts-are-evil">External Trusts Are Evil</h1>
+<p>
+Posted on Tue 14 March 2023 in <a href="./category/active-directory.html">Active Directory</a>
+</p>
+</header>
+<div>
+<p>This post is duel posted on the <a href="https://semperis.com/blog/ad-security-research-breaking-trust-transitivity" target="_blank">Semperis blog</a>.</p>
+<p>Another day, another “by design” but clearly unintended Windows AD feature. While playing with Kerberos tickets I discovered an issue that allowed me to authenticate to other domains within a forest across external non-transitive trusts. This means that there is in fact no such thing as a “non-transitive trust”, and the description as such when creating a trust is at best misleading, leaving systems administrators with a false sense of security. After reporting this issue to Microsoft, I received the following response:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/01-msrc-response.png"></center>
+<center>Figure 1: MSRC Response</center><p></p>
+<p>This post details the issue discovered but as Microsoft do not feel that it affects security and as a result are not planning on fixing this issue, there is no way to avoid what is being described within this post apart from not using external trusts at all.</p>
+<h2>Trusts and Transitivity</h2>
+<p><a href="https://twitter.com/harmj0y" target="_blank">Will Schroeder</a> published a <a href="https://blog.harmj0y.net/redteaming/a-guide-to-attacking-domain-trusts/" target="_blank">great post</a> on trusts back in 2017. If you are not too familiar with the different trusts and how they work, I highly recommend reading that first as I will not be going into as much detail on the various types. For this post, I will not be discussing intra-forest trusts (trusts within a single forest) other than as they apply to the specific attack path that I am going to discuss. I also will not be discussing selective authentication trusts, but I have never actually seen these in real environments.
+The remaining trusts are forest trusts and external trusts.
+Forest trusts are trusts between two forests; or more accurately a transitive trust between the root domains of two forests, which means any user from any domain within the trusted forest can authenticate to any domain within the trusting forest.
+External trusts, on the other hand, are trusts between two domains and are described as being “non-transitive”, which should mean that only users within the trusted domain can authenticate against only the trusting domain.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/02-trust-transitivty.png"></center>
+<center>Figure 2: External Non-Transitive Trust</center><p></p>
+<p>Other technical differences are present between forest and external trusts, but these will be discussed if and when required for this post.</p>
+<p>Microsoft <a href="https://learn.microsoft.com/en-us/azure/active-directory-domain-services/concepts-forest-trust" target="_blank">describes</a> trust transitivity as follows:</p>
+<blockquote>
+<p>Transitivity determines whether a trust can be extended outside of the two domains with which it was formed.</p>
+<ul>
+<li>A transitive trust can be used to extend trust relationships with other domains.</li>
+<li>A non-transitive trust can be used to deny trust relationships with other domains.</li>
+</ul>
+</blockquote>
+<p>This description is very clear. For non-transitive trusts, only the two domains involved in the trust can authenticate to each other and not beyond. As I will demonstrate in this post, this is not the case.</p>
+<h2>Lab Setup</h2>
+<p>To properly demonstrate this issue, several multi-domain forests are required with external trusts between them. I have setup the lab as follows:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/03-lab-setup.png"></center>
+<center>Figure 3: Lab Setup</center><p></p>
+<p>This setup involves three (3) forests, two (2) of which have three (3) domains and the other containing two (2) domains. The domains <strong>semperis.lab</strong> and <strong>treetest.lab</strong> have a bidirectional non-transitive external trust:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/04-semperis-treetest-trust.png"></center>
+<center>Figure 4: External Trust 1</center><p></p>
+<p>The domains <strong>grandchild1.child1.semperis.lab</strong> and <strong>semperisaz.lab</strong> also have a bidirectional non-transitive external trust:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/05-grandchild-semperisaz-trust.png"></center>
+<center>Figure 5: External Trust 2</center><p></p>
+<p>This should make it possible to demonstrate the implications and limitations of this issue.</p>
+<h2>How Kerberos Cross-Trust Authentication Works</h2>
+<p>The main thing that is required to authenticate to a service across a trust using Kerberos is a referral (or referral TGT). This is a ticket requested from your local domain controller (DC) for the foreign domain. This section assumes a basic understanding of how the normal Kerberos authentication flow works, for a detailed explanation of that check out <a href="https://twitter.com/PyroTek3" target="_blank">Sean Metcalf</a>’s <a href="https://adsecurity.org/?p=3458" target="_blank">Detecting Kerberoasting Activity</a> post. It would also be advantageous to be reasonably familiar with <a href="https://github.com/GhostPack/Rubeus" target="_blank">Rubeus</a> (as I will be using it to request tickets in the remaining sections). This section will focus on the <strong>semperis.lab</strong> forest which is sufficient to demonstrate how ticket requests across trusts are performed, the information here is, however, applicable to any “allowed” trust path.</p>
+<p>The simplest example of cross-trust authentication is to authenticate to a service on a domain which has a direct trust with the local domain. The trust that the domain <strong>grandchild1.child1.semperis.lab</strong> has with <strong>child1.semperis.lab</strong>, shown in Figure 5 above, is an example of this. In this situation, the first step, after obtaining the initial TGT, in obtaining a service ticket for an account in <strong>grandchild1.child1.semperis.lab</strong> to a service in <strong>child1.semperis.lab</strong> is to obtain a referral for <strong>child1.semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/06-referral-request.png"></center>
+<center>Figure 6: Referral Request For child1.semperis.lab</center><p></p>
+<p>As shown in Figure 6 above, the request was made to a DC (<strong>SGC1DC1.grandchild1.child1.semperis.lab</strong>) within the domain (<strong>grandchild1.child1.semperis.lab</strong>) local to the authenticating user (<strong>lowpriv</strong>). The request was made for the service <strong>krbtgt/child1.semperis.lab</strong> and the fact that the ServiceRealm (srealm) is the local domain (<strong>grandchild1.child1.semperis.lab</strong>) within the resulting ticket, shows that this ticket is a referral. The diagram below shows this:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/07-referral-request-diagram.png"></center>
+<center>Figure 7: Referral Request</center><p></p>
+<p>This referral can now be used to request service tickets (STs) from the foreign domain:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/08-referral-usage.png"></center>
+<center>Figure 8: Example Usage of Referral</center><p></p>
+<p>Here an ST was requested from the foreign DC (<strong>SC1DC1.child1.semperis.lab</strong>) for the service <strong>host/SC1DC1.child1.semperis.lab</strong> using the referral retrieved previously.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/09-referral-st-diagram.png"></center>
+<center>Figure 9: Requesting ST Using Referral</center><p></p>
+<p>To take this one step further, if a service on the forest root domain (<strong>semperis.lab</strong>) is required, a referral for this domain cannot be directly requested from the local (<strong>grandchild1.child1.semperis.lab</strong>) domain:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/10-root-referral-request.png"></center>
+<center>Figure 10: Referral Request For semperis.lab</center><p></p>
+<p>As shown in Figure 10 above, a referral for <strong>krbtgt/semperis.lab</strong> was requested from the local DC <strong>sgc1dc1.grandchild1.child1.semperis.lab</strong>. However, the ticket returned by the DC was for the service <strong>krbtgt/child1.semperis.lab</strong>, meaning that this is a referral for the domain <strong>child1.semperis.lab</strong>, <em>NOT</em> <strong>semperis.lab</strong>.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/11-root-referral-request-diagram.png"></center>
+<center>Figure 11: Requesting Referral For semperis.lab</center><p></p>
+<p>This can be explicitly shown by trying to use this ticket to request a ST for the <strong>semperis.lab</strong> domain:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/12-root-st-failure.png"></center>
+<center>Figure 12: Root Domain Service Ticket Request</center><p></p>
+<p>As shown in Figure 12 above, this results in an <em>AP_ERR_BAD_INTEGRITY</em> error. This is because the referral ticket is encrypted with the trust key for the <strong>grandchild1.child1.semperis.lab --&gt; child1.semperis.lab</strong> trust. The DCs in the root domain <strong>semperis.lab</strong> do not have knowledge of this key and so are not able to decrypt the ticket.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/13-root-st-failure-diagram.png"></center>
+<center>Figure 13: Requesting ST From semperis.lab</center><p></p>
+<p>To request a service ticket for the root domain <strong>semperis.lab</strong>, first a referral for <strong>semperis.lab</strong> must be requested from a DC in the domain <strong>child1.semperis.lab</strong> using this referral:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/14-root-referral-request.png"></center>
+<center>Figure 14: Referral Request For semperis.lab</center><p></p>
+<p>Here a request was made to the foreign DC (<strong>sc1dc1.child1.semperis.lab</strong>) using the referral for the domain <strong>child1.semperis.lab</strong> to request a further referral for the root domain <strong>semperis.lab</strong>. It should be noted here that in order to request this ticket, the <strong>/targetdomain</strong> argument is required. This is because by default Rubeus will use the domain within the ticket passed to it to fill in the domain in the TGS-REQ, in this case that would be <strong>grandchild1.child1.semperis.lab</strong> and would result in a <em>ERR_WRONG_REALM</em> error as the domain local to the DC is <strong>child1.semperis.lab</strong>. This will be very important in the next section.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/15-root-referral-diagram.png"></center>
+<center>Figure 15: Requesting Referral For semperis.lab</center><p></p>
+<p>Lastly, this resulting referral for <strong>semperis.lab</strong> can be used to request STs for the <strong>semperis.lab</strong> domain:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/16-root-st-request.png"></center>
+<center>Figure 16: Service Ticket Request For semperis.lab</center><p></p>
+<p>This ST request from the user <strong>lowpriv@grandchild1.child1.semperis.lab</strong> made to the DC <strong>SDC1.semperis.lab</strong> for the SPN <strong>host/SDC1.semperis.lab</strong> is shown in the following diagram and was successful even though the two domains involved do not have a direct trust due to the trust path being allowed:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/17-root-st-request-diagram.png"></center>
+<center>Figure 17: ST Request For host/sdc1.semperis.lab</center><p></p>
+<p>This method of requesting referrals for trusting domains can be followed to request STs for any service within any domain for which the trust path is <em>“allowed”</em>.</p>
+<h2>Making The Non-Transitive Transitive</h2>
+<p>Now that we understand how authentication across trusts happens, let’s look at how it is possible to traverse external trusts to authenticate to domains that should be prohibited.</p>
+<p>As shown in the Figure 3, the domains <strong>semperisaz.lab</strong> and <strong>grandchild1.child1.semperis.lab</strong> have a bidirectional external trust, this means that after retrieving a TGT for <strong>any</strong> account within the domain <strong>semperisaz.lab</strong> it is possible to request a referral for <strong>grandchild1.child1.semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/18-granchild-referral.png"></center>
+<center>Figure 18: Referral To granchild1.child1.semperis.lab</center><p></p>
+<p>The diagram showing this request is below:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/19-request-grandchild-referral-diagram.png"></center>
+<center>Figure 19: Request Referral For grandchild1.child1.semperis.lab</center><p></p>
+<p>This referral can be used to request STs for services on the domain <strong>grandchild1.child1.semperis.lab</strong>, but if we try to obtain a referral to other domains within the same forest (for example <strong>child1.semperis.lab</strong>) we get an <em>ERR_PATH_NOT_ACCEPTED</em> error, which is expected:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/20-path-not-accepted-error.png"></center>
+<center>Figure 20: Path Not Accepted Error</center><p></p>
+<p>This is because the <strong>semperisaz.lab --&gt; granchild1.child1.semperis.lab</strong> trust is non-transitive, so the path from <strong>semperisaz.lab</strong> to <strong>child1.semperis.lab</strong> is not allowed.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/21-referral-request-child1-diagram.png"></center>
+<center>Figure 21: Requesting Referral For child1.semperis.lab</center><p></p>
+<p>However, we can request a <em>“local”</em> TGT for <strong>grandchild1.child1.semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/22-request-local-tgt.png"></center>
+<center>Figure 22: Requesting “local” TGT For grandchild1.child1.semperis.lab</center><p></p>
+<p>I call this a “local” TGT because unlike the referral, which has a ServiceRealm (srealm) of <strong>semperisaz.lab</strong>, the ServiceRealm is <strong>grandchild1.child1.semperis.lab</strong>.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/23-request-local-tgt-diagram.png"></center>
+<center>Figure 23: Requesting "local" TGT</center><p></p>
+<p>Using this “local” TGT, a referral for <strong>child1.semperis.lab</strong> can now be requested:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/24-request-referral-child1.png"></center>
+<center>Figure 24: Referral For child1.semperis.lab</center><p></p>
+<p>This process can be seen in the following diagram:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/25-use-local-tgt-diagram.png"></center>
+<center>Figure 25: "local" TGT To Request Referral For child1.semperis.lab</center><p></p>
+<p>We now have a usable referral which can be used to request STs for <strong>child1.semperis.lab</strong> using <strong>any</strong> account from the <strong>semperisaz.lab</strong> domain and without making <strong>any</strong> changes to trusts or accounts within AD. This is demonstrated below:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/26-child1-st.png"></center>
+<center>Figure 26: Requesting ST For DC In child1.semperis.lab</center><p></p>
+<p>In Figure 26, a ST was requested from the DC <strong>sc1dc1.child1.semperis.lab</strong> for the service <strong>host/sc1dc1.child1.semperis.lab</strong> as the user <strong>lowpriv@semperisaz.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/27-child1-st-diagram.png"></center>
+<center>Figure 27: Requesting ST For host/sc1dc1.child1.semperis.lab</center><p></p>
+<p>Furthermore, this method can be used to hop around any domain within the same forest that <strong>grandchild1.child1.sermperis.lab</strong> exists in. We can demonstrate this by requesting a referral to the root domain <strong>semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/28-root-referral.png"></center>
+<center>Figure 28: Requesting Referral For semperis.lab</center><p></p>
+<p>A referral was requested for <strong>semperis.lab</strong> from the DC <strong>sc1dc1.child1.semperis.lab</strong> as the user <strong>lowpriv@semperisaz.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/29-root-referral-diagram.png"></center>
+<center>Figure 29: Requesting Referral To semperis.lab</center><p></p>
+<p>Fortunately for security, hopping across further trusts outside of the forest (external or forest trusts) is not possible using this method. As shown in Figure 3, the root domain <strong>semperis.lab</strong> has a bidirectional external trust with <strong>treetest.lab</strong>, this trust can be used to demonstrate that limitation:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/30-2nd-external-trust.png"></center>
+<center>Figure 30: Requesting Referral For treetest.lab</center><p></p>
+<p>This at least stops an attacker using this method of trust hopping from hopping into another forest.</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/31-requesting-referral-treetest-diagram.png"></center>
+<center>Figure 31: Requesting Referral For treetest.lab</center><p></p>
+<p>This issue is clearly useful for attackers trying to elevate privileges within a forest from across a trust. Other than being able to query domain information from domains that systems administrators may think would be disallowed (and query more sensitive domains or potentially domains with weaker security), this also makes it possible to perform attacks such as Kerberoasting or NTLM authentication coercion on domains that may seem to be disallowed.</p>
+<h2>Hopping Further</h2>
+<p>While it is not possible to hop further using this specific method, I did <a href="https://exploit.ph/strange-case-of-trusts-machines-dns.html" target="_blank">write a post</a> a while ago about the ability to create machine accounts across trusts and that this may open up new avenues of attack for attackers. This situation is another example of that.</p>
+<p>Using the referral retrieved for <strong>semperis.lab</strong>, it is possible to request a ticket for the <strong>LDAP</strong> service on a DC in <strong>semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/32-ldap-st.png"></center>
+<center>Figure 32: Request ST For LDAP</center><p></p>
+<p>Here a ST for <strong>ldap/sdc1.semperis.lab</strong> was requested using the referral for <strong>semperis.lab</strong> as the user <strong>lowpriv@semperisaz.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/33-request-ldap-st-diagram.png"></center>
+<center>Figure 33: Request ST For ldap/sdc1.semperis.lab</center><p></p>
+<p>This ST can be injected and used to create a machine account directly in <strong>semperis.lab</strong> (given the configuration allows <em>Authenticated Users</em>, as is default):</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/34-machine-creation.png"></center>
+<center>Figure 34: Create Machine Account In semperis.lab</center><p></p>
+<p>This causes the DC <strong>sdc1.semperis.lab</strong> to create the machine account <strong>TestComp</strong> within the <strong>semperis.lab</strong> domain:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/35-new-machine-diagram.png"></center>
+<center>Figure 35: Create Machine Account TestComp</center><p></p>
+<p>This newly created <strong>TestComp</strong> machine account is a local account within the domain <strong>semperis.lab</strong>. Now that we have a machine account that exists within <strong>semperis.lab</strong>, we can retrieve a TGT for that account:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/36-machine-tgt.png"></center>
+<center>Figure 36: Machine Account TGT</center><p></p>
+<p>Requesting the machine account TGT looks as follows:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/37-machine-tgt-diagram.png"></center>
+<center>Figure 37: Requesting TGT For TestComp</center><p></p>
+<p>This machine account TGT is allowed to request a referral to the trusting domain <strong>treetest.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/38-treetest.lab-referral.png"></center>
+<center>Figure 38: Requesting Referral For treetest.lab</center><p></p>
+<p>Here the machine account’s TGT was used to request a referral for the <strong>treetest.lab</strong> domain from the DC <strong>SDC1.semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/39-treetest-referral-diagram.png"></center>
+<center>Figure 39: Request Referral For treetest.lab</center><p></p>
+<p>Lastly, the issue described in this post can again be used to gain access to the inaccessible <strong>dsptest.lab</strong> domain. First by requesting a “local” TGT for <strong>treetest.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/40-local-treetest-tgt.png"></center>
+<center>Figure 40: Requesting Local TGT For treetest.lab</center><p></p>
+<p>The “local” TGT is requested using the referral for <strong>treetest.lab</strong> as the account <strong>TestComp$@semperis.lab</strong> from the DC <strong>TDC1.treetest.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/41-local-treetest-tgt-diagram.png"></center>
+<center>Figure 41: Requesting "local" TGT For treetest.lab</center><p></p>
+<p>Then using this “local” TGT to request a referral for <strong>dsptest.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/42-dsptest-referral.png"></center>
+<center>Figure 42: Requesting Referral For dsptest.lab</center><p></p>
+<p>Here a referral was requested for the domain <strong>dsptest.lab</strong> from the DC <strong>TDC1.treetest.lab</strong> as the user <strong>TestComp$@semperis.lab</strong>:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/43-dsptest-referral-diagram.png"></center>
+<center>Figure 43: Requesting Referral For dsptest.lab</center><p></p>
+<p>It should be clear that using the combination of these two methods would make it possible to hop very deep into AD enterprise infrastructures, using any low privileged account on a domain which has an external trust to any domain within a forest.</p>
+<h2>Detection</h2>
+<p>Unfortunately, the only way to prevent this attack path is to remove external trusts completely. If this is not possible, detection is possible. The relevant Windows events are <a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4769" target="_blank">4769</a>’s (A Kerberos service ticket was requested). The first indication is that a “local” TGT is requested from an account in a different forest:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/44-4769-local-tgt.png"></center>
+<center>Figure 44: 4769 For Local TGT</center><p></p>
+<p>Here the <em>Account Domain</em> field is a domain that belongs to a different forest and the <em>Service Name</em> is <strong>krbtgt</strong>. This event is followed by another 4769 requesting a referral:</p>
+<p></p><center><img src="/assets/images/external-trusts-are-evil/45-4769-referral.png"></center>
+<center>Figure 45: 4769 For Referral</center><p></p>
+<p>Here the <em>Account Domain</em> is a domain within a different forest and the <em>Service Name</em> is another domain within the local forest.</p>
+<p>It is worth noting that these two events can be on different DCs within the same domain, they do not have to reside on the same DC. At this point, any service tickets requested (4769’s) using this referral will have an <em>Account Domain</em> that contains a domain that should not be allowed to authenticate to the local domain.</p>
+<p>Plans to consume these events and detect this attack are planned for an upcoming release of <a href="https://www.semperis.com/ds-protector/" target="_blank">Directory Services Protector</a> (DSP).</p>
+<h2>Conclusion</h2>
+<p>The biggest problem here is Microsoft’s description of non-transitive trusts being, at best, misleading to systems administrators. This problem is exaggerated by Microsoft’s refusal to accept that this affects security. As it stands, by creating an external “non-transitive” trust, companies must accept that any account within the trusted domain can authenticate against any domain within the whole forest where the trusting domain resides.</p>
+<p>As demonstrated above, in the “Hopping Further” section of this post, this research again highlights the importance of disallowing Authenticated Users from being able to create machine accounts, as not doing so not only puts domains within the forest at a higher risk, but also puts any domains (and the whole forest within which they reside) which have an external trust with any domain within the forest at a higher risk. This is due to the ability to create machine account across trusts, even while using the technique used within this blog post to authenticate against domains which should be disallowed. More information on the machine account quota and how to prevent low privileged machine account creation can be found on <a href="https://twitter.com/kevin_robertson" target="_blank">Kevin Robertson</a>’s excellent post “<a href="https://www.netspi.com/blog/technical/network-penetration-testing/machineaccountquota-is-useful-sometimes/" target="_blank">MachineAccountQuota is USEFUL Sometimes</a>”.</p>
+<p>If nothing else, I hope this blog post informs systems administrators of the real forest-wide risk involved in implementing external trusts. Afterall, how can systems administrators be expected to properly secure their environments while thinking authentication is not possible where it actually is.</p>
+<h2>Timeline</h2>
+<ul>
+<li>2022/05/04 – MSRC case created.</li>
+<li>2022/05/12 – Case status changed to “Review/Repro”.</li>
+<li>2022/06/17 – Case status changed to “Develop” with email that stated "We confirmed the behavior you reported. We'll continue our investigation and determine how to address this issue."</li>
+<li>2022/06/17 – Case status changed to “Complete – Resolved”.</li>
+<li>2022/08/24 – Comment left on case to find out the status.</li>
+<li>2022/09/02 – A follow-up comment left on case to find out the status.</li>
+<li>2022/09/14 – A follow-up email sent to find out the status of the case.</li>
+<li>2022/09/29 – Email received explaining the issue was not determined to affect security.</li>
+<li>2023/03/14 – Public disclosure - Blog post released.</li>
+</ul>
+<h2>Acknowledgements</h2>
+<ul>
+<li><a href="https://twitter.com/harmj0y" target="_blank">Will Schroeder</a> for the creation of Rubeus without which this research very well may not have been done.</li>
+<li>Everyone that reviewed this post and provided feedback, including:<ul>
+<li><a href="https://twitter.com/elad_shamir" target="_blank">Elad Shamir</a></li>
+<li>Harjinder Nijjar</li>
+<li><a href="https://twitter.com/4ndr3w6S" target="_blank">Andrew Schwartz</a></li>
+<li><a href="https://twitter.com/jsecurity101" target="_blank">Jonny Johnson</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tag-cloud">
+<p>
+<a href="./tag/active-directory.html">active directory</a>
+<a href="./tag/infrastructure.html">infrastructure</a>
+<a href="./tag/windows.html">windows</a>
+<a href="./tag/kerberos.html">kerberos</a>
+</p>
+</div>
+</article>
+<footer>
+<p>
+© 2021 - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+<img alt="Creative Commons License" title="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" width="80" height="15">
+</a>
+</p> </footer>
+</main>
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " eXploit ",
+  "url" : ".",
+  "image": "https://exploit.ph/assets/images/profile_standard.jpg",
+  "description": "Something pVVn3|) this way comes."
+}
+</script>
+
+</body></html>

@@ -1,0 +1,314 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+<title> Rust to Assembly: Understanding the Inner Workings of Rust</title>
+<meta name="description" content="Understand the assembly code generated for various Rust concepts like enums, match, self-passing, arrays, option, and smart pointers. Learn how the Rust language is translated to assembly and how the compiler optimizes the code. Also, discover the performance implications of static and dynamic dispatch in Rust.">
+
+  <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-C9GKHZ5Q67&amp;l=dataLayer&amp;cx=c"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-57131963-1"></script><script src="/cdn-cgi/apps/head/ts1kOia7MXPIf2OwrHHfX3ik25k.js"></script><script src="/cdn-cgi/apps/body/U3uRTQn5KgBtPVlwf8J8bueJJBI.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="shortcut icon" href="/images/favicon.png">
+</head>
+
+<body>
+
+  <nav class="navbar is-white">
+
+    <div class="navbar-brand">
+      <a href="/" class="navbar-item">
+        <img src="/images/EventHelix-white-rounded-bg-blue.png" alt="EventHelix logo" title="Click to visit EventHelix home" style="max-height: 50px">
+      </a>
+      <a class="navbar-burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
+
+    <div class="navbar-menu" id="nav-links">
+      <div class="navbar-start">
+
+        <div class="navbar-item has-dropdown is-hoverable is-size-5 is-hidden-touch">
+          <a href="/visualether" class="navbar-link" title="Analyze Wireshark PCAP output by converting into sequence diagrams.">
+            VisualEther
+          </a>
+          <div class="navbar-dropdown">
+            <a href="/visualether" class="navbar-item">
+              Visualize Wireshark traces with sequence diagrams
+            </a>
+            <a href="/visualether/download" class="navbar-item">
+              Download the free Community Edition
+            </a>
+            <hr class="dropdown-divider is-hidden-touch">
+            <a href="/visualether/community-professional-comparison" class="navbar-item">
+              Community vs Professional Edition
+            </a>
+            <a href="/visualether/trial" class="navbar-item">
+              Try Professional Edition (free trial)
+            </a>
+            <a href="/visualether/order" class="navbar-item">
+              Buy Professional Edition
+            </a>
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable is-size-5 is-hidden-touch">
+          <a href="/eventstudio" class="navbar-link" title="Model and review system interactions. Generate sequence diagrams.">
+            EventStudio
+          </a>
+
+          <div class="navbar-dropdown">
+            <a href="/eventstudio" class="navbar-item">
+              Model and review complex scenarios with sequence diagrams
+            </a>
+            <a href="/eventstudio/download" class="navbar-item">
+              Download the free Community Edition
+            </a>
+            <hr class="dropdown-divider is-hidden-touch">
+            <a href="/eventstudio/community-professional-comparison" class="navbar-item">
+              Community vs Professional Edition
+            </a>
+            <a href="/eventstudio/trial" class="navbar-item">
+              Try Professional Edition (free trial)
+            </a>
+            <a href="/eventstudio/order" class="navbar-item">
+              Buy Professional Edition
+            </a>
+          </div>
+        </div>
+
+        <a href="/visualether/" class="navbar-item is-hidden-desktop" title="Analyze Wireshark PCAP output by converting into sequence diagrams.">
+          <p class="subtitle">VisualEther</p>
+        </a>
+
+        <a href="/eventstudio/" class="navbar-item is-hidden-desktop" title="Model and review system interactions. Generate sequence diagrams">
+          <p class="subtitle">EventStudio</p>
+        </a>
+
+        <a href="/rust/" class="navbar-item" title="Rust programming language to assembly mapping">
+          <p class="subtitle">Rust</p>
+        </a>
+        <a href="/5g/" class="navbar-item" title="5G-NR tutorials and call flows">
+          <p class="subtitle">5G</p>
+        </a>
+        <a href="/lte/" class="navbar-item" title="LTE call flows and tutorials">
+          <p class="subtitle">LTE</p>
+        </a>
+        <a href="/ims/" class="navbar-item" title="IP Multimedia Subsystem call flows">
+          <p class="subtitle">IMS</p>
+        </a>
+
+        <a href="/telecom/" class="navbar-item" title="Telecom call flows">
+          <p class="subtitle">Telecom</p>
+        </a>
+
+        <a href="/networking/" class="navbar-item" title="Networking sequence diagrams">
+          <p class="subtitle">Networking</p>
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable is-size-5 is-hidden-touch">
+          <a href="/design/" class="navbar-link" title="Embedded and object oriented design patterns">
+            Design
+          </a>
+
+          <div class="navbar-dropdown">
+            <a href="/embedded/" class="navbar-item">
+              Embedded design
+            </a>
+            <a href="/object-oriented/" class="navbar-item">
+              Object oriented design
+            </a>
+            <a href="/design-patterns/" class="navbar-item">
+              Design patterns
+            </a>
+            <a href="/fault-handling/" class="navbar-item">
+              Fault handling
+            </a>
+            <a href="/congestion-control/" class="navbar-item">
+              Congestion control
+            </a>
+          </div>
+        </div>
+
+        <a href="/design/" class="navbar-item is-hidden-desktop" title="Embedded and object oriented design patterns">
+          <p class="subtitle">Design</p>
+        </a>
+
+        <a href="/about/" class="navbar-item">
+          <p class="subtitle">About</p>
+        </a>
+      </div>
+
+    </div>
+  </nav>
+
+  <div class="container">
+    
+    
+
+    
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+
+      <ul>
+        
+        
+        <li><a href="https://www.EventHelix.com/">EventHelix</a></li>
+        
+        <li class="is-active"><a href="#" aria-current="page">Rust</a></li>
+      </ul>
+    </nav>
+    
+    
+    <div class="content">
+
+      
+
+<h1 class="is-size-1">Rust to Assembly: Understanding the Inner Workings of Rust</h1>
+<section>
+    <div class="columns">
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-enum-match">
+                <h4>Rust enum and match representation in assembly</h4>
+                <p>Learn how enums are organized in memory. Also understand the generated assembly code for match on an
+                    enum.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-value-reference-box-rc-arc">
+                <h4>Assembly code generated when self is passed by value, reference or as a smart pointer</h4>
+                <p>Compare the generated assembly from the Rust code. Learn how
+                    the memory is organized in these cases.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-arrays-option-box">
+                <h4>Mapping Arrays, Tuples, Box and Option to assembly</h4>
+                <p>Learn how Arrays, Tuples, Box and Option are represented in memory.
+                    Also understand the generated assembly code for these types.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-vector-iteration">
+                <h4>Map Rust vector iteration to assembly</h4>
+                <p>Learn how to map Rust vector iteration to assembly. Also understand how the compiler optimizes the
+                    loop with
+                    vector instructions.
+                </p>
+            </a>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-mapping-to-str-slice-vector">
+                <h4>Mapping a bool vector to string slice vector</h4>
+                <p>Understand the assembly code generated when mapping a <code><strong>Vec&lt;bool&gt;</strong></code>
+                    to a <code><strong>Vec&lt;&amp; 'static str&gt;</strong></code> (static string slice vector).
+                    The allocations and de-allocations operations are also covered.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-mapping-to-string-vector">
+                <h4>Mapping a bool vector to owned string vector</h4>
+                <p>Understand the assembly code generated when mapping a <code><strong>Vec&lt;bool&gt;</strong></code>
+                    to a <code><strong>Vec&lt;String&gt;</strong></code> (owned string).
+                    The allocations and de-allocations operations are also covered.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-static-vs-dynamic-dispatch">
+                <h4>Compare static vs dynamic dispatch in Rust</h4>
+                <p>Compare the assembly code generated for static vs dynamic dispatch for traits. Understand the
+                    performance implications of each approach.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-tail-call-via-vtable-and-box-trait-free">
+                <h4>Understand tail call via vtable and freeing via a trait object</h4>
+                <p>Learn how the compiler optimizes dynamically dispatched tail calls and how it frees memory when using
+                    trait objects.
+                </p>
+            </a>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-recursive-tree-fold">
+                <h4>Rust Recursive Tree Traversal in Assembly</h4>
+                <p>Learn how Rust compiles recursive tree traversal to assembly code and the optimization techniques
+                    used.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-return-impl-fn-vs-dyn-fn">
+                <h4>Rust Closures: impl Fn vs Box dyn Fn</h4>
+                <p>Compare assembly code for Rust closures returned as <code><strong>impl Fn</strong></code> and
+                    <code><strong>Box&lt;dyn Fn&gt;</strong></code>
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-async-await">
+                <h4>Rust async/await: State Machines and Assembly</h4>
+                <p>Learn how Rust implements async functions using state machines and assembly code
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-to-assembly-async-await-nested">
+                <h4>Rust async/await: Nested async function calls with loops</h4>
+                <p>Desugaring and assembly code analysis for nested async function with a loop.
+                </p>
+            </a>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-flex">
+            <a class="box" href="/rust/rust-async-executor">
+                <h4>Rust async/await: Async executor</h4>
+                <p>Learn how the async executor schedules async tasks in Rust. Understand the code of a simple async executor.
+                </p>
+            </a>
+        </div>
+        <div class="column is-flex">
+
+        </div>
+        <div class="column is-flex">
+
+        </div>
+        <div class="column is-flex">
+
+        </div>
+    </div>
+</section>
+
+
+
+
+
+    </div>
+  </div>
+
+
+
+  <footer class="section">
+    <div class="content has-text-centered">
+      <a href="https://medium.com/@eventhelix">Medium</a> •
+      <a href="https://github.com/eventhelix">GitHub</a> •
+      <a href="https://twitter.com/eventhelix/">Twitter</a> •
+      <a href="https://www.linkedin.com/company/eventhelix-com-inc-">LinkedIn</a> •
+      <a href="https://www.facebook.com/eventhelix/">Facebook</a>
+      <p>© EventHelix.com</p>
+    </div>
+  </footer>
+
+  <script src="/scripts/mobile-menu.js"></script>
+
+
+</body></html>

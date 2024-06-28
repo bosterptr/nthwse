@@ -1,0 +1,885 @@
+<html><head>
+<title>hashcat - advanced password recovery</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="content-language" content="en">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="description" content="World's fastest and most advanced password recovery utility">
+<meta name="keywords" content="hashcat, OpenCL, CUDA, password, recovery, cracker, cracking, CPU, GPU, Intel, AMD, NVidia">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" type="text/css" href="/s/style.css" media="screen">
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+<link rel="alternate" type="application/rss+xml" title="hashcat announcements, RSS 2.0" href="/forum/syndication.php?fid=19">
+<link rel="alternate" type="application/atom+xml" title="hashcat announcements, Atom 1.0" href="/forum/syndication.php?fid=19&amp;type=atom1.0">
+<link rel="canonical" href="https://hashcat.net/hashcat/">
+</head>
+<body>
+<div class="bdin">
+  <div class="header">
+    <h1><a href="/"><span>hashcat<i></i></span><br>
+     advanced password recovery</a></h1>
+    <hr>
+  </div>
+  <div class="sidebar_l">
+    <div class="navigation">
+      <h2>Navigation</h2>
+      <ul>
+        <li class="open"><a href="/hashcat/" title="Hashcat">hashcat</a></li>
+        <li><a href="/forum/" title="Forum">Forum</a></li>
+        <li><a href="/wiki/" title="Wiki">Wiki</a></li>
+        <li><a href="/tools/" title="Tools">Tools</a></li>
+        <li><a href="/events/" title="Events">Events</a></li>
+        <li><a href="/cap2hashcat/" title="Converter">Converter</a></li>
+        <li><a href="/contact/" title="Contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section" id="download">
+      <h2>Download</h2>
+      <table border="1" width="720">
+      <tbody><tr>
+        <th width="320">Name</th>
+        <th width="100">Version</th>
+        <th width="100">Date</th>
+        <th width="100">Download</th>
+        <th width="100">Signature</th>
+      </tr>
+      <tr>
+        <td>hashcat binaries</td>
+        <td>v6.2.6</td>
+        <td>2022.09.02</td>
+        <td><a href="/files/hashcat-6.2.6.7z">Download</a></td>
+        <td><a href="/files/hashcat-6.2.6.7z.asc">PGP</a></td>
+      </tr>
+      <tr>
+        <td>hashcat sources</td>
+        <td>v6.2.6</td>
+        <td>2022.09.02</td>
+        <td><a href="/files/hashcat-6.2.6.tar.gz">Download</a></td>
+        <td><a href="/files/hashcat-6.2.6.tar.gz.asc">PGP</a></td>
+      </tr>
+    </tbody></table>
+  </div>
+
+  Signing key on PGP keyservers: RSA, 2048-bit. Key ID: 2048R/8A16544F. Fingerprint: A708 3322 9D04 0B41 99CC  0052 3C17 DA8B 8A16 544F
+  <br>
+  <br>
+  Check out our <a href="https://github.com/hashcat/hashcat">GitHub Repository</a> for the latest development version
+  <div class="subsection">
+    <br>
+    <h3>GPU Driver requirements:</h3>
+    <ul>
+      <li>AMD GPUs on Linux require "AMDGPU" (21.50 or later) and "ROCm" (5.0 or later)</li>
+      <li>AMD GPUs on Windows require "AMD Adrenalin Edition" (Adrenalin 22.5.1 exactly)</li>
+      <li>Intel CPUs require "OpenCL Runtime for Intel Core and Intel Xeon Processors" (16.1.1 or later)</li>
+      <li>NVIDIA GPUs require "NVIDIA Driver" (440.64 or later) and "CUDA Toolkit" (9.0 or later)</li>
+    </ul>
+  </div>
+  <div class="section" id="features">
+    <h2>Features</h2>
+    <ul class="features">
+      <li class="lite">World's fastest password cracker</li>
+      <li class="lite">World's first and only in-kernel rule engine</li>
+      <li><b>Free</b></li>
+      <li><b>Open-Source (MIT License)</b></li>
+      <li>Multi-OS (Linux, Windows and macOS)</li>
+      <li>Multi-Platform (CPU, GPU, APU, etc., everything that comes with an OpenCL runtime)</li>
+      <li>Multi-Hash (Cracking multiple hashes at the same time)</li>
+      <li>Multi-Devices (Utilizing multiple devices in same system)</li>
+      <li>Multi-Device-Types (Utilizing mixed device types in same system)</li>
+      <li>Supports password candidate brain functionality</li>
+      <li>Supports distributed cracking <b>networks</b> (using overlay)</li>
+      <li>Supports <b>interactive</b> pause / resume</li>
+      <li>Supports sessions</li>
+      <li>Supports restore</li>
+      <li>Supports reading password candidates from file and stdin</li>
+      <li>Supports hex-salt and hex-charset</li>
+      <li>Supports automatic <b>performance</b> tuning</li>
+      <li>Supports automatic keyspace ordering markov-chains</li>
+      <li>Built-in benchmarking system</li>
+      <li>Integrated thermal <b>watchdog</b></li>
+      <li><b><a href="#features-algos">350+ Hash-types</a></b> implemented with performance in mind</li>
+      <li class="last">... <b>and much more</b></li>
+    </ul>
+  </div>
+  <div class="section" id="screenshot">
+    <h2>Screenshot</h2>
+    <div class="image hashcat">
+      <img src="hashcat.png" alt="hashcat screenshot" width="675">
+    </div>
+  </div>
+  <div class="section" id="features-algos">
+    <h2>Algorithms</h2>
+    <ul>
+      <li>MD4</li>
+      <li>MD5</li>
+      <li>SHA1</li>
+      <li>SHA2-224</li>
+      <li>SHA2-256</li>
+      <li>SHA2-384</li>
+      <li>SHA2-512</li>
+      <li>SHA3-224</li>
+      <li>SHA3-256</li>
+      <li>SHA3-384</li>
+      <li>SHA3-512</li>
+      <li>RIPEMD-160</li>
+      <li>BLAKE2b-512</li>
+      <li>GOST R 34.11-2012 (Streebog) 256-bit, big-endian</li>
+      <li>GOST R 34.11-2012 (Streebog) 512-bit, big-endian</li>
+      <li>GOST R 34.11-94</li>
+      <li>GPG (AES-128/AES-256 (SHA-1($pass)))</li>
+      <li>Half MD5</li>
+      <li>Keccak-224</li>
+      <li>Keccak-256</li>
+      <li>Keccak-384</li>
+      <li>Keccak-512</li>
+      <li>Whirlpool</li>
+      <li>SipHash</li>
+      <li>md5(utf16le($pass))</li>
+      <li>sha1(utf16le($pass))</li>
+      <li>sha256(utf16le($pass))</li>
+      <li>sha384(utf16le($pass))</li>
+      <li>sha512(utf16le($pass))</li>
+      <li>md5($pass.$salt)</li>
+      <li>md5($salt.$pass)</li>
+      <li>md5($salt.$pass.$salt)</li>
+      <li>md5($salt.md5($pass))</li>
+      <li>md5($salt.md5($pass.$salt))</li>
+      <li>md5($salt.md5($salt.$pass))</li>
+      <li>md5($salt.sha1($salt.$pass))</li>
+      <li>md5($salt.utf16le($pass))</li>
+      <li>md5(md5($pass))</li>
+      <li>md5(md5($pass).md5($salt))</li>
+      <li>md5(md5(md5($pass)))</li>
+      <li>md5(sha1($pass))</li>
+      <li>md5(sha1($pass).$salt)</li>
+      <li>md5(sha1($pass).md5($pass).sha1($pass))</li>
+      <li>md5(sha1($salt).md5($pass))</li>
+      <li>md5(strtoupper(md5($pass)))</li>
+      <li>md5(utf16le($pass).$salt)</li>
+      <li>sha1($pass.$salt)</li>
+      <li>sha1($salt.$pass)</li>
+      <li>sha1($salt.$pass.$salt)</li>
+      <li>sha1($salt.sha1($pass))</li>
+      <li>sha1($salt.sha1($pass.$salt))</li>
+      <li>sha1($salt.utf16le($pass))</li>
+      <li>sha1($salt1.$pass.$salt2)</li>
+      <li>sha1(CX)</li>
+      <li>sha1(md5($pass))</li>
+      <li>sha1(md5($pass).$salt)</li>
+      <li>sha1(md5($pass.$salt))</li>
+      <li>sha1(md5(md5($pass)))</li>
+      <li>sha1(sha1($pass))</li>
+      <li>sha1(sha1($pass).$salt)</li>
+      <li>sha1(sha1($salt.$pass.$salt))</li>
+      <li>sha1(utf16le($pass).$salt)</li>
+      <li>sha256($pass.$salt)</li>
+      <li>sha256($salt.$pass)</li>
+      <li>sha256($salt.$pass.$salt)</li>
+      <li>sha256($salt.sha256($pass))</li>
+      <li>sha256($salt.sha256_bin($pass))</li>
+      <li>sha256($salt.utf16le($pass))</li>
+      <li>sha256(md5($pass))</li>
+      <li>sha256(sha256($pass).$salt)</li>
+      <li>sha256(sha256_bin($pass))</li>
+      <li>sha256(utf16le($pass).$salt)</li>
+      <li>sha384($pass.$salt)</li>
+      <li>sha384($salt.$pass)</li>
+      <li>sha384($salt.utf16le($pass))</li>
+      <li>sha384(utf16le($pass).$salt)</li>
+      <li>sha512($pass.$salt)</li>
+      <li>sha512($salt.$pass)</li>
+      <li>sha512($salt.utf16le($pass))</li>
+      <li>sha512(utf16le($pass).$salt)</li>
+      <li>BLAKE2b-512($pass.$salt)</li>
+      <li>BLAKE2b-512($salt.$pass)</li>
+      <li>HMAC-MD5 (key = $pass)</li>
+      <li>HMAC-MD5 (key = $salt)</li>
+      <li>HMAC-SHA1 (key = $pass)</li>
+      <li>HMAC-SHA1 (key = $salt)</li>
+      <li>HMAC-SHA256 (key = $pass)</li>
+      <li>HMAC-SHA256 (key = $salt)</li>
+      <li>HMAC-SHA512 (key = $pass)</li>
+      <li>HMAC-SHA512 (key = $salt)</li>
+      <li>HMAC-Streebog-256 (key = $pass), big-endian</li>
+      <li>HMAC-Streebog-256 (key = $salt), big-endian</li>
+      <li>HMAC-Streebog-512 (key = $pass), big-endian</li>
+      <li>HMAC-Streebog-512 (key = $salt), big-endian</li>
+      <li>CRC32</li>
+      <li>CRC32C</li>
+      <li>CRC64Jones</li>
+      <li>Java Object hashCode()</li>
+      <li>MurmurHash</li>
+      <li>MurmurHash3</li>
+      <li>3DES (PT = $salt, key = $pass)</li>
+      <li>DES (PT = $salt, key = $pass)</li>
+      <li>AES-128-ECB NOKDF (PT = $salt, key = $pass)</li>
+      <li>AES-192-ECB NOKDF (PT = $salt, key = $pass)</li>
+      <li>AES-256-ECB NOKDF (PT = $salt, key = $pass)</li>
+      <li>ChaCha20</li>
+      <li>Linux Kernel Crypto API (2.4)</li>
+      <li>Skip32 (PT = $salt, key = $pass)</li>
+      <li>PBKDF2-HMAC-MD5</li>
+      <li>PBKDF2-HMAC-SHA1</li>
+      <li>PBKDF2-HMAC-SHA256</li>
+      <li>PBKDF2-HMAC-SHA512</li>
+      <li>scrypt</li>
+      <li>phpass</li>
+      <li>TACACS+</li>
+      <li>SIP digest authentication (MD5)</li>
+      <li>IKE-PSK MD5</li>
+      <li>IKE-PSK SHA1</li>
+      <li>SNMPv3 HMAC-MD5-96</li>
+      <li>SNMPv3 HMAC-MD5-96/HMAC-SHA1-96</li>
+      <li>SNMPv3 HMAC-SHA1-96</li>
+      <li>SNMPv3 HMAC-SHA224-128</li>
+      <li>SNMPv3 HMAC-SHA256-192</li>
+      <li>SNMPv3 HMAC-SHA384-256</li>
+      <li>SNMPv3 HMAC-SHA512-384</li>
+      <li>WPA-EAPOL-PBKDF2</li>
+      <li>WPA-EAPOL-PMK</li>
+      <li>WPA-PBKDF2-PMKID+EAPOL</li>
+      <li>WPA-PMK-PMKID+EAPOL</li>
+      <li>WPA-PMKID-PBKDF2</li>
+      <li>WPA-PMKID-PMK</li>
+      <li>IPMI2 RAKP HMAC-SHA1</li>
+      <li>CRAM-MD5</li>
+      <li>JWT (JSON Web Token)</li>
+      <li>Kerberos 5, etype 17, TGS-REP</li>
+      <li>Kerberos 5, etype 17, Pre-Auth</li>
+      <li>Kerberos 5, etype 18, TGS-REP</li>
+      <li>Kerberos 5, etype 18, Pre-Auth</li>
+      <li>Kerberos 5, etype 23, AS-REQ Pre-Auth</li>
+      <li>Kerberos 5, etype 23, TGS-REP</li>
+      <li>Kerberos 5, etype 23, AS-REP</li>
+      <li>NetNTLMv1 / NetNTLMv1+ESS</li>
+      <li>NetNTLMv1 / NetNTLMv1+ESS (NT)</li>
+      <li>NetNTLMv2</li>
+      <li>NetNTLMv2 (NT)</li>
+      <li>Amazon AWS4-HMAC-SHA256</li>
+      <li>Flask Session Cookie</li>
+      <li>iSCSI CHAP authentication, MD5(CHAP)</li>
+      <li>RACF</li>
+      <li>AIX {smd5}</li>
+      <li>AIX {ssha1}</li>
+      <li>AIX {ssha256}</li>
+      <li>AIX {ssha512}</li>
+      <li>LM</li>
+      <li>QNX /etc/shadow (MD5)</li>
+      <li>QNX /etc/shadow (SHA256)</li>
+      <li>QNX /etc/shadow (SHA512)</li>
+      <li>DPAPI masterkey file v1</li>
+      <li>DPAPI masterkey file v2</li>
+      <li>GRUB 2</li>
+      <li>MS-AzureSync PBKDF2-HMAC-SHA256</li>
+      <li>BSDi Crypt, Extended DES</li>
+      <li>NTLM</li>
+      <li>Radmin2</li>
+      <li>Radmin3</li>
+      <li>Samsung Android Password/PIN</li>
+      <li>Windows Hello PIN/Password</li>
+      <li>Windows Phone 8+ PIN/password</li>
+      <li>Cisco-ASA MD5</li>
+      <li>Cisco-IOS $8$ (PBKDF2-SHA256)</li>
+      <li>Cisco-IOS $9$ (scrypt)</li>
+      <li>Cisco-IOS type 4 (SHA256)</li>
+      <li>Cisco-PIX MD5</li>
+      <li>Citrix NetScaler (SHA1)</li>
+      <li>Citrix NetScaler (SHA512)</li>
+      <li>Domain Cached Credentials (DCC), MS Cache</li>
+      <li>Domain Cached Credentials 2 (DCC2), MS Cache 2</li>
+      <li>FortiGate (FortiOS)</li>
+      <li>FortiGate256 (FortiOS256)</li>
+      <li>ArubaOS</li>
+      <li>Juniper IVE</li>
+      <li>Juniper NetScreen/SSG (ScreenOS)</li>
+      <li>Juniper/NetBSD sha1crypt</li>
+      <li>iPhone passcode (UID key + System Keybag)</li>
+      <li>macOS v10.4, macOS v10.5, macOS v10.6</li>
+      <li>macOS v10.7</li>
+      <li>macOS v10.8+ (PBKDF2-SHA512)</li>
+      <li>bcrypt $2*$, Blowfish (Unix)</li>
+      <li>md5crypt, MD5 (Unix), Cisco-IOS $1$ (MD5)</li>
+      <li>descrypt, DES (Unix), Traditional DES</li>
+      <li>sha256crypt $5$, SHA256 (Unix)</li>
+      <li>sha512crypt $6$, SHA512 (Unix)</li>
+      <li>SQLCipher</li>
+      <li>MSSQL (2000)</li>
+      <li>MSSQL (2005)</li>
+      <li>MSSQL (2012, 2014)</li>
+      <li>MongoDB ServerKey SCRAM-SHA-1</li>
+      <li>MongoDB ServerKey SCRAM-SHA-256</li>
+      <li>PostgreSQL</li>
+      <li>PostgreSQL CRAM (MD5)</li>
+      <li>PostgreSQL SCRAM-SHA-256</li>
+      <li>Oracle H: Type (Oracle 7+)</li>
+      <li>Oracle S: Type (Oracle 11+)</li>
+      <li>Oracle T: Type (Oracle 12+)</li>
+      <li>MySQL $A$ (sha256crypt)</li>
+      <li>MySQL CRAM (SHA1)</li>
+      <li>MySQL323</li>
+      <li>MySQL4.1/MySQL5</li>
+      <li>Sybase ASE</li>
+      <li>DNSSEC (NSEC3)</li>
+      <li>KNX IP Secure - Device Authentication Code</li>
+      <li>CRAM-MD5 Dovecot</li>
+      <li>SSHA-256(Base64), LDAP {SSHA256}</li>
+      <li>SSHA-512(Base64), LDAP {SSHA512}</li>
+      <li>Dahua Authentication MD5</li>
+      <li>RedHat 389-DS LDAP (PBKDF2-HMAC-SHA256)</li>
+      <li>FileZilla Server &gt;= 0.9.55</li>
+      <li>ColdFusion 10+</li>
+      <li>Apache $apr1$ MD5, md5apr1, MD5 (APR)</li>
+      <li>Episerver 6.x &lt; .NET 4</li>
+      <li>Episerver 6.x &gt;= .NET 4</li>
+      <li>hMailServer</li>
+      <li>nsldap, SHA-1(Base64), Netscape LDAP SHA</li>
+      <li>nsldaps, SSHA-1(Base64), Netscape LDAP SSHA</li>
+      <li>SAP CODVN B (BCODE)</li>
+      <li>SAP CODVN B (BCODE) from RFC_READ_TABLE</li>
+      <li>SAP CODVN F/G (PASSCODE)</li>
+      <li>SAP CODVN F/G (PASSCODE) from RFC_READ_TABLE</li>
+      <li>SAP CODVN H (PWDSALTEDHASH) iSSHA-1</li>
+      <li>PeopleSoft</li>
+      <li>PeopleSoft PS_TOKEN</li>
+      <li>SolarWinds Orion</li>
+      <li>SolarWinds Orion v2</li>
+      <li>SolarWinds Serv-U</li>
+      <li>Lotus Notes/Domino 5</li>
+      <li>Lotus Notes/Domino 6</li>
+      <li>Lotus Notes/Domino 8</li>
+      <li>OpenEdge Progress Encode</li>
+      <li>Oracle Transportation Management (SHA256)</li>
+      <li>Huawei sha1(md5($pass).$salt)</li>
+      <li>AuthMe sha256</li>
+      <li>AES Crypt (SHA256)</li>
+      <li>VMware VMX (PBKDF2-HMAC-SHA1 + AES-256-CBC)</li>
+      <li>LUKS</li>
+      <li>VeraCrypt</li>
+      <li>BestCrypt v3 Volume Encryption</li>
+      <li>FileVault 2</li>
+      <li>VirtualBox (PBKDF2-HMAC-SHA256 &amp; AES-128-XTS)</li>
+      <li>VirtualBox (PBKDF2-HMAC-SHA256 &amp; AES-256-XTS)</li>
+      <li>DiskCryptor</li>
+      <li>BitLocker</li>
+      <li>Android FDE (Samsung DEK)</li>
+      <li>Android FDE &lt;= 4.3</li>
+      <li>Apple File System (APFS)</li>
+      <li>TrueCrypt</li>
+      <li>eCryptfs</li>
+      <li>PDF 1.1 - 1.3 (Acrobat 2 - 4)</li>
+      <li>PDF 1.1 - 1.3 (Acrobat 2 - 4), collider #1</li>
+      <li>PDF 1.1 - 1.3 (Acrobat 2 - 4), collider #2</li>
+      <li>PDF 1.4 - 1.6 (Acrobat 5 - 8)</li>
+      <li>PDF 1.4 - 1.6 (Acrobat 5 - 8) - user and owner pass</li>
+      <li>PDF 1.7 Level 3 (Acrobat 9)</li>
+      <li>PDF 1.7 Level 8 (Acrobat 10 - 11)</li>
+      <li>MS Office 2007</li>
+      <li>MS Office 2010</li>
+      <li>MS Office 2013</li>
+      <li>MS Office 2016 - SheetProtection</li>
+      <li>MS Office &lt;= 2003 $0/$1, MD5 + RC4</li>
+      <li>MS Office &lt;= 2003 $0/$1, MD5 + RC4, collider #1</li>
+      <li>MS Office &lt;= 2003 $0/$1, MD5 + RC4, collider #2</li>
+      <li>MS Office &lt;= 2003 $3, SHA1 + RC4, collider #1</li>
+      <li>MS Office &lt;= 2003 $3, SHA1 + RC4, collider #2</li>
+      <li>MS Office &lt;= 2003 $3/$4, SHA1 + RC4</li>
+      <li>Open Document Format (ODF) 1.2 (SHA-256, AES)</li>
+      <li>Open Document Format (ODF) 1.1 (SHA-1, Blowfish)</li>
+      <li>Apple Secure Notes</li>
+      <li>Apple iWork</li>
+      <li>1Password, agilekeychain</li>
+      <li>1Password, cloudkeychain</li>
+      <li>Password Safe v2</li>
+      <li>Password Safe v3</li>
+      <li>LastPass + LastPass sniffed</li>
+      <li>KeePass 1 (AES/Twofish) and KeePass 2 (AES)</li>
+      <li>KeePass 1 (AES/Twofish) and KeePass 2 (AES) - keyfile only mode</li>
+      <li>Bitwarden</li>
+      <li>Ansible Vault</li>
+      <li>Mozilla key3.db</li>
+      <li>Mozilla key4.db</li>
+      <li>Apple Keychain</li>
+      <li>7-Zip</li>
+      <li>RAR3-hp</li>
+      <li>RAR3-p (Compressed)</li>
+      <li>RAR3-p (Uncompressed)</li>
+      <li>RAR5</li>
+      <li>PKZIP (Compressed Multi-File)</li>
+      <li>PKZIP (Compressed)</li>
+      <li>PKZIP (Mixed Multi-File)</li>
+      <li>PKZIP (Mixed Multi-File Checksum-Only)</li>
+      <li>PKZIP (Uncompressed)</li>
+      <li>PKZIP Master Key</li>
+      <li>PKZIP Master Key (6 byte optimization)</li>
+      <li>SecureZIP AES-128</li>
+      <li>SecureZIP AES-192</li>
+      <li>SecureZIP AES-256</li>
+      <li>WinZip</li>
+      <li>Android Backup</li>
+      <li>Stuffit5</li>
+      <li>AxCrypt 1</li>
+      <li>AxCrypt 1 in-memory SHA1</li>
+      <li>AxCrypt 2 AES-128</li>
+      <li>AxCrypt 2 AES-256</li>
+      <li>iTunes backup &lt; 10.0</li>
+      <li>iTunes backup &gt;= 10.0</li>
+      <li>WBB3 (Woltlab Burning Board)</li>
+      <li>PHPS</li>
+      <li>SMF (Simple Machines Forum) &gt; v1.1</li>
+      <li>MediaWiki B type</li>
+      <li>Redmine</li>
+      <li>Umbraco HMAC-SHA1</li>
+      <li>Joomla &lt; 2.5.18</li>
+      <li>OpenCart</li>
+      <li>PrestaShop</li>
+      <li>Tripcode</li>
+      <li>Drupal7</li>
+      <li>PunBB</li>
+      <li>MyBB 1.2+, IPB2+ (Invision Power Board)</li>
+      <li>vBulletin &lt; v3.8.5</li>
+      <li>vBulletin &gt;= v3.8.5</li>
+      <li>bcrypt(md5($pass)) / bcryptmd5</li>
+      <li>bcrypt(sha1($pass)) / bcryptsha1</li>
+      <li>bcrypt(sha512($pass)) / bcryptsha512</li>
+      <li>osCommerce, xt:Commerce</li>
+      <li>TOTP (HMAC-SHA1)</li>
+      <li>Web2py pbkdf2-sha512</li>
+      <li>Django (PBKDF2-SHA256)</li>
+      <li>Django (SHA-1)</li>
+      <li>Atlassian (PBKDF2-HMAC-SHA1)</li>
+      <li>Ruby on Rails Restful-Authentication</li>
+      <li>Ruby on Rails Restful Auth (one round, no sitekey)</li>
+      <li>Python passlib pbkdf2-sha512</li>
+      <li>Python passlib pbkdf2-sha256</li>
+      <li>Python passlib pbkdf2-sha1</li>
+      <li>PKCS#8 Private Keys (PBKDF2-HMAC-SHA1 + 3DES/AES)</li>
+      <li>PKCS#8 Private Keys (PBKDF2-HMAC-SHA256 + 3DES/AES)</li>
+      <li>JKS Java Key Store Private Keys (SHA1)</li>
+      <li>RSA/DSA/EC/OpenSSH Private Keys ($0$)</li>
+      <li>RSA/DSA/EC/OpenSSH Private Keys ($6$)</li>
+      <li>RSA/DSA/EC/OpenSSH Private Keys ($1, $3$)</li>
+      <li>RSA/DSA/EC/OpenSSH Private Keys ($4$)</li>
+      <li>RSA/DSA/EC/OpenSSH Private Keys ($5$)</li>
+      <li>XMPP SCRAM PBKDF2-SHA1</li>
+      <li>Teamspeak 3 (channel hash)</li>
+      <li>Telegram Desktop &lt; v2.1.14 (PBKDF2-HMAC-SHA1)</li>
+      <li>Telegram Desktop &gt;= v2.1.14 (PBKDF2-HMAC-SHA512)</li>
+      <li>Telegram Mobile App Passcode (SHA256)</li>
+      <li>Skype</li>
+      <li>MetaMask Wallet</li>
+      <li>BitShares v0.x - sha512(sha512_bin(pass))</li>
+      <li>Bitcoin/Litecoin wallet.dat</li>
+      <li>Bitcoin WIF private key (P2PKH)</li>
+      <li>Bitcoin WIF private key (P2SH(P2WPKH))</li>
+      <li>Bitcoin WIF private key (P2WPKH, Bech32)</li>
+      <li>Electrum Wallet (Salt-Type 1-3)</li>
+      <li>Electrum Wallet (Salt-Type 4)</li>
+      <li>Electrum Wallet (Salt-Type 5)</li>
+      <li>Blockchain, My Wallet</li>
+      <li>Blockchain, My Wallet, V2</li>
+      <li>Blockchain, My Wallet, Second Password (SHA256)</li>
+      <li>Stargazer Stellar Wallet XLM</li>
+      <li>Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256</li>
+      <li>Ethereum Wallet, PBKDF2-HMAC-SHA256</li>
+      <li>Ethereum Wallet, SCRYPT</li>
+      <li>MultiBit Classic .key (MD5)</li>
+      <li>MultiBit Classic .wallet (scrypt)</li>
+      <li>MultiBit HD (scrypt)</li>
+      <li>Exodus Desktop Wallet (scrypt)</li>
+      <li>Terra Station Wallet (AES256-CBC(PBKDF2($pass)))</li>
+    </ul>
+  </div>
+  <div class="section" id="attack-modes">
+    <h2>Attack-Modes</h2>
+    <ul>
+      <li>Straight <sup>*</sup></li>
+      <li>Combination</li>
+      <li>Brute-force</li>
+      <li>Hybrid dict + mask</li>
+      <li>Hybrid mask + dict</li>
+      <li>Association <sup>*</sup></li>
+    </ul>
+    <p>
+      <sup>*</sup> accept Rules
+    </p>
+  </div>
+  <div class="section" id="supported-runtimes">
+    <h2>Supported compute runtimes</h2>
+    <ul>
+      <li>AMD OpenCL</li>
+      <li>AMD ROCm</li>
+      <li>Apple OpenCL</li>
+      <li>Apple Metal</li>
+      <li>Intel OpenCL</li>
+      <li>NVidia OpenCL</li>
+      <li>NVidia CUDA</li>
+      <li>POCL OpenCL</li>
+    </ul>
+  </div>
+  <div class="section" id="supported-device-types">
+    <h2>Supported compute device types</h2>
+    <ul>
+      <li>GPU</li>
+      <li>CPU</li>
+      <li>APU</li>
+    </ul>
+  </div>
+  <div class="section" id="help">
+    <h2>Help</h2>
+    <ul>
+      <li><a href="/wiki/doku.php?id=frequently_asked_questions" class="button">FAQ</a></li>
+      <li><a href="/forum/" class="button">Forum</a></li>
+      <li><a href="https://discord.gg/HFS523HGBT" class="button">Discord</a></li>
+      <li><a href="https://github.com/hashcat/hashcat" class="button">GitHub</a></li>
+      <li><a href="https://twitter.com/hashcat" class="button">Twitter</a></li>
+    </ul>
+    <p>
+    A detailed description of all commandline parameters is available by using <tt>--help</tt>. Next to that, the 7zip-package contains extensive documentation. Look for <tt>examples.txt</tt>. If you encounter a Bug, report it in the Forums where Fixes and Beta versions are announced as well.<br><br>
+    If you still think you need help by a real human come to #hashcat on <a href="https://libera.chat/">Libera.Chat</a> IRC.
+    </p>
+  </div>
+  <div class="section" id="download-older">
+    <h2>Download older version(s)</h2>
+    <p>
+       This is a list of older hashcat versions, it's not always bad to grab the <a href="#download">latest version</a>.
+    </p>
+    <table border="1" width="720">
+
+    <tbody><tr>
+      <th width="320">Name</th>
+      <th width="100">Version</th>
+      <th width="100">Date</th>
+      <th width="100">Download</th>
+      <th width="100">Signature</th>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.5</td>
+      <td>2021.11.21</td>
+      <td><a href="/files/hashcat-6.2.5.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.5.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.5</td>
+      <td>2021.11.21</td>
+      <td><a href="/files/hashcat-6.2.5.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.5.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.4</td>
+      <td>2021.08.29</td>
+      <td><a href="/files/hashcat-6.2.4.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.4.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.4</td>
+      <td>2021.08.29</td>
+      <td><a href="/files/hashcat-6.2.4.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.4.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.3</td>
+      <td>2021.07.16</td>
+      <td><a href="/files/hashcat-6.2.3.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.3.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.3</td>
+      <td>2021.07.16</td>
+      <td><a href="/files/hashcat-6.2.3.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.3.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.2</td>
+      <td>2021.06.13</td>
+      <td><a href="/files/hashcat-6.2.2.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.2.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.2</td>
+      <td>2021.06.13</td>
+      <td><a href="/files/hashcat-6.2.2.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.2.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.1</td>
+      <td>2021.05.15</td>
+      <td><a href="/files/hashcat-6.2.1.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.1.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.1</td>
+      <td>2021.05.15</td>
+      <td><a href="/files/hashcat-6.2.1.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.1.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.2.0</td>
+      <td>2021.05.14</td>
+      <td><a href="/files/hashcat-6.2.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.2.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.2.0</td>
+      <td>2021.05.14</td>
+      <td><a href="/files/hashcat-6.2.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.2.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.1.1</td>
+      <td>2020.07.29</td>
+      <td><a href="/files/hashcat-6.1.1.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.1.1.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.1.1</td>
+      <td>2020.07.29</td>
+      <td><a href="/files/hashcat-6.1.1.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.1.1.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.1.0</td>
+      <td>2020.07.28</td>
+      <td><a href="/files/hashcat-6.1.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.1.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.1.0</td>
+      <td>2020.07.28</td>
+      <td><a href="/files/hashcat-6.1.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.1.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v6.0.0</td>
+      <td>2020.06.16</td>
+      <td><a href="/files/hashcat-6.0.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-6.0.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v6.0.0</td>
+      <td>2020.06.16</td>
+      <td><a href="/files/hashcat-6.0.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-6.0.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+  	  <td>hashcat binaries</td>
+  	  <td>v5.1.0</td>
+	  <td>2018.12.02</td>
+	  <td><a href="/files/hashcat-5.1.0.7z">Download</a></td>
+	  <td><a href="/files/hashcat-5.1.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+  	  <td>hashcat sources</td>
+	  <td>v5.1.0</td>
+	  <td>2018.12.02</td>
+	  <td><a href="/files/hashcat-5.1.0.tar.gz">Download</a></td>
+	  <td><a href="/files/hashcat-5.1.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v5.0.0</td>
+      <td>2018.10.28</td>
+      <td><a href="/files/hashcat-5.0.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-5.0.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v5.0.0</td>
+      <td>2018.10.28</td>
+      <td><a href="/files/hashcat-5.0.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-5.0.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v4.2.1</td>
+      <td>2018.08.07</td>
+      <td><a href="/files/hashcat-4.2.1.7z">Download</a></td>
+      <td><a href="/files/hashcat-4.2.1.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v4.2.1</td>
+      <td>2018.08.07</td>
+      <td><a href="/files/hashcat-4.2.1.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-4.2.1.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v4.2.0</td>
+      <td>2018.08.02</td>
+      <td><a href="/files/hashcat-4.2.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-4.2.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v4.2.0</td>
+      <td>2018.08.02</td>
+      <td><a href="/files/hashcat-4.2.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-4.2.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v4.1.0</td>
+      <td>2018.02.21</td>
+      <td><a href="/files/hashcat-4.1.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-4.1.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v4.1.0</td>
+      <td>2018.02.21</td>
+      <td><a href="/files/hashcat-4.1.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-4.1.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v4.0.1</td>
+      <td>2017.11.07</td>
+      <td><a href="/files/hashcat-4.0.1.7z">Download</a></td>
+      <td><a href="/files/hashcat-4.0.1.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v4.0.1</td>
+      <td>2017.11.07</td>
+      <td><a href="/files/hashcat-4.0.1.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-4.0.1.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v4.0.0</td>
+      <td>2017.10.27</td>
+      <td><a href="/files/hashcat-4.0.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-4.0.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v4.0.0</td>
+      <td>2017.10.27</td>
+      <td><a href="/files/hashcat-4.0.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-4.0.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.6.0</td>
+      <td>2017.06.09</td>
+      <td><a href="/files/hashcat-3.6.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.6.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.6.0</td>
+      <td>2017.06.09</td>
+      <td><a href="/files/hashcat-3.6.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.6.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.5.0</td>
+      <td>2017.04.05</td>
+      <td><a href="/files/hashcat-3.5.0.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.5.0.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.5.0</td>
+      <td>2017.04.05</td>
+      <td><a href="/files/hashcat-3.5.0.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.5.0.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.40</td>
+      <td>2017.03.03</td>
+      <td><a href="/files/hashcat-3.40.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.40.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.40</td>
+      <td>2017.03.03</td>
+      <td><a href="/files/hashcat-3.40.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.40.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.30</td>
+      <td>2017.01.06</td>
+      <td><a href="/files/hashcat-3.30.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.30.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.30</td>
+      <td>2017.01.06</td>
+      <td><a href="/files/hashcat-3.30.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.30.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.20</td>
+      <td>2016.12.02</td>
+      <td><a href="/files/hashcat-3.20.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.20.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.20</td>
+      <td>2016.12.02</td>
+      <td><a href="/files/hashcat-3.20.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.20.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.10</td>
+      <td>2016.08.19</td>
+      <td><a href="/files/hashcat-3.10.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.10.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.10</td>
+      <td>2016.08.19</td>
+      <td><a href="/files/hashcat-3.10.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.10.tar.gz.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat binaries</td>
+      <td>v3.00</td>
+      <td>2016.06.29</td>
+      <td><a href="/files/hashcat-3.00.7z">Download</a></td>
+      <td><a href="/files/hashcat-3.00.7z.asc">PGP</a></td>
+    </tr>
+    <tr>
+      <td>hashcat sources</td>
+      <td>v3.00</td>
+      <td>2016.06.29</td>
+      <td><a href="/files/hashcat-3.00.tar.gz">Download</a></td>
+      <td><a href="/files/hashcat-3.00.tar.gz.asc">PGP</a></td>
+    </tr>
+    </tbody></table>
+  </div>
+</div>
+
+
+</div></body></html>

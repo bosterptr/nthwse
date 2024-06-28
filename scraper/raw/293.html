@@ -1,0 +1,471 @@
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Defeating Code Obfuscation with Angr</title>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-MXJ9D7WCBZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MXJ9D7WCBZ');
+</script>
+  <link rel="stylesheet" href="/blog/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed"> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Defeating Code Obfuscation with Angr | NapongiZero’s Blog</title>
+<meta name="generator" content="Jekyll v3.9.2">
+<meta property="og:title" content="Defeating Code Obfuscation with Angr">
+<meta name="author" content="NapongiZero">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="A few weeks back I encountered an obfuscated piece of code. Reversing it seemed very tedious.">
+<meta property="og:description" content="A few weeks back I encountered an obfuscated piece of code. Reversing it seemed very tedious.">
+<link rel="canonical" href="https://napongizero.github.io/blog/Defeating-Code-Obfuscation-with-Angr">
+<meta property="og:url" content="https://napongizero.github.io/blog/Defeating-Code-Obfuscation-with-Angr">
+<meta property="og:site_name" content="NapongiZero’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2021-05-30T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Defeating Code Obfuscation with Angr">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"NapongiZero","url":"https://napongizero.github.io"},"dateModified":"2021-05-30T00:00:00+00:00","datePublished":"2021-05-30T00:00:00+00:00","description":"A few weeks back I encountered an obfuscated piece of code. Reversing it seemed very tedious.","headline":"Defeating Code Obfuscation with Angr","mainEntityOfPage":{"@type":"WebPage","@id":"https://napongizero.github.io/blog/Defeating-Code-Obfuscation-with-Angr"},"url":"https://napongizero.github.io/blog/Defeating-Code-Obfuscation-with-Angr"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/blog/">
+    
+    <h1>napongizero@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/blog/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/blog/about"><h2 class="header-link">About</h2></a>
+<a href="/blog/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Defeating Code Obfuscation with Angr</h2>
+  <time datetime="2021-05-30T00:00:00+00:00" class="by-line">30 May 2021</time>
+  <p>A few weeks back I encountered an <a href="https://en.wikipedia.org/wiki/Obfuscation_(software)">obfuscated</a> piece of code. Reversing it seemed very tedious.</p>
+
+<p>Today I’ll go into detail on how I tackled it by using <strong>“Angr”</strong>, a suite of Python3 libraries that lets you load a binary and do a lot of cool things to it. You can read more about it <a href="https://angr.io/">here</a>.</p>
+
+<p>This blog post will cover practical guidelines on how you can use Angr in order to reverse engineer obfuscated code.</p>
+
+<h1 id="table-of-contents">Table of Contents</h1>
+
+<ul>
+  <li><a href="#table-of-contents">Table of Contents</a></li>
+  <li><a href="#introduction">Introduction</a>
+    <ul>
+      <li><a href="#symbolic-execution---short-introduction">Symbolic Execution - Short Introduction</a></li>
+      <li><a href="#angr---basic-usage">Angr - Basic Usage</a></li>
+    </ul>
+  </li>
+  <li><a href="#reversing-obfuscated-binary">Reversing Obfuscated Binary</a>
+    <ul>
+      <li><a href="#file-analysis">File Analysis</a></li>
+      <li><a href="#angr-to-the-rescue">Angr to the rescue</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
+
+<p><br></p>
+
+<h1 id="introduction">Introduction</h1>
+<p>I’ll be giving a short introduction to Angr as I believe that knowing how our tools work is important. If you don’t care for that (or already know about Angr) feel free to skip ahead to <a href="#reversing-obfuscated-binary">the reversing part.</a></p>
+
+<p><br></p>
+
+<h2 id="symbolic-execution---short-introduction">Symbolic Execution - Short Introduction</h2>
+
+<p>As I mentioned, Angr is a suite of Python libs and I’m using it as a framework for binary analysis. Angr works by combining static and dynamic symbolic analysis, which is called “concolic” analysis. Nonetheless, people usually refer to it as a symbolic execution/analysis engine.</p>
+
+<p>What is symbolic execution you ask? Well, that could be a blog post by itself (if not a book). But let me try to simplify it real quick.</p>
+
+<blockquote>
+  <p>Symbolic execution involves simulating the execution of a program by replacing input values of a program with “symbolic” values. As the
+simulation of the execution progresses constraints are added
+to “symbolic” values whenever the input is processed. When
+a branch condition is encountered, the simulation is forked
+into two paths: one path where the branch condition evaluates to true and the other where it evaluates to false.</p>
+</blockquote>
+
+<p>In layman terms, input values are replaced by symbolic ones. Then, executing the program with symbolic values builds up constraints. Have a look at this simple if statement:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Assume a &amp; b are controlled by the user</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">)</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">;</span>
+<span class="k">else</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">;</span>
+</code></pre></div></div>
+<p>Graph view:</p>
+
+<p><img src="assets/Defeating-Code-Obfuscation-with-Angr/simple_if.png" alt=""></p>
+
+<p>Meaning, the constraints for the left branch is <code class="language-plaintext highlighter-rouge">a&gt;b</code>, while the constraints for the right branch is <code class="language-plaintext highlighter-rouge">a&lt;=b</code>.</p>
+
+<p>Real-world programs aren’t as simple, and the constraints for branches deep in the code can get very big, very fast. In order to solve these constraints Angr uses Z3, a theorem prover by Microsoft. Z3 checks if the constraints are satisfiable (SAT) or not. Assuming a certain branch has satisfiable constraints, we can ask Angr to give an example for an input that meet the constraints.</p>
+
+<p><br></p>
+
+<h2 id="angr---basic-usage">Angr - Basic Usage</h2>
+
+<p>Showcasing basic usage of Angr. In the following example we’ll add constraints and ask Angr to evaluate (solve) them.</p>
+
+<p>Consider the following code snippet:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+    <span class="kt">int</span> <span class="n">a</span><span class="o">=</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="kt">int</span> <span class="n">b</span><span class="o">=</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">10</span> <span class="o">&gt;</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="o">&amp;&amp;</span> <span class="mi">10</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="o">&amp;&amp;</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="mi">2</span><span class="o">*</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[+] Math is hard... but not 4 u! </span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We’ll use Angr to add the constraints manually, and then solve it by using the built-in solver. This is different from how we usually use Angr and it’s only meant to show case a bit before diving into a complicated case.</p>
+
+<p>Step-by-step iPython commands with explanations:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Importing angr
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">angr</span> 
+
+<span class="c1"># A wrapper for Z3. Claripy is used for constraint-solving.
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">claripy</span> 
+
+<span class="c1"># Loading the binary to angr. 
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">p</span> <span class="o">=</span> <span class="n">angr</span><span class="p">.</span><span class="n">Project</span><span class="p">(</span><span class="s">'./a.out'</span><span class="p">)</span> 
+<span class="n">WARNING</span> <span class="o">|</span> <span class="mi">2021</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">24</span> <span class="mi">17</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mi">05</span><span class="p">,</span><span class="mi">450</span> <span class="o">|</span> <span class="n">cle</span><span class="p">.</span><span class="n">loader</span> <span class="o">|</span> <span class="n">The</span> <span class="n">main</span> <span class="n">binary</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">position</span><span class="o">-</span><span class="n">independent</span> <span class="n">executable</span><span class="p">.</span> <span class="n">It</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">loaded</span> <span class="k">with</span> <span class="n">a</span> <span class="n">base</span> <span class="n">address</span> <span class="n">of</span> <span class="mh">0x400000</span><span class="p">.</span>
+
+<span class="c1"># Constructs a state ready to execute at the binary's entry point.
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">state</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">entry_state</span><span class="p">()</span> 
+
+<span class="c1"># Create a bitvector symbol named "a" of length 32 bits
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">a</span> <span class="o">=</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">BVS</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> 
+
+<span class="c1"># Create a bitvector symbol named "b" of length 32 bits
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">b</span> <span class="o">=</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">BVS</span><span class="p">(</span><span class="s">"b"</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> 
+
+<span class="s">''' Adding constraints manually '''</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="mi">10</span><span class="o">&gt;</span><span class="n">a</span><span class="p">)</span> 
+<span class="n">Out</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Bool</span> <span class="n">a_39_32</span> <span class="o">&lt;</span> <span class="mh">0xa</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Bool</span> <span class="n">a_39_32</span> <span class="o">&gt;</span> <span class="mh">0x5</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Bool</span> <span class="n">b_40_32</span> <span class="o">&gt;</span> <span class="mh">0x1</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Bool</span> <span class="n">b_40_32</span> <span class="o">&lt;</span> <span class="mh">0xa</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Bool</span> <span class="mh">0x2</span> <span class="o">*</span> <span class="n">b_40_32</span> <span class="o">-</span> <span class="n">a_39_32</span> <span class="o">==</span> <span class="mh">0xa</span><span class="o">&gt;</span><span class="p">]</span>
+
+<span class="c1"># Evaluates the value of "a" by taking the current constraints into consideration.
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="mi">6</span>
+
+<span class="c1"># Evaluates the value of "b" by taking the current constraints into consideration.
+</span><span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="mi">8</span>
+</code></pre></div></div>
+
+<p>Now that we got the basics down, let’s move over to the main event.</p>
+
+<p><br></p>
+
+<h1 id="reversing-obfuscated-binary">Reversing Obfuscated Binary</h1>
+
+<p>The obfuscated binary that I originally had to work on cannot be disclosed at this time.
+Therefore, I’ll be showcasing a <strong>very similar</strong> use case. Do not be discouraged though, as the fundamentals are exactly the same.</p>
+
+<p>The binary that we’ll be reversing is “<a href="assets/Defeating-Code-Obfuscation-with-Angr/jack">Jack</a>” from <a href="https://ctftime.org/event/1118">DarkCTF2020</a>.</p>
+
+<p><br></p>
+
+<h2 id="file-analysis">File Analysis</h2>
+
+<p>Starting with basic utilities to gather information about the binary.</p>
+
+<p><img src="assets/Defeating-Code-Obfuscation-with-Angr/file_jack.png" alt=""></p>
+
+<p>Making the file executable &amp; using <code class="language-plaintext highlighter-rouge">ltrace</code> to trace the library functions:</p>
+
+<p><img src="assets/Defeating-Code-Obfuscation-with-Angr/ltrace_angr.png" alt=""></p>
+
+<p>This yields us some good information on what we’re up against.</p>
+
+<p>It seems that the challenge is to find the ‘key’ for the program (There may be more than one).</p>
+
+<p>Next, I decided to load the binary in Ghidra in order to take a better look at what’s going on.</p>
+
+<p>Decompiling the main program:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bool</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+
+<span class="p">{</span>
+  <span class="n">uint</span> <span class="n">uVar1</span><span class="p">;</span>
+  <span class="kt">size_t</span> <span class="n">sVar2</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="n">in_FS_OFFSET</span><span class="p">;</span>
+  <span class="n">uint</span> <span class="n">local_38</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">local_34</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">local_30</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">local_2c</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_28</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_27</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_26</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_25</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_24</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_23</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_22</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_21</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_20</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1f</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1e</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1d</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1c</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1b</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_1a</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">local_19</span><span class="p">;</span>
+  <span class="n">undefined</span> <span class="n">local_18</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="n">local_10</span><span class="p">;</span>
+  
+  <span class="n">local_10</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="o">*</span><span class="p">)(</span><span class="n">in_FS_OFFSET</span> <span class="o">+</span> <span class="mh">0x28</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Enter your key: "</span><span class="p">);</span>
+  <span class="n">fgets</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_28</span><span class="p">,</span><span class="mh">0x11</span><span class="p">,</span><span class="n">stdin</span><span class="p">);</span>
+  <span class="n">local_18</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">sVar2</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_28</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">sVar2</span> <span class="o">!=</span> <span class="mh">0x10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Try Harder"</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="n">local_25</span> <span class="o">*</span> <span class="mh">0x1000000</span> <span class="o">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">local_28</span> <span class="o">+</span> <span class="n">local_27</span> <span class="o">*</span> <span class="mh">0x100</span> <span class="o">+</span> <span class="n">local_26</span> <span class="o">*</span> <span class="mh">0x10000</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="n">local_38</span> <span class="o">^</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">local_38</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">local_38</span> <span class="o">*</span> <span class="mh">0x20</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="n">local_38</span> <span class="o">^</span> <span class="n">local_38</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="p">(</span><span class="n">local_38</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="o">+</span> <span class="n">local_38</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">local_38</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">local_38</span> <span class="o">*</span> <span class="mh">0x20</span> <span class="o">^</span> <span class="n">local_38</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="n">local_38</span> <span class="o">^</span> <span class="n">local_38</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">local_38</span> <span class="o">=</span> <span class="n">local_38</span> <span class="o">+</span> <span class="p">(</span><span class="n">local_38</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">);</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">local_21</span> <span class="o">*</span> <span class="mh">0x1000000</span> <span class="o">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">local_24</span> <span class="o">+</span> <span class="n">local_23</span> <span class="o">*</span> <span class="mh">0x100</span> <span class="o">+</span> <span class="n">local_22</span> <span class="o">*</span> <span class="mh">0x10000</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span> <span class="o">^</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">local_34</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">+</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">);</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">local_1d</span> <span class="o">*</span> <span class="mh">0x1000000</span> <span class="o">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">local_20</span> <span class="o">+</span> <span class="n">local_1f</span> <span class="o">*</span> <span class="mh">0x100</span> <span class="o">+</span> <span class="n">local_1e</span> <span class="o">*</span> <span class="mh">0x10000</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span> <span class="o">^</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">local_30</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">+</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">);</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">local_19</span> <span class="o">*</span> <span class="mh">0x1000000</span> <span class="o">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">local_1c</span> <span class="o">+</span> <span class="n">local_1b</span> <span class="o">*</span> <span class="mh">0x100</span> <span class="o">+</span> <span class="n">local_1a</span> <span class="o">*</span> <span class="mh">0x10000</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="o">&amp;</span> <span class="mh">0x20000000U</span><span class="p">)</span> <span class="o">+</span> <span class="n">uVar1</span> <span class="o">*</span> <span class="mh">0x20</span> <span class="o">^</span> <span class="n">uVar1</span><span class="p">;</span>
+    <span class="n">uVar1</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">^</span> <span class="n">uVar1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="n">local_2c</span> <span class="o">=</span> <span class="n">uVar1</span> <span class="o">+</span> <span class="p">(</span><span class="n">uVar1</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">);</span>
+    <span class="n">check_flag</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_38</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">local_10</span> <span class="o">==</span> <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="o">*</span><span class="p">)(</span><span class="n">in_FS_OFFSET</span> <span class="o">+</span> <span class="mh">0x28</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">sVar2</span> <span class="o">!=</span> <span class="mh">0x10</span><span class="p">;</span>
+  <span class="p">}</span>
+                    <span class="cm">/* WARNING: Subroutine does not return */</span>
+  <span class="n">__stack_chk_fail</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can see that there is a check that makes sure our input is 16 characters long:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">sVar2</span> <span class="o">!=</span> <span class="mh">0x10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Try Harder"</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+</code></pre></div></div>
+
+<p>And after that a bunch of bit shifts, additions &amp; multiplications are used before calling <code class="language-plaintext highlighter-rouge">check_flag(&amp;local_38);</code>.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* check_flag(unsigned int*) */</span>
+
+<span class="kt">void</span> <span class="nf">check_flag</span><span class="p">(</span><span class="n">uint</span> <span class="o">*</span><span class="n">param_1</span><span class="p">)</span>
+
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">((((</span><span class="o">*</span><span class="n">param_1</span> <span class="o">==</span> <span class="mh">0xcb9f59b7</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">param_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x5b90f617</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">param_1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x20e59633</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
+     <span class="p">(</span><span class="n">param_1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x102fd1da</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"Good Work!"</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Try Harder"</span><span class="p">);</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><br>
+Assuming our goal is to get to the line that says “Good Work!”, we need to find the correct input to the program that reaches that point. (Perhaps there are more than one due to the bit shifts).</p>
+
+<p>In other words, we have a couple of options:</p>
+
+<ul>
+  <li>Bruteforcing - 16 characters, might be letters, signs, numbers.. too difficult to brute.</li>
+  <li>RE - Dynamic/Static analysis, although it’s not fun to reverse ugly code. We can change the value of <code class="language-plaintext highlighter-rouge">param_1</code> at runtime, hooking, etc.</li>
+  <li>Patching - Patch the program to reach the desired <code class="language-plaintext highlighter-rouge">puts</code> call. But let’s assume that we don’t want to make any changes.</li>
+  <li>Symbolic Execution (Angr) - Our obvious choice for today. Plus, it yields us an actual valid input to the program.</li>
+</ul>
+
+<p><br></p>
+
+<h2 id="angr-to-the-rescue">Angr to the rescue</h2>
+
+<p>First, we’ll load the necessary libraries.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">angr</span>
+<span class="kn">import</span> <span class="nn">claripy</span>
+</code></pre></div></div>
+
+<p>Next, we’ll set the base address of the program and load the binary via Angr.</p>
+
+<p>We’ll set the base address of the program, and set “auto_load_libs” to false.</p>
+
+<p>*Note: setting “auto_load_libs” to false will disable CLE’s (Angr’s binary loader) attempt to automatically resolve shared library dependencies. I recommend using it to avoid causing an exception to be thrown whenever a binary has a shared library dependency that cannot be resolved.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Ghidra loaded the binary to 0x00100000 (default Image Base)
+</span><span class="n">base_addr</span> <span class="o">=</span> <span class="mh">0x00100000</span> 
+
+<span class="n">proj</span> <span class="o">=</span> <span class="n">angr</span><span class="p">.</span><span class="n">Project</span><span class="p">(</span><span class="s">'./jack'</span><span class="p">,</span> <span class="n">main_opts</span><span class="o">=</span><span class="p">{</span><span class="s">'base_addr'</span><span class="p">:</span> <span class="n">base_addr</span><span class="p">},</span> <span class="n">load_options</span><span class="o">=</span><span class="p">{</span><span class="s">"auto_load_libs"</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>Filling in the information that we gathered about the binary;</p>
+
+<p>We know that our input needs to be 16 characters long. Therefore, we need to create a <em>symbolic bitvector</em> for our 16 characters. 
+I created a bitvector for each byte in the input, before linking them together.</p>
+
+<p>*Note: a bitvector is essentially just a sequence of bits. A symbolic bitvector is a symbolic variable, which in a sense instead of holding a concrete numerical value, holds a symbol. Then, performing arithmetic operations with that variable will yield a tree of operations (termed an abstract syntax tree or AST, from compiler theory). ASTs can be translated into constraints as seen in <a href="#angr---basic-usage">the example</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_length</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># claripy.BVS('x', 8) =&gt; Create an eight-bit symbolic bitvector "x".
+# Creating a symbolic bitvector for each character:
+</span><span class="n">input_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">claripy</span><span class="p">.</span><span class="n">BVS</span><span class="p">(</span><span class="s">"char_%d"</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_length</span><span class="p">)]</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">claripy</span><span class="p">.</span><span class="n">Concat</span><span class="p">(</span><span class="o">*</span><span class="n">input_chars</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Next, getting the entry state of the program while setting the input of the program to stdin.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">entry_state</span> <span class="o">=</span> <span class="n">proj</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">entry_state</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s">"./jack"</span><span class="p">],</span> <span class="n">stdin</span><span class="o">=</span><span class="nb">input</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Adding a constraint so that each character has to be in the printable ascii range. It’s just an assumption of mine, we don’t know it to be true or false.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">byte</span> <span class="ow">in</span> <span class="n">input_chars</span><span class="p">:</span>
+    <span class="n">entry_state</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">byte</span> <span class="o">&gt;=</span> <span class="mh">0x20</span><span class="p">,</span> <span class="n">byte</span> <span class="o">&lt;=</span> <span class="mh">0x7e</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We’re practically done with the setup, and can finally simulate the execution of the binary. In order to do that, we need a <code class="language-plaintext highlighter-rouge">SimulationManager</code>, which is a key part here. With it, we can control multiple states, step() &amp; run() similarly to a debugger.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Establish the simulation with the entry state
+</span><span class="n">simulation</span> <span class="o">=</span> <span class="n">proj</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">simulation_manager</span><span class="p">(</span><span class="n">entry_state</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now that we can symbolically execute the program, we should set some goals. Where do we want angr to reach, and which paths (branches) we don’t care for.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">success_addr</span> <span class="o">=</span> <span class="mh">0x00101489</span> <span class="c1"># Address of "puts("Good Work!");"
+</span><span class="n">failure_addr</span> <span class="o">=</span> <span class="mh">0x00101468</span> <span class="c1"># Address of "puts("Try Harder");"
+</span>
+<span class="c1"># Finding a state that reaches `success_addr`, while discarding all states that go through `failure_addr`
+</span><span class="n">simulation</span><span class="p">.</span><span class="n">explore</span><span class="p">(</span><span class="n">find</span> <span class="o">=</span> <span class="n">success_addr</span><span class="p">,</span> <span class="n">avoid</span> <span class="o">=</span> <span class="n">failure_addr</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>*Note: I got the addresses of the relevant <code class="language-plaintext highlighter-rouge">puts</code> calls in Ghidra:
+<img src="assets/Defeating-Code-Obfuscation-with-Angr/goodwork.png" alt=""></p>
+
+<p><br>
+Checking if we found a state that reached <code class="language-plaintext highlighter-rouge">success_addr</code> is easy:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># If at least one state was found
+</span><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation</span><span class="p">.</span><span class="n">found</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c1"># Take the first one and print what it evaluates to
+</span>    <span class="n">solution</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">.</span><span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">solution</span><span class="p">.</span><span class="n">solver</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">cast_to</span><span class="o">=</span><span class="nb">bytes</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"[-] no solution found :("</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Executing the script results in a desired input that reaches “Good Work!”</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b'n0_5ymb0l1c,3x30'
+
+❯ ./jack
+Enter your key: 
+n0_5ymb0l1c,3x30
+Good Work!
+bye
+</code></pre></div></div>
+
+<p><br></p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Angr can be quite useful in certain cases as shown above. It’s a niche tool, but I think it’s really cool. You can use it as a standalone tool, or with open-source plugins for IDA Pro, Ghidra, Binary Ninja &amp; more.</p>
+
+<p>I hope you’ve enjoyed reading through this blog post. If you want to leave any feedback, you can find my email in the <a href="about">about</a> page.</p>
+
+<h1 id="references">References</h1>
+
+<p><a href="https://docs.angr.io/">https://docs.angr.io/</a> - All Angr things</p>
+
+<ul>
+  <li><a href="https://github.com/Brandon-Everhart/AngryIDA">AngryIDA - IDA Pro plugin</a></li>
+  <li><a href="https://github.com/Nalen98/AngryGhidra">AngryGhidra - Ghidra plugin</a></li>
+  <li><a href="https://github.com/borzacchiello/seninja">SENinja - Binary Ninja plugin (similar, Angr inspired)</a></li>
+</ul>
+
+<p>“Code obfuscation against symbolic execution attacks” - conference paper by Sebastian Banescu. Used part of the definition of “symbolic execution” from this paper.</p>
+
+<p><br></p>
+
+<p><br></p>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://napongizero.github.io/blog/about">
+    <span>
+        <b>(☞ﾟヮﾟ)☞ NapongiZero </b>
+    </span>
+    
+    <span>© 2022</span>
+  </a>
+  <p></p>
+</footer>
+
+
+  
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-MXJ9D7WCBZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MXJ9D7WCBZ');
+</script>
+  
+
+
+
+</body></html>

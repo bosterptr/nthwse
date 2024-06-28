@@ -1,0 +1,1589 @@
+<html class="v2" dir="ltr" lang="en"><head>
+<link href="https://www.blogger.com/static/v1/widgets/3566091532-css_bundle_v2.css" rel="stylesheet" type="text/css">
+<meta content="width=1100" name="viewport">
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta content="blogger" name="generator">
+<link href="http://findingbad.blogspot.com/favicon.ico" rel="icon" type="image/x-icon">
+<link href="http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html" rel="canonical">
+<link rel="alternate" type="application/atom+xml" title="DFIR and Threat Hunting - Atom" href="http://findingbad.blogspot.com/feeds/posts/default">
+<link rel="alternate" type="application/rss+xml" title="DFIR and Threat Hunting - RSS" href="http://findingbad.blogspot.com/feeds/posts/default?alt=rss">
+<link rel="service.post" type="application/atom+xml" title="DFIR and Threat Hunting - Atom" href="https://www.blogger.com/feeds/6244942915864113008/posts/default">
+
+<link rel="alternate" type="application/atom+xml" title="DFIR and Threat Hunting - Atom" href="http://findingbad.blogspot.com/feeds/1843229681679979041/comments/default">
+<!--Can't find substitution for tag [blog.ieCssRetrofitLinks]-->
+<link href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s320/Screen+Shot+2020-07-07+at+11.17.31+AM.png" rel="image_src">
+<meta content="http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html" property="og:url">
+<meta content="Insider Threat Hunting" property="og:title">
+<meta content="          If you subscribe to the notion that a user, who is intent on stealing data from your org, will require a change in their behavior...." property="og:description">
+<meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/w1200-h630-p-k-no-nu/Screen+Shot+2020-07-07+at+11.17.31+AM.png" property="og:image">
+<title>DFIR and Threat Hunting: Insider Threat Hunting</title>
+<style id="page-skin-1" type="text/css"><!--
+/*
+-----------------------------------------------
+Blogger Template Style
+Name:     Simple
+Designer: Blogger
+URL:      www.blogger.com
+----------------------------------------------- */
+/* Content
+----------------------------------------------- */
+body {
+font: normal normal 12px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: #222222;
+background: #eeaa00 none repeat scroll top left;
+padding: 0 40px 40px 40px;
+}
+html body .region-inner {
+min-width: 0;
+max-width: 100%;
+width: auto;
+}
+h2 {
+font-size: 22px;
+}
+a:link {
+text-decoration:none;
+color: #cc6611;
+}
+a:visited {
+text-decoration:none;
+color: #888888;
+}
+a:hover {
+text-decoration:underline;
+color: #ff9900;
+}
+.body-fauxcolumn-outer .fauxcolumn-inner {
+background: transparent url(https://resources.blogblog.com/blogblog/data/1kt/simple/body_gradient_tile_light.png) repeat scroll top left;
+_background-image: none;
+}
+.body-fauxcolumn-outer .cap-top {
+position: absolute;
+z-index: 1;
+height: 400px;
+width: 100%;
+}
+.body-fauxcolumn-outer .cap-top .cap-left {
+width: 100%;
+background: transparent url(https://resources.blogblog.com/blogblog/data/1kt/simple/gradients_light.png) repeat-x scroll top left;
+_background-image: none;
+}
+.content-outer {
+-moz-box-shadow: 0 0 40px rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 0 10px #333333;
+box-shadow: 0 0 40px rgba(0, 0, 0, .15);
+margin-bottom: 1px;
+}
+.content-inner {
+padding: 10px 10px;
+}
+.content-inner {
+background-color: #ffffff;
+}
+/* Header
+----------------------------------------------- */
+.header-outer {
+background: #cc6611 url(https://resources.blogblog.com/blogblog/data/1kt/simple/gradients_light.png) repeat-x scroll 0 -400px;
+_background-image: none;
+}
+.Header h1 {
+font: normal normal 60px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: #ffffff;
+text-shadow: 1px 2px 3px rgba(0, 0, 0, .2);
+}
+.Header h1 a {
+color: #ffffff;
+}
+.Header .description {
+font-size: 140%;
+color: #ffffff;
+}
+.header-inner .Header .titlewrapper {
+padding: 22px 30px;
+}
+.header-inner .Header .descriptionwrapper {
+padding: 0 30px;
+}
+/* Tabs
+----------------------------------------------- */
+.tabs-inner .section:first-child {
+border-top: 0 solid #eeeeee;
+}
+.tabs-inner .section:first-child ul {
+margin-top: -0;
+border-top: 0 solid #eeeeee;
+border-left: 0 solid #eeeeee;
+border-right: 0 solid #eeeeee;
+}
+.tabs-inner .widget ul {
+background: #f5f5f5 url(https://resources.blogblog.com/blogblog/data/1kt/simple/gradients_light.png) repeat-x scroll 0 -800px;
+_background-image: none;
+border-bottom: 1px solid #eeeeee;
+margin-top: 0;
+margin-left: -30px;
+margin-right: -30px;
+}
+.tabs-inner .widget li a {
+display: inline-block;
+padding: .6em 1em;
+font: normal normal 14px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: #999999;
+border-left: 1px solid #ffffff;
+border-right: 1px solid #eeeeee;
+}
+.tabs-inner .widget li:first-child a {
+border-left: none;
+}
+.tabs-inner .widget li.selected a, .tabs-inner .widget li a:hover {
+color: #000000;
+background-color: #eeeeee;
+text-decoration: none;
+}
+/* Columns
+----------------------------------------------- */
+.main-outer {
+border-top: 0 solid #eeeeee;
+}
+.fauxcolumn-left-outer .fauxcolumn-inner {
+border-right: 1px solid #eeeeee;
+}
+.fauxcolumn-right-outer .fauxcolumn-inner {
+border-left: 1px solid #eeeeee;
+}
+/* Headings
+----------------------------------------------- */
+div.widget > h2,
+div.widget h2.title {
+margin: 0 0 1em 0;
+font: normal bold 11px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: #000000;
+}
+/* Widgets
+----------------------------------------------- */
+.widget .zippy {
+color: #999999;
+text-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
+}
+.widget .popular-posts ul {
+list-style: none;
+}
+/* Posts
+----------------------------------------------- */
+h2.date-header {
+font: normal bold 11px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+}
+.date-header span {
+background-color: transparent;
+color: #222222;
+padding: inherit;
+letter-spacing: inherit;
+margin: inherit;
+}
+.main-inner {
+padding-top: 30px;
+padding-bottom: 30px;
+}
+.main-inner .column-center-inner {
+padding: 0 15px;
+}
+.main-inner .column-center-inner .section {
+margin: 0 15px;
+}
+.post {
+margin: 0 0 25px 0;
+}
+h3.post-title, .comments h4 {
+font: normal normal 22px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+margin: .75em 0 0;
+}
+.post-body {
+font-size: 110%;
+line-height: 1.4;
+position: relative;
+}
+.post-body img, .post-body .tr-caption-container, .Profile img, .Image img,
+.BlogList .item-thumbnail img {
+padding: 2px;
+background: #ffffff;
+border: 1px solid #eeeeee;
+-moz-box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+-webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+}
+.post-body img, .post-body .tr-caption-container {
+padding: 5px;
+}
+.post-body .tr-caption-container {
+color: #222222;
+}
+.post-body .tr-caption-container img {
+padding: 0;
+background: transparent;
+border: none;
+-moz-box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+-webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+box-shadow: 0 0 0 rgba(0, 0, 0, .1);
+}
+.post-header {
+margin: 0 0 1.5em;
+line-height: 1.6;
+font-size: 90%;
+}
+.post-footer {
+margin: 20px -2px 0;
+padding: 5px 10px;
+color: #666666;
+background-color: #f9f9f9;
+border-bottom: 1px solid #eeeeee;
+line-height: 1.6;
+font-size: 90%;
+}
+#comments .comment-author {
+padding-top: 1.5em;
+border-top: 1px solid #eeeeee;
+background-position: 0 1.5em;
+}
+#comments .comment-author:first-child {
+padding-top: 0;
+border-top: none;
+}
+.avatar-image-container {
+margin: .2em 0 0;
+}
+#comments .avatar-image-container img {
+border: 1px solid #eeeeee;
+}
+/* Comments
+----------------------------------------------- */
+.comments .comments-content .icon.blog-author {
+background-repeat: no-repeat;
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAd0SU1FB9sLFwMeCjjhcOMAAAD+SURBVDjLtZSvTgNBEIe/WRRnm3U8RC1neQdsm1zSBIU9VVF1FkUguQQsD9ITmD7ECZIJSE4OZo9stoVjC/zc7ky+zH9hXwVwDpTAWWLrgS3QAe8AZgaAJI5zYAmc8r0G4AHYHQKVwII8PZrZFsBFkeRCABYiMh9BRUhnSkPTNCtVXYXURi1FpBDgArj8QU1eVXUzfnjv7yP7kwu1mYrkWlU33vs1QNu2qU8pwN0UpKoqokjWwCztrMuBhEhmh8bD5UDqur75asbcX0BGUB9/HAMB+r32hznJgXy2v0sGLBcyAJ1EK3LFcbo1s91JeLwAbwGYu7TP/3ZGfnXYPgAVNngtqatUNgAAAABJRU5ErkJggg==);
+}
+.comments .comments-content .loadmore a {
+border-top: 1px solid #999999;
+border-bottom: 1px solid #999999;
+}
+.comments .comment-thread.inline-thread {
+background-color: #f9f9f9;
+}
+.comments .continue {
+border-top: 2px solid #999999;
+}
+/* Accents
+---------------------------------------------- */
+.section-columns td.columns-cell {
+border-left: 1px solid #eeeeee;
+}
+.blog-pager {
+background: transparent none no-repeat scroll top center;
+}
+.blog-pager-older-link, .home-link,
+.blog-pager-newer-link {
+background-color: #ffffff;
+padding: 5px;
+}
+.footer-outer {
+border-top: 0 dashed #bbbbbb;
+}
+/* Mobile
+----------------------------------------------- */
+body.mobile  {
+background-size: auto;
+}
+.mobile .body-fauxcolumn-outer {
+background: transparent none repeat scroll top left;
+}
+.mobile .body-fauxcolumn-outer .cap-top {
+background-size: 100% auto;
+}
+.mobile .content-outer {
+-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+}
+.mobile .tabs-inner .widget ul {
+margin-left: 0;
+margin-right: 0;
+}
+.mobile .post {
+margin: 0;
+}
+.mobile .main-inner .column-center-inner .section {
+margin: 0;
+}
+.mobile .date-header span {
+padding: 0.1em 10px;
+margin: 0 -10px;
+}
+.mobile h3.post-title {
+margin: 0;
+}
+.mobile .blog-pager {
+background: transparent none no-repeat scroll top center;
+}
+.mobile .footer-outer {
+border-top: none;
+}
+.mobile .main-inner, .mobile .footer-inner {
+background-color: #ffffff;
+}
+.mobile-index-contents {
+color: #222222;
+}
+.mobile-link-button {
+background-color: #cc6611;
+}
+.mobile-link-button a:link, .mobile-link-button a:visited {
+color: #ffffff;
+}
+.mobile .tabs-inner .section:first-child {
+border-top: none;
+}
+.mobile .tabs-inner .PageList .widget-content {
+background-color: #eeeeee;
+color: #000000;
+border-top: 1px solid #eeeeee;
+border-bottom: 1px solid #eeeeee;
+}
+.mobile .tabs-inner .PageList .widget-content .pagelist-arrow {
+border-left: 1px solid #eeeeee;
+}
+
+--></style>
+<style id="template-skin-1" type="text/css"><!--
+body {
+min-width: 960px;
+}
+.content-outer, .content-fauxcolumn-outer, .region-inner {
+min-width: 960px;
+max-width: 960px;
+_width: 960px;
+}
+.main-inner .columns {
+padding-left: 0px;
+padding-right: 310px;
+}
+.main-inner .fauxcolumn-center-outer {
+left: 0px;
+right: 310px;
+/* IE6 does not respect left and right together */
+_width: expression(this.parentNode.offsetWidth -
+parseInt("0px") -
+parseInt("310px") + 'px');
+}
+.main-inner .fauxcolumn-left-outer {
+width: 0px;
+}
+.main-inner .fauxcolumn-right-outer {
+width: 310px;
+}
+.main-inner .column-left-outer {
+width: 0px;
+right: 100%;
+margin-left: -0px;
+}
+.main-inner .column-right-outer {
+width: 310px;
+margin-right: -310px;
+}
+#layout {
+min-width: 0;
+}
+#layout .content-outer {
+min-width: 0;
+width: 800px;
+}
+#layout .region-inner {
+min-width: 0;
+width: auto;
+}
+body#layout div.add_widget {
+padding: 8px;
+}
+body#layout div.add_widget a {
+margin-left: 32px;
+}
+--></style>
+<link href="https://www.blogger.com/dyn-css/authorization.css?targetBlogID=6244942915864113008&amp;zx=b1202076-afbf-4daa-a779-3f5170ab9ed7" media="all" onload="if(media!='all')media='all'" rel="stylesheet"><noscript><link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=6244942915864113008&amp;zx=b1202076-afbf-4daa-a779-3f5170ab9ed7' rel='stylesheet'/></noscript>
+<meta name="google-adsense-platform-account" content="ca-host-pub-1556223355139109">
+<meta name="google-adsense-platform-domain" content="blogspot.com">
+
+<script src="https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.pl.G_Xx-0O26DQ.O/m=gapi_iframes,gapi_iframes_style_bubble/rt=j/sv=1/d=1/ed=1/am=AAAQ/rs=AHpOoo8Nw84uIBBCxrKdPDDYYR2v5OFSfw/cb=gapi.loaded_0?le=scs" async=""></script><script type="text/javascript" language="javascript">
+  // Supply ads personalization default for EEA readers
+  // See https://www.blogger.com/go/adspersonalization
+  adsbygoogle = window.adsbygoogle || [];
+  if (typeof adsbygoogle.requestNonPersonalizedAds === 'undefined') {
+    adsbygoogle.requestNonPersonalizedAds = 1;
+  }
+</script>
+
+
+<script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/js/google_top_exp.js"></script><style>.gc-bubbleDefault{background-color:transparent!important;text-align:left;padding:0!important;margin:0!important;border:0!important;table-layout:auto!important}.gc-reset{background-color:transparent!important;border:0!important;padding:0!important;margin:0!important;text-align:left}.pls-bubbleTop{border-bottom:1px solid #ccc!important}.pls-contentLeft,.pls-topTail,.pls-vertShimLeft{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif)!important}.pls-topTail{background-repeat:repeat-x!important;background-position:bottom!important}.pls-vertShim{background-color:#fff!important;text-align:right}.tbl-grey .pls-vertShim{background-color:#f5f5f5!important}.pls-vertShimLeft{background-repeat:repeat-y!important;background-position:100%!important;height:4px}.pls-vertShimRight{height:4px}.pls-confirm-container .pls-vertShim{background-color:#fff3c2!important}.pls-contentWrap{background-color:#fff!important;position:relative!important;vertical-align:top}.pls-contentLeft{background-repeat:repeat-y;background-position:100%;vertical-align:top}.pls-dropRight{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropR_3.png)!important;background-repeat:repeat-y!important;vertical-align:top}.pls-dropBL,.pls-dropTR .pls-dropBR,.pls-tailleft,.pls-vert,.pls-vert img{vertical-align:top}.pls-dropBottom{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropB_3.png)!important;background-repeat:repeat-x!important;width:100%;vertical-align:top}.pls-topLeft{background:inherit!important;text-align:right;vertical-align:bottom}.pls-topRight{background:inherit!important;text-align:left;vertical-align:bottom}.pls-bottomLeft{background:inherit!important;text-align:right}.pls-bottomRight{background:inherit!important;text-align:left;vertical-align:top}.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{display:none;position:relative}.pls-dropBL,.pls-dropBR,.pls-dropTR,.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite_3.png)!important;background-repeat:no-repeat}.tbl-grey .pls-dropBL,.tbl-grey .pls-dropBR,.tbl-grey .pls-dropTR,.tbl-grey .pls-tailbottom,.tbl-grey .pls-tailleft,.tbl-grey .pls-tailright,.tbl-grey .pls-tailtop{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite-grey.png)!important}.pls-tailbottom{background-position:-23px 0}.pls-confirm-container .pls-tailbottom{background-position:-23px -10px}.pls-tailtop{background-position:-19px -20px}.pls-tailright{background-position:0 0}.pls-tailleft{background-position:-10px 0}.pls-tailtop{vertical-align:top}.gc-bubbleDefault td{line-height:0;font-size:0}.pls-tailbottom,.pls-topLeft img,.pls-topRight img{vertical-align:bottom}.bubbleDropTR,.pls-bottomLeft,.pls-bottomLeft img,.pls-dropBottom img,.pls-dropBottomL img,.pls-dropBottomR img{vertical-align:top}.pls-dropTR{background-position:0 -22px}.pls-dropBR{background-position:0 -27px}.pls-dropBL{background-position:0 -16px}.pls-spacerbottom,.pls-spacerleft,.pls-spacerright,.pls-spacertop{position:static!important}.pls-spinner{bottom:0;position:absolute;left:0;margin:auto;right:0;top:0}</style><style class="singleton-element" type="text/css">.cookie-choices-info { position:fixed;width:100%;background-color:#666;margin:0;left:0;top:0;padding:0;z-index:4000;text-align:center;color:#fff;line-height:140%;padding:10px 0;font-family:roboto,Arial; } .cookie-choices-info .cookie-choices-inner { position:relative;width:initial;margin:0;left:0;top:0; } .cookie-choices-info .cookie-choices-text { display:inline-block;vertical-align:middle;font-size:16px;margin:10px 20px;color:#ccc;max-width:800px;text-align:left; }.cookie-choices-info .cookie-choices-buttons { display:inline-block;vertical-align:middle;white-space:nowrap;margin:0 10px; } .cookie-choices-info .cookie-choices-button:hover {  color: #fff; } .cookie-choices-info .cookie-choices-button { font-weight:bold;text-transform:UPPERCASE;white-space:nowrap;color:#eee;margin-left:8px;padding:0 6px; text-decoration:none; }</style></head>
+<body class=" variant-bold">
+<div class="navbar section" id="navbar" name="Navbar"><div class="widget Navbar" data-version="1" id="Navbar1"><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"><iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="" tabindex="0" vspace="0" width="100%" id="navbar-iframe" name="navbar-iframe" src="https://www.blogger.com/navbar.g?targetBlogID=6244942915864113008&amp;blogName=DFIR+and+Threat+Hunting&amp;publishMode=PUBLISH_MODE_BLOGSPOT&amp;navbarType=LIGHT&amp;layoutType=LAYOUTS&amp;searchRoot=https://findingbad.blogspot.com/search&amp;blogLocale=en&amp;v=2&amp;homepageUrl=http://findingbad.blogspot.com/&amp;targetPostID=1843229681679979041&amp;blogPostOrPageUrl=http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html&amp;vt=8381633252112303620&amp;usegapi=1&amp;jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.pl.G_Xx-0O26DQ.O%2Fam%3DAAAQ%2Fd%3D1%2Frs%3DAHpOoo8Nw84uIBBCxrKdPDDYYR2v5OFSfw%2Fm%3D__features__#id=navbar-iframe&amp;_gfid=navbar-iframe&amp;parent=http%3A%2F%2Ffindingbad.blogspot.com&amp;pfname=&amp;rpctoken=30061882"></iframe></div>
+<script type="text/javascript" src="https://apis.google.com/js/platform.js" gapi_processed="true"></script>
+<script type="text/javascript">
+      gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          gapi.iframes.getContext().openChild({
+              url: 'https://www.blogger.com/navbar.g?targetBlogID\x3d6244942915864113008\x26blogName\x3dDFIR+and+Threat+Hunting\x26publishMode\x3dPUBLISH_MODE_BLOGSPOT\x26navbarType\x3dLIGHT\x26layoutType\x3dLAYOUTS\x26searchRoot\x3dhttps://findingbad.blogspot.com/search\x26blogLocale\x3den\x26v\x3d2\x26homepageUrl\x3dhttp://findingbad.blogspot.com/\x26targetPostID\x3d1843229681679979041\x26blogPostOrPageUrl\x3dhttp://findingbad.blogspot.com/2020/07/insider-threat-hunting.html\x26vt\x3d8381633252112303620',
+              where: document.getElementById("navbar-iframe-container"),
+              id: "navbar-iframe"
+          });
+        }
+      });
+    </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div class="body-fauxcolumns">
+<div class="fauxcolumn-outer body-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="content-fauxcolumns">
+<div class="fauxcolumn-outer content-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content-outer">
+<div class="content-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left content-fauxborder-left">
+<div class="fauxborder-right content-fauxborder-right"></div>
+<div class="content-inner">
+<header>
+<div class="header-outer">
+<div class="header-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left header-fauxborder-left">
+<div class="fauxborder-right header-fauxborder-right"></div>
+<div class="region-inner header-inner">
+<div class="header section" id="header" name="Header"><div class="widget Header" data-version="1" id="Header1">
+<div id="header-inner">
+<div class="titlewrapper">
+<h1 class="title">
+<a href="http://findingbad.blogspot.com/">
+DFIR and Threat Hunting
+</a>
+</h1>
+</div>
+<div class="descriptionwrapper">
+<p class="description"><span>
+</span></p>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="header-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</header>
+<div class="tabs-outer">
+<div class="tabs-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left tabs-fauxborder-left">
+<div class="fauxborder-right tabs-fauxborder-right"></div>
+<div class="region-inner tabs-inner">
+<div class="tabs no-items section" id="crosscol" name="Cross-Column"></div>
+<div class="tabs no-items section" id="crosscol-overflow" name="Cross-Column 2"></div>
+</div>
+</div>
+<div class="tabs-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="main-outer">
+<div class="main-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left main-fauxborder-left">
+<div class="fauxborder-right main-fauxborder-right"></div>
+<div class="region-inner main-inner">
+<div class="columns fauxcolumns">
+<div class="fauxcolumn-outer fauxcolumn-center-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-left-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-right-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<!-- corrects IE6 width calculation -->
+<div class="columns-inner">
+<div class="column-center-outer">
+<div class="column-center-inner">
+<div class="main section" id="main" name="Main"><div class="widget Blog" data-version="1" id="Blog1">
+<div class="blog-posts hfeed">
+
+          <div class="date-outer">
+        
+<h2 class="date-header"><span>Tuesday, July 7, 2020</span></h2>
+
+          <div class="date-posts">
+        
+<div class="post-outer">
+<div class="post hentry uncustomized-post-template" itemprop="blogPost" itemscope="itemscope" itemtype="http://schema.org/BlogPosting">
+<meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s320/Screen+Shot+2020-07-07+at+11.17.31+AM.png" itemprop="image_url">
+<meta content="6244942915864113008" itemprop="blogId">
+<meta content="1843229681679979041" itemprop="postId">
+<a name="1843229681679979041"></a>
+<h3 class="post-title entry-title" itemprop="name">
+Insider Threat Hunting
+</h3>
+<div class="post-header">
+<div class="post-header-line-1"></div>
+</div>
+<div class="post-body entry-content" id="post-body-1843229681679979041" itemprop="description articleBody">
+
+
+
+
+
+
+<!--StartFragment-->
+
+<br>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+If you subscribe to
+the notion that a user, who is intent on stealing data from your org, will
+require a change in their behavior.<span style="mso-spacerun: yes;">&nbsp; </span>Then
+identifying that change is critically important.<span style="mso-spacerun: yes;">&nbsp; </span>As this change happens, they will take
+actions that they have not previously taken.<span style="mso-spacerun: yes;">&nbsp;
+</span>These actions can be seen as anomalies and is where we want to identify
+and analyze their behavior. </div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+I've been studying
+insider IP theft, particularly those with a connection to China, for a number
+of years now.<span style="mso-spacerun: yes;">&nbsp; </span>I feel that, in a way,
+this problem mimics the APT of 10 years ago.<span style="mso-spacerun: yes;">&nbsp;
+</span>Nobody with exposure to it is willing to talk about the things that work
+or don't.<span style="mso-spacerun: yes;">&nbsp; </span>This leaves open the
+opportunity for this behavior to successfully continue.<span style="mso-spacerun: yes;">&nbsp; </span>While I'm not going to share specific
+signatures, I would like to talk about the logic I use for hunting.<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>This is my attempt to generate conversation
+around an area that, in my opinion, can't be ignored.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Just as in network
+intrusions, there are phases that an insider will likely go through before data
+exfil occurs.<span style="mso-spacerun: yes;">&nbsp; </span>But unlike network
+intrusions, these phases are not all required as the insider probably has all
+the access they need.<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>They may perform
+additional actions to hide what they are doing.<span style="mso-spacerun: yes;">&nbsp;
+</span>They may collect data from different areas of the network.<span style="mso-spacerun: yes;">&nbsp; </span>They may even<span style="mso-spacerun: yes;">&nbsp;
+</span>simply exfil data with no other steps.<span style="mso-spacerun: yes;">&nbsp;
+</span>There are no set TTP's for classes of insiders, but below are some
+phases that you could see:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Data Discovery</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Data Collection</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Data Packaging</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Data Obfuscation</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Data Exfil</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+I've also added a
+few additional points that may be of interest.<span style="mso-spacerun: yes;">&nbsp;
+</span>These aren't necessarily phases, but may add to the story behind their
+behavior.<span style="mso-spacerun: yes;">&nbsp; </span>I'm including it in the phase category
+for scoring purposes though.<span style="mso-spacerun: yes;">&nbsp; </span>The scoring
+will be explained more below.<span style="mso-spacerun: yes;">&nbsp; </span>The
+additional points of interest are:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Motive - Is there a
+reason behind their actions?</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Job Position - Does
+their position give them access to sensitive data?</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Red Flags - e.g.
+Employee has submitted 2 week notice.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+By assigning these
+tags, behaviors that enter multiple phases suddenly become more
+interesting.<span style="mso-spacerun: yes;">&nbsp; </span>In many cases, multiple
+phases such as data packaging -&gt; data exfil should rise above a single phase
+such as data collection.<span style="mso-spacerun: yes;">&nbsp; </span>This is because
+a rule is only designed to accurately identify an action, regardless of
+intent.<span style="mso-spacerun: yes;">&nbsp; </span>But by looking at the sum of
+these actions we can begin to surface behaviors.<span style="mso-spacerun: yes;">&nbsp; </span>This is not to say that the total count of a
+single rule or a single instance of a highly critical rule will not draw the
+same attention.<span style="mso-spacerun: yes;">&nbsp; </span>It should, and that's
+where rule weighting comes in.<span style="mso-spacerun: yes;">&nbsp; </span></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Weighting is simply
+assigning a number score to the criticality of an action.<span style="mso-spacerun: yes;">&nbsp; </span>If a user performs an action that is being
+watched, a score is assigned to their total weight (weighted) for the day.<span style="mso-spacerun: yes;">&nbsp; </span>Depending on a user's behavior, their
+weighted score may rise over the course of that day.<span style="mso-spacerun: yes;">&nbsp; </span>If a user begins exhibiting anomalous
+behavior and a threshold is met, based on certain conditions, an alert may
+fire.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+An explanation of
+alert generation.<span style="mso-spacerun: yes;">&nbsp; </span>My first attempt at
+this was simply to correlate multiple events per user.<span style="mso-spacerun: yes;">&nbsp; </span>As I developed new queries the number of
+alerts I received grew drastically.<span style="mso-spacerun: yes;">&nbsp;
+</span>There was really no logic other than looking for multiple events which
+simply led to noise.<span style="mso-spacerun: yes;">&nbsp; </span>I then sat down and
+thought about the reasons why I would want to be notified and came up with:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+User has been
+identified in multiple rules + single phase + weight threshold met (500)</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+User has been
+identified in multiple phases + weight threshold met (300)</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+User exceeds weight
+threshold (1000)</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+To describe this
+logic in numbers it would look like:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+|where ((scount &gt;
+1 and TotalWeight &gt; 500) OR (pcount &gt; 1 and TotalWeight &gt; 300) OR
+(TotalWieght &gt; 1000))</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+By implementing
+those 3 requirements I was able to eliminate the vast majority of noise and
+began surfacing interesting behavior.<span style="mso-spacerun: yes;">&nbsp; </span>I
+did<span style="mso-spacerun: yes;">&nbsp; </span>wonder what I may be missing though.<span style="mso-spacerun: yes;">&nbsp; </span>Were there users exhibiting behavior<span style="mso-spacerun: yes;">&nbsp; </span>that I would potentially want to
+investigate?<span style="mso-spacerun: yes;">&nbsp; </span>Obviously my alert logic
+wouldn't identify everything of interest.<span style="mso-spacerun: yes;">&nbsp;
+</span>I needed a good way to hunt for threads to pull, so<span style="mso-spacerun: yes;">&nbsp; </span>I set about describing behaviors in
+numbers.<span style="mso-spacerun: yes;">&nbsp; </span>I wrote about this a little in
+a previous post <a href="http://findingbad.blogspot.com/2020/05/its-all-in-numbers.html">http://findingbad.blogspot.com/2020/05/its-all-in-numbers.html</a>,
+but I'll go through it again.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Using the existing
+detections rules I used the rule name, weight and phase fields to create
+metadata that would describe a user's behavior.<span style="mso-spacerun: yes;">&nbsp;
+</span>Here's the fields I created and use for them:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Total Weight - The
+sum weight of a user's behavior.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Distinct rule count
+- The number of unique rule names a user has been seen in.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Total rule count -
+The total number of rules a user has been seen in.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Phase count - The
+number of phases a user has been seen in.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Knowing that riskier
+behavior often involves multiple actions taken by a user, I created the
+following fields to convey this.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Phase multiplier -
+Additional value given to a user that is seen in multiple phases.<span style="mso-spacerun: yes;">&nbsp; </span>Increases for every phase above 1. </div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Source multiplier -
+Additional value given to a user that is seen in multiple rules.<span style="mso-spacerun: yes;">&nbsp; </span>Increases for every rule above 1.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+We then add Total
+Weight + Total rule count + Phase multiplier + Source multiplier to get the
+users weighted score.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s1600/Screen+Shot+2020-07-07+at+11.17.31+AM.png" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" data-original-height="278" data-original-width="1050" height="84" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s320/Screen+Shot+2020-07-07+at+11.17.31+AM.png" width="320"></a></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+By generating these
+numbers we can, not only observe how a user acted over the course of that day,
+but also surface anomalous behavior when compared to how others users
+acted.<span style="mso-spacerun: yes;">&nbsp; </span>For this I'm using an isolation
+forest and feeding it the total weight, phase count, total rule count and
+weighted numbers.<span style="mso-spacerun: yes;">&nbsp; </span>I feel these values
+best describe how a user acted and therefore are best used to identify
+anomalous activity.<span style="mso-spacerun: yes;">&nbsp; </span></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi_N38XZzXr-AmgPFrD5I2vORkbIWGCfxVHpvj50royVV-FMJRCG0OR8Rdk1csc_yaTd_piquhcHXnjBR9FaBUSFtuW3SOFpOjFntGvzMuUXk2bcqZRpgkDRn9fHXgdtisBWtxaJ0nWag-F/s1600/Screen+Shot+2020-07-07+at+11.19.20+AM.png" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" data-original-height="758" data-original-width="1274" height="190" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi_N38XZzXr-AmgPFrD5I2vORkbIWGCfxVHpvj50royVV-FMJRCG0OR8Rdk1csc_yaTd_piquhcHXnjBR9FaBUSFtuW3SOFpOjFntGvzMuUXk2bcqZRpgkDRn9fHXgdtisBWtxaJ0nWag-F/s320/Screen+Shot+2020-07-07+at+11.19.20+AM.png" width="320"></a></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+I'm also storing
+this metadata so that I can:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Look at their
+behavior patterns over time This particular user was identified on 4 different days:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVIw09yhSrnE6UW4rUKbPx4y838ZkDEswzjGxHWkGybPMOWBpXyzpCgou0b7tC9d9oOquqMFKshMdyY9kke4c7EcLxz8pouPxk0axJkYx2ze5PtZal_pV2DVLgkSmxpvrAf4YqeHj_uvz1/s1600/Screen+Shot+2020-07-07+at+11.25.42+AM.png" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" data-original-height="850" data-original-width="1288" height="211" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVIw09yhSrnE6UW4rUKbPx4y838ZkDEswzjGxHWkGybPMOWBpXyzpCgou0b7tC9d9oOquqMFKshMdyY9kke4c7EcLxz8pouPxk0axJkYx2ze5PtZal_pV2DVLgkSmxpvrAf4YqeHj_uvz1/s320/Screen+Shot+2020-07-07+at+11.25.42+AM.png" width="320"></a></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Compare their sum of
+activity to other anomalous users.<span style="mso-spacerun: yes;">&nbsp; </span>This
+will help me identify the scale of their behavior.&nbsp; This user's actions are leaning outside of normal ptterns:</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8QJIIchFQQKxg1dTe6crz4nL2aZPp1dereUvicV1nw8Xw_0dsa-aStfbWfqHetBQBMbOBXF1jWX5-grgge_xyybavVNYF53ylvGjM9Co-0MrRBJRwqjL1reDAD2RWMRZF-TFGx4n2gKgH/s1600/Screen+Shot+2020-07-07+at+11.21.30+AM.png" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" data-original-height="752" data-original-width="1308" height="183" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8QJIIchFQQKxg1dTe6crz4nL2aZPp1dereUvicV1nw8Xw_0dsa-aStfbWfqHetBQBMbOBXF1jWX5-grgge_xyybavVNYF53ylvGjM9Co-0MrRBJRwqjL1reDAD2RWMRZF-TFGx4n2gKgH/s320/Screen+Shot+2020-07-07+at+11.21.30+AM.png" width="320"></a></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+I can also look at
+the daily activity and compare that against top anomalous users or where they
+rank as a percentage.&nbsp; You can see on the plot below that the user's actions were anomalous on a couple of different days.&nbsp;</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghbTt3Zp_6Kcjbl9Rqzh43bPKUlt0cW7v5LVBRa6Pj-oNKMWvLgqhN-tHT-UicdqWvCgjDM6yHhVCRDBRJT3uT1zRZcURtU2m9CAituhbmjAn-ejtDA7fblBRwMtc7YVOCT-mxQRQE1emE/s1600/Screen+Shot+2020-07-07+at+11.23.22+AM.png" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" data-original-height="750" data-original-width="1324" height="181" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghbTt3Zp_6Kcjbl9Rqzh43bPKUlt0cW7v5LVBRa6Pj-oNKMWvLgqhN-tHT-UicdqWvCgjDM6yHhVCRDBRJT3uT1zRZcURtU2m9CAituhbmjAn-ejtDA7fblBRwMtc7YVOCT-mxQRQE1emE/s320/Screen+Shot+2020-07-07+at+11.23.22+AM.png" width="320"></a></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+There are also a
+number of other use cases for retaining this metadata.</div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+This has taken a lot
+of time and effort to get to this point and is still a work in progress.<span style="mso-spacerun: yes;">&nbsp; </span>I can say though that I have found this to be
+a great way to quickly identify the threads that need be pulled. </div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+<br></div>
+<div style="font-family: Calibri; font-size: 11.0pt; margin: 0in;">
+Again, I'm sharing
+this so that maybe a conversation will begin to happen.<span style="mso-spacerun: yes;">&nbsp; </span>Are orgs hunting for insiders, and if so,
+how?<span style="mso-spacerun: yes;">&nbsp; </span>It's a conversation that's long
+overdue in my opinion.</div>
+<!--EndFragment--><br>
+<div style="clear: both;"></div>
+</div>
+<div class="post-footer">
+<div class="post-footer-line post-footer-line-1">
+<span class="post-author vcard">
+Posted by
+<span class="fn" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person">
+<span itemprop="name">Jack Crook</span>
+</span>
+</span>
+<span class="post-timestamp">
+at
+<meta content="http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html" itemprop="url">
+<a class="timestamp-link" href="http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html" rel="bookmark" title="permanent link"><abbr class="published" itemprop="datePublished" title="2020-07-07T08:31:00-07:00">8:31 AM</abbr></a>
+</span>
+<span class="post-comment-link">
+</span>
+<span class="post-icons">
+<span class="item-control blog-admin pid-400962724">
+<a href="https://www.blogger.com/post-edit.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;from=pencil" title="Edit Post">
+<img alt="" class="icon-action" height="18" src="https://resources.blogblog.com/img/icon18_edit_allbkg.gif" width="18">
+</a>
+</span>
+</span>
+<div class="post-share-buttons goog-inline-block">
+<a class="goog-inline-block share-button sb-email" href="https://www.blogger.com/share-post.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;target=email" target="_blank" title="Email This"><span class="share-button-link-text">Email This</span></a><a class="goog-inline-block share-button sb-blog" href="https://www.blogger.com/share-post.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;target=blog" onclick="window.open(this.href, &quot;_blank&quot;, &quot;height=270,width=475&quot;); return false;" target="_blank" title="BlogThis!"><span class="share-button-link-text">BlogThis!</span></a><a class="goog-inline-block share-button sb-twitter" href="https://www.blogger.com/share-post.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;target=twitter" target="_blank" title="Share to Twitter"><span class="share-button-link-text">Share to Twitter</span></a><a class="goog-inline-block share-button sb-facebook" href="https://www.blogger.com/share-post.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;target=facebook" onclick="window.open(this.href, &quot;_blank&quot;, &quot;height=430,width=640&quot;); return false;" target="_blank" title="Share to Facebook"><span class="share-button-link-text">Share to Facebook</span></a><a class="goog-inline-block share-button sb-pinterest" href="https://www.blogger.com/share-post.g?blogID=6244942915864113008&amp;postID=1843229681679979041&amp;target=pinterest" target="_blank" title="Share to Pinterest"><span class="share-button-link-text">Share to Pinterest</span></a>
+</div>
+</div>
+<div class="post-footer-line post-footer-line-2">
+<span class="post-labels">
+</span>
+</div>
+<div class="post-footer-line post-footer-line-3">
+<span class="post-location">
+</span>
+</div>
+</div>
+</div>
+<div class="comments" id="comments">
+<a name="comments"></a>
+<h4>No comments:</h4>
+<div id="Blog1_comments-block-wrapper">
+<dl class="avatar-comment-indent" id="comments-block">
+</dl>
+</div>
+<p class="comment-footer">
+</p><div class="comment-form">
+<a name="comment-form"></a>
+<h4 id="comment-post-message">Post a Comment</h4>
+<p>
+</p>
+<p>Note: Only a member of this blog may post a comment.</p>
+<a href="https://www.blogger.com/comment/frame/6244942915864113008?po=1843229681679979041&amp;hl=en&amp;blogspotRpcToken=6176261" id="comment-editor-src"></a>
+<iframe allowtransparency="true" class="blogger-iframe-colorize blogger-comment-from-post" frameborder="0" height="88px" id="comment-editor" name="comment-editor" src="https://www.blogger.com/comment/frame/6244942915864113008?po=1843229681679979041&amp;hl=en&amp;blogspotRpcToken=6176261#%7B%22color%22%3A%22rgb(34%2C%2034%2C%2034)%22%2C%22backgroundColor%22%3A%22rgb(255%2C%20255%2C%20255)%22%2C%22unvisitedLinkColor%22%3A%22rgb(204%2C%20102%2C%2017)%22%2C%22fontFamily%22%3A%22Arial%2C%20Tahoma%2C%20Helvetica%2C%20FreeSans%2C%20sans-serif%22%7D" width="100%" data-resized="true"></iframe>
+<script src="https://www.blogger.com/static/v1/jsbin/1466990918-comment_from_post_iframe.js" type="text/javascript"></script>
+<script type="text/javascript">
+      BLOG_CMT_createIframe('https://www.blogger.com/rpc_relay.html');
+    </script>
+</div>
+<p></p>
+</div>
+</div>
+
+        </div></div>
+      
+</div>
+<div class="blog-pager" id="blog-pager">
+<span id="blog-pager-newer-link">
+<a class="blog-pager-newer-link" href="http://findingbad.blogspot.com/2021/02/more-behavioral-hunting-and-insider.html" id="Blog1_blog-pager-newer-link" title="Newer Post">Newer Post</a>
+</span>
+<span id="blog-pager-older-link">
+<a class="blog-pager-older-link" href="http://findingbad.blogspot.com/2020/06/dynamic-correlation-ml-and-hunting.html" id="Blog1_blog-pager-older-link" title="Older Post">Older Post</a>
+</span>
+<a class="home-link" href="http://findingbad.blogspot.com/">Home</a>
+</div>
+<div class="clear"></div>
+<div class="post-feeds">
+<div class="feed-links">
+Subscribe to:
+<a class="feed-link" href="http://findingbad.blogspot.com/feeds/1843229681679979041/comments/default" target="_blank" type="application/atom+xml">Post Comments (Atom)</a>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="column-left-outer">
+<div class="column-left-inner">
+<aside>
+</aside>
+</div>
+</div>
+<div class="column-right-outer">
+<div class="column-right-inner">
+<aside>
+<div class="sidebar section" id="sidebar-right-1"><div class="widget BlogArchive" data-version="1" id="BlogArchive1">
+<h2>Blog Archive</h2>
+<div class="widget-content">
+<div id="ArchiveList">
+<div id="BlogArchive1_ArchiveList">
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2022/">
+2022
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2022/02/">
+February
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2021/">
+2021
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2021/10/">
+October
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2021/02/">
+February
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2020/">
+2020
+</a>
+<span class="post-count" dir="ltr">(5)</span>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2020/07/">
+July
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="posts">
+<li><a href="http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html">Insider Threat Hunting</a></li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2020/06/">
+June
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2020/05/">
+May
+</a>
+<span class="post-count" dir="ltr">(3)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/">
+2018
+</a>
+<span class="post-count" dir="ltr">(6)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/10/">
+October
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/09/">
+September
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/06/">
+June
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/03/">
+March
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2018/01/">
+January
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/">
+2017
+</a>
+<span class="post-count" dir="ltr">(7)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/12/">
+December
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/11/">
+November
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/04/">
+April
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/02/">
+February
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2017/01/">
+January
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/">
+2016
+</a>
+<span class="post-count" dir="ltr">(14)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/11/">
+November
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/10/">
+October
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/09/">
+September
+</a>
+<span class="post-count" dir="ltr">(9)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/08/">
+August
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="http://findingbad.blogspot.com/2016/07/">
+July
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+</div></div>
+</aside>
+</div>
+</div>
+</div>
+<div style="clear: both"></div>
+<!-- columns -->
+</div>
+<!-- main -->
+</div>
+</div>
+<div class="main-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<footer>
+<div class="footer-outer">
+<div class="footer-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left footer-fauxborder-left">
+<div class="fauxborder-right footer-fauxborder-right"></div>
+<div class="region-inner footer-inner">
+<div class="foot no-items section" id="footer-1"></div>
+<table border="0" cellpadding="0" cellspacing="0" class="section-columns columns-2">
+<tbody>
+<tr>
+<td class="first columns-cell">
+<div class="foot no-items section" id="footer-2-1"></div>
+</td>
+<td class="columns-cell">
+<div class="foot no-items section" id="footer-2-2"></div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- outside of the include in order to lock Attribution widget -->
+<div class="foot section" id="footer-3" name="Footer"><div class="widget Attribution" data-version="1" id="Attribution1">
+<div class="widget-content" style="text-align: center;">
+Simple theme. Powered by <a href="https://www.blogger.com" target="_blank">Blogger</a>.
+</div>
+<div class="clear"></div>
+</div></div>
+</div>
+</div>
+<div class="footer-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</footer>
+<!-- content -->
+</div>
+</div>
+<div class="content-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+    window.setTimeout(function() {
+        document.body.className = document.body.className.replace('loading', '');
+      }, 10);
+  </script>
+<!--To Ty odpowiadasz za poinformowanie u\u017cytkownik\xf3w o\xa0u\u017cywaniu plik\xf3w cookie i\xa0zbieraniu danych na blogu. Blogger udost\u0119pnia standardowe powiadomienie, kt\xf3rego mo\u017cesz u\u017cywa\u0107 na swoim blogu. Mo\u017cesz je dostosowa\u0107 do swoich potrzeb lub zast\u0105pi\u0107 w\u0142asnym. Tu znajdziesz wi\u0119cej informacji: http://www.blogger.com/go/cookiechoices.-->
+<script defer="" src="/js/cookienotice.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(event) {
+      window.cookieChoices && cookieChoices.showCookieConsentBar && cookieChoices.showCookieConsentBar(
+          (window.cookieOptions && cookieOptions.msg) || 'W\xa0tej witrynie s\u0105 wykorzystywane pliki cookie, kt\xf3rych Google u\u017cywa do \u015bwiadczenia swoich us\u0142ug i\xa0analizowania ruchu. Tw\xf3j adres\xa0IP i\xa0nazwa klienta u\u017cytkownika oraz dane dotycz\u0105ce wydajno\u015bci i\xa0bezpiecze\u0144stwa s\u0105 udost\u0119pniane firmie Google, by zapewni\u0107 odpowiedni\u0105 jako\u015b\u0107 us\u0142ug, generowa\u0107 statystyki u\u017cytkowania oraz wykrywa\u0107 nadu\u017cycia i\xa0na nie reagowa\u0107.',
+          (window.cookieOptions && cookieOptions.close) || 'Rozumiem',
+          (window.cookieOptions && cookieOptions.learn) || 'Dowiedz si\u0119 wi\u0119cej',
+          (window.cookieOptions && cookieOptions.link) || 'https://www.blogger.com/go/blogspot-cookies');
+    });
+  </script>
+
+<script type="text/javascript" src="https://www.blogger.com/static/v1/widgets/922809059-widgets.js"></script>
+<script type="text/javascript">
+window['__wavt'] = 'AOuZoY4iCdMJLyZ61ayzUHbzqEz0B5pG1w:1718451980967';_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d6244942915864113008','//findingbad.blogspot.com/2020/07/insider-threat-hunting.html','6244942915864113008');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '6244942915864113008', 'title': 'DFIR and Threat Hunting', 'url': 'http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html', 'canonicalUrl': 'http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html', 'homepageUrl': 'http://findingbad.blogspot.com/', 'searchUrl': 'http://findingbad.blogspot.com/search', 'canonicalHomepageUrl': 'http://findingbad.blogspot.com/', 'blogspotFaviconUrl': 'http://findingbad.blogspot.com/favicon.ico', 'bloggerUrl': 'https://www.blogger.com', 'hasCustomDomain': false, 'httpsEnabled': true, 'enabledCommentProfileImages': true, 'gPlusViewType': 'FILTERED_POSTMOD', 'adultContent': false, 'analyticsAccountNumber': '', 'encoding': 'UTF-8', 'locale': 'en', 'localeUnderscoreDelimited': 'en', 'languageDirection': 'ltr', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'isDynamicViewsAvailable': true, 'feedLinks': '\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22DFIR and Threat Hunting - Atom\x22 href\x3d\x22http://findingbad.blogspot.com/feeds/posts/default\x22 /\x3e\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/rss+xml\x22 title\x3d\x22DFIR and Threat Hunting - RSS\x22 href\x3d\x22http://findingbad.blogspot.com/feeds/posts/default?alt\x3drss\x22 /\x3e\n\x3clink rel\x3d\x22service.post\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22DFIR and Threat Hunting - Atom\x22 href\x3d\x22https://www.blogger.com/feeds/6244942915864113008/posts/default\x22 /\x3e\n\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22DFIR and Threat Hunting - Atom\x22 href\x3d\x22http://findingbad.blogspot.com/feeds/1843229681679979041/comments/default\x22 /\x3e\n', 'meTag': '', 'adsenseHostId': 'ca-host-pub-1556223355139109', 'adsenseHasAds': false, 'adsenseAutoAds': false, 'boqCommentIframeForm': true, 'loginRedirectParam': '', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/1156f5042d12a8cd', 'plusOneApiSrc': 'https://apis.google.com/js/platform.js', 'disableGComments': true, 'interstitialAccepted': false, 'sharing': {'platforms': [{'name': 'Get link', 'key': 'link', 'shareMessage': 'Get link', 'target': ''}, {'name': 'Facebook', 'key': 'facebook', 'shareMessage': 'Share to Facebook', 'target': 'facebook'}, {'name': 'BlogThis!', 'key': 'blogThis', 'shareMessage': 'BlogThis!', 'target': 'blog'}, {'name': 'Twitter', 'key': 'twitter', 'shareMessage': 'Share to Twitter', 'target': 'twitter'}, {'name': 'Pinterest', 'key': 'pinterest', 'shareMessage': 'Share to Pinterest', 'target': 'pinterest'}, {'name': 'Email', 'key': 'email', 'shareMessage': 'Email', 'target': 'email'}], 'disableGooglePlus': true, 'googlePlusShareButtonWidth': 0, 'googlePlusBootstrap': '\x3cscript type\x3d\x22text/javascript\x22\x3ewindow.___gcfg \x3d {\x27lang\x27: \x27en\x27};\x3c/script\x3e'}, 'hasCustomJumpLinkMessage': false, 'jumpLinkMessage': 'Read more', 'pageType': 'item', 'postId': '1843229681679979041', 'postImageThumbnailUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s72-c/Screen+Shot+2020-07-07+at+11.17.31+AM.png', 'postImageUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s320/Screen+Shot+2020-07-07+at+11.17.31+AM.png', 'pageName': 'Insider Threat Hunting', 'pageTitle': 'DFIR and Threat Hunting: Insider Threat Hunting'}}, {'name': 'features', 'data': {}}, {'name': 'messages', 'data': {'edit': 'Edit', 'linkCopiedToClipboard': 'Link copied to clipboard!', 'ok': 'Ok', 'postLink': 'Post Link'}}, {'name': 'template', 'data': {'name': 'Simple', 'localizedName': 'Simple', 'isResponsive': false, 'isAlternateRendering': false, 'isCustom': false, 'variant': 'bold', 'variantId': 'bold'}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '?view\x3dclassic'}, 'flipcard': {'name': 'flipcard', 'url': '?view\x3dflipcard'}, 'magazine': {'name': 'magazine', 'url': '?view\x3dmagazine'}, 'mosaic': {'name': 'mosaic', 'url': '?view\x3dmosaic'}, 'sidebar': {'name': 'sidebar', 'url': '?view\x3dsidebar'}, 'snapshot': {'name': 'snapshot', 'url': '?view\x3dsnapshot'}, 'timeslide': {'name': 'timeslide', 'url': '?view\x3dtimeslide'}, 'isMobile': false, 'title': 'Insider Threat Hunting', 'description': '          If you subscribe to the notion that a user, who is intent on stealing data from your org, will require a change in their behavior....', 'featuredImage': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjyTki5eroh5jYweRv850eWPYHtRArTx_iNph9fYR5KsOx6eap1YcdH5BpBZrDX-fhQjiEz7hveY5hcbF8m45OYtt8FfrV2AQpAPSk3yOetSKpGcbJEZsV4QihZjQdD9GesQfQ_hR14GaC/s320/Screen+Shot+2020-07-07+at+11.17.31+AM.png', 'url': 'http://findingbad.blogspot.com/2020/07/insider-threat-hunting.html', 'type': 'item', 'isSingleItem': true, 'isMultipleItems': false, 'isError': false, 'isPage': false, 'isPost': true, 'isHomepage': false, 'isArchive': false, 'isLabelSearch': false, 'postId': 1843229681679979041}}]);
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'lightboxEnabled': true, 'lightboxModuleUrl': 'https://www.blogger.com/static/v1/jsbin/630159536-lbx.js', 'lightboxCssUrl': 'https://www.blogger.com/static/v1/v-css/13464135-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar-right-1', document.getElementById('BlogArchive1'), {'languageDirection': 'ltr', 'loadingMessage': 'Loading\x26hellip;'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_AttributionView', new _WidgetInfo('Attribution1', 'footer-3', document.getElementById('Attribution1'), {}, 'displayModeFull'));
+</script>
+
+<div id="cookieChoiceInfo" class="cookie-choices-info singleton-element"><div class="cookie-choices-inner"><span class="cookie-choices-text">W&nbsp;tej witrynie są wykorzystywane pliki cookie, których Google używa do świadczenia swoich usług i&nbsp;analizowania ruchu. Twój adres&nbsp;IP i&nbsp;nazwa klienta użytkownika oraz dane dotyczące wydajności i&nbsp;bezpieczeństwa są udostępniane firmie Google, by zapewnić odpowiednią jakość usług, generować statystyki użytkowania oraz wykrywać nadużycia i&nbsp;na nie reagować.</span><span class="cookie-choices-buttons"><a href="https://www.blogger.com/go/blogspot-cookies" target="_blank" class="cookie-choices-button">Dowiedz się więcej</a><a id="cookieChoiceDismiss" href="#" class="cookie-choices-button">Rozumiem</a></span></div></div><link type="text/css" rel="stylesheet" href="https://www.blogger.com/static/v1/v-css/13464135-lightbox_bundle.css"><script type="text/javascript" src="https://www.blogger.com/static/v1/jsbin/630159536-lbx.js"></script></body></html>

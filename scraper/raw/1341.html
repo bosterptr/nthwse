@@ -1,0 +1,1150 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Overview of GLIBC heap exploitation techniques</title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.querySelector('html').classList.add('dark');
+        } else {
+            document.querySelector('html').classList.remove('dark');
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="preconnect" href="https://fonts.gstatic.com"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+
+    <link rel="stylesheet" type="text/css" href="/assets/styles/main.css?v=88d1ac4537">
+
+    <style>
+        :root {
+            --logo-width: 11.25rem;
+        }
+    </style>
+
+    <meta name="description" content="Overview of current GLIBC heap exploitation techniques up to GLIBC 2.34, including their ideas and introduced mitigations along the way">
+    <link rel="canonical" href="https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/amp/">
+    
+    <meta property="og:site_name" content="Low-level adventures">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Overview of GLIBC heap exploitation techniques">
+    <meta property="og:description" content="Overview of current GLIBC heap exploitation techniques up to GLIBC 2.34, including their ideas and introduced mitigations along the way">
+    <meta property="og:url" content="https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/">
+    <meta property="og:image" content="https://0x434b.dev/content/images/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png">
+    <meta property="article:published_time" content="2022-02-13T15:15:47.000Z">
+    <meta property="article:modified_time" content="2024-05-16T05:36:43.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Overview of GLIBC heap exploitation techniques">
+    <meta name="twitter:description" content="Overview of current GLIBC heap exploitation techniques up to GLIBC 2.34, including their ideas and introduced mitigations along the way">
+    <meta name="twitter:url" content="https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/">
+    <meta name="twitter:image" content="https://0x434b.dev/content/images/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="0x434b">
+    <meta name="twitter:site" content="@0xricksanchez">
+    <meta name="twitter:creator" content="@0xricksanchez">
+    <meta property="og:image:width" content="497">
+    <meta property="og:image:height" content="699">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Low-level adventures",
+        "url": "https://0x434b.dev/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://0x434b.dev/favicon.ico",
+            "width": 48,
+            "height": 48
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "0x434b",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://0x434b.dev/content/images/2022/06/tvEzScas_400x400.jpg",
+            "width": 400,
+            "height": 400
+        },
+        "url": "https://0x434b.dev/author/0x434b/",
+        "sameAs": [
+            "https://0x434b.dev",
+            "https://twitter.com/0xricksanchez"
+        ]
+    },
+    "headline": "Overview of GLIBC heap exploitation techniques",
+    "url": "https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/",
+    "datePublished": "2022-02-13T15:15:47.000Z",
+    "dateModified": "2024-05-16T05:36:43.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://0x434b.dev/content/images/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png",
+        "width": 497,
+        "height": 699
+    },
+    "description": "Overview of current GLIBC heap exploitation techniques up to GLIBC 2.34, including their ideas and introduced mitigations along the way",
+    "mainEntityOfPage": "https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.80">
+    <link rel="alternate" type="application/rss+xml" title="Low-level adventures" href="https://0x434b.dev/rss/">
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/portal@~2.37/umd/portal.min.js" data-i18n="false" data-ghost="https://0x434b.dev/" data-key="104c88e0cd01f2a5ed18156f4e" data-api="https://0x434b.dev/ghost/api/content/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="104c88e0cd01f2a5ed18156f4e" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://0x434b.dev/" crossorigin="anonymous"></script>
+    
+    <link href="https://0x434b.dev/webmentions/receive/" rel="webmention">
+    <script defer="" src="/public/cards.min.js?v=88d1ac4537"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=88d1ac4537">
+    <script defer="" src="/public/comment-counts.min.js?v=88d1ac4537" data-ghost-comments-counts-api="https://0x434b.dev/members/api/comments/counts/"></script>
+    <script defer="" src="/public/member-attribution.min.js?v=88d1ac4537"></script>
+    <!-- site header -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+<link rel="stylesheet" href="https://github.com/asciinema/asciinema-player/releases/download/v2.6.1/asciinema-player.css">
+
+<!-- link tag -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.css">
+<!-- script tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+
+<style>
+    pre[class*=language-] {
+        margin: 0.5em 0;
+        font-size: 0.75em;
+        background: #111;
+    }
+</style>
+
+<style>:root {--ghost-accent-color: #038743;}</style>
+<style>.gh-portal-account-header{display:flex;flex-direction:column;align-items:center;margin:0 0 32px}.gh-portal-account-header .gh-portal-avatar{margin:6px 0 8px!important}.gh-portal-account-data{margin-bottom:40px}footer.gh-portal-account-footer{display:flex}.gh-portal-account-footer.paid{margin-top:12px}.gh-portal-account-footermenu{display:flex;align-items:center;list-style:none;padding:0;margin:0}.gh-portal-account-footerright{display:flex;flex-grow:1;align-items:center;justify-content:flex-end}.gh-portal-account-footermenu li{margin-right:16px}.gh-portal-account-footermenu li:last-of-type{margin-right:0}.gh-portal-freeaccount-newsletter{display:flex;align-items:center;justify-content:space-between;margin-top:24px}.gh-portal-freeaccount-newsletter .label{display:flex;flex-direction:column;flex-grow:1}.gh-portal-free-ctatext{margin-top:-12px}.gh-portal-cancelcontinue-container{margin:24px 0 32px}.gh-portal-list-detail .gh-portal-email-notice{display:flex;align-items:center;gap:5px;margin-top:6px;color:var(--red);font-weight:500;font-size:1.25rem;letter-spacing:.2px}.gh-portal-email-notice-icon{width:20px;height:20px}.gh-portal-billing-button-loader{width:32px;height:32px;margin-right:-3px;opacity:.6}.gh-portal-product-icon{width:52px;margin-right:12px;border-radius:2px}.gh-portal-account-discountcontainer{position:relative;display:flex;align-items:center}.gh-portal-account-old-price{text-decoration:line-through;color:var(--grey9)!important}.gh-portal-account-tagicon{width:16px;height:16px;color:var(--brandcolor);margin-right:5px;z-index:999}@media (max-width: 390px){.gh-portal-account-footer{padding:0!important}}@media (max-width: 340px){.gh-portal-account-footer{padding:0!important;flex-wrap:wrap;gap:12px}.gh-portal-account-footer .gh-portal-account-footerright{justify-content:flex-start}}.gh-email-suppressed-page-title{margin-bottom:14px}.gh-email-suppressed-page-icon{display:block;width:38px;height:38px;margin:0 auto 18px}.gh-email-suppressed-page-text{padding:0 14px;text-align:center;color:var(--grey6)}.gh-email-faq-footer-text{color:var(--grey8)}.gh-portal-list-detail.email-newsletter .gh-email-faq-page-button{display:block;margin-top:3px}.gh-portal-action-footer .gh-email-faq-page-button{margin-left:4px}.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:calc(6vmin - 14px)}.emailReceivingFAQ .gh-portal-closeicon-container{right:calc(6vmin - 20px)}@media (max-width: 480px){.emailReceivingFAQ .gh-portal-btn-back,.emailReceivingFAQ .gh-portal-btn-back:hover{left:16px}.emailReceivingFAQ .gh-portal-closeicon-container{right:24px}}.gh-email-faq-page-button{color:var(--brandcolor);cursor:pointer;background:none;transition:color linear .1s;font-size:1.45rem}</style><style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style></head>
+<body class="is-article">
+
+    <div class="site-wrapper flex flex-col justify-start min-h-screen">
+        <header class="header w-full flex items-center h-16 top-0 px-4 shadow-sm z-50 sticky">
+    <div class="header-wrap relative flex items-center flex-auto justify-between">
+        <a class="header-logo flex-none" href="https://0x434b.dev">
+                <span class="text-28 font-bold leading-tight font-sans">Low-level adventures</span>
+        </a>
+
+            <nav class="mainMenu px-5 items-center hidden flex-grow lg:flex">
+                    <ul class="nav">
+        <li class="nav-home"><a href="https://0x434b.dev/">Home</a></li>
+        <li class="nav-about"><a href="https://0x434b.dev/about/">About</a></li>
+        <li class="nav-publications"><a href="https://0x434b.dev/Publications/">Publications</a></li>
+        <li class="nav-buzzwords"><a href="https://0x434b.dev/what-the-buzz/">Buzzwords</a></li>
+        <li class="nav-fuzzing-papers"><a href="https://github.com/0xricksanchez/paper_collection">Fuzzing-Papers</a></li>
+        <li class="nav-buy-me-a-coffee"><a href="https://www.buymeacoffee.com/0xricksanchez">Buy me a coffee</a></li>
+    </ul>
+
+            </nav>
+
+        <ul class="header-left flex flex-none justify-end">
+            <li class="dropdown is-right is-hoverable hidden relative lg:block">
+                <span class="hla h-16 flex items-center text-sm">Follow <svg class="icon is-small is-stroke transform rotate-90" style="width:1rem;height:1rme"><use xlink:href="#icon-forward"></use></svg></span>
+
+                <div class="dropdown-menu max-w-sm w-96">
+                    <div class="dropdown-content p-6">
+                        <aside class="js-social-media social-media header-social-media mb-5">
+
+    <a title="Twitter @0xricksanchez" href="https://twitter.com/0xricksanchez" class="button border-none" target="_blank" rel="noopener noreferrer">
+        <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
+    </a>
+
+
+
+
+
+<a href="https://github.com/0xricksanchez" title="Github" class="button border-none hover:text-github" target="_blank" rel="noopener noreferrer"><svg class="icon icon--github"><use xlink:href="#icon-github"></use></svg></a><a href="https://0x434b.dev/rss" title="RSS" class="button border-none hover:text-rss" target="_blank" rel="noopener noreferrer"><svg class="icon icon--rss"><use xlink:href="#icon-rss"></use></svg></a></aside>
+                        <div class="mb-2">
+                            <h5 class="text-white text-2xl font-bold mb-2">Subscribe to Low-level adventures</h5>
+                            <div class="text-base mb-2 text-white text-opacity-60">Get the latest posts delivered right to your inbox</div>
+
+                            <form class="members-dropdown" data-members-form="subscribe">
+                                <div class="flex">
+                                    <input class="subscribe-email text-base flex-grow rounded-none text-white border-transparent" style="background:#252525" data-members-email="" placeholder="youremail@example.com" aria-label="Your email address" aria-describedby="header-subscribe-btn" autocomplete="off" required="">
+                                    <button id="header-subscribe-btn" class="button is-primary flex-none rounded-none" type="submit">
+                                        <span class="button-text">Subscribe</span>
+                                        <span class="hidden"><svg class="icon hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path opacity=".3" fill="currentColor" d="M20.201 5.169c-8.254 0-14.946 6.692-14.946 14.946 0 8.255 6.692 14.946 14.946 14.946s14.946-6.691 14.946-14.946c-.001-8.254-6.692-14.946-14.946-14.946zm0 26.58c-6.425 0-11.634-5.208-11.634-11.634 0-6.425 5.209-11.634 11.634-11.634 6.425 0 11.633 5.209 11.633 11.634 0 6.426-5.208 11.634-11.633 11.634z"></path><path fill="currentColor" d="M26.013 10.047l1.654-2.866a14.855 14.855 0 00-7.466-2.012v3.312c2.119 0 4.1.576 5.812 1.566z"><animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite"></animateTransform></path></svg></span>
+                                    </button>
+                                </div>
+                                <div class="message-success mt-5 p-2 rounded text-white bg-success hidden"><strong>Great!</strong> Check your inbox and click the link to confirm your subscription</div>
+                                <div class="message-error mt-5 p-2 rounded text-white bg-red-400 hidden">Please enter a valid email address!</div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="js-dark-mode h-16 hla hidden lg:flex items-center cursor-pointer px-2">
+                <svg class="icon is-large icon--moon"><use xlink:href="#icon-moon"></use></svg>
+                <svg class="icon is-large icon--sunny hidden"><use xlink:href="#icon-sunny"></use></svg>
+            </li>
+
+
+            <li class="header-dropdown-menu dropdown is-right is-hoverable h-16 hidden lg:flex items-center cursor-pointer">
+                <span class="hla"><svg class="icon is-large"><use xlink:href="#icon-user"></use></svg></span>
+
+                <div class="dropdown-menu is-right whitespace-normal">
+                    <div class="dropdown-content p-5 text-white">
+                            <a href="/signin/" data-portal="signin" class="flex items-center justify-between py-2 hover:opacity-80 gh-portal-close">
+                                <span>Log in</span>
+                                <svg class="icon is-stroke is-small"><use xlink:href="#icon-next"></use></svg>
+                            </a>
+                            <a href="/signup/" data-portal="signup" class="flex items-center justify-between py-2 hover:opacity-80 gh-portal-close">
+                                <span>Sign up</span>
+                                <svg class="icon is-stroke is-small"><use xlink:href="#icon-next"></use></svg>
+                            </a>
+
+                    </div>
+                </div>
+            </li>
+
+            <li class="js-toggle-search hla h-16 cursor-pointer flex items-center px-2"><svg class="icon is-large"><use xlink:href="#icon-search"></use></svg></li>
+            <li class="js-menu-open hla h-16 cursor-pointer flex items-center lg:hidden">
+                <svg class="icon is-large"><use xlink:href="#icon-menu"></use></svg>
+            </li>
+        </ul>
+    </div>
+</header>
+        <main class="site-main">
+
+
+<div class="container mx-auto flex flex-col lg:flex-row my-10">
+        <article class="post min-w-0 flex-auto">
+                <header class="post-header mb-6">
+    
+    <h1 class="post-title text-4xl md:text-42 text text-title">Overview of GLIBC heap exploitation techniques</h1>
+    <p class="post-excerpt text-xl mt-5 text-gray-500">Overview of current GLIBC heap exploitation techniques up to GLIBC 2.34, including their ideas and introduced mitigations along the way</p>
+</header>
+                <div class="hh flex items-center relative z-4 flex-auto overflow-hidden">
+    <ul class="hh-author flex flex-wrap flex-none mr-3">
+        <li class="hh-author-item realtive">
+            <a href="/author/0x434b/" title="Go to the profile of 0x434b" class="relative">
+                <img class="object-cover rounded-full avatar is-44x44" src="/content/images/size/w100/2022/06/tvEzScas_400x400.jpg" alt="Go to the profile of  0x434b" width="36" height="36">
+            </a>
+        </li>
+    </ul>
+
+    <div class="hh-right flex-auto overflow-hidden text-sm">
+        <div class="noWrapWithEllipsis text-gray-500">
+            <time class="datetime capitalize" datetime="2022-02-13">Published 13 Feb 2022</time>
+            <span class="mx-1 bull"></span>
+            <span class="readingTime cursor-default" title="43 min read">43 min read</span>
+        </div>
+
+        <div class="hh-author-name noWrapWithEllipsis font-medium text-gray-900">
+            <span class="text-gray-500">By </span>
+            <a href="/author/0x434b/">0x434b</a>
+        </div>
+    </div>
+</div>
+
+
+                <figure class="post-image mt-8 mx-auto max-w-screen-xl">
+        <img class="post-img w-full max-auto" srcset="/content/images/size/w300/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png 300w,
+                    /content/images/size/w600/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png 600w,
+                    /content/images/size/w1000/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png 1000w,
+                    /content/images/size/w2000/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png 2000w" sizes="(max-width: 400px) 300px,(max-width: 730px) 600px, (max-width: 1600px) 100vw" src="/content/images/size/w2000/2022/02/07a7bc510510aa96b3478b2d96aa172311e4e9320d909c520c5c815147d0c96f.png" alt="Overview of GLIBC heap exploitation techniques">
+        
+    </figure>
+
+            <div class="post-body-wrap relative lg:flex">
+    <div id="post-body" class="post-body min-w-0 js-post-content font-sans text-lg">
+        <p>This post will aim at giving a general overview of publicly found GLIBC heap exploitation techniques. Actual exploitation will be left as an exercise for the reader. The remainder of this post will be divided in 2 parts: Patched and unpatched techniques. The latter category is to the best of my knowledge. I will provide links to patches as good as I can when a technique has been rendered unusable. Unusable should be interpreted with caution, as I'm only talking original attack vector here. Someone, somewhere, might find a new way to exploit a dead technique again!</p>
+<!--kg-card-begin: html-->
+<div class="toc-container">
+    <div class="toc-heading">Table fo contents</div>
+	<aside class="toc"><ol class="toc-list "><li class="toc-list-item is-active-li"><a href="#basics" class="toc-link node-name--H2  is-active-link">Basics</a><ol class="toc-listis-collapsible"><li class="toc-list-item"><a href="#chunks" class="toc-link node-name--H3 ">Chunks</a></li><li class="toc-list-item"><a href="#bins" class="toc-link node-name--H3 ">Bins</a><ol class="toc-list  is-collapsible "><li class="toc-list-item"><a href="#fastbin" class="toc-link node-name--H4 ">Fastbin</a></li><li class="toc-list-item"><a href="#smallbin" class="toc-link node-name--H4 ">Smallbin</a></li><li class="toc-list-item"><a href="#unsortedbin" class="toc-link node-name--H4 ">Unsortedbin</a></li><li class="toc-list-item"><a href="#largebin" class="toc-link node-name--H4 ">Largebin</a></li><li class="toc-list-item"><a href="#tcache" class="toc-link node-name--H4 ">Tcache</a></li></ol></li><li class="toc-list-item"><a href="#arena" class="toc-link node-name--H3 ">Arena</a></li><li class="toc-list-item"><a href="#unlinking" class="toc-link node-name--H3 ">Unlinking</a></li><li class="toc-list-item"><a href="#remaindering" class="toc-link node-name--H3 ">Remaindering</a></li><li class="toc-list-item"><a href="#exhausting" class="toc-link node-name--H3 ">Exhausting</a></li><li class="toc-list-item"><a href="#consolidation" class="toc-link node-name--H3 ">Consolidation</a></li><li class="toc-list-item"><a href="#malloc-hooks" class="toc-link node-name--H3 ">Malloc hooks</a></li></ol></li><li class="toc-list-item"><a href="#patched-techniques" class="toc-link node-name--H2 ">Patched techniques</a><ol class="toc-list  is-collapsible "><li class="toc-list-item"><a href="#house-of-prime" class="toc-link node-name--H4 ">House of Prime</a></li><li class="toc-list-item"><a href="#unsafe-unlink" class="toc-link node-name--H4 ">Unsafe unlink</a></li><li class="toc-list-item"><a href="#house-of-mind-original" class="toc-link node-name--H4 ">House of Mind (Original)</a></li><li class="toc-list-item"><a href="#house-of-orange" class="toc-link node-name--H4 ">House of Orange</a></li><li class="toc-list-item"><a href="#house-of-rabbit" class="toc-link node-name--H3 ">House of Rabbit</a></li><li class="toc-list-item"><a href="#unsortedbin-attack" class="toc-link node-name--H3 ">Unsortedbin Attack</a></li><li class="toc-list-item"><a href="#house-of-force" class="toc-link node-name--H3 ">House of Force</a></li><li class="toc-list-item"><a href="#house-of-corrosion" class="toc-link node-name--H3 ">House of Corrosion</a></li><li class="toc-list-item"><a href="#house-of-roman" class="toc-link node-name--H3 ">House of Roman</a></li><li class="toc-list-item"><a href="#house-of-storm" class="toc-link node-name--H3 ">House of Storm</a></li><li class="toc-list-item"><a href="#house-of-husk" class="toc-link node-name--H3 ">House of Husk</a></li><li class="toc-list-item"><a href="#house-of-kauri" class="toc-link node-name--H3 ">House of Kauri</a></li><li class="toc-list-item"><a href="#house-of-fun" class="toc-link node-name--H3 ">House of Fun</a></li><li class="toc-list-item"><a href="#tcache-dup" class="toc-link node-name--H3 ">Tcache Dup</a></li></ol></li><li class="toc-list-item"><a href="#unpatched-techniques" class="toc-link node-name--H2 ">Unpatched Techniques</a><ol class="toc-list  is-collapsible "><li class="toc-list-item"><a href="#house-of-lore" class="toc-link node-name--H3 ">House of Lore</a></li><li class="toc-list-item"><a href="#safe-unlink" class="toc-link node-name--H3 ">Safe Unlink</a></li><li class="toc-list-item"><a href="#fastbin-dup" class="toc-link node-name--H3 ">Fastbin Dup</a></li><li class="toc-list-item"><a href="#house-of-spirit" class="toc-link node-name--H3 ">House of Spirit</a></li><li class="toc-list-item"><a href="#house-of-einherjar" class="toc-link node-name--H3 ">House of Einherjar</a></li><li class="toc-list-item"><a href="#house-of-mind-fastbin-edition" class="toc-link node-name--H3 ">House of Mind (Fastbin Edition)</a></li><li class="toc-list-item"><a href="#poison-null-byte" class="toc-link node-name--H3 ">Poison NULL byte</a></li><li class="toc-list-item"><a href="#house-of-muney" class="toc-link node-name--H3 ">House of Muney</a></li><li class="toc-list-item"><a href="#house-of-rust" class="toc-link node-name--H3 ">House of Rust</a></li><li class="toc-list-item"><a href="#house-of-crust" class="toc-link node-name--H3 ">House of Crust</a></li><li class="toc-list-item"><a href="#house-of-io" class="toc-link node-name--H3 ">House of IO</a></li><li class="toc-list-item"><a href="#largebin-attack" class="toc-link node-name--H3 ">Largebin attack</a></li><li class="toc-list-item"><a href="#tcachehouse-of-botcake" class="toc-link node-name--H3 ">Tcache - House of Botcake</a></li><li class="toc-list-item"><a href="#tcachehouse-of-spirit" class="toc-link node-name--H3 ">Tcache - House of Spirit</a></li><li class="toc-list-item"><a href="#tcachepoisoning" class="toc-link node-name--H3 ">Tcache - Poisoning</a></li><li class="toc-list-item"><a href="#tcachestashing-unlink" class="toc-link node-name--H3 ">Tcache - Stashing unlink</a></li></ol></li></ol></aside>
+</div>
+<!--kg-card-end: html-->
+<h2 id="basics">Basics</h2><p>To get started, let's get on the same page with some terminology!</p><h3 id="chunks">Chunks</h3><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-3.png" class="kg-image" alt="" loading="lazy" width="846" height="616" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-3.png 600w, https://0x434b.dev/content/images/2022/02/image-3.png 846w" sizes="(min-width: 720px) 720px"></figure><p></p><h3 id="bins">Bins</h3><p>A bin is a list structure (doubly or singly linked list) of non-allocated chunks. Bins are differentiated based on the size of chunks they contain and are handled differently. We'll take a brief look at them next.</p><h4 id="fastbin">Fastbin</h4><p>The fastbins are a collection of singly linked, non-circular lists, with each bin in the fastbins holding chunks of a fixed size ranging from <strong>0x20</strong> to <strong>0xb0</strong>. The head of the fastbin is stored in its arena, while the 1st qword of a fastbin chunk's userdata is repurposed as a forward pointer (fd) that points to the next chunk in a specific fastbin. A fd of NULL indicates the end of the list. The fastbins are LIFO structures. Chunks are directly linked into the corresponding fastbin if the tcache is present and the appropriately sized tcachebin is already full. When requesting a chunk in fastbin range, the search is prioritized as follows: tcachebin⇾fastbin⇾unsortedbin⇾top_chunk.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-4.png" class="kg-image" alt="" loading="lazy" width="2000" height="260" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-4.png 600w, https://0x434b.dev/content/images/size/w1000/2022/02/image-4.png 1000w, https://0x434b.dev/content/images/size/w1600/2022/02/image-4.png 1600w, https://0x434b.dev/content/images/2022/02/image-4.png 2196w" sizes="(min-width: 720px) 720px"></figure><h4 id="smallbin">Smallbin</h4><p>Smallbins, contrary to the fastbins are doubly linked, circular lists (62 in total) that each hold chunks of a specific size ranging from <strong>0x20</strong> to <strong>0x3f0</strong>, overlapping the fastbins. The head of each smallbin is located in the arena. Linking into a smallbin only happens via the unsortedbin, when sorting occurs. The list metadata (forward and backward pointers) are stored inline in the freed chunks. The smallbins are unlike the fastbins FIFO structures.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-5.png" class="kg-image" alt="" loading="lazy" width="1728" height="236" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-5.png 600w, https://0x434b.dev/content/images/size/w1000/2022/02/image-5.png 1000w, https://0x434b.dev/content/images/size/w1600/2022/02/image-5.png 1600w, https://0x434b.dev/content/images/2022/02/image-5.png 1728w" sizes="(min-width: 720px) 720px"></figure><h4 id="unsortedbin">Unsortedbin</h4><p>An unsortedbin is a doubly linked, circular list. It holds free chunks of any size. The head and tail of the unsortedbin are located within the arena. Inline metadata in the form of a forward and backward pointer are used to link chunks. Chunks are directly linked into the head of the unsortedbin if they are either not in fastbin range (&gt;= 0x90) or in case of the tcache being present if the tcache is full and if the chunk is outside tcache size range (&gt;= 0x420). The unsortedbin is only searched (from tail to head) after the tcache, fastbins and smallbins, but before the largebins. If during the search an exact fit is encountered is allocated, if it's not an exact fit the free chunk is sorted into the appropriate small- or largebin. If a chunk is bigger than the requested chunk, the remaindering process will take place and the remainder will be linked into the head of the unsortedbin again.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-6.png" class="kg-image" alt="" loading="lazy" width="1718" height="163" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-6.png 600w, https://0x434b.dev/content/images/size/w1000/2022/02/image-6.png 1000w, https://0x434b.dev/content/images/size/w1600/2022/02/image-6.png 1600w, https://0x434b.dev/content/images/2022/02/image-6.png 1718w" sizes="(min-width: 720px) 720px"></figure><h4 id="largebin">Largebin</h4><p>Largebins, are also doubly linked, circular lists. Unlike the fast- or smallbins, each largebin does not just hold a fixed size but a range of sizes (e.g. 0x400 to 0x430 sized chunks are linked into the same largebin). The head of the largebin also resides in the arena. Inline metadata in the form of forward and backward pointers is also still present here. A major difference is the occurrence of two additional pointers (fd_nextsize and bk_nextsize), which are only present in the first element of each largebin. These <code>nextsize</code> pointers form another doubly linked, circular list and point to the next/previous largebin. Linking into a largebin only occurs via the arena's unsortedbin when sorting occurs, similar to how it's handled in the smallbins. During scanning for an exact fit or larger sized chunk to serve, the appropriately sized largebin is searched from back to front. Furthermore, malloc only allocates a chunk with the <code>nextsize</code> pointers (skip list pointers) when it's the last chunk in a largebin to avoid having to change multiple pointers. Non-exact fit chunks are exhausted/remaindered when allocated from a largebin. The <code>last_remainder</code> field is not set!</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-7.png" class="kg-image" alt="" loading="lazy" width="1745" height="224" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-7.png 600w, https://0x434b.dev/content/images/size/w1000/2022/02/image-7.png 1000w, https://0x434b.dev/content/images/size/w1600/2022/02/image-7.png 1600w, https://0x434b.dev/content/images/2022/02/image-7.png 1745w" sizes="(min-width: 720px) 720px"></figure><h4 id="tcache">Tcache</h4><p>Since GLIBC &gt;= 2.26 each thread has its own tcache which sits at the very beginning of the heap. It kind of behaves like an arena, just that a tcache is thread-specific. There are 64 tcachebins with fixed sizes, with a preceding array that keeps count about how many entries each tcachebin has.  Since GLIBC &gt;= 2.30 each count is the size of a word, before that, it was a char*. The tcachebins behave similarly to fastbins, with each acting as the head of a singly linked, non-circular list of chunks of a specific size. By default, each tcachebin can hold 7 free chunks (which can be tweaked with the <code>tcache_count</code> variable in the malloc_par struct). When a tcachebin is full, a newly freed chunk is treated as if there is no tcache around. Allocating from a tcachebin takes priority over every other bin. Phenomena with tcaches around is tcache dumping, which occurs when a thread allocates a chunk from its arena. When a chunk is allocated from the fast-/smallbins, malloc dumps any remaining free chunk in that bin into their corresponding tcachebin until it is full. Similarly, when an unsortedbin scan occurs, any encountered chunk that is an exact fit will also be dumped into the tcachebin. If the tcachebin is full and malloc finds another exact-fitting chunk in the unsortedbin, that chunk is allocated. If the unsortedbin scan is completed and &gt;=1 chunk(s)  were dumped into the tcachebin, a chunk is allocated from that tcachebin.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-9.png" class="kg-image" alt="" loading="lazy" width="688" height="433" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-9.png 600w, https://0x434b.dev/content/images/2022/02/image-9.png 688w"></figure><hr><h3 id="arena">Arena</h3><p>An arena is not more than a state struct for malloc to use. An arena primarily consists of the bins, among a few other noteworthy fields. The mutex field serializes access to an arena. The flag field holds information about whether an arena's heap memory is contiguous. The <code>have_fastchunks</code> boolean field indicates the fastbins may not be empty. The <code>binmap</code> is a bitvector that loosely represents which of an arena's smallbins &amp; largebins are occupied. It's used by malloc to quickly find the next largest, occupied bin when a request could not be serviced. Binmap searches occur after an unsuccessful unsortedbin or largebin search. The next field is a pointer to a singly linked, circular lost of all arenas belonging to this arena. Next_free is also a singly linked but non-circular list of free arenas (arenas with no threads attached). Attached_threads is just the number of threads concurrently using this arena. System_mem holds the value of the total writable memory currently mapped by this arena. Max_system_mem is the largest amount of writable memory this arena had mapped at any point.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-8.png" class="kg-image" alt="" loading="lazy" width="737" height="638" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-8.png 600w, https://0x434b.dev/content/images/2022/02/image-8.png 737w" sizes="(min-width: 720px) 720px"></figure><h3 id="unlinking">Unlinking</h3><p>During allocation/free operations, chunks may be unlinked from any of the free lists (bins) they were stored in. The unlinked chunk is often referred to as "victim" in the malloc source. Unlinking in fastbins/tcache is straightforward, as they're singly linked LIFO lists. The process only involves copying the victim's fd into the head of the list, which then points to the next free chunk following our victim, effectively removing the victim from the list. There's a partial unlinking process for bins allocated from the small-/unsortedbin. The victim's chunk bk is followed to the previous chunk. There, the address of the head of the bin is copied into the chunk's fd. Finally, the victim chunk's bk is copied over the bk of the head of the bin. Lastly, there's also the notion of a full unlink that occurs when a chunk is consolidated into another free chunk or is allocated from the largebin. In the process, the victim chunk's fd is followed and the victim bk is copied over to the destination bk. Next, the victim chunk's bk is followed and the victim fd is copied over the destination fd.</p><h3 id="remaindering">Remaindering</h3><p>Remaindering is simply the term referring to splitting a chunk into two parts, the requested size one and the remainder. The remainder is linked into the unsortedbin. Remaindering can occur at three phases: During allocation from the largebins, during binmap search, and from a last remainder during unsortedbin scanning.</p><h3 id="exhausting">Exhausting</h3><p>Simply the term for when an N sized chunk is requested and only an N+0x10 sized chunk is found, e.g. in the unsortedbin. A remainder of 0x10 is an invalid chunk size, so malloc will just "exhaust" the whole N+0x10 chunk and allocate that one as is.</p><h3 id="consolidation">Consolidation</h3><p>Consolidation is the process of merging at least two free chunks on the heap into a larger free chunk to avoid fragmentation. Consolidation with the top chunk is also worth noting.</p><h3 id="malloc-hooks">Malloc hooks</h3><p>These hooks have been a hell of helpful in past exploitation techniques, but due to them enabling numerous techniques showcased below, they have been removed in <a href="https://patchwork.sourceware.org/project/glibc/patch/20210713073845.504356-10-siddhesh@sourceware.org/?ref=0x434b.dev">GLIBC &gt;= 2 .34</a>. </p><ol><li><code>__malloc_hook</code>/ <code>__free_hook</code> / <code>__realloc_hook</code>: Located in a writable segment within the GLIBC. These pointers, defaulting to 0 but when set, result in instead of the default GLIBC malloc/realloc/free functionality being called the function pointed to the value being set within these hooks being called on an allocation/free.</li><li><code>__after_morecore_hook</code>: The variable <code>__after_morecore_hook</code> points at a function that is called each time after <code>sbrk()</code> was asked for more memory.</li><li><code>__malloc_initialize_hook</code>: The variable <code>__malloc_initialize_hook</code> points to a function that is called once when the malloc implementation is initialized. So overwriting it with an attacker controlled value would just be useful when malloc has never been called before.</li><li><code>__memalign_hook</code>: When set and <code>aligned_alloc()</code>, <code>memalign()</code>, <code>posix_memalign()</code>, or <code>valloc()</code> are being invoked, these function pointed to by the address stored in this hook is being called instead</li><li><code>_dl_open_hook</code>: When triggering an abort message in GLIBC, typically <code>backtrace_and_maps()</code> to print the stderr trace is called. When this happens, <code>__backtrace()</code> and within that code <code>init()</code> is called, where <code>__libc_dlopen()</code> and <code>__libc_dlsym()</code> are invoked. The gist is that IFF <code>_dl_open_hook</code> is not NULL<em>,</em> <code>_dl_open_hook</code>⇾<code>dlopen_mode</code> and <code>_dl_open_hook</code>⇾<code>dlsym</code> will be called. So, the idea is to just overwrite _dl_open_hook with an address an attacker controls where a fake vtable function table can be crafted</li></ol><hr><h2 id="patched-techniques">Patched techniques</h2><p>Let's dive into the known patched techniques first, as this is where it all started.</p><h4 id="house-of-prime">House of Prime</h4><p><strong>Gist: </strong>Corrupt the fastbin maximum size variable (holds the size of the largest allowable fastbin for free to create), which under certain circumstances allows an attacker to hijack the arena structure, which in turn allows either to return an arbitrary memory chunk or direct modification of execution control data (as shown in the <a href="https://seclists.org/bugtraq/2005/Oct/118?ref=0x434b.dev">malloc maleficarium</a>).</p><p><strong>Applicable until:</strong> &lt; 2.4</p><p><strong>Root cause:</strong> Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.3.4</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D3e030bd5f9fa57f79a509565b5de6a1c0360d953&amp;ref=0x434b.dev">Added safe unlink</a>
+</td>
+    </tr>
+<tr>
+          <td>2.3.4</td>
+<td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D6bf4302e764e422656f4f7230619fe9ab481ae04&amp;ref=0x434b.dev">Check the next chunk on free is not beyond the bounds of the heap</a>
+</td>
+   </tr>
+<tr>
+          <td>2.3.4</td>
+<td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D893e609847a2f372970e349e0cede2e8529bea71&amp;ref=0x434b.dev">Check next chunk's size sanity on free()</a>
+</td>
+    </tr>
+<tr>
+      <td>2.3.4</td>
+<td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D6cce65407e2fc5015c69bb38741d6942b3e412c3&amp;ref=0x434b.dev">Check chunk about to be returned from fastbin is the correct size, same for the unsortedbin</a>
+</td>
+    </tr>
+<tr>
+          <td>2.3.4</td>
+<td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Da334319f6530564d22e775935d9c91663623a1b4&amp;ref=0x434b.dev">Ensure a chunk is aligned on free()</a>
+</td>
+    </tr>
+<tr>
+          <td>2.4</td>
+<td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dbf58906631a&amp;ref=0x434b.dev">Fail if block size is obviously wrong (&lt; MINSIZE, which is 16) in free()</a>
+</td>
+  </tr>
+
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The technique requires an attacker to have full control over two chunks to tamper with, 2 calls to <code>free()</code> and one call to <code>malloc()</code>. Let's assume we have 4 chunks A, B, C, and D (guard). First, an overflow from chunk A into the size field of Chunk B is used to set chunk B's size to 8. When freeing this chunk, internally this results in an index underflow returning the address of <code>max_fast</code> instead of the address of the fastbin to free this chunk into. Ultimately, this results in an overwrite of <code>max_fast</code> with a large address. The next step in this technique involves overwriting the <code>arena_key</code> variable when calling free on chunk C. A precondition here is that the arena_key is stored at a higher address than the address of the thread's arena. Otherwise, the attempted overwrite won't work. Before freeing chunk C, we need to overwrite its size field (with a set prev_inuse bit). The size we need is <code>(((dist_arena_key_to_fastbins0 / sizeof(mfastbinptr) + 2 ) &lt;&lt; 3) + 1)</code>. When setting the size of chunk C to that value and freeing it after, <code>arena_key</code> will hold the address of chunk C. Overwriting <code>arena_key</code> is a necessity as it will point the programs' arena to the set value, letting us hijack the whole arena itself as we control the heap space.</p><p><strong>Notes: </strong>In these old versions of GLIBC, <code>fastbins[-1]</code> was pointing to <code>max_fast</code> as they were both part of the arena and right next to each other in memory. Nowadays, <code>max_fast</code> is called <code>global_max_fast</code>, which is a global variable in recent GLIBC implementations. For this reason, this technique cannot be leveraged as is anymore (besides the patches). However, the idea of overwriting <code>max_fast_global</code> is still applicable with the right preconditions! Overwriting the (global_)max_fast variable qualifies large chunks for fastbin insertion when freed. Freeing a large chunk and linking it into the fastbin for its size will write the address of that chunk into an offset from the first fastbin. This allows an attacker to overwrite an 8 byte aligned qword with a heap address. The formula to calculate the size of a chunk needed to overwrite a target with its address when freed is <em>chunk_size = (delta * 2) + 0x20,</em> with delta being the distance between the first fastbin and the target in bytes.</p><h4 id="unsafe-unlink">Unsafe unlink</h4><p><strong>Gist: </strong>Force the unlink macro during consolidation to process attacker controlled fd/bk pointers.</p><p><strong>Applicable until: </strong>&lt; 2.3.4</p><p><strong>Root cause: Overflow</strong></p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.3.4</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommitdiff%3Bh%3D3e030bd5f9fa57f79a509565b5de6a1c0360d953&amp;ref=0x434b.dev">Added safe unlink</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The basic idea is to force the unlink macro, which kicks in during chunk consolidation, to process attacker-controlled fd/bk pointers. This could be forced when being able to allocate two chunks N and N+1, where N+1 is out of fastbin range (as it would just get thrown into one of the fastbins in the next step). Then we need to write to chunk Ns user data, providing some forged bk and fd pointers in the 1st and 2nd qword. In the same write we would want to provide a fake <code>prev_size</code> field in the last qword of chunk N that matches chunk Ns size followed by an overflow into chunk N+1 to clear its <code>prev_inuse</code> flag indicating that chunk N (located before chunk N+1) is not in use anymore, even if it still is. When we free chunk N+1 now the chunk consolidation kicks in. When chunk N+1 is cleared, the <code>prev_inuse</code> flag is checked and backward consolidation is attempted, as the flag is not present. For that, the <code>prev_size</code> field is followed to locate the preceding chunk N on the heap. Then a reflected write occurs as the victims bk (chunk N) is copied over the bk of the chunk pointed to by the victims (chunk N) fd and the victims fd is written over the fd of the chunk pointed to by the victims bk.</p><h4 id="house-of-mind-original">House of Mind (Original)</h4><p><strong>Gist: </strong>Craft a non-main arena within the main arena and trick free into processing a chunk with the <code>NON_MAIN_ARENA</code> bit set, resulting in a target overwrite of sensitive values.</p><p><strong>Applicable until:</strong> &lt; 2.11</p><p><strong>Root cause:</strong> Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.11</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Df6887a0d9a55f5c80c567d9cb153c1c6582410f9&amp;ref=0x434b.dev">Multiple integrity checks for allocations from different bins as well as sorting freed chunks in different bins</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The idea of the House of Mind technique is to make <code>free</code> believe that the supplied chunk does <em>not</em> belong to the main arena (by setting the <code>NON_MAIN_ARENA</code> flag, e.g. due to an overflow bug). In these older GLIBC versions, a call to <code>free</code> triggers a wrapper function called <code>public_fREe()</code>:</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-1.png" class="kg-image" alt="" loading="lazy" width="698" height="906" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-1.png 600w, https://0x434b.dev/content/images/2022/02/image-1.png 698w"></figure><p> This function gets a chunks' user data address. <code>mem2chunk()</code> will calculate the start of the supplied chunk. The resulting address is supplied to the <code>arena_for_chunk()</code> function. Depending on whether the <code>NON_MAIN_ARENA</code> bit is set in the chunks' size field, this either returns the location of the main arena or a macro called <code>heap_for_ptr(chunk)-&gt;ar_ptr</code> is invoked. <code>heap_for_ptr()</code> ultimately just does <code>ptr &amp; 0xFFF00000</code> and returns the result. In short, when a non-main arena heap is created, it is always aligned to a multiple of <code>HEAP_MAX_SIZE</code> (1 MB). Just setting the <code>NON_MAIN_ARENA</code> bit would make the result point back to the main_arena, where a <code>heap_info</code> structure is then expected, as <code>ar_ptr</code> is the first member of such a struct. This would typically fail, as there won't be any such data at this address. The idea is now that we force so many allocations on the heap that eventually we can free a victim chunk with a <code>NON_MAIN_ARENA</code> bit set so that the returned address to the <code>heap_info</code> struct still actually resides in the main heap but overlapping attacker controlled data. When that happens, an attacker can provide an arbitrary value to e.g. <code>ar_ptr</code> (where <code>malloc</code> expects to find an arena struct, (compare <code>mstate</code> below)).</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image.png" class="kg-image" alt="" loading="lazy" width="497" height="699"></figure><p> Wherever <code>ar_ptr</code> points to, an attacker needs to have control over the memory (e.g. on the heap, an environment variable, stack, ...) to forge an arena there as well. The scheme is to reach the sorting of the victim chunk into the unsortedbin portion within <code>_int_free()</code>. There the linking into the bin takes place, which in turn is based on the value of <code>ar_ptr</code> as it is used to find the unsortedbin! The goal is to forge the necessary fields to the fake arena. When sorting a victim chunk into the unsortedbin takes place we force a controlled overwrite as we seem to control parts of the data being used to write (e.g. <code>prev_size field</code>) and all the locations being written to as we control the whole arena.</p><h4 id="house-of-orange">House of Orange</h4><p><strong>Gist: </strong>Overflow into the main arena's top chunk, reducing its size and forcing a top chunk extension. An unsortedbin attack on the old top chunks bk aiming at the <code>_IO_list_all</code> pointer to set up for file stream exploitation with an attacker crafted fake file stream on the heap.</p><p><strong>Applicable until: </strong>&lt; 2.26</p><p><strong>Root cause: </strong>Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.24</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Ddb3476aff19b75c4fdefbe65fcd5f0a90588ba51&amp;ref=0x434b.dev">libio: Implement vtable verification </a>
+</td>
+    </tr>
+  <tr>
+      <td>2.26</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D91e7cf982d0104f0e71770f5ae8e3faf352dea9f&amp;ref=0x434b.dev">Do not flush stdio streams, which changes the behavior of malloc_printerr that does no longer call _IO_flush_all_lockp now</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.27</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dec2c1fcefb200c6cb7e09553f3c6af8815013d83&amp;ref=0x434b.dev">Abort on heap corruption without a backtrace</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p>‌<strong>Idea: </strong>The House of Orange consists (typically) of a 3-step approach: Extending the top chunk, an unsortedbin attack, followed by file stream exploitation. <em>Phase 1 </em>consists of utilizing an overflow into the <code>top_chunk</code> and changing its value to a small, paged aligned value with a <code>prev_inuse</code> flag set.  When we now request a large chunk, which the top chunk cannot serve anymore, more memory from the kernel is requested via <code>brk()</code>. In case of the memory between the old top chunk and the returned memory from <code>brk()</code> not being contiguous (which is the case as we tampered with the top chunk), the old top chunk is freed. When this is done, the old top chunk is sorted into the unsortedbin. This enables <em>Phase 2</em>, which utilizes the same overflow bug again to tamper with the old top chunk's bk pointer to point at <code>_IO_list_all</code>. </p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-2.png" class="kg-image" alt="" loading="lazy" width="512" height="1289"></figure><p>While doing so, we're also crafting a more or less complete fake file stream. Next we're requesting a chunk with a size other than 0x60, which will trigger our unsortedbin attack, resulting in the old top chunk being sorted into the 0x60 smallbin. The result is the <code>_IO_list_all</code> pointer getting overwritten with the address of the unsortedbin. This lets the unsortedbin scan continue at the "chunk" overlapping the <code>_IO_list_all</code> pointer. It naturally fails a size sanity check, triggering the <code>abort()</code> function. This results in flushing all file streams via <code>_IO_flist_all_lockp()</code>, which dereferences <code>_IO_list_all</code> to find the first file stream. Our fake file stream overlapping the main arena is not flushed, and its <code>_chain</code> pointer overlapping the 0x60 smallbin bk is followed to the fake file stream on the heap. Having our fake file stream set up correctly, the <code>__overflow</code>entry in the fake file stream's <em>vtable</em> is called, with the address of the fake file stream as the first argument.</p><p><strong>Notes: </strong>When overwriting the old top chunk's bk and crafting a fake file stream on the heap, the <code>_flags</code> field overlaps the old top chunk's <code>prev_size</code> field. The fake file stream's <code>_mode</code> field has to be ≤ 0.  The value of  <code>_IO_write_ptr</code> has to be larger than the value of <code>_IO_write_base</code>. The <em>vtable</em> pointer has to be populated with the address of a fake <em>vtable</em>, at any location, with the address of <code>system()</code> overlapping the vtable's <code>__overflow</code> entry. Finally, we can skip Phase 1 if we can set up an unsortedbin attack in any other way.</p><h3 id="house-of-rabbit">House of Rabbit</h3><p><strong>Gist: </strong>Link a fake chunk into the largest bin and set its size so large that it wraps around the VA space, just stopping shy of the target we want to write.</p><p><strong>Applicable until: </strong>&lt; 2.28</p><p><strong>Root cause: </strong>UAF / Fastbin Dup / Overflow / ...</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.26</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D17f487b7afa7cd6c316040f3e6c86dc96b2eec301&amp;ref=0x434b.dev">Size vs prev_size check in unlink macro that only checks if the value at the fake chunk plus its size field is equal to the size field.</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.27</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D249a5895f120b13290a372a49bb4b499e749806f&amp;ref=0x434b.dev">Ensure that a consolidated fast chunk (malloc_consolidate) has a sane size </a>
+</td>
+    </tr>
+
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>Forge a House of Force like primitive by linking a fake chunk into a largebin and setting its size field to a huge value. Our goal is to link a fake chunk with 2 size fields into the fastbin, then shuffle it into unsortedbin, and finally into the largest largebin (bin 126). One of these size fields belong to the fake chunk, the other one to the succeeding chunk, with the succeeding chunk's size field being placed 0x10 bytes before the fake chunk's size field. Once the fake chunk is linked into the fastbin it is consolidated into the unsortedbin via <code>malloc_consolidate()</code>, which cannot be triggered via <code>malloc()</code> because this results in the fake chunk being sorted which triggers an <code>abort()</code> call when it fails a size sanity check. Instead, the fake chunk is sorted by freeing a chunk that exceeds the <code>FASTBIN_CONSOLIDATION_THRESHOLD</code> (0x10000). This can be achieved by freeing a normal chunk that borders the top chunk, because <code>_int_free()</code> considers the entire consolidated space to be the size of the freed chunk!  Next we modify the fake chunks size (&gt; 0x80001) so it can be sorted into the largest large bin. We sort our fake chunk in the largebin by requesting an even larger chunk. Depending on the circumstances we may need to increase the value of <code>system_mem</code> first by allocating, freeing, then allocating a chunk larger than the current <code>system_mem</code> value. When our fake chunk got sorted into bin 126 we want to modify its size field a final time to an arbitrary large value from which our next request should be served when trying to bridge the distance between the current heap allocation and the target we want to overwrite.</p><p><strong>Notes:</strong> The quickest way to achieve linking our fake chunk into bin 126 is via the <em>House of Lore</em> technique. This attack might still be feasible in later versions of GLIBC. However, an attacker has to manually tamper with the <code>prev_size</code> field of the fake fence post chunk to bypass the introduced mitigations. Additionally, GLIBC 2.29 introduced further size sanity checks for allocations from the top chunk, making this technique even more difficult to pull off.</p><h3 id="unsortedbin-attack">Unsortedbin Attack</h3><p><strong>Gist: </strong>Perform a reflective write that results in writing a GLIBC address to an attacker controlled location.</p><p><strong>Applicable until: </strong>&lt; 2.29</p><p><strong>Root cause: </strong>Overflow / WAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Db90ddd08f6dd688e651df9ee89ca3a69ff88cd0c&amp;ref=0x434b.dev">Various unsortedbin integrity checks, which for example ensure that the chunk at victim.bk-&gt;fd is the victim chunk.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>This attack allows us to write the address of an arena's unsortedbin to an arbitrary memory location. This is enabled by the so-called <em>partial unlinking</em> process that occurs when allocating/sorting an unsortedbin. In this process, a chunk is removed from the tail end of a doubly linked, circular list and when doing so, it involves writing the address of the unsortedbin over the fd pointer of the chunk pointed to by the victim chunk's bk. When we're able to tamper with the bk of an already freed chunk that was put in the unsortedbin, we can get the address of the unsortedbin at the address we supplied in the bk + 0x10. Being able to leak the unsortedbin means leaking the GLIBC address. Other use cases are to bypass the libio vtable integrity check by overwriting the <code>_dl_open_hook</code>, corrupt the <code>global_max_fast variable</code> (<em>House of Prime</em>), or target <code>_IO_list_all</code> (<em>House of Orange</em>).</p><h3 id="house-of-force">House of Force</h3><p><strong>Gist: </strong>Overwrite the <code>top_chunk</code> with a huge value to span the VA space, so the next allocation overwrites the target.</p><p><strong>Applicable until: </strong>&lt; 2.29</p><p><strong>Root cause: </strong>Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D30a17d8c95fbfb15c52d1115803b63aaa73a285c&amp;ref=0x434b.dev">Top chunk size integrity check</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.30</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D249a5895f120b13290a372a49bb4b499e749806f&amp;ref=0x434b.dev">Make malloc fail with requests larger than PTRDIFF_MAX</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>Leverage an overflow into the top chunk and change its size to a large value to bridge the gap between the top chunk and the target (can span and wrap around the whole VA space).  This allows us to request a new chunk overlapping the target and overwriting it with user controlled data. The technique worked as the top chunk size was not subject to any size integrity checks, nor was malloc checked for arbitrarily large allocation request that would exhaust the whole VA space.</p><h3 id="house-of-corrosion">House of Corrosion</h3><p><strong>Gist: </strong>House of Orange style attack that also utilize file stream exploitation (stderr) that is preceded by an unsortedbin attack against the <code>global_max_fast</code> variable leveraging partial overwrites.</p><p><strong>Applicable until: </strong> &gt; 2.26 &amp;&amp; &lt; 2.30</p><p><strong>Root cause: </strong>WAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.24</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Ddb3476aff19b75c4fdefbe65fcd5f0a90588ba51&amp;ref=0x434b.dev">libio vtable hardening</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.27</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D8e1472d2c1e25e6eabc2059170731365f6d5b3d1&amp;ref=0x434b.dev">Further libio vtable hardening</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.27</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D91e7cf982d0104f0e71770f5ae8e3faf352dea9f&amp;ref=0x434b.dev">abort() no longer flushes file stream buffers</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.28</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D91e7cf982d0104f0e71770f5ae8e3faf352dea9f&amp;ref=0x434b.dev">_allocate_buffer and _free_buffer function pointers were replaced with explicit calls to malloc() and free()</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.28</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dbdc3009b8ff0effdbbfb05eb6b10966753cbf9b8&amp;ref=0x434b.dev">Check if bck-&gt;fd != victim when removing a chunk from the unsortedbin during an unsortedbin iteration</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Db90ddd08f6dd688e651df9ee89ca3a69ff88cd0c&amp;ref=0x434b.dev">Various unsortedbin integrity checks, which for example ensure that the chunk at victim.bk-&gt;fd is the victim chunk.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>This technique advances the <em>House of Orange</em> and requires an unsortedbin attack against the <code>global_max_fas</code>t variable (check <em>House of Prime</em>). Once <code>global_max_fast</code> has been overwritten with the address of the unsortedbin, large chunks qualify for fastbin insertion when freed. With the WAF bug, this yields 3 primitives. First, freeing a large chunk will link it into the fastbin for its size, writing the address of that chunk into an offset from the first fastbin. This allows an attacker to overwrite an 8 byte aligned qword with a heap address. Second, using the first primitive, freeing a large chunk to write its address to an offset from the first fastbin. The value at that offset is treated as a fastbin entry; hence, it is copied into the freed chunk's fd. This fd again can be tampered with the WAF bug. Requesting the same chunk back will write the tampered value back into its original location in memory. This allows an attacker to modify the least significant bytes of an address in the libc writable segment or replace a value entirely. Third, we can make one further improvement to transplant values between writable memory locations. Changing the size of a chunk between freeing and allocation it allows a value to be read onto the heap from one address, then written to a second address after being changed. This requires an attacker to emulate a double-free bug, using the WAF, which is achieved by requesting  2 nearby chunks, freeing them, then modifying the LSB of the chunk's fd that points to the other chunk to point back to itself instead! When this victim chunk is allocated, a pointer to it remains in the fastbin slot overlapping the transplant destination. Now the victim chunk size can be changed via a WAF aligned with its size field, then it is freed again to copy the transplant source data into its fd on the heap. At this point, an attacker can modify the data with the WAF. Lastly, the victim chunk size is changed again, and the chunk allocated, writing the target data to its destination fastbin slot. This third primitive requires an attacker to write "safety" values on the heap where the fastbin next size checks are applied against the victim chunk (e.g. by requesting large chunks to write the top chunk size field into).  The <em>House of Corrrosion</em> combines these 3 primitives into a file stream exploit by tampering with various stderr fields and then triggering a failed assert. The libio vtable integrity check is bypassed by modifying the stderr vtable ptr such that a function that uses a function pointer is called when the assert fails. The location of this function pointer is overwritten with the address of a call RAX gadget. </p><p><strong>Notes: </strong>This technique requires good heap control and quite a few allocations on top of guessing 4 bits of entropy. Furthermore, this technique only works when your thread is attached to the main arena. The strength of this technique, however, lies in it being able to drop a shell without a PIE binary having to leak any address. Finally, this technique in all its glory seems difficult to pull of, it has been demonstrated to work with the mitigations introduced in GLBIC 2.29, but personally, I think it requires too many prerequisites to pull of reliably; hence, it's in the patched section.</p><h3 id="house-of-roman">House of Roman</h3><p><strong>Gist: </strong>The idea of the House of Roman is a leakless heap exploitation technique that mainly leverages relative overwrites to get pointers in the proper locations without knowing the exact value of them.</p><p><strong>Applicable until:</strong> &lt; 2.29</p><p><strong>Root cause:</strong> Overflow / Off-by-one / UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Db90ddd08f6dd688e651df9ee89ca3a69ff88cd0c&amp;ref=0x434b.dev">Various unsortedbin integrity checks, which for example ensure that the chunk at victim.bk-&gt;fd is the victim chunk.</a>
+</td>
+    </tr>
+
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>First, we try to make a fastbin point near the <code>__malloc_hook</code> using a UAF. Since we don't know the addresses of literally anything, the idea here is to make good use of heap feng shui and partial overwrites. We allocate 4 chunks A (0x60), B (0x80), C (0x80), and D (0x60). We then directly free chunk C, which gets put in the unsortedbin and also populated with a fd and bk. Then we allocate a new chunk E (0x60) which takes the spot of the old chunk C. Chunk E is not cleared and still holds the old fd and bk. Next we free chunk D and A and so the fastbins are getting populated and chunk A's fd now points to chunk D (offset 0x190). Now we use our first partial overwrite and overwrite the LSB of chunk A's fd with a null byte. This results in the fastbin pointer in chunk A now pointing to chunk E, which is still allocated and also holds the old unsortedbin's fd and bk. Our next goal is to make the old unsortedbin pointers to point to something useful instead of the unsortedbin. We want to leverage another partial overwrite to make the fd point to the common fake fast chunk near the <code>__malloc_hook</code>. As we do NOT have a leak, we have to brute force 4 bits of entropy. The lower 3 nibbles of a GLIBC addresses are not subject to ASLR, so we can just overwrite the 12 lower bits of the old fd in chunk E without any further knowledge. However, the remaining 4 bits are subject to ASLR. When we successfully brute forced the fake chunks address and linked it into the fastbin by partially overwriting the old fd, we have to clear the fastbins first by doing two 0x60 allocations. The next chunk we allocate will be our fake chunk, overlapping the <code>__malloc_hook</code>. Step 2 now involves directing an unsortedbin attack against the <code>__malloc_hook</code> to write the address of the unsortedbin into the <code>__malloc_hook</code>. To accomplish this, we allocate another at least 0x80 sized chunk and a small guard chunk. Next, we free the larger chunk right away and link it into the unsortedbin. The chunk will receive a fd and bk again, where we target the bk with <code>__malloc_hook - 0x10</code> with another UAF attack. The next chunk falling into the unsortedbin size will trigger the unsortedbin attack. Now we already have the <code>__malloc_hook</code> populated with a GLIBC address. As we still don't have a leak, we need yet another partial overwrite in the <code>__malloc_hook</code> with either the address of <code>system()</code> or a one gadget. In The first case we need the same brute forcing idea as before but this time with 8 bits. As for a one gadget, we would need 12 bits. This allows us to overwrite the <code>__malloc_hook</code> with either of these and pop a shell eventually.</p><h3 id="house-of-storm">House of Storm</h3><p><strong>Gist: </strong>The House of Storm technique refers to a combination of a largebin + unsortedbin attack to write a valid size to a user chosen address in memory to forge a chunk.</p><p><strong>Applicable until:</strong> &lt; 2.29</p><p><strong>Root cause:</strong> UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Db90ddd08f6dd688e651df9ee89ca3a69ff88cd0c&amp;ref=0x434b.dev">Multiple unsortedbin integrity checks</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.30</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D5b06f538c5aee0389ed034f60d90a8884d6d54de&amp;ref=0x434b.dev">2.30: Check for largebin list corruption when sorting into a largebin.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The idea is to allocate two large chunks, each followed by a guard chunk to avoid consolidation and with the first chunk (A) being larger than the second (B). Next, we free both chunks in the order B, A, dropping them both into the unsortedbin. Allocating the larger chunk (A) again pushes the smaller one (B) into the largebin. We free A right away after. At this point, there is a single chunk in the largebin and a single chunk in the unsortedbin, with the chunk in the unsortedbin being the larger one. Now the idea is to overwrite chunk A's bk pointing to the target. We also have to set chunk B's bk to a valid address (e.g. <code>target + 0x8</code>). Next, we want to tamper with chunk B's <code>bk_nextsize</code> field and corrupt it with the address where our fake chunk size field should be placed. At this point, we already corrupted everything we need. Now the final step is to find the appropriate size for the last chunk to allocate. This will trigger the chain, once in the unsortedbin, the largebin chunk will be used to write a fake but valid size field value to the location of our target. Next, the unsortedbin will see that the chunk pointed to by its bk has a valid size field and is removed from the bin (this is our forged chunk that overlaps the target).</p><h3 id="house-of-husk">House of Husk</h3><p><strong>Gist: </strong>This technique builds upon a UAF bug to trigger an unsortedbin attack to overwrite the <code>global_max_fast</code> variable while also targeting the <code>__printf_arginfo_table</code> and <code>__printf_function_table</code> with relative overwrites to call a custom function/one gadget</p><p><strong>Applicable until:</strong> &lt; 2.29</p><p><strong>Root cause:</strong> UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Db90ddd08f6dd688e651df9ee89ca3a69ff88cd0c&amp;ref=0x434b.dev">Various unsortedbin integrity checks, which for example ensure that the chunk at victim.bk-&gt;fd is the victim chunk.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>In GLIBC, there exists a function called <code>register_printf_function</code>. Its sole purpose is to register a new format string for <code>printf()</code>. Internally, this function calls <code>__register_printf_specifier</code> and it sets up the <code>__printf_arginfo_table</code> when invoked for the first time. </p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://0x434b.dev/content/images/2022/02/image-10.png" class="kg-image" alt="" loading="lazy" width="605" height="406" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-10.png 600w, https://0x434b.dev/content/images/2022/02/image-10.png 605w"><figcaption><span style="white-space: pre-wrap;">Snippet from __register_printf_specifier that populates the __printf_arginfo_table</span></figcaption></figure><p>When a function from the <em>printf</em> family is invoked, the <code>__printf_function_table</code> is checked for whether it is populated or not. </p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://0x434b.dev/content/images/2022/02/image-12.png" class="kg-image" alt="" loading="lazy" width="633" height="96" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-12.png 600w, https://0x434b.dev/content/images/2022/02/image-12.png 633w"><figcaption><span style="white-space: pre-wrap;">Snippet from the vfprintf handling in GLIBC &lt; 2.29</span></figcaption></figure><p>If one of the 3 tables is not NULL, execution is continued in the custom format string specification at the <code>do_positional label</code>. There the <code>__printf_arginfo_table</code> is used, in which each index has to be a pointer to a function that is executed for a format string. </p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://0x434b.dev/content/images/2022/02/image-11.png" class="kg-image" alt="" loading="lazy" width="629" height="538" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-11.png 600w, https://0x434b.dev/content/images/2022/02/image-11.png 629w"><figcaption><span style="white-space: pre-wrap;">Snippet from printf_positional function that is being invoked at do_positional</span></figcaption></figure><p> With that out of the way, the technique consists of 5 steps. Step 1 is to allocate 3 chunks A, B, and C. Chunk A needs to qualify for the unsortedbin and can also be used for a GLIBC address leak with a UAF. The size of chunk B has to be as calculated according to the <code>chunk_size</code> formula for offset <code>__printf_function_table</code>. The formula being <code>chunk_size = (delta * 2 ) + 0x20</code>, with delta being the number of bytes after the fastbin location. Chunk C is analogous to chunk B, just for the offset <code>__printf_arginfo_table</code>. In step 2 we free chunk A and overwrite its unsortedbin bk with our UAF with the value of <code>global_max_fast - 0x10</code>.  Now we allocate chunk A again, which triggers the overwrite of <code>lobal_max_fast</code>. Step 3 involves freeing chunk B, which overwrites <code>__printf_function_table</code> with a heap address allowing the check != NULL to fail, and moving code execution to the custom <em>printf</em> format specifier path. Step 4 involves overwriting <code>__printf_arginfo_table</code> with a forged pointer to a custom function/one gadget. The  <code>__printf_arginfo_table</code> is indexed as <code>((ASCII_val - 2 ) * 8)</code> for a specific <em>printf</em> format character. At this calculated index, a pointer to the function to call is stored when this format specifier is encountered. So to trigger our exploit we just need to make a call to <code>printf()</code> with the format specifier that we have targeted as explained above.</p><p><strong>Notes:  </strong>This technique in theory does not depend on the version of GLIBC, as long as it has fastbin and unsortedbin attacks available.</p><h3 id="house-of-kauri">House of Kauri</h3><p><strong>Gist: </strong>Link a chunk into multiple tcachebins by overflowing into a freed chunk and changing it size field.</p><p><strong>Applicable until: </strong>&lt; 2.32</p><p><strong>Root cause: </strong>Overflow / Double-free</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dbcdaad21d4635931d1bd3b54a7894276925d081d&amp;ref=0x434b.dev">Tcache double free check</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Daffec03b713c82c43a5b025dddc21bde3334f41e&amp;ref=0x434b.dev">Tcache validate tc_idx before checking for double frees</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.32</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D49c3c37651e&amp;ref=0x434b.dev">Safe-linking</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>This little technique is just another double-free mitigation bypass that when we have the possibility to overflow from one chunk into another while also being presented with a double-free, we can potentially link the same chunk in different tcache free-lists by tampering with a chunk's size field. This effectively confuses the tcache data structure by linking the same chunk into different free lists.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-60.png" class="kg-image" alt="" loading="lazy" width="799" height="691" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-60.png 600w, https://0x434b.dev/content/images/2022/02/image-60.png 799w" sizes="(min-width: 720px) 720px"></figure><h3 id="house-of-fun">House of Fun</h3><p><strong>Gist: </strong>The House of Fun technique is based on the front link attack targeting freed largebin chunks to make malloc return an arbitrary chunk overlapping a target.</p><p><strong>Applicable until:</strong> &lt; 2.30</p><p><strong>Root cause:</strong> UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.30</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D5b06f538c5aee0389ed034f60d90a8884d6d54de&amp;ref=0x434b.dev">Check for largebin list corruption when sorting into a largebin.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The easiest way to pull this technique of is by leveraging the largebin mechanics. We want to allocate 2 large chunks A and B that fit in the same largebin but are not the same size (e.g. 0x400, 0x420). Each largebin should be separated by a guard chunk to avoid chunk consolidation. Next, we free the first smaller largebin and shuffle it from the unsortedbin into the largebin. Next, we use our UAF vulnerability to overwrite the freed chunk's bk with the area we want to later tamper with (At this point, this chunk's bk still pointed to the head of the largebin). Afterwards, we free the second larger chunk and shuffle it into the largebin as well. As both chunks are sorted into the same largebin and the second chunk is larger, the largebin is sorted. When this occurs our forged bk from chunk A now points to chunk B. The goal with that setup is to get a largebin chunk under attacker control and overwrite its bk and <code>bk_nextsize</code> to point before the <code>_dl_open_hook</code> so that a future allocated chunk has its address written over the <code>_dl_open_hook</code> pointing then to an attacker controlled chunk on the heap, where we can forge a function vtable that executes a one gadget for example.</p><h3 id="tcache-dup">Tcache Dup</h3><p><strong>Gist: </strong>Bypassing tcache double-free mitigations by freeing our chunk into the tcache as well as the fastbin.</p><p><strong>Applicable until:</strong> &lt; 2.29</p><p><strong>Root cause:</strong> Double-free</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dbcdaad21d4635931d1bd3b54a7894276925d081d&amp;ref=0x434b.dev">Tcache double free check</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Daffec03b713c82c43a5b025dddc21bde3334f41e&amp;ref=0x434b.dev">Tcache validate tc_idx before checking for double frees</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The strategy is the same as with the fastbin dup. Until GLIBC 2.29 there was no double free mitigation whatsoever. Starting with version 2.29 we need to adjust our strategy a little because when a chunk is linked into a tcachebin, the address of that thread's tcache is written into the slot usually reserved for a free chunk's bk pointer, which is relabelled as a <em>key</em> field.  When chunks are freed, their key field is checked and if it matches the address of the tcache, then the appropriate tcachebin is searched for the freed chunk. If its found <code>abort()</code> is called. We can bypass this by filling the tcachebin, freeing our chunk into the same sized fastbin, emptying the tcachebin and freeing our victim another time. Next, we allocate the victim chunk from the tcachebin, at which point we can tamper with the fastbin fd pointer. When the victim chunk is allocated from its fastbin, the remaining chunks in the same fastbin are dumped into the tcache, including the fake chunk, tcache dumping does not include a double-free check.</p><hr><h2 id="unpatched-techniques">Unpatched Techniques</h2><p>Techniques detailed here look like they're still useable at the time of writing (GLIBC 2.34). Hence, the <em>applicable until</em> only contains a question mark. Patches might be present, when specific patches (known to me) have made this technique more difficult to exploit.</p><h3 id="house-of-lore">House of Lore</h3><p><strong>Gist: </strong>Link a fake chunk into the unsortedbin, smallbin or largebin by tampering with inline malloc metadata.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>UAF / Overflow</p><p><strong>Idea: </strong>Depending on which bin we're targeting, we need to make sure all requirements are satisfied for such a chunk. When we're linking a fake chunk into the smallbins, it requires overwriting the bk of a chunk linked into a smallbin with the address of our fake chunk. We also need to ensure that <code>victim.bk-&gt;fd == victim</code>. We get there by writing the address of the victim small chunk into the fake chunk's fd before the small chunk is allocated. Once the small chunk is allocated, the fake chunk must pass the <code>victim.bk-&gt;fd == victim</code> check as well, which we can achieve by pointing both its fd and bk at itself (at least in GLIBC 2.27). For the largebins, the easiest way to link a fake chunk in there is overwriting a skip chunk's fd with the address of a fake chunk and preparing the fake chunk's fd and bk to satisfy the safe unlinking checks. The fake chunk must have the same size field as the skip chunk and the skip chunk must have another same-sized or smaller chunk in the same bin, as malloc will not check the skip chunk's fd for a viable chunk if the skip chunk is the last in the bin. The fake chunk's fd and bk can be prepared to satisfy the safe unlinking checks by pointing them both at the fake chunk. As for the unsortedbin, it behaves similar to an unsortedbin attack and must meet all those requirements.</p><p><strong>Notes: </strong>This technique is more of a general idea instead of a specific technique. It outlines how to trick malloc in linking fake chunks into different bins. It has been shown that it can still be pulled of in GLIBC 2.34 at the time of writing. One only has to find a way around the introduced mitigations along the way.</p><h3 id="safe-unlink">Safe Unlink</h3><p><strong>Gist: </strong>Analogous to the unsafe unlink technique. Force the unlink macro to process attacker controlled fd/bk pointers, leading to a reflective write. We bypass the safe unlinking checks by aiming the reflected write at a pointer to a chunk that is actually in use.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause:</strong> Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.26</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D17f487b7afa7cd6c316040f3e6c86dc96b2eec30&amp;ref=0x434b.dev">Size vs prev_size check in unlink macro that only checks if the value at the fake chunk plus its size field is equal to the size field.</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dd6db68e66dff25d12c3bc5641b60cbd7fb6ab44f&amp;ref=0x434b.dev">Proper size vs. prev_size check before unlink() in backwards consolidation via free and malloc_consolidate, which now makes sure that the sice field matches the prev_size field.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The idea of the unsafe unlink remains the same. Generally, this technique works best if we have access to a global pointer to an array in which heap chunks are stored. This time we need to make sure that our chunk that we tampered with (fd, bk) is part of a doubly linked list before unlinking it. The check consists of <code>victim.fd-&gt;bk == victim</code> &amp;&amp; <code>victim.bk-&gt;fd == victim</code>. It essentially says that the bk of the chunk pointed to by the victim chunk's fd points back to the victim chunk that the applies when following the victim chunk's bk and the fd of the chunk at that position needs also to point back to our victim. We can achieve this if we can forge a fake chunk starting at the 1st qword of a legit chunk's user data. Point its fd &amp; bk 0x18 and 0x10 bytes respectively before a user data pointer to the chunk in which they reside. We also need to craft a 0x10 size smaller <code>prev_size</code> field to account for our forged chunk within the legitimate chunk. Finally, we need to leverage an overflow to clear the <code>prev_inuse</code>flag of the succeeding chunk. The adjusted <code>prev_size</code> field will trigger the unlink and consolidation with our fake chunk instead of the legitimate one. In the end, we want that the fd and bk of the of chunk that our fake chunk points to point both back to our fake chunk. Once our fake chunk passes the safe unlinking checks, malloc unlinks it as before. Our fake chunks fd is followed and our fake chunks bk is copied over the bk at the destination. Then our bk is followed and copied and our fd is copied to the fd in the destination.</p><h3 id="fastbin-dup">Fastbin Dup</h3><p><strong>Gist: </strong>Link a fake chunk into the fastbin by tricking malloc into returning the same chunk twice from the fastbins  due to a double-free bug.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Double-free</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.3.4</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D37fa1953d53&amp;ref=0x434b.dev">Disallow freeing the same fast chunk twice in a row by checking if the victim is already on top of the fastbin list</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.3.4</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D893e609847a2f372970e349e0cede2e8529bea71&amp;ref=0x434b.dev">Check during free for a chunk in fastbin range if the size of the next chunk (top of the fastbin) is legit, meaning if its within bounds (0x18, av-&gt;system_mem)</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.3.4</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D893e609847a2f372970e349e0cede2e8529bea71&amp;ref=0x434b.dev">Check that a returned chunk from a fastbin is the correct size</a>
+</td>
+    </tr>
+ <tr>
+      <td>2.27</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D249a5895f120b13290a372a49bb4b499e749806f&amp;ref=0x434b.dev">Ensure that a consolidated fast chunk (malloc_consolidate) has a sane size </a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>Leverage a double-free bug to make malloc link the same fast chunk twice into the respective fastbin. We can achieve this by allocating two chunks A &amp; B and freeing them in the order A, B, A. This results in malloc later on returning this very chunk twice as well. This allows us to corrupt fastbin metadata (fd pointer) to link a fake chunk into the fastbin. This fake chunk will be allocated eventually, allowing us to either read and/or write to it.</p><h3 id="house-of-spirit">House of Spirit</h3><p><strong>Gist: </strong>Link an arbitrary chunk into e.g. the fastbin by having full control over what address is supplied to <code>free()</code>.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Pass an arbitrary pointer to free</p><p><strong>Idea: </strong>This technique does not rely on any traditional heap bug. It's based on the scenario that if we're able to pass an arbitrary pointer (to a crafted fake chunk for example) to free we can later allocate said chunk again and potentially overwrite sensitive data, The fake chunk must fulfill all requirements (e.g. proper size field for a fast chunk).</p><h3 id="house-of-einherjar">House of Einherjar</h3><p><strong>Gist: </strong>Clear a <code>prev_inuse</code> bit and force backward consolidation (with a fake chunk) creating overlapping chunks.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>(Null byte) Overflow / Arbitrary write</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.24</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D17f487b7afa7cd6c316040f3e6c86dc96b2eec30&amp;ref=0x434b.dev">Size vs prev_size check in unlink macro that only checks if the value at the fake chunk plus its size field is equal to the size field.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>Clear a legit chunks <code>prev_inuse</code> flag to consolidate it backwards with a (fake) chunk, creating overlapping chunks. When attempting to consolidate with a fake chunk, we need to provide a forged fake <code>prev_size</code> field as well when operating on GLIBC &gt;= 2.26! Having access to overlapped chunks could allow us to read or write sensitive data.</p><h3 id="house-of-mind-fastbin-edition">House of Mind (Fastbin Edition)</h3><p><strong>Gist: </strong>The idea of this attack is largely identical to the original proposed <em>House of Mind</em> that was mostly focused on the unsortedbins, while this one targets the fastbins. We use a fake non-main arena to write to a new location.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause:</strong> Overflow</p><p><strong>Idea: </strong>The idea of this attack is largely identical to the original proposed <em>House of Mind</em> that was mostly focused on the unsortedbins. Due to GLIBC mitigations as well as other exploit mitigations such as NX the old attack does not work anymore. However, the idea here is still identical, we need to do some proper heap feng shui to align attacker controlled data with a forged <code>heap_info</code> struct. Create said <code>heap_info</code>as well as a fake arena. Corrupt a fastbin sized chunk afterwards (setting the <code>NON_MAIN_ARENA</code> bit) and trigger the attack via freeing our victim chunk. The first step, the heap feng shui needs us to determine how many allocations of what size we have to request from the program to reach a memory address, which we can control, and where the <code>heap_for_ptr()</code> macro would return to, so we can forge the <code>heap_info</code> struct. On recent systems <code>EAP_MAX_SIZE</code> grew from 1 MB to 4 MB. We would need at least 0x2000000 bytes to force a new heap memory alignment that would return a suitable location that we control and can place the <code>heap_info</code> struct into. Once we have control of the aligned memory, we prepare the <code>heap_info</code> struct in the 2nd step. Here we really only need to provide the <code>ar_ptr</code> again, which is the first struct member. As before, we want to point <code>ar_ptr</code>to our forged arena. For a successful overwrite, we need to consider two things: our arena location and the fastbin size we target. If we want to overwrite a specific location in memory with our heap chunk, we must put the arena close to the target. When considering which fastbin to target, we need to keep in mind that depending on the choice, a different offset within the <code>fastbinsY[NFASTBINS]</code>array will be affected. When everything is in order, we can trigger the vulnerability by freeing our victim chunk. Ultimately, the attacker fully controls the location being written to but not the value itself (the written value will be at the address of the victim chunk). As we're overwriting our target (arbitrary location) with a rather large heap memory pointer, it could be used to overwrite sensitive bounded values like maximum index vars or something like <code>global_max_fast</code> again.</p><p><strong>Notes: </strong>This likely still needs a heap leak to make it work.</p><h3 id="poison-null-byte">Poison NULL byte</h3><p><strong>Gist: </strong>Leverage a single NULL byte overflow to create overlapping chunks but unlike the <em>House of Einherjar</em> we do not have to provide a fake <code>prev_size</code> field.</p><p><strong>Applicable until: </strong>?</p><p><strong>Root cause: </strong>Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.26</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D17f487b7afa7cd6c316040f3e6c86dc96b2eec30&amp;ref=0x434b.dev">Size vs prev_size check in unlink macro that only checks if the value at the fake chunk plus its size field is equal to the size field.</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dd6db68e66dff25d12c3bc5641b60cbd7fb6ab44f&amp;ref=0x434b.dev">Proper size vs. prev_size check before unlink() in backwards consolidation via free and malloc_consolidate, which now makes sure that the sice field matches the prev_size field.</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The overflow must be directed at a free chunk with a size field of at least 0x110. In this scenario, the LSB of the size field is cleared, removing &gt;= 0x10 bytes from the chunk's size... When the victim chunk is allocated again, the succeeding prev_size field is not updated. This may require 4 chunks. Chunk 1 is used to overflow in the freed chunk 2. Chunk 3 is normal-sized. Chunk 4 is used to avoid top chunk backwards consolidation. When overflown into chunk 2 we request new chunks 2.1 (normal-sized) and 2.2. Then we free chunk 2.1 and chunk 3. As the prev_size wasn't properly updated before, chunk 3 will be backwards consolidated with chunk 2.1 overlapping the still allocated chunk 2.2.</p><h3 id="house-of-muney">House of Muney</h3><p><strong>Gist: </strong>Leakless exploitation technique that tampers with the (prev_)size field of an MMAPED chunked so that when it is freed and allocated again after it's overlapping part of the memory mapping in GLIBC, where we want to tamper with the symbol table leading to code exec.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Overflow</p><p><strong>Idea: </strong>We want to tamper with a MMAPED chunk, in particular with its size and/or <code>prev_size</code> field (Note: <code>prev_size</code> + <code>size</code> must equal a page size). The size of the chunk depends an can roughly be calculated with the formula <code>SizeofMMAPChunk = byteToLibc + bytesToOverlapDynsym</code>. The goal here is to gain control over normally read-only GLIBC sections: <em>.gnu.hash</em> and <em>.dynsym</em>. There are two main points to consider in this first step: <code>mmap_threshold</code> and heap feng shui. To get a chunk outside the default heap section, it must be larger than this upper limit, or we have to find a way to tamper with that limit value somehow if it denies us a proper allocation. Second, we want to position our mmaped chunk in a proper location, so that may require some tinkering. After tampering with the chunks size field, we want to free it. This results in parts of the GLIBC code getting unmapped from the VAS. The next step after freeing the chunk is allocating it back (mmapped), which results in all values being NULLed. As we pretty much deleted parts of the LIBC at this point, we need to rewrite the parts that matter. This can be done by e.g. copying in the GLIBC sections byte for byte and making the necessary changes to the symbol table, or debug the process to see what parts the loader would actually need to only provide this minimal working solution. What it comes down to in the later technique is to find the <code>elf_header_ptr</code> location in the overlapping chunk and write the <code>elf_bitmask_ptr</code>, <code>elf_bucket_ptr</code>, <code>elf_chain_zero_ptr</code>, and <code>symbol_table_ptr</code> to finally overwrite a specific function (like <code>exit()</code>) in the symbol table with the offset to system, a one gadget, any desired function or begin a ROP chain.</p><p><strong>Notes: </strong>This technique does <strong>not</strong> work in full RELRO binaries. Also, the overwritten function (in the symbol table) that is being called to trigger the exploit must <em>not</em> have been called before, as otherwise the function resolution process won't kick in.</p><h3 id="house-of-rust">House of Rust</h3><p><strong>Gist: </strong>The House of Rust allows for a direct attack into GLIBC's stdout FILE stream by abusing the tcache stashing mechanism with two tcache stashing unlink + largebin attack combos.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause:</strong> UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.32</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D49c3c37651e&amp;ref=0x434b.dev">Safe-linking</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The House of Rust is a 5 stage approach. Stage 1 will be completely dedicated to heap feng shui. Most, if not all, needed allocations will be made here. Stage 2 involves a tcache stashing unlink + and a largebin attack. The tcache stashing unlink is used to link the <code>tcache_perthread_struct</code> into the 0xb0 tcachebin. The largebin attack is used to fix the broken the fd pointer of the chunk that holds a pointer to the <code>tcache_perthread_struct</code> in its bk pointer. At the end of this Stage, the next 0x90 sized request with be served at the <code>tcache_perthread_struct</code>. This step requires roughly 20 allocations of varying sizes. Next up in stage 3 a similar TSU + LB attack is attempted to write a GLIBC value somewhere in the <code>tcache_perthread_struct</code>. This again requires an additional 20 allocations. Stage 4 aims at getting a GLIBC leak in stdout via file stream exploitation. For that, we want to edit the chunk holding the GLIBC address, overwriting the 2 LSBs of the GLIBC, so it points to the stdout FILE structure. This requires guessing 4 bits of the GLIBC load address. When brute forcing is successful, we can allocate from the appropriate tcachebin, overlapping with <code>IO_2_1_stdout</code>. This ends up with a huge information leak the next time there is stdout activity through the file stream. Putting it all together in stage 5 to pop a shell is just consisting of editing the <code>tcache_perthread_struct</code> chunk again, overwriting its fd with the address with e.g.: one of the malloc hooks as usual.</p><h3 id="house-of-crust">House of Crust</h3><p><strong>Gist: </strong>Leakless technique that leverages house of rust safe-linking bypass primitives, leading to a <em>House of Corrosion</em> like attack that ends up with file stream exploitation in stderr to pop a shell.</p><p><strong>Applicable until: </strong>?</p><p><strong>Root cause:</strong> UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.32</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D49c3c37651e&amp;ref=0x434b.dev">Safe-linking</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The first 2 steps are identical to the <em>House of Rust</em>. Step 3 is largely similar as well with the goal being to write 2 libc addresses to the <code>tcache_perthread_struct</code> with the execution having to use largebins as leaving the unsortedbin pointing to the <code>tcache_perthread_struct</code> after would cause an abort later down the road. Step 4 shares similarities with the<em> House of Corrosion</em> as it tries to corrupt the <code>global_max_fast</code> variable via tampering with the <code>tcache_perthread_struct</code>. This, again, requires 4 bits of GLIBC load address guessing. With the <code>global_max_fast</code> being overwritten, we're set for a transplanting primitive as described in the <em>House of Corrosion</em>. The last step, step 5, involves executing three transplants that were prepared instep 4 and trigger stderr activity (file stream exploitation). One possible way for FSE due to a recent bug (see below) is to overwrite the <code>__GI_IO_file_jumps</code> vtable. To trigger the exploit that ends up calling a one gadget requires a bit more tampering, allocating and freeing chunks as the goal is to trigger stderr activity by making malloc attempt to sort a fake chunk with a <code>NON_MAIN_ARENA</code> bit set from the unsortedbin into the largebin (which will fail).</p><p><strong>Notes</strong>: This technique relies on a bug <a href="https://sourceware.org/bugzilla/show_bug.cgi?id=25812&amp;ref=0x434b.dev">introduced in GLIBC v2.29</a> where the libio vtables are mapped into a writable segment. Additionally, the original write-up makes uses of a gadget that was only present in one of the <a href="https://c4ebt.github.io/2021/01/22/House-of-Rust.html?ref=0x434b.dev#breakdown">custom GLIBC builds</a> that were done; hence we basically just skimmed over this one due to these two massive constraints.</p><h3 id="house-of-io">House of IO</h3><p><strong>Gist: </strong>Bypassing safe-linking, which protect single-linked free lists (fastbin, tcache) by abusing the unprotected pointer to the <code>tcache_perthread_struct</code>.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Underflow / UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.32</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D49c3c37651e&amp;ref=0x434b.dev">Safe-linking</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>The <code>tcache_perthread_object</code> is allocated when the heap is created. Furthermore, it is stored right at the heap's beginning (at a relatively low memory address). The safe-linking mitigation aims to protect the fd/next pointer within the free lists. However, the head of each free-list is <em>not</em> protected. Additionally, freeing a chunk and placing it into the tcachebin also places a non-protected pointer to the appropriate tcache entry in the 2nd qword of a chunks' user data. The <em>House of IO</em> assumes one of three scenarios for the bypass to work. First, any attacker with a controlled linear buffer underflow over a heap buffer, or a relative arbitrary write will be able to corrupt the tcache. Secondly, a UAF bug allowing to read from a freed tcache eligible chunk leaks the tcache and with that, the heap base. Thirdly, a badly ordered set of calls to <code>free()</code>, ultimately passing the address of the tcache itself to free, would link the tcache into the 0x290 sized tcachebin. Allocating it as a new chunk would mean complete control over the tcache's values.</p><figure class="kg-card kg-image-card"><img src="https://0x434b.dev/content/images/2022/02/image-13.png" class="kg-image" alt="" loading="lazy" width="663" height="234" srcset="https://0x434b.dev/content/images/size/w600/2022/02/image-13.png 600w, https://0x434b.dev/content/images/2022/02/image-13.png 663w"></figure><p></p><h3 id="largebin-attack">Largebin attack</h3><p><strong>Gist: </strong>Similar to an <em>unsortedbin attack,</em> as its based on tampering with a freed largebin's <code>bk_nextsize</code> pointer.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>UAF / Overflow</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.30</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D5b06f538c5aee0389ed034f60d90a8884d6d54de&amp;ref=0x434b.dev">Two checks for large bin list corruption when sorting into a largebin</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>This attack is largely similar to a classic <em>unsortedbin attack</em>, which got rather difficult to pull of after multiple patches to the unsortedbin integrity checks. The unsortedbin works by manipulating the bk pointer of a freed chunk. In the largebin attack, we leverage the mechanism when the largebin is looped/sorted and tries to work on a tampered with largebin with attacker controlled <code>bk_nextsize</code> and/or bk pointers. The technique itself is often used as a gateway for other exploit techniques, e.g. by overwriting the <code>global_max_fast</code> variable enabling multiple fastbin attacks. The basic idea is to overwrite a freed large chunks <code>bk_nextsize</code> pointer with the address of <code>target-0x20</code>. When requesting a final chunk and the largebin sorting takes places, our overwriting the target is triggered as well. This setup requires some prior heap feng shui, with multiple large chunks separated by guards to avoid consolidation. A working example for GLIBC 2.31 with the mentioned patch above is as follows: Request a large chunk A (0x428) followed by a guard chunk. Request another smaller large chunk B (0x418) followed by another guard chunk. Free chunk A to link it into the unsortedbin. Request a chunk C that is larger than chunk A to trigger the largebin sorting and make chunk A be placed in there. Next we free chunk B to place it into the unsortedbin again. Now, we would need to leverage a UAF or even overflow scenario to overwrite chunk A's <code>bk_nextsize</code> pointer with the <code>target address - 0x20</code>. If we now request a final chunk D that is larger than the just freed chunk B, it places chunk B into the largebin. In this particular version of GLIBC, malloc does <em>not</em> check a freed chunks <code>bk_nextsize</code> pointer for integrity if the new inserted chunk is smaller (chunk B) than currently the smallest present one (chunk A). Upon inserting chunk B into the largebin, chunk A's <code>bk_nextsize-&gt;fd-&gt;nextsize</code> is overwritten to the address of chunk B. In our case, our target is now overwritten with the address of chunk B.</p><h3 id="tcachehouse-of-botcake">Tcache - House of Botcake</h3><p><strong>Gist: </strong>Bypass current tcache double-free mitigations by linking the victim chunk into the tcache as well as the unsortedbin where it has been consolidated with a neighboring chunk.</p><p><strong>Applicable until:</strong> &gt; 2.25 &amp;&amp; &lt; ?</p><p><strong>Root cause:</strong> Double-free</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Dbcdaad21d4635931d1bd3b54a7894276925d081d&amp;ref=0x434b.dev">Tcache double-free checks</a>
+</td>
+    </tr>
+  <tr>
+      <td>2.29</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3Daffec03b713c82c43a5b025dddc21bde3334f41e&amp;ref=0x434b.dev">Tcache validate tc_idx before checking for double frees</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>This is a powerful Tcache poisoning attack that tricks malloc into returning a pointer to an arbitrary memory location. This technique solely relies on the tcache eligible chunks (overlapping the fast chunks). So first we need to fill the tcache bin of a specific chunk size (e.g. 0x100). For that, we need to allocate 7 0x100 sized chunks that will serve as filler material soon. Next up, we need to prepare another 0x100 sized chunk (A) that is used for consolidation later down the road. Next up with allocate yet another 0x100 sized chunk B that will be our victim. Afterwards, we still need a small guard chunk to prevent consolidation with the top chunk. Now we free the 7 prepared filler chunks to fill the 0x100 sized tcachebin. Step 2 now involves freeing our victim chunk B that is, due to its sized, sorted into the unsortedbin. Step 3 involves freeing chunk A, leading to consolidation with our victim chunk B. Next, we allocate a 0x100 sized garbage chunk to free one slot from 0x100 tcachebin. Now we trigger the double-free bug with freeing chunk victim chunk B another time. Now our victim chunk is part of a larger chunk in the unsortedbin as well as part of the 0x100 tcachebin! We're now able to do a simple tcache poisoning by using this overlapped chunk. We will allocate a new 0x120 sized chunk overlapping the victim chunk and overwrite the victim chunk's fd with the target. The 2nd next allocation we make from the 0x100 sized tcachebin overlaps the target. A major advantage of this technique is that we can potentially free chunk A and B as many times as we want, and each time modify their fd pointers to gain as many arbitrary writes as needed.</p><h3 id="tcachehouse-of-spirit">Tcache - House of Spirit</h3><p><strong>Gist: </strong>Free a fake tcache chunk to trick malloc into returning a nearly arbitrary pointer.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Being able to pass an arbitrary pointer to <code>free()</code></p><p><strong>Idea: </strong>The idea is identical to the non tcache chunk <em>House of Spirit </em>technique, but easier to pull of and with one constraint. We do <em>not</em> have to create a second fake chunk after the fake chunk we want to link into the tcache free list, as there are no strict sanity checks in the tcache route in malloc. The freed fake chunk must be appropriately sized, so it is eligible for the tcache.</p><h3 id="tcachepoisoning">Tcache - Poisoning</h3><p><strong>Gist: </strong>Poison the tcache bins and tricking malloc into returning a pointer to an arbitrary memory location.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Overflow / UAF</p>
+<!--kg-card-begin: html-->
+<table>
+  <tbody><tr>
+    <th>GLIBC Version</th>
+    <th>Patches</th>
+  </tr>
+  <tr>
+      <td>2.28</td>
+    <td><a href="https://sourceware.org/git/?p=glibc.git%3Ba%3Dcommit%3Bh%3D77dc0d8643aa99c92bf671352b0a8adde705896f&amp;ref=0x434b.dev">Ensuring the tcache count is not NULL</a>
+</td>
+    </tr>
+</tbody></table>
+<!--kg-card-end: html-->
+<p><strong>Idea: </strong>We can achieve this by allocating two tcache eligible chunks A, B of the same size. Then we're freeing them in the same order we allocated them right after. Next, we use an overflow or UAF bug to overwrite the fd pointer in chunk B with our target location. Now the second allocation we do from this tcachebin will allocate a chunk overlapping our target</p><h3 id="tcachestashing-unlink">Tcache - Stashing unlink</h3><p><strong>Gist: </strong>Link a fake chunk into the tcache by using a quirk of calloc, which does not allocate from the tcachebin as its top priority.</p><p><strong>Applicable until:</strong> ?</p><p><strong>Root cause: </strong>Overflow / UAF</p><p><strong>Idea: </strong>In step 1 of this technique, we will allocate 9 [A to I] chunks that are within tcache size and not fastbin size. They will fall within smallbin size (e.g. 0x90). Next we will free chunks D to I, followed by chunk B to fill the 0x90 tcachebin. Next, we will free chunk A and C, which are now put into the unsortedbin. Step 2 starts with allocating a chunk J that's just above the 0x90 smallbin size (e.g. 0xa0). This will shuffle the two 0x90 chunks from the unsortedbin into the smallbin. Next, we allocate 2 more 0x90 sized chunks K and L, which are taken from the tcachebin, which concludes step 2. Step 3 leverages our overflow / UAF bug, in which we want to overwrite the bk pointer of freed chunk C that's located inside the smallbin with an address to a fake chunk. Now we want to allocate another 0x90 chunk M. This allocation has to take place with <strong>calloc</strong>, as only then, the allocation won't be taken from the tcachebin. This will return the previously freed chunk from the smallbin to the user, while the remaining smallbin as well as our fake chunk will be dumped into the  tcachebins as there are two free slots in there. Now the next 0x90 sized allocation  we're doing with malloc will be taken from and will be our fake chunk</p><p><strong>Notes: </strong>This attack requires at least one allocation with calloc!</p><hr><p>And that's a wrap! I'll be eventually coming back to this post, adding more links to GLIBC patches or even newly discovered techniques. If you found some mistakes or have found a cool new technique, feel free to ping me, as I'd love to know where I went wrong or extend this post with more knowledge :)!</p>
+
+        
+
+    </div>
+
+    <aside class="post-share lg:w-20 flex-none py-9 lg:order-first">
+    <div class="js-share post-share-inner pt-9 sticky top-16 text-center">
+        <span class="uppercase text-xs tracking-wider mb-3 inline-block lg:hidden">Share this article:</span>
+        <div class="buttons items-start justify-center lg:flex-col lg:justify-start">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" class="button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-facebook"></use></svg>
+            </a>
+            <a href="https://twitter.com/share?text=Overview%20of%20GLIBC%20heap%20exploitation%20techniques&amp;url=https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter" class="button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
+            </a>
+            <a href="https://www.reddit.com/submit?url=https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/&amp;title=Overview%20of%20GLIBC%20heap%20exploitation%20techniques" target="_blank" rel="noopener noreferrer" aria-label="Share on Reddit" class="button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-reddit"></use></svg>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/&amp;title=Overview%20of%20GLIBC%20heap%20exploitation%20techniques" target="_blank" rel="noopener noreferrer" aria-label="Share on Linkedin" class="button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-linkedin"></use></svg>
+            </a>
+            <a href="https://pinterest.com/pin/create/button/?url=https%3A%2F%2F0x434b.dev%2Foverview-of-glibc-heap-exploitation-techniques%2F" target="_blank" rel="noopener noreferrer" aria-label="Share on Pinterest" class="button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-pinterest"></use></svg>
+            </a>
+            <a href="whatsapp://send?text=https://0x434b.dev/overview-of-glibc-heap-exploitation-techniques/" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatSapp" class="lg:hidden button is-circle text-xs is-black opacity-20 hover:opacity-40">
+                <svg class="icon"><use xlink:href="#icon-whatsapp"></use></svg>
+            </a>
+        </div>
+    </div>
+</aside>
+</div>
+
+<div class="post-footer mt-8">
+    <div class="post-authors my-10">
+    <div class="flex flex-col md:flex-row items-center p-7 rounded bg-gray-90 ">
+        <a href="/author/0x434b/" class="flex-none h-24 w-24 overflow-hidden relative rounded-full shadow-lg">
+            <img class="image-inset absolute blur-up lazyload" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="/content/images/size/w300/2022/06/tvEzScas_400x400.jpg" alt="0x434b">
+        </a>
+
+        <div class="mt-4 text-center md:ml-5 md:mt-0 md:text-left">
+            <h2 class="text-xl text-title"><a class="hover:text-primary" href="/author/0x434b/">0x434b</a></h2>
+            <p class="mt-2 lineClamp-2 text-gray-700">Researcher interested in anything low-level: hardware, IoT, kernel, exploitation, reverse engineering, fuzzing, code-audit, and pentesting. This blog represents a random collection of my research.</p>
+            <div class="mt-2 text-title">
+
+                <a class="mr-2 hover:text-twitter" href="https://twitter.com/0xricksanchez" title="@0xricksanchez" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon is-small"><use xlink:href="#icon-twitter"></use></svg>
+                </a>
+
+                <a class="hover:text-gray-900" href="https://0x434b.dev" title="https://0x434b.dev" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon is-small is-stroke"><use xlink:href="#icon-link"></use></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="flex prev-next mb-8">
+    <div class="w-1/2 pr-4">
+        <a href="/misc-study-notes-about-arm-aarch64-assembly-and-the-arm-trusted-execution-environment-tee/" class="prev-next-link flex items-center">
+            <img class="hidden h-16 w-16 flex-none object-cover rounded-full blur-up lazyload mr-4 md:block" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="/content/images/size/w300/2022/02/arm-logo--1-.png" height="64" width="64" alt="MISC study notes about ARM AArch64 Assembly and the ARM Trusted Execution Environment (TEE)">
+
+            <div class="prev-next-span">
+                <span class="block text-sm mb-1 text-gray-500">Prev article</span>
+                <h3 class="prev-next-title text-title text-base hover:text-primary leading-tight lineClamp-2 md:text-lg">MISC study notes about ARM AArch64 Assembly and the ARM Trusted Execution Environment (TEE)</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="w-1/2 pl-4">
+        <a href="/dabbling-with-linux-kernel-exploitation-ctf-challenges-to-learn-the-ropes/" class="prev-next-right flex items-center justify-end">
+            <div class="text-right">
+                <span class="block text-sm mb-1 text-gray-500">Next article</span>
+                <h3 class="prev-next-title text-title text-base hover:text-primary leading-tight lineClamp-2 flex-grow md:text-lg">Learning Linux kernel exploitation - Part 1 - Laying the groundwork</h3>
+            </div>
+
+            <img class="hidden h-16 w-16 flex-none object-cover rounded-full blur-up lazyload ml-4 md:block" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="/content/images/size/w300/2022/02/download.jpg" height="64" width="64" alt="Learning Linux kernel exploitation - Part 1 - Laying the groundwork">
+        </a>
+    </div>
+</div>
+    </div>        </article>
+
+        <aside class="sidebar flex-none flex-grow-0 relative pt-14 pb-8 lg:w-80 lg:pt-0 lg:ml-16">
+            <div class="mb-10">
+    <h3 class="uppercase mb-5 border-b pb-2 font-bold text-sm">Latest Posts</h3>
+
+    <div class="sidebar-post mb-4">
+        <a href="https://0x434b.dev/the-state-of-go-fuzzing-did-we-already-reach-the-peak/" class="flex items-center">
+            <figure class="h-20 w-28 relative mr-4 flex-none bg-gray-100 rounded overflow-hidden img-hover">
+                <img class="image-inset absolute img-hover-here blur-up ls-is-cached lazyloaded" src="/content/images/size/w300/2024/05/libfuzzer.png" data-src="/content/images/size/w300/2024/05/libfuzzer.png" width="112" height="80" alt="The State of Go Fuzzing - Did we already reach the peak?">
+            </figure>
+
+            <div class="py-2">
+                <h3 class="text-base text-title lineClamp-2 leading-tight hover:text-primary">The State of Go Fuzzing - Did we already reach the peak?</h3>
+                <div class="text-sm text-gray-500 mt-1"><time class="datetime" datetime=" 2024-05-15 ">15 May 2024</time></div>
+            </div>
+        </a>
+    </div>
+    <div class="sidebar-post mb-4">
+        <a href="https://0x434b.dev/learning-linux-kernel-exploitation-part-2-cve-2022-0847/" class="flex items-center">
+            <figure class="h-20 w-28 relative mr-4 flex-none bg-gray-100 rounded overflow-hidden img-hover">
+                <img class="image-inset absolute img-hover-here blur-up ls-is-cached lazyloaded" src="/content/images/size/w300/2022/03/header-1.jpg" data-src="/content/images/size/w300/2022/03/header-1.jpg" width="112" height="80" alt="Learning Linux kernel exploitation - Part 2 - CVE-2022-0847">
+            </figure>
+
+            <div class="py-2">
+                <h3 class="text-base text-title lineClamp-2 leading-tight hover:text-primary">Learning Linux kernel exploitation - Part 2 - CVE-2022-0847</h3>
+                <div class="text-sm text-gray-500 mt-1"><time class="datetime" datetime=" 2022-05-09 ">9 May 2022</time></div>
+            </div>
+        </a>
+    </div>
+    <div class="sidebar-post mb-4">
+        <a href="https://0x434b.dev/dabbling-with-linux-kernel-exploitation-ctf-challenges-to-learn-the-ropes/" class="flex items-center">
+            <figure class="h-20 w-28 relative mr-4 flex-none bg-gray-100 rounded overflow-hidden img-hover">
+                <img class="image-inset absolute img-hover-here blur-up ls-is-cached lazyloaded" src="/content/images/size/w300/2022/02/download.jpg" data-src="/content/images/size/w300/2022/02/download.jpg" width="112" height="80" alt="Learning Linux kernel exploitation - Part 1 - Laying the groundwork">
+            </figure>
+
+            <div class="py-2">
+                <h3 class="text-base text-title lineClamp-2 leading-tight hover:text-primary">Learning Linux kernel exploitation - Part 1 - Laying the groundwork</h3>
+                <div class="text-sm text-gray-500 mt-1"><time class="datetime" datetime=" 2022-03-01 ">1 March 2022</time></div>
+            </div>
+        </a>
+    </div>
+    <div class="sidebar-post ">
+        <a href="https://0x434b.dev/misc-study-notes-about-arm-aarch64-assembly-and-the-arm-trusted-execution-environment-tee/" class="flex items-center">
+            <figure class="h-20 w-28 relative mr-4 flex-none bg-gray-100 rounded overflow-hidden img-hover">
+                <img class="image-inset absolute img-hover-here blur-up ls-is-cached lazyloaded" src="/content/images/size/w300/2022/02/arm-logo--1-.png" data-src="/content/images/size/w300/2022/02/arm-logo--1-.png" width="112" height="80" alt="MISC study notes about ARM AArch64 Assembly and the ARM Trusted Execution Environment (TEE)">
+            </figure>
+
+            <div class="py-2">
+                <h3 class="text-base text-title lineClamp-2 leading-tight hover:text-primary">MISC study notes about ARM AArch64 Assembly and the ARM Trusted Execution Environment (TEE)</h3>
+                <div class="text-sm text-gray-500 mt-1"><time class="datetime" datetime=" 2022-02-12 ">12 February 2022</time></div>
+            </div>
+        </a>
+    </div>
+</div>
+
+    <div class="sidebar-subscribe mb-8 text-center shadow-lg p-6 bg-primary rounded-2xl" style="background-color:#485375">
+    <svg xmlns="http://www.w3.org/2000/svg" width="45" viewBox="0 0 48 24.33" class="fill-current mb-4 mx-auto text-white"><path data-name="Trazado 79132" d="M47.16 24.31h.2l.06-.06V24.13a.17.17 0 0 1 0-.05v-.05a.17.17 0 0 1 0-.05.11.11 0 0 1 0-.05V1a1 1 0 0 0-1-1H13.27V6.7a1 1 0 0 0 2.08 0V3.35l9.25 8.2-.14.11-9.11 9.12v-6.84a1 1 0 0 0-2.08 0v1.27H7.76a1 1 0 0 0 0 2.08h5.38v6a1 1 0 0 0 1 1h32.97Zm-1.24-3.53-9.12-9.11 6.86-5.82a1 1 0 1 0-1.35-1.58l-11.73 9.91-13.67-12.1h29v18.7ZM25.8 13.13a1.08 1.08 0 0 0 .18-.24l3.9 3.45a1 1 0 0 0 1.36 0l4-3.37a.44.44 0 0 0 .12.15l9.12 9.12h-27.8Z"></path><path data-name="Trazado 79133" d="M1 11.86h17.62a1 1 0 0 0 0-2.09H1a1 1 0 0 0 0 2.09Z"></path><path data-name="Trazado 79134" d="M2.86 6.12h7.9a1 1 0 0 0 0-2.08h-7.9a1 1 0 0 0 0 2.08Z"></path><path data-name="Trazado 79135" d="M8.68 19.61H1a1 1 0 0 0 0 2.08h7.68a1 1 0 1 0 0-2.08Z"></path></svg>
+    <h2 class="text-3xl text-white mb-4 font-bold">Newsletter</h2>
+    <div class="text-base mb-5 text-white opacity-80">Stay up to date! Get all the latest &amp; greatest posts delivered straight to your inbox</div>
+
+    <form class="js-" data-members-form="subscribe">
+        <div class="form-group">
+            <input class="subscribe-email text-base block mb-4 border-none not-dark" data-members-email="" placeholder="youremail@example.com" aria-label="Your email address" aria-describedby="sidebar-subscribe-btn" autocomplete="off" required="">
+            <button id="sidebar-subscribe-btn" class="button bg-white text-primary w-full border-none font-medium" type="submit" style="color:#485375">
+                <span>Subscribe</span>
+            </button>
+        </div>
+        <div class="message-success hidden"><strong>Great!</strong> Check your inbox and click the link to confirm your subscription</div>
+        <div class="message-error hidden">Please enter a valid email address!</div>
+    </form>
+</div>
+
+    <div class="sticky top-24"><div class="mt-12 mb-8">
+    <h3 class="uppercase mb-5 border-b pb-2 font-bold text-sm">Tag Cloud</h3>
+    <div class="buttons">
+        <a href="/tag/re/" class="button is-primary text-sm capitalize">
+            <span>RE</span>
+            <span class="ml-2 text-white text-opacity-80">(8)</span>
+        </a>
+        <a href="/tag/exploitation/" class="button is-primary text-sm capitalize">
+            <span>Exploitation</span>
+            <span class="ml-2 text-white text-opacity-80">(7)</span>
+        </a>
+        <a href="/tag/hardware/" class="button is-primary text-sm capitalize">
+            <span>Hardware</span>
+            <span class="ml-2 text-white text-opacity-80">(6)</span>
+        </a>
+        <a href="/tag/fuzzing/" class="button is-primary text-sm capitalize">
+            <span>Fuzzing</span>
+            <span class="ml-2 text-white text-opacity-80">(2)</span>
+        </a>
+        <a href="/tag/general/" class="button is-primary text-sm capitalize">
+            <span>General</span>
+            <span class="ml-2 text-white text-opacity-80">(2)</span>
+        </a>
+    </div>
+</div>
+</div>
+</aside></div>
+
+</main>
+
+        <footer class="footer py-14">
+    <div class="container mx-auto text-center">
+        <aside class="js-social-media social-media footer-social-media">
+
+    <a title="Twitter @0xricksanchez" href="https://twitter.com/0xricksanchez" class="button border-none" target="_blank" rel="noopener noreferrer">
+        <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
+    </a>
+
+
+
+
+
+<a href="https://github.com/0xricksanchez" title="Github" class="button border-none hover:text-github" target="_blank" rel="noopener noreferrer"><svg class="icon icon--github"><use xlink:href="#icon-github"></use></svg></a><a href="https://0x434b.dev/rss" title="RSS" class="button border-none hover:text-rss" target="_blank" rel="noopener noreferrer"><svg class="icon icon--rss"><use xlink:href="#icon-rss"></use></svg></a></aside>
+        
+
+        <div class="text-sm mt-5 opacity-80">
+            <span class="block mb-2">Copyright 2024, Low-level adventures. All Rights Reserved.</span>
+            <span>Design with  <svg class="icon is-small text-red-500 animated infinite pulse"><use xlink:href="#icon-heart"></use></svg> by <a href="https://godofredo.ninja" title="Developer FullStack.">@GodoFredoNinja</a></span>
+        </div>
+    </div>
+</footer>
+        <div class="mobile-menu-wrapper">
+    <div class="mobile-menu w-full fixed inset-0 bg-blank min-h-screen left-auto z-50 overflow-y-auto overflow-x-hidden md:max-w-sm">
+        <div class="mobile-menu-container">
+            <div class="mobile-menu-header px-4 flex justify-between shadow-sm">
+                <div class="js-dark-mode h-16 flex items-center cursor-pointer">
+                    <svg class="icon is-large icon--moon"><use xlink:href="#icon-moon"></use></svg>
+                    <svg class="icon is-large icon--sunny hidden"><use xlink:href="#icon-sunny"></use></svg>
+                </div>
+
+                <div class="flex items-center">
+                        <span class="text-28 font-bold leading-tight font-sans">Low-level adventures</span>
+                </div>
+
+                <div class="js-menu-close h-16 flex items-center cursor-pointer">
+                    <svg class="icon is-large"><use xlink:href="#icon-close"></use></svg>
+                </div>
+            </div>
+
+            <hr class="mt-0">
+
+            <nav class="px-4 mobile-nav uppercase tracking-wide">
+                    <ul class="nav">
+        <li class="nav-home"><a href="https://0x434b.dev/">Home</a></li>
+        <li class="nav-about"><a href="https://0x434b.dev/about/">About</a></li>
+        <li class="nav-publications"><a href="https://0x434b.dev/Publications/">Publications</a></li>
+        <li class="nav-buzzwords"><a href="https://0x434b.dev/what-the-buzz/">Buzzwords</a></li>
+        <li class="nav-fuzzing-papers"><a href="https://github.com/0xricksanchez/paper_collection">Fuzzing-Papers</a></li>
+        <li class="nav-buy-me-a-coffee"><a href="https://www.buymeacoffee.com/0xricksanchez">Buy me a coffee</a></li>
+    </ul>
+
+            </nav>
+
+            <hr>
+
+            <nav class="flex px-4 justify-around">
+                    <a href="/signin/" data-portal="signin" class="button is-black is-outlined drop-border gh-portal-close">Log in</a>
+                    <a href="/signup/" data-portal="signup" class="button is-black is-outlined gh-portal-close">Sign up</a>
+            </nav>
+
+            <hr>
+
+            <div>
+                <span class="block px-4 text-sm">Follow</span>
+                <aside class="js-social-media social-media mobile-social-media pb-5 text-title">
+
+    <a title="Twitter @0xricksanchez" href="https://twitter.com/0xricksanchez" class="button border-none" target="_blank" rel="noopener noreferrer">
+        <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
+    </a>
+
+
+
+
+
+<a href="https://github.com/0xricksanchez" title="Github" class="button border-none hover:text-github" target="_blank" rel="noopener noreferrer"><svg class="icon icon--github"><use xlink:href="#icon-github"></use></svg></a><a href="https://0x434b.dev/rss" title="RSS" class="button border-none hover:text-rss" target="_blank" rel="noopener noreferrer"><svg class="icon icon--rss"><use xlink:href="#icon-rss"></use></svg></a></aside>            </div>
+        </div>
+
+    </div>
+    <div class="mobile-menu-bg bg-black inset-0 fixed z-20 hidden bg-opacity-60"></div>
+</div>    </div>
+
+    <div class="js-search search w-full fixed z-20 top-0 left-0 mt-16 hidden">
+    <div class="">
+        <form class="px-4 flex items-center pt-5 pb-4 text-xl border-b">
+            <svg class="icon is-large flex-none mr-1"><use xlink:href="#icon-search"></use></svg>
+
+            <input id="search-bar" class="flex-grow border-none text-xl bg-transparent text-gray-900" type="text" placeholder="Search">
+
+            <div class="js-toggle-search flex-none text-gray-400 ml-2 cursor-pointer"><svg class="icon is-small"><use xlink:href="#icon-close"></use></svg></div>
+        </form>
+
+        <div class="pt-6 pb-5">
+            <h5 class="js-search-suggestion uppercase px-4 text-xs tracking-wide font-light mb-3">Search suggestions</h5>
+            <ul id="search-results"></ul>
+        </div>
+
+    </div>
+</div>
+    <script>
+        var siteUrl = 'https://0x434b.dev';
+        var siteSearch = '/assets/scripts/search.js?v=88d1ac4537';
+        var prismJs = '/assets/scripts/prismjs.js?v=88d1ac4537';
+        var prismJsComponents = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/';
+        var mapacheGallery = false;
+    </script>
+
+    <svg aria-hidden="true" style="position:absolute;width:0;height:0" xmlns="http://www.w3.org/2000/svg" overflow="hidden"><defs><symbol id="icon-star" viewBox="0 0 24 24"><path d="M23.25 9.53h-8.608L12 1.5 9.358 9.53H.75l7.041 4.941-2.742 8.03L12 17.525l6.951 4.976-2.747-8.03z"></path></symbol><symbol id="icon-pinterest" viewBox="0 0 24 24"><path d="M12.002 1.5c-5.798 0-10.5 4.702-10.5 10.5 0 4.298 2.588 7.992 6.286 9.619-.028-.731-.005-1.612.183-2.409l1.35-5.723s-.338-.67-.338-1.659c0-1.556.9-2.719 2.025-2.719.956 0 1.416.717 1.416 1.575 0 .961-.614 2.395-.928 3.727-.262 1.116.558 2.02 1.659 2.02 1.987 0 3.328-2.555 3.328-5.583 0-2.302-1.552-4.022-4.369-4.022-3.183 0-5.17 2.377-5.17 5.03 0 .914.272 1.561.694 2.058.192.23.22.323.15.586-.052.192-.164.656-.216.844-.07.267-.286.361-.525.263-1.467-.6-2.152-2.203-2.152-4.012 0-2.981 2.517-6.558 7.505-6.558 4.008 0 6.647 2.902 6.647 6.014 0 4.12-2.292 7.195-5.667 7.195-1.134 0-2.198-.614-2.564-1.308 0 0-.609 2.419-.741 2.888-.22.811-.656 1.617-1.055 2.25.891.273 1.915.43 2.976.431h.001c5.798 0 10.5-4.702 10.5-10.5S17.8 1.502 12.002 1.502z"></path></symbol><symbol id="icon-facebook" viewBox="0 0 24 24"><path d="M22.5 12.063c0-5.798-4.702-10.5-10.5-10.5S1.5 6.265 1.5 12.063c0 5.241 3.839 9.585 8.859 10.373v-7.337H7.692v-3.036h2.667V9.75c0-2.631 1.568-4.086 3.966-4.086 1.149 0 2.351.205 2.351.205v2.584h-1.325c-1.304 0-1.711.809-1.711 1.641v1.969h2.912l-.465 3.036h-2.446v7.338c5.02-.788 8.859-5.132 8.859-10.374z"></path></symbol><symbol id="icon-eart" viewBox="0 0 24 24"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.01 18.047a8.3 8.3 0 01-4.899-2.387 8.303 8.303 0 01-2.448-5.909c0-2.01.705-3.911 1.997-5.422.033.399.115.827.094 1.133-.077 1.115-.187 1.813.466 2.754.254.367.317.892.441 1.316.121.415.605.633.938.888.673.516 1.317 1.116 2.031 1.57.471.3.765.449.627 1.024-.111.462-.142.747-.381 1.159-.073.126.275.934.391 1.05.351.351.7.674 1.083.99.594.491-.058 1.128-.341 1.834zm6.919-2.388a8.297 8.297 0 01-4.339 2.301 3.47 3.47 0 011.026-1.376c.333-.257.749-.75.923-1.141s.404-.729.636-1.088c.331-.511-.817-1.281-1.188-1.443-.837-.363-1.467-.854-2.211-1.377-.53-.373-1.606.195-2.204-.066-.819-.358-1.495-.98-2.207-1.516-.735-.554-.699-1.199-.699-2.015.576.021 1.395-.159 1.777.304.121.146.535.799.813.567.227-.19-.168-.949-.244-1.128-.235-.549.535-.763.928-1.136.514-.486 1.616-1.248 1.529-1.596s-1.103-1.335-1.699-1.181c-.089.023-.876.848-1.028.978l.012-.808c.003-.17-.317-.345-.302-.454.037-.277.809-.78 1.001-1.001-.134-.084-.593-.478-.732-.42-.336.14-.716.237-1.052.377 0-.117-.014-.226-.031-.334a8.056 8.056 0 012.078-.611l.046-.006.66.265.466.553.465.48.407.131.646-.609-.167-.435v-.391a8.269 8.269 0 013.54 1.397c-.189.017-.397.045-.631.075-.097-.057-.221-.083-.326-.123.306.658.625 1.307.95 1.957.347.694 1.115 1.438 1.25 2.17.159.863.049 1.647.136 2.663.084.978 1.103 2.089 1.103 2.089s.47.16.862.104a8.306 8.306 0 01-2.192 3.846z"></path></symbol><symbol id="icon-link" viewBox="0 0 24 24"><path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.688" d="M9.75 16.5h-3a4.5 4.5 0 010-9h3m4.5 0h3a4.5 4.5 0 010 9h-3M7.654 12h8.785"></path></symbol><symbol id="icon-twitter" viewBox="0 0 24 24"><path d="M23.063 5.133a9.165 9.165 0 01-2.606.717 4.555 4.555 0 001.997-2.513 9.04 9.04 0 01-2.883 1.102 4.54 4.54 0 00-7.852 3.103c0 .356.038.703.117 1.036A12.865 12.865 0 012.48 3.83a4.55 4.55 0 001.411 6.066 4.442 4.442 0 01-2.063-.567v.056a4.542 4.542 0 003.642 4.453c-.38.103-.783.159-1.195.159-.291 0-.577-.028-.853-.084a4.547 4.547 0 004.242 3.155 9.098 9.098 0 01-6.722 1.879A12.686 12.686 0 007.889 21c8.358 0 12.923-6.923 12.923-12.928 0-.197-.005-.394-.014-.586a9.228 9.228 0 002.264-2.353z"></path></symbol><symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M15.75 4.5c.994 0 1.936.394 2.648 1.102S19.5 7.257 19.5 8.25v7.5c0 .994-.394 1.936-1.102 2.648S16.743 19.5 15.75 19.5h-7.5c-.994 0-1.936-.394-2.648-1.102S4.5 16.743 4.5 15.75v-7.5c0-.994.394-1.936 1.102-2.648S7.257 4.5 8.25 4.5h7.5zm0-1.5h-7.5C5.363 3 3 5.363 3 8.25v7.5C3 18.638 5.363 21 8.25 21h7.5c2.888 0 5.25-2.362 5.25-5.25v-7.5C21 5.363 18.638 3 15.75 3z"></path><path d="M16.875 8.25c-.623 0-1.125-.502-1.125-1.125S16.252 6 16.875 6a1.125 1.125 0 010 2.25zM12 9c1.655 0 3 1.345 3 3s-1.345 3-3 3-3-1.345-3-3 1.345-3 3-3zm0-1.5c-2.484 0-4.5 2.016-4.5 4.5s2.016 4.5 4.5 4.5 4.5-2.016 4.5-4.5-2.016-4.5-4.5-4.5z"></path></symbol><symbol id="icon-youtube" viewBox="0 0 24 24"><path d="M23.841 6.975c0-2.109-1.552-3.806-3.469-3.806A169.616 169.616 0 0012.422 3h-.844c-2.7 0-5.353.047-7.95.169-1.912 0-3.464 1.706-3.464 3.816A68.603 68.603 0 000 11.991a71.766 71.766 0 00.159 5.011c0 2.109 1.552 3.82 3.464 3.82 2.728.127 5.527.183 8.372.178 2.85.009 5.639-.047 8.372-.178 1.917 0 3.469-1.711 3.469-3.82.112-1.673.164-3.342.159-5.016a68.815 68.815 0 00-.155-5.011zM9.703 16.589V7.378l6.797 4.603-6.797 4.608z"></path></symbol><symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M19.44 4.552A10.383 10.383 0 0012.075 1.5h-.033.002C6.281 1.5 1.59 6.168 1.588 11.906v.014c0 1.911.518 3.701 1.422 5.237l-.026-.048L1.5 22.5l5.543-1.447a10.35 10.35 0 004.993 1.266h.008c5.762 0 10.453-4.668 10.456-10.406v-.026a10.29 10.29 0 00-3.059-7.334l-.001-.001zm-7.396 16.01h-.007a8.661 8.661 0 01-4.46-1.228l.04.022-.317-.188-3.289.859.878-3.192-.207-.328a8.511 8.511 0 01-1.329-4.592v-.01.001c0-4.769 3.9-8.648 8.694-8.648h.015a8.673 8.673 0 018.672 8.654v.001c-.002 4.769-3.9 8.649-8.691 8.649zm4.767-6.477c-.261-.13-1.547-.759-1.785-.846s-.414-.13-.588.13-.675.844-.827 1.02-.305.195-.566.065-1.103-.405-2.101-1.29c-.777-.69-1.301-1.541-1.453-1.801s-.016-.401.114-.531c.118-.117.261-.304.392-.456s.174-.261.261-.434.044-.325-.022-.455-.588-1.41-.805-1.931c-.212-.507-.428-.438-.588-.446a11.337 11.337 0 00-.501-.009.959.959 0 00-.696.324l-.001.001c-.24.261-.915.891-.915 2.169s.938 2.516 1.067 2.69 1.842 2.8 4.463 3.926a13.4 13.4 0 001.382.518l.107.029c.626.198 1.195.17 1.645.103.502-.075 1.547-.629 1.764-1.237s.217-1.128.152-1.236-.24-.174-.501-.304z"></path></symbol><symbol id="icon-next" viewBox="0 0 24 24"><path stroke-linejoin="round" stroke-linecap="round" stroke-width="2.25" d="M12.563 5.25l6.75 6.75-6.75 6.75M18.375 12H4.687"></path></symbol><symbol id="icon-forward" viewBox="0 0 24 24"><path stroke-linejoin="round" stroke-linecap="round" stroke-width="2.25" d="M8.625 5.25l6.75 6.75-6.75 6.75"></path></symbol><symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21c-.315 0-.608-.098-.849-.264l.005.003c-3.684-2.501-5.279-4.215-6.159-5.287-1.875-2.285-2.773-4.631-2.747-7.172C2.28 5.369 4.615 3 7.457 3c2.066 0 3.497 1.164 4.331 2.133a.283.283 0 00.424.001c.833-.97 2.265-2.133 4.331-2.133 2.842 0 5.177 2.368 5.207 5.28.025 2.541-.873 4.887-2.747 7.172-.88 1.072-2.475 2.787-6.159 5.287-.236.163-.529.26-.844.261z"></path></symbol><symbol id="icon-linkedin" viewBox="0 0 24 24"><path d="M20.82 1.5H3.294c-.958 0-1.794.689-1.794 1.635V20.7c0 .952.837 1.8 1.794 1.8h17.521c.963 0 1.685-.854 1.685-1.8V3.135c.006-.946-.722-1.635-1.68-1.635zM8.01 19.005H5.002V9.651H8.01zM6.609 8.228h-.022c-.963 0-1.586-.717-1.586-1.614 0-.914.64-1.613 1.624-1.613s1.587.695 1.608 1.613c0 .897-.624 1.614-1.625 1.614zm12.396 10.777h-3.008V13.89c0-1.225-.438-2.063-1.526-2.063-.832 0-1.324.563-1.543 1.11-.082.197-.104.465-.104.739v5.328H9.816V9.65h3.008v1.302c.438-.623 1.122-1.521 2.713-1.521 1.975 0 3.469 1.302 3.469 4.108z"></path></symbol><symbol id="icon-close" viewBox="0 0 24 24"><path d="M20.76 4.162l-.922-.922L12 11.078 4.162 3.24l-.922.922L11.078 12 3.24 19.838l.922.922L12 12.922l7.838 7.838.922-.922L12.922 12z"></path></symbol><symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 .581q-1.877 0-3.643.586-1.704.571-3.158 1.637-1.44 1.056-2.496 2.491-1.066 1.459-1.637 3.163Q.48 10.224.48 12.101t.586 3.638q.571 1.709 1.637 3.163 1.056 1.44 2.496 2.496 1.454 1.066 3.158 1.632 1.766.59 3.643.59t3.643-.59q1.704-.566 3.158-1.632 1.44-1.056 2.496-2.496 1.066-1.454 1.637-3.163.586-1.762.586-3.638 0-1.522-.394-2.99-.394-1.454-1.147-2.765-.758-1.315-1.834-2.39T17.75 2.118q-1.306-.749-2.76-1.142Q13.521.582 12 .582zm7.478 19.118l-.206-.211q-.653-.514-1.397-.89T16.329 18q-.259-.13-.84-.389-.509-.23-.739-.341-.245-.11-.379-.346t-.101-.504v-1.171q.043-.389.24-.73.394-.451.586-1.018t.154-1.162q.029-.336.23-.6l.36-.37q.067-.259.202-.706.115-.398.178-.624.067-.245.041-.379t-.156-.216q-.115-.072-.374-.134V8.307q.048-.614-.122-1.2t-.538-1.073-.89-.818q-.634-.418-1.382-.566-.734-.144-1.474 0-.749.149-1.382.571-.518.341-.883.835t-.545 1.082-.151 1.212v.998q-.163.082-.23.125-.12.072-.182.154-.067.096-.067.211-.082.542.077 1.066t.523.936q.072.072.106.168t.024.202q-.005.59.18 1.15t.54 1.03q.269.365.365.809t.005.89v.24q.024.322-.144.598t-.466.401l-1.45.73q-1.699.562-3.101 1.67-1.147-1.118-1.91-2.52-.749-1.378-1.07-2.911t-.187-3.094q.134-1.594.732-3.079t1.606-2.729q.984-1.214 2.278-2.1t2.786-1.361q1.522-.48 3.125-.497t3.134.434q1.502.446 2.813 1.306t2.318 2.054q1.032 1.224 1.658 2.698t.794 3.062q.163 1.555-.127 3.096t-1.015 2.928q-.734 1.421-1.858 2.563l-.139.149v-.029z"></path></symbol><symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 23.491q-1.781-.005-3.461-.538-1.632-.518-3.043-1.498-1.397-.97-2.453-2.299-1.066-1.344-1.69-2.938Q.71 14.576.592 12.8t.305-3.49q.413-1.661 1.291-3.134.874-1.454 2.131-2.597 1.272-1.157 2.818-1.886 1.598-.749 3.36-.984l1.55-.202L10.9 1.568q-.835.773-1.435 1.735t-.931 2.045-.365 2.22v.269q-.005 1.651.605 3.182.595 1.502 1.699 2.688 1.128 1.205 2.618 1.908t3.137.799q1.618.096 3.158-.403 1.565-.509 2.832-1.565l1.21-.998-.427 1.55q-.442 1.661-1.349 3.115-.888 1.421-2.15 2.53t-2.789 1.805q-1.56.71-3.264.931-.72.101-1.45.11zM9.158 2.002q-1.728.49-3.192 1.522Q4.545 4.532 3.523 5.95T2.001 9.039q-.518 1.714-.432 3.511t.768 3.454q.658 1.613 1.812 2.928t2.666 2.179q1.555.888 3.324 1.21t3.54.034q1.718-.283 3.259-1.111t2.726-2.105q1.214-1.315 1.925-2.966-1.45.84-3.096 1.142-1.627.293-3.259.029-1.651-.269-3.118-1.082T9.55 14.186q-1.085-1.243-1.694-2.779-.614-1.56-.667-3.235v-.278q-.01-1.598.494-3.11t1.474-2.779z"></path></symbol><symbol id="icon-menu" viewBox="0 0 24 24"><path d="M.499 3.97h23.002v2.002H.499V3.97zm0 7.032h23.002v1.997H.499v-1.997zm0 7.027h23.002v2.002H.499v-2.002z"></path></symbol><symbol id="icon-sunny" viewBox="0 0 24 24"><path d="M5.15 6.418q.13.13.295.197t.343.067.341-.067.288-.192q.173-.178.235-.41t0-.466-.23-.406l-1.574-1.57q-.173-.173-.406-.233t-.466 0-.406.233-.233.403 0 .461.233.403zM12 4.099q.245 0 .451-.12t.326-.326.12-.451V.999q.005-.245-.118-.451T12.45.222t-.451-.12-.451.12-.326.326-.12.451v2.203q-.005.245.118.451t.329.326.451.12zM4.109 12q0-.245-.12-.451t-.326-.326-.451-.12H.999q-.245-.005-.451.118t-.326.329-.12.451.12.451.326.326.451.12h2.213q.245 0 .451-.12t.326-.326.12-.451zM18.23 6.682q.178 0 .343-.07t.286-.204l1.579-1.57q.173-.173.233-.403t0-.461-.233-.403-.406-.233-.466 0-.406.233l-1.57 1.57q-.197.192-.252.461t.05.523.336.406.504.151zm.629 10.896q-.173-.173-.403-.233t-.463 0-.408.23-.235.403 0 .466.228.406l1.584 1.57q.12.13.286.202t.343.07.343-.07.295-.192q.173-.173.233-.406t0-.466-.233-.406zm4.143-6.48h-2.213q-.245 0-.451.122t-.326.329-.12.451.12.451.326.326.451.12h2.213q.245.005.451-.118t.326-.329.12-.451-.12-.451-.326-.326-.451-.12v-.005zM12 5.832q-1.258 0-2.4.485-1.109.466-1.963 1.32T6.317 9.6q-.485 1.142-.485 2.4t.485 2.4q.466 1.109 1.32 1.963t1.963 1.32q1.142.485 2.4.485t2.4-.485q1.109-.466 1.963-1.32t1.32-1.963q.485-1.142.485-2.4t-.485-2.4q-.466-1.109-1.32-1.963T14.4 6.317q-1.142-.485-2.4-.485zm0 14.069q-.245 0-.451.12t-.326.326-.12.451v2.203q0 .245.12.451t.326.326.451.12.451-.12.326-.326.12-.451v-2.203q.005-.245-.118-.451t-.329-.326-.451-.12zm-6.869-2.323l-1.57 1.584q-.192.192-.242.458t.053.516.329.401.499.151q.178.005.343-.062t.286-.197l1.579-1.579q.173-.173.233-.403t0-.463-.233-.403-.406-.233-.466 0-.406.23z"></path></symbol><symbol id="icon-search" viewBox="0 0 24 24"><path d="M22.848 21.912L17.63 16.69q.96-1.142 1.522-2.51.542-1.325.662-2.76.125-1.416-.178-2.803-.302-1.406-1.008-2.654-.73-1.286-1.829-2.294t-2.443-1.627q-1.301-.6-2.726-.782-1.411-.182-2.813.062-1.416.24-2.693.893-1.315.677-2.371 1.73T2.025 6.319q-.653 1.272-.898 2.693-.24 1.397-.058 2.808.182 1.426.778 2.731.619 1.344 1.627 2.443t2.299 1.824q1.243.71 2.65 1.013 1.392.298 2.808.178 1.43-.12 2.76-.662 1.368-.562 2.51-1.526l5.218 5.184zm-12.398-3.47q-1.589 0-3.034-.614-1.402-.59-2.482-1.67t-1.67-2.482q-.614-1.45-.614-3.036t.614-3.036q.59-1.397 1.67-2.477t2.482-1.675q1.445-.61 3.034-.61t3.038.61q1.397.595 2.477 1.675t1.67 2.477q.614 1.45.614 3.036t-.614 3.036q-.59 1.402-1.67 2.482t-2.477 1.67q-1.45.614-3.038.614z"></path></symbol><symbol id="icon-rss" viewBox="0 0 24 24"><path d="M6.432 15.538q-.547.005-1.013.274-.451.269-.715.72-.274.466-.274 1.008t.274 1.008q.264.456.715.72.466.274 1.01.274t1.01-.274q.451-.264.715-.72.274-.466.274-1.008t-.274-1.008q-.264-.451-.715-.72-.466-.274-1.008-.274zm-2.002-6v2.914q1.416 0 2.722.542t2.304 1.543 1.538 2.309.535 2.724h2.918q0-1.325-.341-2.602-.341-1.267-.998-2.405-.662-1.142-1.601-2.078t-2.086-1.594q-1.142-.653-2.41-.989-1.277-.336-2.602-.331zm0-5.17V7.32q1.997.005 3.874.634 1.814.61 3.36 1.747 1.531 1.128 2.65 2.659 1.138 1.55 1.742 3.365.624 1.877.624 3.874h2.918q0-2.472-.778-4.8-.749-2.246-2.155-4.166-1.392-1.896-3.288-3.288-1.92-1.411-4.166-2.16-2.328-.778-4.8-.782z"></path></symbol><symbol id="icon-reddit" viewBox="0 0 24 24"><path d="M24 11.33a2.66 2.66 0 01-1.46 2.384c.107.415.161.844.161 1.286 0 4.232-4.781 7.661-10.674 7.661-5.879 0-10.661-3.429-10.661-7.661 0-.429.054-.857.147-1.259A2.688 2.688 0 010 11.33a2.664 2.664 0 014.607-1.821c1.808-1.259 4.219-2.076 6.897-2.17L13.058.361a.469.469 0 01.549-.348l4.942 1.085a2.003 2.003 0 11-.215.911l-4.473-.991-1.393 6.321c2.692.08 5.129.884 6.951 2.143a2.664 2.664 0 014.58 1.848zM5.598 13.996a2.003 2.003 0 104.006.012 2.003 2.003 0 00-4.006-.012zm10.848 4.754a.477.477 0 000-.696.484.484 0 00-.683 0c-.804.817-2.531 1.098-3.763 1.098s-2.96-.281-3.763-1.098a.484.484 0 00-.683 0 .477.477 0 000 .696c1.272 1.272 3.723 1.366 4.446 1.366s3.174-.094 4.446-1.366zm-.04-2.746a2.004 2.004 0 000-4.005 2.003 2.003 0 100 4.005z"></path></symbol></defs></svg>
+    <script>
+  var searchSettings = {
+    key: "1773cee69ce6b7777f81c90b1d",
+    url: "https://0x434b.dev",
+  };
+</script>
+
+<script>
+  var followSocialMedia = {
+    github: ["https://github.com/0xricksanchez", "Github"],
+    rss: ["https://0x434b.dev/rss", "RSS"],
+  };
+</script>
+
+<script type="text/javascript" src="https://github.com/asciinema/asciinema-player/releases/download/v2.6.1/asciinema-player.js"></script>
+
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Github -->
+    <symbol id="icon-github" viewBox="0 0 24 24">
+      <title>github</title>
+      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+    </symbol>
+  </defs>
+</svg> 
+
+
+<!-- Add ToC capabiltiies -->
+
+<script>
+    tocbot.init({
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: '.post-body',
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: 'h1, h2, h3, h4, h5, h6' ,
+    // For headings inside relative or absolute positioned containers within content.
+    hasInnerContainers: true,
+    // Also include collapsed containers
+    isCollapsedClass: '',
+    });
+</script>
+
+<style>
+.toc-heading{
+    text-align: center;
+    font-weight: bold;
+}
+.toc  ol {
+    counter-reset: item;
+}
+
+.toc  ol  li {
+    display: block;
+    margin-left: 10px;
+    list-style: decimal;
+}
+
+.toc  li:before {
+    content: counters(item, ".") " ";
+    counter-increment: item;
+}
+</style>
+
+    <script src="/assets/scripts/post.js?v=88d1ac4537"></script>
+
+    
+
+    
+
+<div id="ghost-portal-root"></div><div id="sodo-search-root"></div><script src="/assets/scripts/search.js?v=88d1ac4537" defer="" async=""></script><script src="/assets/scripts/prismjs.js?v=88d1ac4537" defer="" async=""></script></body></html>

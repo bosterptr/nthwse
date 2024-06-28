@@ -1,0 +1,348 @@
+<html lang="en"><head>
+  <meta name="name" content="PWK Notes: Tunneling and Pivoting [Updated]">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>PWK Notes: Tunneling and Pivoting [Updated] | 0xdf hacks stuff</title>
+<meta name="generator" content="Jekyll v4.3.3">
+<meta property="og:title" content="PWK Notes: Tunneling and Pivoting [Updated]">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="That beautiful feeling of shell on a box is such a high. But once you realize that you need to pivot through that host deeper into the network, it can take you a bit out of your comfort zone. I’ve run into this in Sans Netwars, Hackthebox, and now in PWK. In this post I’ll attempt to document the different methods I’ve used for pivoting and tunneling, including different ways to use SSH, sshuttle, and meterpreter, as well as some strategies for how to live from the host you are currently working through. Updated on 28 Jan 2018 to add references to two additional tools, Chisel and SSF.">
+<meta property="og:description" content="That beautiful feeling of shell on a box is such a high. But once you realize that you need to pivot through that host deeper into the network, it can take you a bit out of your comfort zone. I’ve run into this in Sans Netwars, Hackthebox, and now in PWK. In this post I’ll attempt to document the different methods I’ve used for pivoting and tunneling, including different ways to use SSH, sshuttle, and meterpreter, as well as some strategies for how to live from the host you are currently working through. Updated on 28 Jan 2018 to add references to two additional tools, Chisel and SSF.">
+<link rel="canonical" href="https://0xdf.gitlab.io/2019/01/28/pwk-notes-tunneling-update1.html">
+<meta property="og:url" content="https://0xdf.gitlab.io/2019/01/28/pwk-notes-tunneling-update1.html">
+<meta property="og:site_name" content="0xdf hacks stuff">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2019-01-28T12:23:38+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="PWK Notes: Tunneling and Pivoting [Updated]">
+<meta name="twitter:site" content="@0xdf_">
+<script async="" src="//static.ads-twitter.com/uwt.js"></script><script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2019-01-28T12:23:38+00:00","datePublished":"2019-01-28T12:23:38+00:00","description":"That beautiful feeling of shell on a box is such a high. But once you realize that you need to pivot through that host deeper into the network, it can take you a bit out of your comfort zone. I’ve run into this in Sans Netwars, Hackthebox, and now in PWK. In this post I’ll attempt to document the different methods I’ve used for pivoting and tunneling, including different ways to use SSH, sshuttle, and meterpreter, as well as some strategies for how to live from the host you are currently working through. Updated on 28 Jan 2018 to add references to two additional tools, Chisel and SSF.","headline":"PWK Notes: Tunneling and Pivoting [Updated]","mainEntityOfPage":{"@type":"WebPage","@id":"https://0xdf.gitlab.io/2019/01/28/pwk-notes-tunneling-update1.html"},"url":"https://0xdf.gitlab.io/2019/01/28/pwk-notes-tunneling-update1.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/bootstrap-toc.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css"> 
+  <link rel="stylesheet" href="/assets/css/buymeacoffee.css">
+  
+  <link rel="stylesheet" href="/assets/css/syntax.css"><link type="application/atom+xml" rel="alternate" href="https://0xdf.gitlab.io/feed.xml" title="0xdf hacks stuff"><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-P056MVQVGM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-P056MVQVGM');
+</script>
+<!--<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-120216868-1', 'auto');
+ga('send', 'pageview');
+</script>-->
+  
+<link rel="icon" type="image/png" href="/assets/icons/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-16x16.png" sizes="16x16">
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1px; bottom: 2px; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style></head>
+
+  <body data-spy="scroll" data-toggle="toc" data-offset="150">
+  
+<header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">0xdf hacks stuff</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+            <a class="page-link-site" href="/">Home</a>
+<a class="page-link-site" href="/about">About Me</a><a class="page-link-site" href="/tags">Tags</a><a class="page-link-site bmc" href="https://youtube.com/@0xdf"><img src="/icons/youtube.png" class="svg-icon" alt="">YouTube</a>
+          <a class="page-link-site bmc" href="https://gitlab.com/0xdf/ctfscripts"><img src="/icons/gitlab.png" class="svg-icon" alt="">Gitlab</a><a class="page-link-site bmc" href="/feed.xml"><img src="/icons/rss.png" class="svg-icon" alt=""><span>feed</span></a><a class="page-link-site bmc" target="_blank" href="https://www.buymeacoffee.com/0xdf"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee" style="-webkit-filter: drop-shadow(0px 0px 2px white); filter: drop-shadow(0px 0px 2px white);"></a>
+        </div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">PWK Notes: Tunneling and Pivoting [Updated]</h1>
+    <p class="post-meta">
+
+<span class="tag-list"><a href="/tags#pwk " class="post-tag">pwk</a> <a href="/tags#oscp " class="post-tag">oscp</a> <a href="/tags#pivot " class="post-tag">pivot</a> <a href="/tags#ssh " class="post-tag">ssh</a> <a href="/tags#tunnel " class="post-tag">tunnel</a> <a href="/tags#sshuttle " class="post-tag">sshuttle</a> <a href="/tags#meterpreter " class="post-tag">meterpreter</a> <a href="/tags#htb-reddish " class="post-tag">htb-reddish</a> </span><br><br>
+
+
+<time class="dt-published" datetime="2019-01-28T12:23:38+00:00" itemprop="datePublished">Jan 28, 2019
+      </time></p>
+
+  </header>
+
+  
+  <div class="post-content e-content" itemprop="articleBody">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="sticky-top">
+            <p><a href="#" style="color: #e6e6e6; text-decoration: none;">PWK Notes: Tunneling and Pivoting [Updated]</a></p>
+	    <!--https://afeld.github.io/bootstrap-toc/-->  
+          <nav id="toc" data-toggle="toc"><ul class="nav navbar-nav"><li><a class="nav-link" href="#overview">Overview</a></li><li><a class="nav-link" href="#live-off-the-land">Live Off the Land</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#why">Why?</a></li><li><a class="nav-link" href="#scanning--nmap">Scanning / nmap</a></li></ul></li><li><a class="nav-link" href="#ssh-into-beachhead-target">SSH Into Beachhead Target</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#ssh-tunneling">SSH Tunneling</a></li><li><a class="nav-link" href="#sshuttle">sshuttle</a></li></ul></li><li><a class="nav-link" href="#without-ssh-access-to-beachhead">Without SSH Access to Beachhead</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#chisel-and-secure-socket-funneling-ssf">Chisel and Secure Socket Funneling (SSF)</a></li><li><a class="nav-link" href="#metasploit-meterpreter">Metasploit Meterpreter</a></li><li><a class="nav-link" href="#reverse-ssh">Reverse SSH</a></li></ul></li><li><a class="nav-link" href="#ssh-support-escape-sequences">SSH Support Escape Sequences</a></li><li><a class="nav-link" href="#summary">Summary</a></li></ul></nav>
+        </div>
+      </div>
+      <div class="col-sm-9" id="postBody">
+        <p><img src="https://0xdfimages.gitlab.io/img/tunneling-cover.jpg" alt="" style="float: right; margin-left:50px"> That beautiful feeling of shell on a box is such a high. But once you realize that you need to pivot through that host deeper into the network, it can take you a bit out of your comfort zone. I’ve run into this in Sans Netwars, Hackthebox, and now in PWK. In this post I’ll attempt to document the different methods I’ve used for pivoting and tunneling, including different ways to use SSH, sshuttle, and meterpreter, as well as some strategies for how to live from the host you are currently working through. Updated on 28 Jan 2018 to add references to two additional tools, Chisel and SSF.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The goal here is to send traffic through a compromised host (which I’ll refer to as beachhead) to other target hosts the beachhead can talk to. There’s a lot you’ll be able to do from the beachhead itself. But there will be times that you want to use tools on your workstation to communicate with hosts through the beachhead. How I do that will depend on what kind of access I have to the beachhead host. The best case is if I can ssh into that host, because it allows me to port forward, and better yet, opens the door for a really nice tool, <code class="language-plaintext highlighter-rouge">shuttle</code>. But, more often than not, I’ll find myself with only a nc reverse shell, and I’ll show some options here as well.</p>
+
+<h2 id="live-off-the-land">Live Off the Land</h2>
+
+<h3 id="why">Why?</h3>
+
+<p>Before going to a ton of effort to figure out how to get your workstation talking to target hosts through the beachhead, consider what you can do from the beachhead itself, since you can already run commands there. Linux workstations may have <code class="language-plaintext highlighter-rouge">nmap</code> already installed. They will likely have <code class="language-plaintext highlighter-rouge">python</code> and <code class="language-plaintext highlighter-rouge">perl</code>, and potentially <code class="language-plaintext highlighter-rouge">gcc</code> for compiling things. Bash scripting will take you a long way even if it’s just doing a ping sweep in parallel (putting the command in <code class="language-plaintext highlighter-rouge">()</code> with a <code class="language-plaintext highlighter-rouge">&amp;</code> at the end will start them all in parallel, so this runs in a second):</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">root@host:~#</span><span class="w"> </span><span class="k">for </span>i <span class="k">in</span> <span class="si">$(</span><span class="nb">seq </span>1 254<span class="si">)</span><span class="p">;</span> <span class="k">do</span> <span class="o">(</span>ping <span class="nt">-c</span> 1 10.2.2.<span class="k">${</span><span class="nv">i</span><span class="k">}</span> | <span class="nb">grep</span> <span class="s2">"bytes from"</span> &amp;<span class="o">)</span><span class="p">;</span> <span class="k">done</span><span class="p">;</span>
+<span class="go">64 bytes from 10.2.2.10: icmp_seq=1 ttl=64 time=0.013 ms
+</span></code></pre></div></div>
+
+<h3 id="scanning--nmap">Scanning / nmap</h3>
+
+<p>Regardless of what kind of access I have to my beachhead, I’m going to want to scan the new network for host and port discovery. While it is possible to set up tunnels to scan, it’s very difficult to do, and flaky at best. If nmap isn’t already on the beachhead, my preferred method is to bring a copy of <code class="language-plaintext highlighter-rouge">nmap</code> that’s statically compiled to beachhead (typically via wget or curl on linux, or smb on windows).</p>
+
+<p>You can <a href="https://blog.zsec.uk/staticnmap/">compile the source yourself</a>, or there’s a few GitHub repos out there with statically compiled tools for various oses / architectures:</p>
+
+<ul>
+  <li>https://github.com/andrew-d/static-binaries</li>
+  <li>https://github.com/static-linux/static-binaries-i386</li>
+  <li>https://github.com/yunchih/static-binaries</li>
+</ul>
+
+<p>For nmap, if you’re in a very stripped down container, you may get an error <code class="language-plaintext highlighter-rouge">Unable to open /etc/services for reading service information</code>. Just grab a copy of that file from your local box, upload it to the beachhead and drop it in <code class="language-plaintext highlighter-rouge">/etc</code>. You won’t have access to all the nmap scripts, but you can get feel for what exists.</p>
+
+<h2 id="ssh-into-beachhead-target">SSH Into Beachhead Target</h2>
+
+<h3 id="ssh-tunneling">SSH Tunneling</h3>
+
+<p>The easiest tunneling case is when you have ssh access to the beachhead machine. I wrote a post earlier about <a href="/2018/06/10/intro-to-ssh-tunneling.html">SSH Tunneling</a>. I won’t repeat that here, but the summary is this:</p>
+
+<ul>
+  <li>To tunnel a single port through an SSH tunnel, connect with <code class="language-plaintext highlighter-rouge">-L [local listen port]:[target ip]:[target port]</code>. Then send traffic to <code class="language-plaintext highlighter-rouge">127.0.0.1:[port]</code>, and it will go through the tunnel to the <code class="language-plaintext highlighter-rouge">[target ip]:[port]</code>.</li>
+  <li>To set up a proxy, use <code class="language-plaintext highlighter-rouge">-D [port]</code>, and then set your proxy to <code class="language-plaintext highlighter-rouge">127.0.0.1:[port]</code>.</li>
+</ul>
+
+<p>When you’re using a proxy, you can do that with a browser (either in the browser settings, or I use <a href="https://getfoxyproxy.org/">FoxyProxy</a> for quick changing), or you can use a tool called <code class="language-plaintext highlighter-rouge">proxychains</code>.</p>
+
+<p>To use <code class="language-plaintext highlighter-rouge">proxychains</code>, first edit <code class="language-plaintext highlighter-rouge">/etc/proxychains.conf</code> by adding your proxy under <code class="language-plaintext highlighter-rouge">[ProxyList]</code> at the bottom of the file (and commenting others out). Mine looks like this when working with a <code class="language-plaintext highlighter-rouge">-D 1080</code>:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go"> 60 [ProxyList]
+ 61 # add proxy here ...
+ 62 socks4 127.0.0.1 1080
+</span></code></pre></div></div>
+
+<p>Then you can run <code class="language-plaintext highlighter-rouge">proxychains [tool]</code>, and it will run that tool proxied through the tunnel. Some tools behave better than others. Also, if you are sending some kind of exploit to the target host, consider what payload you use. If you use a reverse tcp shell, can the new target talk back to your listener on localhost? Your exploit is likely kicking off a new process that will not be aware of this proxied traffic. You can solve this by listening on the beachhead if nc is there.</p>
+
+<h3 id="sshuttle">sshuttle</h3>
+
+<p>During PWK is discovered a tool called <code class="language-plaintext highlighter-rouge">sshuttle</code>. It’s so awesome. Install with <code class="language-plaintext highlighter-rouge">apt install sshuttle</code> or <code class="language-plaintext highlighter-rouge">pip install sshuttle</code>.</p>
+
+<p>So if I have a beachhead device at 10.1.1.1, and it also has an interface on 10.2.2.0/24 with other hosts behind it, I can run:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp"># </span>sshuttle <span class="nt">-r</span> root@10.1.1.1 10.2.2.0/24
+<span class="go">root@10.1.1.1's password:
+client: Connected.
+</span></code></pre></div></div>
+
+<p>This creates a VPN-like connection, allowing me to visit 10.2.2.10 in a browser or with curl, and see the result.</p>
+
+<p>Some mileage may vary. I’ve never had success running <code class="language-plaintext highlighter-rouge">nmap</code> through <code class="language-plaintext highlighter-rouge">sshuttle</code>, and there are a lot of people out there posting similar complaints. But it is a very nice way to interact with a host over a tunnel.</p>
+
+<h2 id="without-ssh-access-to-beachhead">Without SSH Access to Beachhead</h2>
+
+<h3 id="chisel-and-secure-socket-funneling-ssf">Chisel and Secure Socket Funneling (SSF)</h3>
+
+<p>While sshing back to yourself is effective, frameworks like Chisel and SSF can help to manage tunnels and create them in a quick and secure manner. Chisel has become my go to. Check out <a href="/2020/08/10/tunneling-with-chisel-and-ssf-update.html">this post</a> for details.</p>
+
+<h3 id="metasploit-meterpreter">Metasploit Meterpreter</h3>
+
+<h4 id="portfwd">portfwd</h4>
+
+<p>I tend to try to avoid using Meterpreter, but the port forwarding ability is one place where it really outshines other options.  If you can get a shell on a box, you can likely get a meterpreter shell as well. From there, you can run something like:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">meterpreter &gt; </span>portfwd add <span class="nt">-l</span> 80 <span class="nt">-r</span> 172.19.0.4 <span class="nt">-p</span> 80
+</code></pre></div></div>
+
+<p>Now, you can point your browser at <code class="language-plaintext highlighter-rouge">http://127.0.0.1</code>, and it will forward traffic through your meterpreter session, and from there to a remote host, in this case 172.19.0.4 port 80.</p>
+
+<p>The biggest drawback is that you’ll need to add this for each port you want to tunnel.</p>
+
+<h4 id="autoroute">Autoroute</h4>
+
+<p>If you are working in Metasploit, you can also background the session, and then <code class="language-plaintext highlighter-rouge">use post/multi/manage/autoroute</code>. The options are relatively straight forward:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">msf post(multi/manage/autoroute) &gt; </span>options
+<span class="go">
+Module options (post/multi/manage/autoroute):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   CMD      autoadd          yes       Specify the autoroute command (Accepted: add, autoadd, print, delete, default)
+   NETMASK  255.255.255.0    no        Netmask (IPv4 as "255.255.255.0" or CIDR as "/24"
+   SESSION                   yes       The session to run this module on.
+   SUBNET                    no        Subnet (IPv4, for example, 10.10.10.0)
+</span></code></pre></div></div>
+
+<p>Give it the subnet you want to target, and the session you want to forward over, and run it, and then you can work against the subnet from within Metasploit as if you can talk directly to it.</p>
+
+<h4 id="metasploit-socks-proxy">Metasploit socks proxy</h4>
+
+<p>You can also <code class="language-plaintext highlighter-rouge">use auxiliary/server/socks4a</code>. This will allow you to route things through Metasploits routes as a proxy. So after setting up autoroute, you can create a socks proxy that will listen, route traffic to the appropriate session, and then send it from there. I don’t have too much experience here, but it’s something that would work if you work within Metasploit.</p>
+
+<h3 id="reverse-ssh">Reverse SSH</h3>
+
+<p>Most linux hosts will have an ssh client. And while it is less common on Windows, you can upload one (<code class="language-plaintext highlighter-rouge">plink.exe</code> is a stand-alone exe that is at <code class="language-plaintext highlighter-rouge">/usr/share/windows-binaries/plink.exe</code> on Kali). From there, you can ssh back to your attacker box with a <code class="language-plaintext highlighter-rouge">-R</code> flag, which will open up listening ports on your attacker box, that are forwarded through the tunnel and out the other side. This will also require you to create a tunnel for each target/port combination you want to talk to.</p>
+
+<p>If you find a Linux host that doesn’t have SSH (more common in containers), <a href="https://matt.ucc.asn.au/dropbear/dropbear.html">Dropbear</a> is a good option. I show how to use this in <a href="/2019/01/26/htb-reddish.html#creating-port-forwards-with-dropbear">my write-up of Reddish from HackTheBox</a>.</p>
+
+<h2 id="ssh-support-escape-sequences">SSH Support Escape Sequences</h2>
+
+<p>If you’re going to be creating tunnels over SSH, you’re almost certainly going to need to change the tunnels or create new ones. That’s really annoying, if it means disconnecting and reconnecting with new flags. SSH Control Sequences to the rescue. There’s a <a href="https://pen-testing.sans.org/blog/2015/11/10/protected-using-the-ssh-konami-code-ssh-control-sequences">post from Jeff McJunkin</a> which describes this well. The sort version is, hit enter, then <code class="language-plaintext highlighter-rouge">~</code> (the tilde, top left of the US keyboard), then one of the characters to interact with the SSH session. The most useful is <code class="language-plaintext highlighter-rouge">C</code>, which opens the command prompt, and allows you to add in something like <code class="language-plaintext highlighter-rouge">-D 9001</code>, and then resumes the session.</p>
+
+<p>So, for example, to add a port forward port 8080 from your local host to a target 10.3.3.3 on port 80, you’d do the following:</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">enter</code></li>
+  <li><code class="language-plaintext highlighter-rouge">~C</code></li>
+  <li>At the <code class="language-plaintext highlighter-rouge">ssh&gt;</code> prompt, <code class="language-plaintext highlighter-rouge">-L 8080:10.3.3.3:80</code></li>
+</ol>
+
+<p>It looks like this:</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">root@host:~$</span><span class="w">
+</span><span class="gp">ssh&gt;</span><span class="w"> </span><span class="nt">-L</span> 8080:10.3.3.3:80
+<span class="go">Forwarding port.
+
+</span><span class="gp">root@host:~$</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="summary">Summary</h2>
+
+<p>Pivoting into a network can be intimidating, but there are tools that will help. Consider what you can do directly from the beachhead host. Bring tools there to work from there. Try to get SSH access if you can. Use meterpreter where you can’t.</p>
+
+<p>If I missed any good techniques, please let a comment and let me know!</p>
+
+      </div>
+    </div>
+  
+  </div><a class="u-url" href="/2019/01/28/pwk-notes-tunneling-update1.html" hidden=""></a>
+</article>
+
+      </div>
+    </main>
+<footer class="site-footer h-card">
+
+  <div class="wrapper">
+
+    <h2 data-toc-skip="" class="footer-heading">0xdf hacks stuff</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">0xdf hacks stuff
+</li><li><a class="u-email" href="mailto:0xdf.223@gmail.com">0xdf.223@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://www.twitter.com/0xdf_"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">0xdf_</span></a></li><!--<li><a href="https://mm.netsecfocus.com/nsf/messages/@oxdf"><img class="svg-icon" src="/assets/icons/mattermost-icon-128.png" alt="NSF" /><span class="username">oxdf</span></a></li>--><li><a href="https://youtube.com/channel/UChO9OAH57Flz35RRX__E25A"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#youtube"></use></svg> <span class="username">0xdf</span></a></li><li><a href="/feed.xml"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#rss"></use></svg> <span>feed</span></a></li><li class="bmc"><a href="https://www.hackthebox.eu/home/users/profile/4935"><img class="svg-icon bmc" src="/assets/icons/htb-favicon.png" alt="HTB"><span class="username">0xdf</span></a></li><li class="bmc"><a rel="me" href="https://infosec.exchange/@0xdf"><img class="svg-icon bmc" src="/assets/icons/mastodon.svg" alt="Mastodon"><span class="username">@0xdf@infosec.exchange</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>CTF solutions, malware analysis, home lab development</p>
+        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/0xdf"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:15px;font-size:28px !important;">Buy me a coffee</span></a>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="/assets/js/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+  <script src="/assets/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="/assets/js/bootstrap-toc.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  <script src="/assets/js/collapsable.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+<script>
+  $(document).ready(function () {
+    mermaid.initialize({
+      startOnLoad:true,
+      theme: "default",
+    });
+    window.mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+  });
+</script>
+
+  <script src="/assets/js/fix_mermaid.js"></script>
+
+
+  <!-- Twitter universal website tag code -->
+  <script>
+    !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+     },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+     a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+    // Insert Twitter Pixel ID and Standard Event data below
+    twq('init','o42o1');
+    twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+</footer>
+
+
+
+</body></html>

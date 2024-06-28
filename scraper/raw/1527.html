@@ -1,0 +1,536 @@
+<html class=" js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg smil svgclippaths"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>
+    Using neural networks for password cracking | Sebastian Neef - 0day.work
+    </title>
+
+    
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="https://0day.work/content/images/size/w256h256/2017/08/0day-1.png">
+
+    <!--<link rel="stylesheet" type="text/css" href="/assets/css/screen.css?v=8ad44a1902" />-->
+
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v=8ad44a1902">
+    <link rel="stylesheet" href="/assets/css/monokai_sublime.css?v=8ad44a1902">
+    <link rel="stylesheet" href="/assets/css/default.css?v=8ad44a1902">
+    <link rel="stylesheet" href="/assets/css/elusive-icons.min.css?v=8ad44a1902">
+    <link rel="stylesheet" href="/assets/css/cookieconsent.min.css?v=8ad44a1902">
+
+    <link rel="icon" href="https://0day.work/content/images/size/w256h256/2017/08/0day-1.png" type="image/png">
+    <link rel="canonical" href="https://0day.work/using-neural-networks-for-password-cracking/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="https://0day.work/using-neural-networks-for-password-cracking/amp/">
+    
+    <meta property="og:site_name" content="Sebastian Neef - 0day.work">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Using neural networks for password cracking">
+    <meta property="og:description" content="In this blogpost I'm going to write about how it's possible to use neural
+networks for password cracking.
+
+TL;DR
+It's possible to train a neural network on a dataset of cracked passwords and
+then use it to predict uncracked passwords.
+
+Idea
+Somewhen during the last year I found a">
+    <meta property="og:url" content="https://0day.work/using-neural-networks-for-password-cracking/">
+    <meta property="article:published_time" content="2016-01-07T19:03:17.000Z">
+    <meta property="article:modified_time" content="2016-03-10T12:23:12.000Z">
+    <meta property="article:tag" content="research">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Using neural networks for password cracking">
+    <meta name="twitter:description" content="In this blogpost I'm going to write about how it's possible to use neural
+networks for password cracking.
+
+TL;DR
+It's possible to train a neural network on a dataset of cracked passwords and
+then use it to predict uncracked passwords.
+
+Idea
+Somewhen during the last year I found a">
+    <meta name="twitter:url" content="https://0day.work/using-neural-networks-for-password-cracking/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Sebastian Neef">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="research">
+    <meta name="twitter:site" content="@0daywork">
+    
+    <script type="text/javascript" async="" defer="" src="//piwik.neef.it/piwik.js"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Sebastian Neef - 0day.work",
+        "url": "https://0day.work/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://0day.work/content/images/2016/01/0day-1.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Sebastian Neef",
+        "url": "https://0day.work/author/sebastian/",
+        "sameAs": []
+    },
+    "headline": "Using neural networks for password cracking",
+    "url": "https://0day.work/using-neural-networks-for-password-cracking/",
+    "datePublished": "2016-01-07T19:03:17.000Z",
+    "dateModified": "2016-03-10T12:23:12.000Z",
+    "keywords": "research",
+    "description": "In this blogpost I&#x27;m going to write about how it&#x27;s possible to use neural\nnetworks for password cracking.\n\nTL;DR\nIt&#x27;s possible to train a neural network on a dataset of cracked passwords and\nthen use it to predict uncracked passwords.\n\nIdea\nSomewhen during the last year I found a fascinating blogpost about recurrent\nneural networks [https://karpathy.github.io/2015/05/21/rnn-effectiveness/] on\nhackernews and Karpathy&#x27;s char-rnn [https://github.com/karpathy/char-rnn] on\nGithub. I was playing aroun",
+    "mainEntityOfPage": "https://0day.work/using-neural-networks-for-password-cracking/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.85">
+    <link rel="alternate" type="application/rss+xml" title="Sebastian Neef - 0day.work" href="https://0day.work/rss/">
+    
+    <script defer="" src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/sodo-search.min.js" data-key="056aff3bf5c32ce7b86d4c1876" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.1/umd/main.css" data-sodo-search="https://0day.work/" crossorigin="anonymous"></script>
+    
+    <link href="https://0day.work/webmentions/receive/" rel="webmention">
+    <script defer="" src="/public/cards.min.js?v=8ad44a1902"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=8ad44a1902">
+    <style>
+    .post img {
+    	max-width: 50%;
+        height: auto;
+        display:block;
+        margin: 0 auto;
+    }
+    .description i.read-more::before {
+    	content: "read more...";
+    }
+    
+    body {
+        font-size: 1.7em;
+    }
+</style>
+<link rel="stylesheet" href="/assets/css/jquery.fancybox.min.css"><style>:root {--ghost-accent-color: #15171A;}</style>
+
+    <script type="text/javascript" src="/assets/js/jquery.js?v=8ad44a1902"></script>
+    <script type="text/javascript" src="/assets/js/cookieconsent.min.js?v=8ad44a1902"></script>
+    <script type="text/javascript" src="/assets/js/cookies.js?v=8ad44a1902"></script>
+
+    <!--<link rel="stylesheet" href="/assets/css/default.css?v=8ad44a1902">-->
+    
+    <script src="/assets/js/highlight.pack.js?v=8ad44a1902"></script>
+  
+      <script>hljs.initHighlightingOnLoad();</script>
+
+
+<script>
+
+</script>
+<style>.App{text-align:center}.App-logo{height:40vmin;pointer-events:none}@media (prefers-reduced-motion: no-preference){.App-logo{animation:App-logo-spin infinite 20s linear}}.App-header{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}.App-link{color:#61dafb}@keyframes App-logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style><style></style></head>
+<body><div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window cc-banner cc-type-info cc-theme-classic cc-bottom cc-color-override-1827372716 " style=""><!--googleoff: all--><span id="cookieconsent:desc" class="cc-message">Diese Webseite benötigt Cookies, um ohne Einschränkungen genutzt werden zu können. <a aria-label="learn more about cookies" role="button" tabindex="0" class="cc-link" href="https://it-solutions-neef.de/datenschutz.html" target="_blank">Mehr erfahren</a></span><div class="cc-compliance"><a aria-label="dismiss cookie message" role="button" tabindex="0" class="cc-btn cc-dismiss">Verstanden</a></div><!--googleon: all--></div>
+<div class="container">
+<div class="row">
+<div class="col-md-2 hidden-sm hidden-xs">
+
+    <div class="logo">
+<a class="blog-logo" href="https://0day.work">
+        <img class="blog-logo-image" src="https://0day.work/content/images/2016/01/0day-1.png" alt="Blog Logo">
+</a>
+    </div>
+
+
+<h5>Sebastian Neef - 0day.work</h5>
+<hr>
+<ul class="list-unstyled menu">
+    <li>
+        <a href="https://0day.work/">
+         <i class="el el-home"></i> Home 
+        </a>
+    </li>
+    <li>
+        <a href="https://0day.work/contact/">
+         <i class="el el-envelope"></i> Contact
+        </a>
+    </li>
+
+    <li>
+       <a href="https://twitter.com/0daywork" target="_blank">
+            <i class="el el-twitter"></i> @0daywork
+       </a>
+    </li>
+
+    <li>
+        <a href="https://twitter.com/gehaxelt" target="_blank">
+            <i class="el el-twitter"></i> @gehaxelt
+        </a>
+    </li>
+
+    <li>
+        <a href="https://it-solutions-neef.de/impressum.html" target="_blank">
+            Impressum
+        </a>
+    </li>
+
+    <li>
+        <a href="https://it-solutions-neef.de/datenschutz.html" target="_blank">
+           Datenschutz 
+        </a>
+    </li>
+
+
+</ul>
+
+
+
+</div>
+<div class="col-md-10 col-xs-12">
+    
+
+<a href="/" class="read-more"><i class="el el-caret-left read-more"></i> home</a>
+<hr>
+
+
+
+
+
+<main role="main">
+
+    <article class="row post tag-research no-image">
+
+        <header class="col-xs-12">
+        <div class="col-md-10 no-margin no-padding post">
+            <h1 class="title">
+            Using neural networks for password cracking
+
+            </h1>
+             </div>
+<div class="col-md-2">
+            </div>
+
+        </header>
+
+        <section class="col-xs-12">
+            <!--kg-card-begin: markdown--><p>In this blogpost I'm going to write about how it's possible to use neural networks for password cracking.</p>
+<!-- more -->
+<h1 id="tldr">TL;DR</h1>
+<p>It's possible to train a neural network on a dataset of cracked passwords and then use it to predict uncracked passwords.</p>
+<h1 id="idea">Idea</h1>
+<p>Somewhen during the last year I found a fascinating blogpost about <a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/">recurrent neural networks</a> on hackernews and Karpathy's <a href="https://github.com/karpathy/char-rnn">char-rnn</a> on Github. I was playing around with neural networks before, so I started to think about ways to (ab)use these in a security context. People are already trying to use neural networks as <a href="https://scholar.google.de/scholar?hl=en&amp;q=neural+network+security+ids">intrusion detection systems</a> or similar defensive security strategies.<br>
+But what about the attacker's perspective? Can neural networks somehow be used to facilitate attacks or offensive behaviour?</p>
+<p>After finishing Karpathy's article and especially the section about creating new baby names, I was wondering if it could learn patterns from passwords and generate similar ones.</p>
+<p>Imagine that you have a large dataset of hashed passwords from a specific website [<em>insert recent hack here</em>]. You run your standard hash cracking tool and wordlist against it and manage to crack a portion of the passwords. Depending on the website's niche, there may be a pattern in the passwords which you don't know. So let's see if a RNN can figure it out and generate new valid passwords for previously uncracked hashes.</p>
+<h1 id="setup">Setup</h1>
+<p><em>Disclaimer:</em> I'm not a machine learning expert, so I may have done something wrong. I also didn't finish the model training, so this is more of a proof of concept.</p>
+<p>I didn't want to waste my time and computation power on hashing and cracking passwords, so I skipped this step and downloaded the <a href="http://downloads.skullsecurity.org/passwords/rockyou.txt.bz2">rockyou.txt</a> wordlist. It is around 134MB in size and contains around 14M passwords. The notes state <code>Best list available; huge, stolen unencrypted</code>, but there was no particular reason for choosing this one. I always assumed that wordlists would be free of duplicates, but this assumption didn't hold for this one, so I removed them first:</p>
+<pre><code class="language-bash hljs">$&gt; sort rockyou.txt | uniq -u &gt; rockyou.unique.txt
+$&gt; du -sb rockyou.* 
+<span class="hljs-number">139921497</span>	rockyou.txt
+<span class="hljs-number">139842217</span>	rockyou.unique.txt
+</code></pre>
+<p>It's unlikely that cracked passwords are sorted, so I randomized the unique wordlist again:</p>
+<pre><code class="language-bash hljs">$&gt; sort -R rockyou.unique.txt &gt; rockyou.random.txt
+</code></pre>
+<p>After that I split it into two parts:</p>
+<ul>
+<li>The training set with the first 250k passwords:</li>
+</ul>
+<pre><code class="language-bash hljs">$&gt; head -n <span class="hljs-number">250000</span> rockyou.random.txt &gt; train.txt
+</code></pre>
+<ul>
+<li>The rest is the testing set</li>
+</ul>
+<p>I reassured me that there are no overlapping entries in both the training and testing dataset:</p>
+<pre><code class="language-bash hljs">$&gt; sort train.txt test.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">0</span>
+</code></pre>
+<p>Training neural networks on a CPU isn't recommended anymore, because GPUs are much faster when it comes to parallel number crunching. Unfortunately I don't have a  CUDA cluster at home, so I rent an <a href="https://aws.amazon.com/ec2/instance-types/">AWS GPU g2.2xlarge spot instance</a> for some hours. The spot instances are really, really cheap and perfect for such experiments. Luckily someone created a <a href="https://github.com/brotchie/torch-ubuntu-gpu-ec2-install">community AMI (ami-c79b7eac)</a> with all tools and cuda drivers installed and configured. You'll just need to run the following commands to setup char-nn:</p>
+<pre><code class="language-bash hljs">$&gt; <span class="hljs-built_in">cd</span> /tmp/
+$&gt; sudo luarocks install nngraph 
+$&gt; sudo luarocks install optim
+$&gt; git <span class="hljs-built_in">clone</span> https://github.com/karpathy/char-rnn
+$&gt; <span class="hljs-built_in">cd</span> char-rnn
+</code></pre>
+<p>The last step is to upload the <code>train.txt</code> file to <code>/tmp/char-rnn/data/pws/input.txt</code>.</p>
+<p>I trained the dataset on three different recurrent neural networks for around 10 epochs:</p>
+<ul>
+<li><code>$&gt; th train.lua -rnn_size 128 -num_layers 3 -eval_val_every 500 -seq_length 50 -data_dir data/pws/ -savefile pws</code></li>
+<li><code>$&gt; th train.lua -rnn_size 512 -num_layers 3 -eval_val_every 500 -seq_length 100 -data_dir data/pws/ -savefile pws2</code></li>
+<li><code>$&gt; th train.lua -rnn_size 64 -num_layers 3 -eval_val_every 500 -seq_length 20 -data_dir data/pws/ -savefile pws3</code></li>
+</ul>
+<p>Once in every epoch, I let the network generate output of 25kb in length:</p>
+<pre><code class="language-bash hljs">$&gt; th sample.lua -length <span class="hljs-number">25000</span> cv/lm_pws_epochXY &gt; output/pws-epochXY
+</code></pre>
+<p>That was around 2500 lines (=passwords).</p>
+<pre><code class="language-bash hljs">$&gt; wc <span class="hljs-operator">-l</span> *.txt
+ <span class="hljs-number">2681</span> pws-<span class="hljs-number">0.54</span>.txt
+     <span class="hljs-number">2534</span> pws1-<span class="hljs-number">1.62</span>.txt
+     <span class="hljs-number">2599</span> pws1-<span class="hljs-number">2.16</span>.txt
+     <span class="hljs-number">2571</span> pws1-<span class="hljs-number">3.24</span>-<span class="hljs-number">12345</span>.txt
+     <span class="hljs-number">2571</span> pws1-<span class="hljs-number">3.24</span>-pass.txt
+     <span class="hljs-number">2570</span> pws1-<span class="hljs-number">3.24</span>.txt
+     <span class="hljs-number">2498</span> pws1-<span class="hljs-number">4.86</span>.txt
+     <span class="hljs-number">2583</span> pws1-<span class="hljs-number">5.40</span>.txt
+     <span class="hljs-number">2564</span> pws1-<span class="hljs-number">6.48</span>.txt
+     <span class="hljs-number">2566</span> pws1-<span class="hljs-number">7.02</span>.txt
+     <span class="hljs-number">2638</span> pws1-<span class="hljs-number">8.10</span>.txt
+     <span class="hljs-number">2523</span> pws1-<span class="hljs-number">9.18</span>.txt
+     <span class="hljs-number">2416</span> pws1-<span class="hljs-number">10.26</span>-t0.<span class="hljs-number">3</span>.txt
+     <span class="hljs-number">2540</span> pws1-<span class="hljs-number">10.26</span>-t0.<span class="hljs-number">5</span>.txt
+     <span class="hljs-number">2628</span> pws1-<span class="hljs-number">10.26</span>-t0.<span class="hljs-number">8</span>.txt
+     <span class="hljs-number">2567</span> pws1-<span class="hljs-number">10.26</span>.txt
+     <span class="hljs-number">2446</span> pws2-<span class="hljs-number">1.08</span>.txt
+     <span class="hljs-number">2681</span> pws2-<span class="hljs-number">2.16</span>.txt
+     <span class="hljs-number">2634</span> pws3-<span class="hljs-number">0.65</span>.txt
+     <span class="hljs-number">2585</span> pws3-<span class="hljs-number">6.91</span>.txt
+     <span class="hljs-number">2609</span> pws3-<span class="hljs-number">9.72</span>.txt
+     <span class="hljs-number">2552</span> pws3-<span class="hljs-number">12.09</span>.txt
+     <span class="hljs-number">2574</span> pws3-<span class="hljs-number">16.19</span>.txt
+     <span class="hljs-number">2611</span> pws3-<span class="hljs-number">18.13</span>.txt
+</code></pre>
+<p>The files have the following format: <code>pwsX-EPOCH[-t].txt</code> where</p>
+<ul>
+<li>X is the network id</li>
+<li>EPOCH is the epoch of the used savefile</li>
+<li>-t is the temperature used for sampling</li>
+</ul>
+<h1 id="results">Results</h1>
+<p>Again, our goal was to see if the network can predirect passwords from the testing dataset (<code>test.txt</code>) by learning passwords from the training set (<code>train.txt</code>). Now that we've gathered some (minimal amount of) data, let's evaluate it.</p>
+<h2 id="network1">Network #1</h2>
+<ul>
+<li>Neurons per layer: 128</li>
+<li>Layers: 3</li>
+<li>Sequence length: 50</li>
+</ul>
+<p>This network generated 31k unique passwords of which only 92 are in the training set:</p>
+<pre><code class="language-bash hljs">$&gt; cat pws-* | sort | uniq -u &gt; output-<span class="hljs-number">1</span>.txt
+$&gt; wc <span class="hljs-operator">-l</span> output-<span class="hljs-number">1</span>.txt 
+<span class="hljs-number">31441</span> output-<span class="hljs-number">1</span>.txt
+$&gt; sort output-<span class="hljs-number">1</span>.txt train.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">92</span>
+$&gt; sort output-<span class="hljs-number">1</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">3180</span>
+</code></pre>
+<p><em>YAY</em> the network created 3180 passwords which can also be found in the testing set. Let's have a look at some of these:</p>
+<pre><code class="language-bash hljs">$&gt; sort output-<span class="hljs-number">1</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> | sort -R | head -n <span class="hljs-number">25</span> 
+freddy12
+ava2005
+joseph2006
+sexylexy
+marcolo
+jackson7
+jackson1
+ariela11
+andrew12345
+mercedes23
+brittshit
+<span class="hljs-number">19081984</span>
+jklover
+boodoo
+eliana19
+<span class="hljs-number">725972</span>
+daliani
+pacy99
+<span class="hljs-number">121093</span>a
+celin1
+Hottie.
+andrew1010
+tatty9
+karina79
+amanda213
+<span class="hljs-number">080223</span>
+</code></pre>
+<h2 id="network2">Network #2</h2>
+<ul>
+<li>Neurons per layer: 512</li>
+<li>Layers: 3</li>
+<li>Sequence length: 100</li>
+</ul>
+<p>I didn't train it too long, because it was relative slow per batch. Only 5k password generated of which 3 are in the training and 178 are in the testing dataset.</p>
+<pre><code class="language-bash hljs">$&gt; wc <span class="hljs-operator">-l</span> output-<span class="hljs-number">2</span>.txt 
+<span class="hljs-number">5046</span> output-<span class="hljs-number">2</span>.txt
+$&gt; sort output-<span class="hljs-number">2</span>.txt train.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">3</span>
+$&gt; sort output-<span class="hljs-number">2</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">178</span>
+$&gt; sort output-<span class="hljs-number">2</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> | sort -R | head -n <span class="hljs-number">25</span> 
+zhan23
+hooda1
+dobes
+<span class="hljs-number">081087</span>
+<span class="hljs-number">69777</span>
+jestin
+<span class="hljs-number">492007</span>
+<span class="hljs-number">25372</span>
+griss34
+<span class="hljs-number">14711</span>
+<span class="hljs-number">172085</span>
+ka2006
+ellva
+<span class="hljs-number">10113</span>
+franz27
+nissa09
+<span class="hljs-number">33</span>
+<span class="hljs-number">012187</span>
+a
+<span class="hljs-number">1113</span>sd
+ilove2
+ford19
+<span class="hljs-number">40309</span>
+kina13
+kiku13
+</code></pre>
+<h2 id="network3">Network #3</h2>
+<ul>
+<li>Neurons per layer: 64</li>
+<li>Layers: 3</li>
+<li>Sequence length: 20</li>
+</ul>
+<p>The smallest network managed to generate 15k passwords with only 15 being in the training and 726 in the testing set.</p>
+<pre><code class="language-bash hljs">$&gt; wc <span class="hljs-operator">-l</span> output-<span class="hljs-number">3</span>.txt 
+<span class="hljs-number">14976</span> output-<span class="hljs-number">3</span>.txt
+$&gt; sort output-<span class="hljs-number">3</span>.txt train.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">15</span>
+$&gt; sort output-<span class="hljs-number">3</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> |wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">726</span>
+$&gt; sort output-<span class="hljs-number">3</span>.txt test.txt | uniq <span class="hljs-operator">-d</span> | sort -R | head -n <span class="hljs-number">25</span> 
+dannica
+hissss
+lobe21
+carlo14
+ho
+killer1
+candice12
+laiska
+kaley2
+pusher1
+<span class="hljs-number">778658</span>
+<span class="hljs-number">7344501</span>
+leanng
+bron55
+GOLLITA
+jaimi
+<span class="hljs-number">490767</span>
+<span class="hljs-number">552655</span>
+<span class="hljs-number">71</span>
+<span class="hljs-number">12</span>
+cocker07
+<span class="hljs-number">660244</span>
+nanina
+hirann
+love19
+</code></pre>
+<h2 id="allnetworkstogether">All networks together</h2>
+<p>Let's combine the output of all three networks. We get more than 50k unique passwords from which 3,8k are elements from the testing set and 105 from the training set.</p>
+<pre><code class="language-bash hljs">$&gt; wc <span class="hljs-operator">-l</span> output-all.txt 
+<span class="hljs-number">50691</span> output-all.txt
+$&gt; sort output-all.txt train.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">105</span>
+$&gt; sort output-all.txt test.txt | uniq <span class="hljs-operator">-d</span> | wc <span class="hljs-operator">-l</span> 
+<span class="hljs-number">3881</span>
+$&gt; sort output-all.txt test.txt | uniq <span class="hljs-operator">-d</span> | sort -R | head -n <span class="hljs-number">25</span> 
+newmon
+chesar
+pawita
+opalla
+buster6
+reneeia
+singers123
+patito123
+<span class="hljs-number">6312355</span>
+biggie1
+<span class="hljs-number">297572</span>
+jairo01
+bday1992
+coolboy1
+meeka1
+blackie
+laura25
+neil10
+mone10
+<span class="hljs-number">12345</span>sexy
+dog143
+<span class="hljs-number">193208</span>
+mash28
+alexa87
+<span class="hljs-number">793806</span>
+</code></pre>
+<p>I'm sure that one can predict more passwords when the model is trained longer, with other parameters or when the <code>-primetext</code> parameter is used during sampling.</p>
+<h1 id="data">Data</h1>
+<p>If that caught your interest and you want to continue to work on this and/or start the recurrent neural network from a savefile, I've uploaded the contents of the directories:</p>
+<ul>
+<li>cv/</li>
+<li>data/</li>
+<li>output/</li>
+</ul>
+<p>to Github: <a href="https://github.com/gehaxelt/RNN-Passwords">https://github.com/gehaxelt/RNN-Passwords</a>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>As shown above, it is possible to let a computer crunch some numbers and predirect unkown passwords. But based on the amount of data used for the training/testing dataset and the small percentage of predirected passwords, I don't think that his approach has any practical relevance.</p>
+<p>-=-</p>
+<!--kg-card-end: markdown-->
+        </section>
+
+        <footer class="col-xs-12 author">
+            
+            <hr>
+
+      
+        </footer>
+
+    </article>
+    
+</main>
+
+
+</div>
+
+</div>
+</div>
+
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-6">
+          <i class="el el-stop footer-icon"></i>
+            © 2024 <a href="https://0day.work">Sebastian Neef - 0day.work</a> All rights reserved.<br><br>
+            Coder Ghost Theme created by <a href="https://www.mbejda.com">Milos Bejda</a>
+          </div>
+          <div class="col-xs-6 text-right hidden-sm hidden-xs">Proudly published with <a href="https://ghost.org">Ghost</a></div>
+        </div>
+      </div>
+    </footer>
+
+    <a href="#" class="back-to-top"><span class="fa fa-angle-up fa-2x"></span></a>
+
+    <script src="/assets/js/jquery.fancybox.min.js?v=1"></script>
+<script src="/assets/js/fancybox.js?v=1"></script>
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+  _paq.push(["setCookieDomain", "*.0day.work"]);
+  _paq.push(["setDomains", ["*.0day.work"]]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//piwik.neef.it/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '10']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//piwik.neef.it/piwik.php?idsite=10&rec=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+
+    <script src="/assets/js/modernizr.js?v=8ad44a1902"></script>
+    <script type="text/javascript" src="/assets/js/index.js?v=8ad44a1902"></script>
+
+
+
+<div id="sodo-search-root"></div></body></html>

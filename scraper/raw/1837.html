@@ -1,0 +1,953 @@
+<html><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Living Off the Foreign Land - Part 1/3: Setup Linux VM for SOCKS routing « BITSADMIN Blog - Mystery guest in your IT infrastructure</title>
+  <meta name="description" content="Living Off the Foreign Land (LOFL) allows attackers to use Windows' built-in powerful tooling (LOFLCABs) to attack remote systems. The first part in this 3-p...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="https://blog.bitsadmin.com/living-off-the-foreign-land-windows-as-offensive-platform">
+  <link rel="alternate" type="application/rss+xml" title="BITSADMIN Blog - Mystery guest in your IT infrastructure" href="https://blog.bitsadmin.com/feed.xml">
+
+  <!-- OpenGraph / Twitter cards -->
+  <meta name="og:site_name" content="BITSADMIN Blog">
+  <meta name="og:title" content="Living Off the Foreign Land - Part 1/3: Setup Linux VM for SOCKS routing">
+  <meta name="og:type" content="article">
+  <meta name="og:url" content="https://blog.bitsadmin.com/living-off-the-foreign-land-windows-as-offensive-platform">
+  <meta name="twitter:site" content="@bitsadmin">
+  <meta name="twitter:creator" content="@bitsadmin">
+
+  
+  <meta name="og:description" content="Living Off the Foreign Land (LOFL) allows attackers to use Windows' built-in powerful tooling (LOFLCABs) to attack remote systems. The first part in this 3-part article discusses how to setup the Linux VM to transparently tunnel traffic over SOCKS. This enables an Offensive Windows VM to natively use Kerberos to interact with systems in the target network.">
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="og:image" content="https://static.bitsadmin.com/bitsadmin.png">
+  
+  <!-- end of OpenGraph / Twitter cards -->
+</head>
+
+
+  <body>
+
+    <div class="header-placeholder" style="height: 52px;"></div>
+<header class="header">
+  <div class="wrapper">
+    <div id="sidebar-toggle">TOC</div>
+    <a class="site-title" href="/">BITSADMIN Blog - Mystery guest in your IT infrastructure</a>
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="https://bitsadmin.com/">BITSADMIN website</a>
+      
+        
+        <a class="page-link" href="/categories/">Categories</a>
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="col-main">
+          <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Living Off the Foreign Land - Part 1/3: Setup Linux VM for SOCKS routing</h1>
+    <p class="post-meta">Aug 15, 2023</p>
+  </header>
+
+  <article class="post-content">
+    
+<h1 id="introduction">Introduction</h1>
+<p>As environments are increasingly getting more secure and monitored, attackers need to invent new ways to hack into systems whereas administrators and defenders need to prevent and detect such hacking attempts. In the past decade there has been a lot of development on both sides. Where attackers initially were simply able to run basically any payload on a system as long as they did not touch the disk, nowadays defenders have a lot more visibility thanks to next-generation Antivirus and Endpoint Detection and Response (<abbr title="Endpoint Detection and Response">EDR</abbr>) software which is gradually rolling out to more and more systems in an increasing number of organizations.</p>
+
+<p>In case <abbr title="Endpoint Detection and Response">EDR</abbr> software is running and actively monitored by a <abbr title="Security Operations Center">SOC</abbr>, attackers have some ways to proceed:</p>
+<ol>
+  <li>Stay low under the radar, carefully considering the possible telemetry and alerts generated for every activity performed (which is good to do anyways);</li>
+  <li>Attempt to disable or blind the AV/<abbr title="Endpoint Detection and Response">EDR</abbr> software by killing its processes or unhooking functions that feed information to these security systems;</li>
+  <li>Attempt to stay out of sight of the <abbr title="Endpoint Detection and Response">EDR</abbr> software by going deeper and (ab)using drivers.</li>
+</ol>
+
+<p>There is however another way forward which thus far has not been very extensively used and researched yet. This approach is to avoid performing activities on the endpoint where the <abbr title="Endpoint Detection and Response">EDR</abbr> software is running, and instead use the endpoint as a network-level pivoting point into the target network making use of SOCKS proxy.</p>
+
+<p>SOCKS is already used regularly by attackers to execute scripts over network tunnels to perform actions against systems in the target environment. In this area however there is much more to gain when one is aware of the activities Windows system administrators are able to perform from their administrative workstations on systems throughout the environment. When performing a red team engagement, the red team operator is effectively an offensive administrator in someone else’s network; why would such offensive administrator not make use of all the powerful tools and protocols that Windows has embedded into it for the reconnaissance, lateral movement and privilege escalation activities!? This however requires an advanced setup to support the routing of protocols like Kerberos to the target environment, and also specific skills to use tooling used by administrators.</p>
+
+<p>This article aids seasoned red teamers in more effectively using SOCKS and the offensive functionalities of tools natively available in Windows in their operations. Additionally, less experienced red teamers are provided with an end-to-end guide of setting up their attacker machine in which the tooling performs transparent Kerberos authentication to the target environment, blending in with the legitimate activities.</p>
+
+<p>The article will first discuss the setup of VMs on the attacker’s system which consists of both a Linux and a Windows VM to empower the Offensive Windows VM to access the target network. The next part will discuss how to obtain credential material from the victim system in the target network and then place it on the Offensive Windows VM. Once all prerequisites are in place, various examples are provided on how the Offensive Windows VM can be used. This will illustrate the great variety of activities that can be performed from Windows on both the target domain and systems and services in the target domain in order to accomplish the objectives set for the red team engagement. All of this is possible while largely remaining unnoticed by the <abbr title="Endpoint Detection and Response">EDR</abbr> software on the victim system.</p>
+
+<p>For performing the offensive activities on remote systems, I launched a new initiative called the Living Off the Foreign Land (<abbr title="Living Off the Foreign Land">LOFL</abbr>) project. This project acts as a knowledgebase for attackers, administrators and defenders on what functionalities Windows provides to remotely manage other Windows systems, services and Active Directory. Living Off the Foreign Land (<abbr title="Living Off the Foreign Land">LOFL</abbr>), as opposed to Living Off the Land (<abbr title="Living Off the Land">LOL</abbr>), means that the <abbr title="Living Off the Foreign Land">LOFL</abbr> Cmdlets and Binaries (<abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr>) are capable of performing activities from the local (Offensive Windows) system to a REMOTE system. Each of the <abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr> documents the type of activity that it can perform, example command-lines, potential offensive use cases and any IOCs that might be generated.</p>
+
+<p><abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr> are categorized as follows:</p>
+<ul>
+  <li>PowerShell cmdlets (<abbr title="Living Off the Foreign Land Cmdlet">LOFLCmdlet</abbr>);</li>
+  <li>Binaries, both console and GUI (<abbr title="Living Off the Foreign Land Binary">LOFLBin</abbr>);</li>
+  <li>Microsoft Management Console (<abbr title="Microsoft Management Console">MMC</abbr>) snap-ins;</li>
+  <li>VBS and CMD scripts;</li>
+  <li><abbr title="Windows Management Instrumentation">WMI</abbr> classes.</li>
+</ul>
+
+<p>Besides this project being used by attackers to use <abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr> to perform their activities and defenders to create alerting rules for IOCs, Windows system administrators can also greatly benefit from this project. This project can aid in efficiently managing the network, using one-liners to directly use <abbr title="Microsoft Management Console">MMC</abbr> snap-ins against a remote host or using cmdlets and <abbr title="Windows Management Instrumentation">WMI</abbr> classes in scripts to quickly collect information on a large scale or perform actions on multiple systems at once.</p>
+
+<p>Finally, this article and associated <abbr title="Living Off the Foreign Land">LOFL</abbr>-Project website can also be relevant for security incident responders to safely collect information and perform activities against a compromised domain with infected servers and workstations.</p>
+
+<p>The <abbr title="Living Off the Foreign Land">LOFL</abbr>-Project website<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup>, inspired by the great <abbr title="Living Off the Land Binaries and Scripts">LOLBAS</abbr><sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">2</a></sup> and GTFOBins<sup id="fnref:3" role="doc-noteref"><a href="#fn:3" class="footnote" rel="footnote">3</a></sup> websites, can be found at <a href="https://lofl-project.github.io/">https://lofl-project.github.io/</a>. Besides the web interface, APIs are available to programmatically access the <abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr> for any automated processing. Moreover, scripts used for the setup are available in the <abbr title="Living Off the Foreign Land">LOFL</abbr> GitHub repository<sup id="fnref:4" role="doc-noteref"><a href="#fn:4" class="footnote" rel="footnote">4</a></sup> at <a href="https://github.com/bitsadmin/lofl">https://github.com/bitsadmin/lofl</a>.</p>
+
+<p>Because so far I have been the only contributor and there are many <abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr>, the web interface also provides a checkbox which displays the entries of which I expect they can be used as <abbr title="Living Off the Foreign Land Cmdlets and Binaries">LOFLCABs</abbr>, however are not yet fully documented. Any pull requests for complementing these is very much welcome at the <abbr title="Living Off the Foreign Land">LOFL</abbr>-Project GitHub repository at <a href="https://github.com/LOFL-Project/LOFLCAB">https://github.com/<abbr title="Living Off the Foreign Land">LOFL</abbr>-Project/LOFLCAB</a>.</p>
+
+<p>Because of its length, this article is split into three parts:</p>
+<ol>
+  <li>Setup of Linux VM for SOCKS routing (this article)</li>
+  <li>Configure Windows VM for Kerberos and obtaining/using credentials: <a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-2">Part 2</a></li>
+  <li>Living Off the Foreign Land: <a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-3">Part 3</a></li>
+</ol>
+
+<p><strong>Before diving into the setup, it is problaby relevant to read up on the attacks that are possible from the attacker’s Offensive Windows VM using Kerberos in <a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-3">Part 3 of the article</a>.</strong></p>
+
+<p>Now, let’s dive into the first part, setting up a Linux VM for SOCKs routing!</p>
+
+<h1 id="socks">SOCKS</h1>
+<p>As Living Off the Foreign Land heavily depends on SOCKS, this article will start with an explanation on what SOCKS is and what the difference is between its various versions.</p>
+
+<h2 id="socks-1">SOCKS</h2>
+<p>SOCKS stands for Socket Secure and is a protocol used for OSI model layer 4 (TCP/UDP) network communication between a client and a server through an intermediary proxy server. SOCKS is used for purposes like hiding your actual IP for privacy reasons and for reaching hosts that are not reachable directly. This looks as follows.</p>
+
+<p><img src="/assets/img/20230815_living-off-the-foreign-land/SOCKS.png" alt="Connection over SOCKS server" title="Connection over SOCKS server" class="middle-image"></p>
+
+<p>When an application is not configured to use SOCKS, it will simply connect directly to the target host. In case that is not possible, the connection will fail. However, in case like in the picture there is a SOCKS server which <em>is</em> able to reach the target host, this SOCKS server can send packets coming from the Client to the Target, and send responses from the Target back to the Client.</p>
+
+<p>In this example we assume the application is SOCKS-aware which means it can be configured to use a SOCKS server (<code class="language-plaintext highlighter-rouge">2.2.2.2:1080</code>) for any network connections. On a technical level, when the application is instructed to connect, the application running on the Client (<code class="language-plaintext highlighter-rouge">1.1.1.1</code>) establishes a TCP connection with the SOCKS server (<code class="language-plaintext highlighter-rouge">2.2.2.2</code>), which by default listens on port <code class="language-plaintext highlighter-rouge">1080/TCP</code>. Once the connection is established, the client requests the SOCKS server to connect to the Target (<code class="language-plaintext highlighter-rouge">3.3.3.3</code>), for example on port <code class="language-plaintext highlighter-rouge">80/TCP</code>. The SOCKS server then attempts to establish the TCP connection to the Target (<code class="language-plaintext highlighter-rouge">3.3.3.3:80</code>). Assuming the connection is successful, the Client can then send data over the SOCKS server encapsulated in SOCKS, and any responses are sent from the Target to the SOCKS server which in turn sends them back to the Client. This effectively describes the functionality of SOCKS4.</p>
+
+<h2 id="socks4a">SOCKS4A</h2>
+<p>SOCKS4A is a minor extension to SOCKS4 where instead of only being able to communicate with IP addresses over SOCKS, it adds the possibility to communicate to communicate with hostnames as well.</p>
+
+<p>In case SOCKS4A is used, the Client application can request the SOCKS server to establish a connection with <code class="language-plaintext highlighter-rouge">Target.com:80</code> (as opposed to <code class="language-plaintext highlighter-rouge">3.3.3.3:80</code> in the previous example). The SOCKS server will then resolve the domain name and establish a connection to it (in this case <code class="language-plaintext highlighter-rouge">3.3.3.3:80</code>). To the client application the SOCKS server reports back a dummy, private use IP address (e.g. <code class="language-plaintext highlighter-rouge">224.0.0.1</code>) which can only be used in the communication with the SOCKS server. Whenever the Client over the SOCKS server attempts to connect to that dummy IP address, the SOCKS server will make sure the connection ends up with the right host that is mapped to that dummy IP address.</p>
+
+<h2 id="socks5">SOCKS5</h2>
+<p>In addition to SOCKS4A, SOCKS5 adds the support for authentication to the SOCKS server, but most importantly IPv6 and UDP support. The UDP support tunnels UDP datagrams over the SOCKS tunnel (TCP) to the other Target side and back.</p>
+
+<p>Be aware though that SOCKS5 is a standard, but software that implements the standard might only implement a subset of features of the SOCKS5 standard. At the moment of writing of this article and as will be discussed in next section, only a few implementations actually support the so-called SOCKS5 UDP ASSOCATE feature defined in the standard.</p>
+
+<p>As a summary, the following table lists the different SOCKS versions, its RFC standard and what features are supported.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th><strong>Protocol</strong></th>
+      <th><strong>URL</strong></th>
+      <th><strong>Notes</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SOCKS</td>
+      <td><a href="https://www.usenix.org/conference/sec92/socks">https://www.usenix.org/conference/sec92/socks</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>SOCKS4</td>
+      <td><a href="https://www.openssh.com/txt/socks4.protocol">https://www.openssh.com/txt/socks4.protocol</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>SOCKS4A</td>
+      <td><a href="https://www.openssh.com/txt/socks4a.protocol">https://www.openssh.com/txt/socks4a.protocol</a></td>
+      <td>Minor extension to SOCKS4 which allows connecting to a hostname in addition to only use IP addresses</td>
+    </tr>
+    <tr>
+      <td>SOCKS5</td>
+      <td><a href="https://www.rfc-editor.org/rfc/rfc1928.txt">https://www.rfc-editor.org/rfc/rfc1928.txt</a></td>
+      <td>Compared to SOCKS4A, SOCKS5 adds support for authentication to the SOCKS server, IPv6 and UDP support. Only a few implementations support for SOCKS5’s UDP ASSOCIATE feature for dynamically connecting to UDP ports.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="non-socks-aware-software">Non-SOCKS aware software</h2>
+<p>Besides making use of an application which has support for SOCKS built-in, it is also possible to use software like proxychains-ng<sup id="fnref:5" role="doc-noteref"><a href="#fn:5" class="footnote" rel="footnote">5</a></sup> to force software in which no SOCKS can be configured to go over the SOCKS server. This is accomplished by proxychains-ng by launching the software which hooks any functions related to network connectivity and at the moment the software attempts to interact with the network, it will make sure in the background the SOCKS tunnel is used. An example of using proxychains-ng for the netcat network utility looks as follows: <code class="language-plaintext highlighter-rouge">proxychains ncat -v target.com 80</code>. Proxychains will load the <code class="language-plaintext highlighter-rouge">ncat</code> binary hooking the network connectivity functions and forcing those over the proxy that is configured in proxychain-ng’s <code class="language-plaintext highlighter-rouge">/etc/proxychains.conf</code> configuration file, e.g., <code class="language-plaintext highlighter-rouge">socks4 2.2.2.2 1080</code>.</p>
+
+<p>Now it is clear what SOCKS is and how it can be used, the next session discusses why SOCKS is so relevant for red teaming.</p>
+
+<h1 id="red-teaming-and-socks">Red teaming and SOCKS</h1>
+<p>During red teams often a C2 software implant is used to obtain access to a system in the target network. From that implant which resides in the memory of the system, code is executed to perform reconnaissance, discovery, lateral movement activities and depending on the objective of the engagement activities like collection, exfiltration or even deployment of (fake) ransomware.</p>
+
+<p>A decade ago, the code executed from the in-memory implant used to be commands through cmd.exe or PowerShell scripts. Because detection of such behavior was increasing, this then moved to .NET assemblies in a sacrificial process spawned by the implant process. Lately security software like next-generation antivirus and Endpoint Detection and Response (<abbr title="Endpoint Detection and Response">EDR</abbr>) software on endpoints are becoming more prevalent and have more visibility on the activities taking place on a system and inside of running processes. To increase operational security (<abbr title="Operational Security">OPSEC</abbr>), attackers have moved more to usage of Beacon Object Files (BOFs) and .NET assemblies which are executed in the process in which the implant is running.</p>
+
+<p>A disadvantage of BOFs and .NET assemblies executing on the system is however that the security software are closely watching the beacon process and its behavior interacting with the various Windows APIs. The security software might also report an alert in the security console once a threshold of malicious activities has been reached. This is where SOCKS can be of help.</p>
+
+<h2 id="c2">C2</h2>
+<p>Most C2 software has SOCKS functionality built-in. Once the SOCKS server is started, on the C2 server or on C2 client on the attacker’s system a SOCKS port is opened. From the attacker system it is then possible to use tooling over the SOCKS tunnel to connect to ports in the target network. This results in the C2 implant only being used as a OSI layer 4 router of network traffic and does not load and execute malicious code inside of its memory, leading to less activities that security software on the endpoint can trigger on. The following diagram illustrates how the C2 software on the Victim system connects to the C2 server and on the C2 server exposes a SOCKS port. Next, the Attacker can use proxychains-ng with netcat to instruct SOCKS to connect to a Server (<code class="language-plaintext highlighter-rouge">4.4.4.4</code>) in the target network on port <code class="language-plaintext highlighter-rouge">80/TCP</code>. The SOCKS connection is then encapsulated in the C2 traffic and the Victim system running the (reverse) SOCKS server connects to the Server on port <code class="language-plaintext highlighter-rouge">80/TCP</code>.</p>
+
+<p><img src="/assets/img/20230815_living-off-the-foreign-land/C2.png" alt="C2 setup" title="C2 setup" class="middle-image"></p>
+
+<p>Besides using the built-in SOCKS functionality of C2 software there are also various other setups which allow access to the target network over SOCKS. These setups will be discussed in the following subsections.</p>
+
+<h2 id="ssh">SSH</h2>
+<p>The SSH client which is nowadays present on both Windows and Linux has SOCKS functionality built-in. Moreover, SSH can expose SOCKS on either the SSH client side or on the SSH server side.</p>
+
+<p>When connecting over SSH to a remote (victim) host using the SSH client, the <code class="language-plaintext highlighter-rouge">-D</code> parameter can be provided with a port number to the SSH client, which then opens a SOCKS4a listener on the client host. For example, <code class="language-plaintext highlighter-rouge">ssh 2.2.2.2 -D 1080</code> will connect to the SSH server running on port <code class="language-plaintext highlighter-rouge">22/TCP</code> of <code class="language-plaintext highlighter-rouge">2.2.2.2</code>, and then on the client (<code class="language-plaintext highlighter-rouge">1.1.1.1</code>) launch a SOCKS4a listener on the loopback interface on port <code class="language-plaintext highlighter-rouge">1080/TCP</code>.</p>
+
+<p>Alternatively, using the <code class="language-plaintext highlighter-rouge">-R</code> parameter an SSH connection can be established from the victim host (<code class="language-plaintext highlighter-rouge">1.1.1.1</code>) to the attacker’s SSH server (<code class="language-plaintext highlighter-rouge">2.2.2.2</code>), exposing the network to which the victim is connected on a SOCKS port on the attacker’s SSH server. The commandline for this setup is <code class="language-plaintext highlighter-rouge">ssh 2.2.2.2 -R 1080</code>. Once connected, the attacker’s SSH server will have a SOCKS4a listener on port <code class="language-plaintext highlighter-rouge">1080/TCP</code>.</p>
+
+<h2 id="hardware-implant">Hardware implant</h2>
+<p>A bit more complex setup could also be used during a red team with a hardware implant like a Raspberry Pi, which is for example connected to the network outlet in a meeting room. This hardware implant then automatically connects back over a 4G/5G dongle to an online hosted Linux middle server where in the connection the <code class="language-plaintext highlighter-rouge">-R 2222:127.0.0.1:22</code> parameter to expose the SSH port of the hardware implant on the middle server. This then allows the attacker to connect to the middle server, and through port <code class="language-plaintext highlighter-rouge">2222</code> on this middle server get access to the hardware implant where again the <code class="language-plaintext highlighter-rouge">-D</code> parameter of the SSH client is used to launch the SOCKS server on the attacker side. This then provides the attacker access to the network where the hardware implant is connected. The blue lines in the schematic indicate that these connections are going over the 4G/5G dongle of the hardware implant.</p>
+
+<p><img src="/assets/img/20230815_living-off-the-foreign-land/HardwareImplant.png" alt="Hardware implant" title="Hardware implant" class="middle-image"></p>
+
+<h2 id="reverse-socks">Reverse SOCKS</h2>
+<p>Often as a red teamer though, access is obtained to a user endpoint which is not directly accessible from the Internet. In such case it is required that the compromised endpoint initiates a connection to an attacker-controlled server, which in turn enables tunneling SOCKS traffic over the compromised endpoint into the target network. Fortunately, such tooling exists, and examples of such tools are Chisel and gost. The diagram for reverse SOCKS looks similar to the one of C2, except that the protocol might differ compared to C2 in the sense that often a TCP connection is used which keeps connected whereas with C2 often a temporary HTTP connection is used which periodically checks whether there are any pending actions.</p>
+
+<h3 id="chisel">Chisel</h3>
+<p>Chisel<sup id="fnref:6" role="doc-noteref"><a href="#fn:6" class="footnote" rel="footnote">6</a></sup> is a great tool written by Jaime Pillora (@jpillora) in Go which consists of a client and server component and allows for reverse SOCKS connections which are tunneled over HTTP. In the Releases of the Chisel repository binaries are available for a variety of operating systems and architectures. Setting Chisel up is very straight forward.</p>
+
+<ol>
+  <li>On an attacker-controlled server launch Chisel in server mode with the <code class="language-plaintext highlighter-rouge">--reverse</code> flag where the port (<code class="language-plaintext highlighter-rouge">1234</code>) should be accessible from the victim system: <code class="language-plaintext highlighter-rouge">chisel server -p 1234 --socks5 --reverse</code></li>
+  <li>On the victim system, execute Chisel in client mode where the IP address and port of the server are specified: <code class="language-plaintext highlighter-rouge">chisel client 2.2.2.2:1234 R:socks</code></li>
+  <li>Once the victim system is connected to the server, the server will open port <code class="language-plaintext highlighter-rouge">1080/TCP</code> which allows incoming SOCKS5 connections</li>
+</ol>
+
+<p>Note that at the moment of writing of this article, the implementation of SOCKS5 on jpillora’s GitHub does not yet support the UDP ASSOCIATE feature of SOCKS5. A fork<sup id="fnref:7" role="doc-noteref"><a href="#fn:7" class="footnote" rel="footnote">7</a></sup> and pull request<sup id="fnref:8" role="doc-noteref"><a href="#fn:8" class="footnote" rel="footnote">8</a></sup> created by the GitHub user Meteorite however <em>does</em> support this SOCKS5 feature. AMD64 Windows and Linux binaries (<code class="language-plaintext highlighter-rouge">chisel64.exe</code> and <code class="language-plaintext highlighter-rouge">chisel64</code>) can be built as follows:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone <span class="nt">-b</span> feature-socks-udp-associate https://github.com/Meteorite/chisel.git
+<span class="nb">cd </span>chisel
+<span class="nv">GOOS</span><span class="o">=</span>windows <span class="nv">GOARCH</span><span class="o">=</span>amd64 <span class="nv">CGO_ENABLED</span><span class="o">=</span>1 <span class="nv">CC</span><span class="o">=</span>x86_64-w64-mingw32-gcc go build <span class="nt">--buildmode</span><span class="o">=</span>exe <span class="nt">-ldflags</span><span class="o">=</span><span class="s2">"-s -w"</span> <span class="nt">-o</span> chisel64.exe main.go
+<span class="nv">GOARCH</span><span class="o">=</span>amd64 <span class="nv">CGO_ENABLED</span><span class="o">=</span>1 go build <span class="nt">-ldflags</span><span class="o">=</span><span class="s2">"-w -s"</span> <span class="nt">-o</span> chisel64 main.go
+</code></pre></div></div>
+
+<p>After building, <code class="language-plaintext highlighter-rouge">chisel64</code> can be executed on the server whereas <code class="language-plaintext highlighter-rouge">chisel64.exe</code> can be used from the victim system.</p>
+
+<h3 id="gost">Gost</h3>
+<p>Gost<sup id="fnref:9" role="doc-noteref"><a href="#fn:9" class="footnote" rel="footnote">9</a></sup> is a tool written by ginuerzh (@ginuerzh) which stands for GO Simple Tunnel and is often used to bypass the Great Firewall of China (GFW). Gost supports a myriad of protocols and transport types. Additionally, gost also supports spawning a SOCKS server <em>and</em> a reverse TCP port forward. Combining these two functionalities, it is possible to spawn a SOCKS server on the client (victim) system and then providing access to that SOCKS server through the reverse port forward. Because gost supports so many options, protocols and transport types it might initially be a challenge to setup, however it is useful to blend into other traffic. Like for Chisel, in the Releases of the gost repository binaries are available for a variety of operating systems and architectures.</p>
+
+<p>Example of how to setup a reverse SOCKS tunnel over the ssh protocol:</p>
+<ol>
+  <li>Launch the gost SSH server on an attacker-controlled server where the port (<code class="language-plaintext highlighter-rouge">1234</code>) should be accessible by the victim system: <code class="language-plaintext highlighter-rouge">gost -L=sshd://:1234</code></li>
+  <li>Launch the SOCKS server and reverse port forward on the client (victim) system: <code class="language-plaintext highlighter-rouge">gost.exe -L=socks5://127.0.0.1:4321 -- -L=rtcp://:1080/127.0.0.1:4321 -F=sshd://1.1.1.1:1234</code></li>
+  <li>Once the victim system is connected to the server, the server will open port <code class="language-plaintext highlighter-rouge">1080/TCP</code> which allows incoming SOCKS5 connections</li>
+</ol>
+
+<p>Something to be aware of is that there are two different versions of gost: v2 which is the legacy version, and v3 which is the version that is rebuilt from scratch. The above commands are valid for v3 and have not been tested on v2. See below a table with links of the two versions.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th><strong>Version</strong></th>
+      <th><strong>2</strong></th>
+      <th><strong>3</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>GitHub</strong></td>
+      <td><a href="https://github.com/ginuerzh/gost">https://github.com/ginuerzh/gost</a></td>
+      <td><a href="https://github.com/go-gost/gost">https://github.com/go-gost/gost</a></td>
+    </tr>
+    <tr>
+      <td><strong>Download</strong></td>
+      <td><a href="https://github.com/ginuerzh/gost/releases">https://github.com/ginuerzh/gost/releases</a></td>
+      <td><a href="https://github.com/go-gost/gost/releases">https://github.com/go-gost/gost/releases</a></td>
+    </tr>
+    <tr>
+      <td><strong>Documentation</strong></td>
+      <td><a href="https://v2.gost.run/en/">https://v2.gost.run/en/</a></td>
+      <td><a href="https://latest.gost.run/en/">https://latest.gost.run/en/</a></td>
+    </tr>
+    <tr>
+      <td><strong>Notes</strong></td>
+      <td>Legacy version of Gost</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="other-options">Other options</h2>
+<p>Besides reverse SOCKS servers there are also other situations in which socks can be used.</p>
+
+<p>Consider for example the SocksOverRDP<sup id="fnref:10" role="doc-noteref"><a href="#fn:10" class="footnote" rel="footnote">10</a></sup> tool written by Balazs Bucsay (@xoreipeip) which adds a module to the RDP (<code class="language-plaintext highlighter-rouge">mstsc.exe</code>) or Citrix client on the attacker side. After launching the SocksOverRDP server component on the RDP/Citrix server side, the RDP/Citrix client opens up a SOCKS port through which the network in which the RDP/Citrix server resides can be accessed over SOCKS.</p>
+
+<p>Another example is a tool called pivotnacci<sup id="fnref:11" role="doc-noteref"><a href="#fn:11" class="footnote" rel="footnote">11</a></sup> written by Eloy Pérez (@Zer1t0) which can be used to pivot over a compromised webserver into the network in which the webserver is located. The tools consist of a script (<code class="language-plaintext highlighter-rouge">.aspx</code>, <code class="language-plaintext highlighter-rouge">.jsp</code> or <code class="language-plaintext highlighter-rouge">.php</code>) which is placed on the webserver and a Python script which is executed on the attacker side, connects to the webserver. Once connected to the webserver, the Python script locally opens up a SOCKS port which can be used to pivot into the network in which the webserver resides.</p>
+
+<p>Many more tools are available which are available which offer some kind of SOCKS support. Aspects to consider when looking for tools are:</p>
+<ol>
+  <li>Support for reverse a reverse SOCKS connection: When launched on the victim system, it connects back to the attacker, and then opens a SOCKS listener on the attacker system providing access to the network the victim system is connected to;</li>
+  <li>Support for outgoing proxy: Regularly corporate environments restrict the ports. This usually means systems are able to connect to just the web ports (<code class="language-plaintext highlighter-rouge">80</code>, <code class="language-plaintext highlighter-rouge">443</code>) and in addition require clients to go over an outgoing proxy server to access the Internet;</li>
+  <li>Support for proxy authentication: In case a proxy is required to access the Internet, some might also require some type of authentication like basic, NTLM or Kerberos. In case the SOCKS software uses the winhttp.dll library, going over the proxy and if needed authenticating to it is handled transparently. If that library is not used, the proxy server address and credentials might have to be specified explicitly. Generally, C2 software under the hood takes care of any corporate proxy that might be in place, which is then also used transparently when the SOCKS functionality of the software implant is activated;</li>
+  <li>Optionally: Type of SOCKS that is supported and which features of the protocol are implemented: Most tools support SOCKS4A, various tools also SOCKS5, but only a few of the tools supporting SOCKS5 also implement the UDP ASSOCIATE feature.</li>
+</ol>
+
+<p>The list of tools that I have taken a look at can be found in <a href="#appendix-a-comparison-of-socks-tools">Appendix A: Comparison of SOCKS tools</a>.</p>
+
+<h2 id="summary">Summary</h2>
+<p>The table below shows the summary of the SOCKS setups that have been discussed in this section.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th><strong>Title</strong></th>
+      <th><strong>Description</strong></th>
+      <th><strong>Link</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C2</td>
+      <td>C2 software implants often have SOCKS functionality built in.</td>
+      <td><a href="https://www.thec2matrix.com/">https://www.thec2matrix.com/</a></td>
+    </tr>
+    <tr>
+      <td>Linux</td>
+      <td>SOCKS tunnel by either directly connecting to a Linux server using the SSH client using the <code class="language-plaintext highlighter-rouge">-D</code> parameter, or alternatively by placing a hardware implant in the target network which dials back to a middle server and then provides SSH access to the hardware implant.</td>
+      <td>n/a</td>
+    </tr>
+    <tr>
+      <td>Chisel</td>
+      <td>Tunneling tool which natively supports reverse SOCKS and provides binaries for many platforms and architectures. Meteorite’s fork provides support for the SOCKS5 UDP ASSOCIATE feature.</td>
+      <td><a href="https://github.com/jpillora/chisel">https://github.com/jpillora/chisel</a></td>
+    </tr>
+    <tr>
+      <td>gost</td>
+      <td>Advanced tunneling tool which allows to tunnel over a myriad of protocols, supporting SOCKS and (via rtcp) reverse SOCKS. Provides binaries for various platforms and architectures.</td>
+      <td><a href="https://github.com/go-gost/gost">https://github.com/go-gost/gost</a></td>
+    </tr>
+    <tr>
+      <td>SocksOverRDP</td>
+      <td>SOCKS tunnel over dynamic virtual channels of Microsoft Remote Desktop or Citrix Remote Desktop.</td>
+      <td><a href="https://github.com/nccgroup/SocksOverRDP">https://github.com/nccgroup/SocksOverRDP</a></td>
+    </tr>
+    <tr>
+      <td>pivotnacci</td>
+      <td>SOCKS tunnel over compromised webserver (<code class="language-plaintext highlighter-rouge">.aspx</code> / <code class="language-plaintext highlighter-rouge">.php</code> / <code class="language-plaintext highlighter-rouge">.jsp</code>)</td>
+      <td><a href="https://github.com/blackarrowsec/pivotnacci">https://github.com/blackarrowsec/pivotnacci</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="windows-red-teaming-and-socks">Windows, red teaming and SOCKS</h1>
+<p>Thinking of an attacker machine, people usually immediately think of a Linux system with a distribution like Kali or BlackArch with a large number of hacking tools and scripts<sup id="fnref:12" role="doc-noteref"><a href="#fn:12" class="footnote" rel="footnote">12</a></sup><sup>,</sup><sup id="fnref:13" role="doc-noteref"><a href="#fn:13" class="footnote" rel="footnote">13</a></sup>. What many do not realize however is that for attacking Windows-based environments, Windows through its various PowerShell modules and binaries is a great offensive operating system which is very capable of performing a whole range of offensive actions against remote Windows systems and services.</p>
+
+<h2 id="advantages-of-using-windows">Advantages of using Windows</h2>
+<p>While performing a red team, the operator effectively is a system administrator who is managing someone else’s environment. Having all Windows’ management tooling at your disposal together with some kind of credential material which authorizes you to interact with the environment is generally all that is needed to perform the job.</p>
+
+<p>Activities that can be performed from Windows are plentiful, a number of examples:</p>
+<ul>
+  <li>Enumerating and modifying Active Directory;</li>
+  <li>Interacting with remote systems performing reconnaissance on active sessions, system information, running processes;</li>
+  <li>Modifying a remote system’s configuration through the registry or Microsoft’s (sometimes undocumented) protocols used by the various Microsoft Management Console (<abbr title="Microsoft Management Console">MMC</abbr>) snap-ins;</li>
+  <li>Execution of commands on remote systems through the various options that are available on Windows.</li>
+</ul>
+
+<p>Having the capability to perform such activities from an Offensive Windows machine over SOCKS has various advantages.</p>
+<ul>
+  <li>No execution takes place on the victim system in the target network, where activities could be picked up by the security software;</li>
+  <li>Instead of just shooting with offensive tools at an environment, you are learning the sysadmin (engineering) side of the story; literally using the tools the administrators use to manage the remote network;</li>
+  <li>Windows regularly makes use of undocumented protocols for which no open source (Linux-based) tooling/scripts might have been written yet while Windows natively speaks with other Windows systems. This means that Windows functionalities can directly be used from an attacker Windows.</li>
+  <li>Kerberos is natively used whenever an authentication is requested by a remote system - more on this in the upcoming sections;</li>
+  <li>It is possible to install any Windows-based 3<sup>rd</sup> party software that is used in the target network on the Offensive Windows machine and use it over the network. Moreover, it is possible to copy Windows-based software that has been in-house developed by the target organization to the Offensive Windows machine and use it from there as well;</li>
+  <li>While network security sensors might trigger on Linux tools like the Impacket implementations of certain protocols, it is less likely that it will trigger when using Windows’ built-in functionality and protocol implementations;</li>
+  <li>When accessing webpages in the target organization, an actual Windows-based browser like Microsoft Edge or Google Chrome is being used, instead of spoofing the user agent, but leaving many other possible traces that the browser was running on a Linux machine.</li>
+</ul>
+
+<h2 id="socks-tooling-in-windows">SOCKS tooling in Windows</h2>
+<p>When searching online, there are various tools for Windows like Sockscap64<sup id="fnref:14" role="doc-noteref"><a href="#fn:14" class="footnote" rel="footnote">14</a></sup>, ProxyCap<sup id="fnref:15" role="doc-noteref"><a href="#fn:15" class="footnote" rel="footnote">15</a></sup> and Proxifier<sup id="fnref:16" role="doc-noteref"><a href="#fn:16" class="footnote" rel="footnote">16</a></sup> which “socksify” applications to force applications that are not SOCKS aware over the SOCKS tunnel. These tools work well for applications like browsers and other tooling that simply establish connections, however lower-level communication and communications initiated by for example out-of-process <abbr title="Component Object Model">COM</abbr> objects are not properly proxied. Moreover, in case any issues arise, it is hard to look into the traffic that is send over SOCKS and debug what is going wrong. Finally, it might be hard to be selective on the traffic that should end up in the target environment as like with proxychains-ng by default connections established by the socksified application are forced over the SOCKS tunnel.</p>
+
+<h2 id="disadvantages-of-using-socks">Disadvantages of using SOCKS</h2>
+<p>In addition to the challenges using tools to socksify applications in Windows, SOCKS also does have a number challenges to be aware of.</p>
+
+<ul>
+  <li>First of all, for SOCKS to work, it requires a real-time interaction between the attacker and the victim system. If the SOCKS traffic is going over a C2 protocol like HTTP which is the default for many C2 frameworks, this will be very noisy on the compromised system and possibly in-between outgoing proxy or network monitoring solutions. Fortunately nowadays connections like WebSockets or other streaming protocols are very common nowadays, so a(n additional) C2 channel which uses such protocol can be established and then used for SOCKS. Alternatively, as discussed in the previous section there are various tools which are able to blend in well with the traffic.</li>
+  <li>Depending on the tool and protocol that is used to communicate to the remote system, it might be very slow. For example, when listing the services that are installed on a remote system, for every service four requests are performed which leads to quite some round trips with the number of services that are nowadays installed on a Windows system.</li>
+  <li>As opposed to a software implant which runs under the context of a certain user and will use that user’s credential material when challenged, SOCKS is only working on the network. For that reason, in case a remote system performs a challenge for authentication, the Offensive Windows machine needs to have credential material ready to authenticate whereas if a tool would be executing on the victim system, the authentication would probably be transparently taken care of. More on how to tackle this in the upcoming sections.</li>
+</ul>
+
+<p>The upcoming sections deal with the issue that it is hard to route Windows traffic over SOCKS. The subsequent section will go into detail on how to resolve the challenge of authenticating from the Offensive Windows machine.</p>
+
+<h1 id="a-match-made-in-heaven">A match made in heaven</h1>
+<p>What if, instead of trying to force Windows to perform its activities over SOCKS, we combine the strengths of the Linux and Windows operating systems? Linux is great at low-level network manipulation while the Windows operating system is great for interacting with remote Windows systems. If through some network configuration it is possible to convince Windows that is able to directly reach the network segments that are reachable from the victim host, Windows is much more willing to collaborate.</p>
+
+<p>To fool Windows, several years ago I started using a solution which consisted of having both a Linux and Windows VM where on the Linux VM I launched several socat<sup id="fnref:17" role="doc-noteref"><a href="#fn:17" class="footnote" rel="footnote">17</a></sup> forwarders in parallel, but through proxychains-ng. This looked as follows:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>proxychains socat TCP-LISTEN:445,fork TCP:4.4.4.4:445
+proxychains socat TCP-LISTEN:5985,fork TCP:4.4.4.4:5985
+</code></pre></div></div>
+
+<p>In my Windows VM I then added a new entry to the hosts file which made <code class="language-plaintext highlighter-rouge">target.victim.com</code> point to the IP address of my Linux VM. After setting that up, it was possible to instruct Windows to for example list the network shares of <code class="language-plaintext highlighter-rouge">target.victim.com</code>, which would then be natively performed from the Windows VM against the Linux VM. In turn the Linux VM would just forward the traffic over SOCKS to the remote host and send back any responses to the Windows VM.</p>
+
+<p>The problem of this setup however is that is not scalable. Whenever a different host needs to be accessed on the same port, the socat listeners on the Linux VM need to be taken offline and new listeners need to be launched. Moreover, additional entries needed to be added to the Windows hosts file to point the hostnames in the target network to the IP address of the Linux VM.</p>
+
+<p>At some moment however I discovered the badvpn software<sup id="fnref:18" role="doc-noteref"><a href="#fn:18" class="footnote" rel="footnote">18</a></sup> by Ambroz Bizjak which contains the tun2socks utility. This utility is able to use a newly created tun interface in Linux, and then tunnel any incoming packets over a SOCKS server to the target network, which is exactly what I needed! As nowadays the badvpn project is no longer maintained an excellent replacement is the tun2socks<sup id="fnref:19" role="doc-noteref"><a href="#fn:19" class="footnote" rel="footnote">19</a></sup> utility by Jason Lyu (@xjasonlyu) which is regularly updated and at the Releases page provides compiled versions for various operating systems and architectures.</p>
+
+<p>Combining tun2socks with the power of Linux’ iptables, routes and DNS server, it provides the perfect setup for Windows to be used as an offensive platform! In the remainder of the article, it is assumed a SOCKS server is used which does not support the UDP ASSOCIATE feature, which is currently the case in most implementations. In case this feature <em>is</em> supported, it simplifies the setup some aspects.</p>
+
+<p>On a high level, this setup on the Linux routing VM is as follows:</p>
+<ul>
+  <li>The Offensive Windows VM is placed behind the Linux routing VM, so Linux is able to control all of the traffic coming from the Offensive Windows VM;</li>
+  <li>The tun2socks network interface is created and configured to reach the target network over SOCKS;</li>
+  <li>Using iptables rules split tunneling is configured where by default all traffic is routed to the Internet while routes for specific subnets are configured to go over the tun2socks interface;</li>
+  <li>A DNS server (dnsmasq) is installed and configured on Linux and the Offensive Windows VM is configured to use this DNS server. This makes sure DNS requests destined for the client network are sent there while everything else is sent to the default Internet DNS server;</li>
+  <li>Some fix-ups are put in place to make sure everything works smoothly.</li>
+</ul>
+
+<p><img src="/assets/img/20230815_living-off-the-foreign-land/HighlevelSetup.png" alt="Hardware implant" title="Hardware implant" class="middle-image"></p>
+
+<p>An additional benefit of this setup is that by default Windows is pretty chatty on the local network segment. Because this network is only between the Linux routing VM and Offensive Windows VM, it does not matter how much noise Windows is making as besides the Linux routing VM who ignores it, nobody is listening anyway.</p>
+
+<p>The next sections will discuss the setup of the Linux routing VM in detail whereas the Offensive Windows VM will be discussed in <a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-2">part 2</a> of this article.</p>
+
+<h1 id="offensive-setup-linux-routing-vm">Offensive setup: Linux routing VM</h1>
+<p>The following subsections discuss the different steps to set up the Linux routing VM. Personally, for the Linux routing VM I use the Arch Linux operating system linked to the BlackArch repository, but any Linux operating system will work fine.</p>
+
+<h2 id="two-network-interfaces">Two network interfaces</h2>
+<p>To start, the Linux routing VM requires two network interfaces. The first interface (<code class="language-plaintext highlighter-rouge">ens33</code>) is used to connect the Linux routing VM to the Internet. The second interface (<code class="language-plaintext highlighter-rouge">ens37</code>) is used for an internal network between the Linux and Windows VMs. In my setup I am using VMware Workstation where for the connection between the Linux and Windows VMs I simply create a new LAN segment and then connect both the second interface of the Linux routing VM as well as the interface of the Offensive Windows VM to it.</p>
+
+<p>This second interface needs to be assigned a static IP address. In this article the IP address will be <code class="language-plaintext highlighter-rouge">10.120.0.1/24</code>, however whenever there are more insights on what the target’s IP network segment IP addresses are, this IP and subnet size can be updated to blend in better with the client network. This is needed because in some occasions the internal IP address of the attacker Windows host (yes, you read that correctly, its internal IP) is being logged. Be aware though that the network segment that is used between the Linux and Windows VMs is not routable towards the target network.</p>
+
+<p>To allow Linux to be able to forward traffic between its different network interfaces, configure the ip_forward flag as follows. This setting can also be set permanently by placing it in the <code class="language-plaintext highlighter-rouge">sysctl.conf</code> file. Once configured, the setting can be validated using <code class="language-plaintext highlighter-rouge">cat /proc/sys/net/ipv4/ip_forward</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sysctl <span class="nt">-w</span> net.ipv4.ip_forward<span class="o">=</span>1
+</code></pre></div></div>
+
+<h2 id="dns-server">DNS server</h2>
+<p>In the offensive setup, a split DNS setup is used. Moreover, optionally a DHCP server on the second Linux network interface can be configured to automatically assign an IP to the Offensive Windows VM(s) that are connected through that interface. For this purpose the dnsmasq<sup id="fnref:20" role="doc-noteref"><a href="#fn:20" class="footnote" rel="footnote">20</a></sup> DNS server software is used which can be installed through the Linux package manager. Next, the configuration can be updated in the <code class="language-plaintext highlighter-rouge">/etc/dnsmasq.conf</code> file as follows where the various target network DNS servers can be collected through the C2 software implant.</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Port
+</span><span class="py">port</span><span class="p">=</span><span class="s">5353</span>
+
+<span class="c"># DHCP server
+</span><span class="py">dhcp-range</span><span class="p">=</span><span class="s">10.120.0.100,10.120.0.200,12h</span>
+<span class="py">dhcp-option</span><span class="p">=</span><span class="s">option:dns-server,10.120.0.1</span>
+<span class="err">dhcp-authoritative</span>
+
+<span class="c"># Target network DNS server(s)
+</span><span class="py">server</span><span class="p">=</span><span class="s">/ad.bitsadmin.com/10.0.10.10</span>
+<span class="py">server</span><span class="p">=</span><span class="s">/ad.bitsadmin.com/10.0.10.11</span>
+<span class="py">server</span><span class="p">=</span><span class="s">/10.0.10.in-addr.arpa/10.0.10.10</span>
+<span class="py">server</span><span class="p">=</span><span class="s">/10.0.10.in-addr.arpa/10.0.10.11</span>
+
+<span class="py">server</span><span class="p">=</span><span class="s">/corp.int/10.0.20.10</span>
+<span class="py">server</span><span class="p">=</span><span class="s">/20.0.10.in-addr.arpa/10.0.20.10</span>
+
+<span class="py">server</span><span class="p">=</span><span class="s">/research.dev/10.0.30.10</span>
+<span class="py">server</span><span class="p">=</span><span class="s">/30.0.10.in-addr.arpa/10.0.30.10</span>
+
+<span class="c"># Default DNS server
+</span><span class="py">server</span><span class="p">=</span><span class="s">1.0.0.1</span>
+</code></pre></div></div>
+
+<p>The configuration starts with setting the port of the DNS server to <code class="language-plaintext highlighter-rouge">5353</code>. The reason why this is done is explained in the next heading.</p>
+
+<p>Next, the configuration of the DHCP server which serves IP addresses in the range of <code class="language-plaintext highlighter-rouge">10.120.0.100</code> to <code class="language-plaintext highlighter-rouge">10.120.0.200</code> and a lease time of 12 hours where the DNS server is set to the IP address of the Linux routing VM. Next the domains (<code class="language-plaintext highlighter-rouge">ad.bitsadmin.com</code>, <code class="language-plaintext highlighter-rouge">corp.int</code> and <code class="language-plaintext highlighter-rouge">research.dev</code>) of the target network are defined where the DNS server IP addresses responsible for the <code class="language-plaintext highlighter-rouge">ad.bitsadmin.com</code> domain are set to <code class="language-plaintext highlighter-rouge">10.0.10.10</code> and <code class="language-plaintext highlighter-rouge">10.0.10.11</code> meaning that whenever a request comes in for <code class="language-plaintext highlighter-rouge">whatever.ad.bitsadmin.com</code>, one of these two IPs is queried to resolve the name.</p>
+
+<p>The lines with <code class="language-plaintext highlighter-rouge">in-addr.arpa</code> are not required, but used for reverse DNS lookups which can be relevant when performing reconnaissance over DNS. This line states that whenever a reverse lookup is performed for an IP address starting with <code class="language-plaintext highlighter-rouge">10.0.10.x</code> (or <code class="language-plaintext highlighter-rouge">10.0.20.x</code>/<code class="language-plaintext highlighter-rouge">10.0.30.x</code> for respectively <code class="language-plaintext highlighter-rouge">corp.int</code> and <code class="language-plaintext highlighter-rouge">research.dev</code>) the IP address specified of the end of the line is used to perform the reverse lookup.</p>
+
+<p>Finally, the default DNS server is specified, which in this case is set to the Cloudflare DNS server, but can be any public DNS server. This configuration makes sure that only specific requests end up at the DNS servers of the target network while others all end up at the public DNS server and therefore will not be visible in the target network. This is needed because when for example launching Burp, DNS requests to portswigger.net by Burp’s updater will be made to the DNS server in the target network which might trigger alerts with the <abbr title="Security Operations Center">SOC</abbr> team. With this setup such requests will simply be sent to the Cloudflare DNS server.</p>
+
+<p>Whenever during the engagement additional domains are discovered, these can also be added to this file. Make sure to restart the dnsmasq service after updating the configuration file to have the changes applied.</p>
+
+<h2 id="dns-server-and-udp-over-socks">DNS server and UDP over SOCKS</h2>
+<p>As discussed before, many implementations of SOCKS server do not support the UDP ASSOCIATE functionality meaning that it is not possible to tunnel UDP traffic over the SOCKS tunnel. Fortunately, there is a solution for this. Even though by default for DNS port <code class="language-plaintext highlighter-rouge">53/UDP</code> is used, the DNS specification states that larger requests/responses can also be performed over <code class="language-plaintext highlighter-rouge">53/TCP</code>, which <em>is</em> supported by the SOCKS tunnel.</p>
+
+<p>To make this all work, the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script from the <abbr title="Living Off the Foreign Land">LOFL</abbr> repository<sup id="fnref:4:1" role="doc-noteref"><a href="#fn:4" class="footnote" rel="footnote">4</a></sup> is available which does the following: Upon start of the script, the script initiates listeners on both port <code class="language-plaintext highlighter-rouge">53/UDP</code> and port <code class="language-plaintext highlighter-rouge">53/TCP</code>. This is also the reason why the dnsmasq DNS server should listen on port <code class="language-plaintext highlighter-rouge">5353</code>, otherwise port <code class="language-plaintext highlighter-rouge">53</code> is already in use. Moreover, the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script parses the <code class="language-plaintext highlighter-rouge">/etc/dnsmasq.conf</code> configuration file where based on the configured entries, the domains are selected for which the incoming DNS requests need to be converted to a DNS request over TCP.</p>
+
+<video width="740" height="430" controls="" poster="/assets/img/20230815_living-off-the-foreign-land/dns_over_tcp_poster.png">
+  <source src="/assets/img/20230815_living-off-the-foreign-land/dns_over_tcp.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<p>Whenever <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> receives a DNS request on port <code class="language-plaintext highlighter-rouge">53/UDP</code>, it will check the record that is requested. In case the record matches the domains specified in the dnsmasq config parsed earlier, a DNS request over TCP is forged and it is sent to port <code class="language-plaintext highlighter-rouge">5353/TCP</code> of the dnsmasq DNS server (<code class="language-plaintext highlighter-rouge">127.0.0.1:5353</code>). Because dnsmasq receives the request on its TCP port, its behavior is to then also interacts over TCP with the server that is configured for that domain, which solves the problem of the unsupported UDP protocol. The answer from the target network’s DNS server is then sent over TCP from dnsmasq back to the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script which simply responds again over UDP to the client performing the DNS request.</p>
+
+<p>Whenever the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script receives a DNS request on port <code class="language-plaintext highlighter-rouge">53/UDP</code> which does not match a domain in the dnsmasq config, it connects over UDP to port <code class="language-plaintext highlighter-rouge">5353</code> of dnsmasq. Because the incoming request was over UDP, dnsmasq then simply uses UDP to connect to the default DNS server (<code class="language-plaintext highlighter-rouge">1.0.0.1</code>) and provides back the response to the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script which is then returned to the client performing the DNS request.</p>
+
+<p>Once dnsmasq has been configured and the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script is running, also the nameserver of the Linux routing VM can be set to itself by executing the following commands where the second command is optional to lock the <code class="language-plaintext highlighter-rouge">/etc/resolv.conf</code> file for modifications.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo </span>nameserver 127.0.0.1 <span class="o">&gt;</span> /etc/resolv.conf
+chattr +i /etc/resolv.conf
+</code></pre></div></div>
+
+<h2 id="tun2socks">Tun2socks</h2>
+<p>Once a SOCKS port is listening which provides access to the target network, tun2socks needs to be configured. As described in the <a href="#a-match-made-in-heaven">A match made in heaven</a> section, Linux binaries for tun2socks can be obtained from the tun2socks GitHub<sup id="fnref:19:1" role="doc-noteref"><a href="#fn:19" class="footnote" rel="footnote">19</a></sup>.</p>
+
+<p>The tun2socks utility requires a new tunnel adapter to be set up. This can be done using the following commands.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip tuntap add mode tun dev tun1
+ip addr add 198.18.0.1/15 dev tun1
+ip <span class="nb">link set </span>dev tun1 up
+</code></pre></div></div>
+
+<p>Using these commands, a new tunnel interface called <code class="language-plaintext highlighter-rouge">tun1</code> is created. Next, an IP address is assigned to the newly created interface. This IP address is part of an address block which is reserved for benchmarking, and it is therefore safe to assume it will not be used by the target network. Finally, the <code class="language-plaintext highlighter-rouge">tun1</code> interface is brought online. At the <abbr title="Living Off the Foreign Land">LOFL</abbr> repository<sup id="fnref:4:2" role="doc-noteref"><a href="#fn:4" class="footnote" rel="footnote">4</a></sup> a utility called <code class="language-plaintext highlighter-rouge">create_tun.sh</code> is available which performs this actions automatically. See the command-line parameters that can be used below.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Create Tunnel Interface v1.0
+@bitsadmin - https://github.com/bitsadmin/lofl
+Usage: create_tun.sh [-d] INTERFACE [IPSUBNET]
+
+Parameters:
+  -d:        Delete the interface
+  INTERFACE: Name of the interface to be created, for example tun1
+  IPSUBNET:  IP address and subnet mask that will be assigned to the new interface.
+             Noted down in CIDR notation, for example: 198.18.0.1/15
+
+Examples:
+  Create new tunnel interface tun1
+  create_tun.sh tun1
+
+  Create new tunnel interface tun1 with specific IP/subnet
+  create_tun.sh tun1 198.18.0.1/15
+
+  Delete tunnel interface tun1
+  create_tun.sh -d tun1
+</code></pre></div></div>
+
+<p>After creating the <code class="language-plaintext highlighter-rouge">tun1</code> interface, the tun2socks command line can be used to link the interface to the SOCKS server and have all traffic sent to the <code class="language-plaintext highlighter-rouge">tun1</code> interface forwarded over the SOCKS tunnel. This command-line looks as follows.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tun2socks <span class="nt">-device</span> tun1 <span class="nt">-proxy</span> socks4://127.0.0.1:1080
+</code></pre></div></div>
+
+<p>As can be seen, the <code class="language-plaintext highlighter-rouge">-device</code> parameter specifies the interface it should use to receive traffic, which is then forwarded over SOCKS. The <code class="language-plaintext highlighter-rouge">-proxy</code> parameter specifies where the traffic coming in at the device should be proxied to. The proxy protocol (in this case <code class="language-plaintext highlighter-rouge">socks4</code>) has various options where for <abbr title="Living Off the Foreign Land">LOFL</abbr> the relevant options are either <code class="language-plaintext highlighter-rouge">socks4</code> or <code class="language-plaintext highlighter-rouge">socks5</code>. More options for the proxy protocol can be found at the Proxy Models page in the tun2socks wiki<sup id="fnref:21" role="doc-noteref"><a href="#fn:21" class="footnote" rel="footnote">21</a></sup>.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">tun1</code> interface is now available to get traffic into the target network, however two more settings need to be configured before it can be used.</p>
+
+<h2 id="routes">Routes</h2>
+<p>Currently because there are no routes configured to the <code class="language-plaintext highlighter-rouge">tun1</code> interface yet, no traffic will be sent yet over this interface and instead everything will be sent over the default route. Such setup is good, because like with the split DNS setup, for <abbr title="Operational Security">OPSEC</abbr> purposes it is important that only the relevant traffic is routed to the target network.</p>
+
+<p>Based on the IP configuration of the victim system which is used for the SOCKS pivoting and any reconnaissance that has been performed on the setup of the domain, IP addresses can be added to the routing table. Proceeding with the example of the ad.bitsadmin.com lab, the following IP ranges can be added to be routed over the SOCKS tunnel on <code class="language-plaintext highlighter-rouge">tun1</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># IP range of ad.bitsadmin.com</span>
+ip route add 10.0.10.0/24 via 198.18.0.1 dev tun1
+
+<span class="c"># IP range of corp.int</span>
+ip route add 10.0.20.0/24 via 198.18.0.1 dev tun1
+
+<span class="c"># IP range of research.dev</span>
+ip route add 10.0.30.0/24 via 198.18.0.1 dev tun1
+</code></pre></div></div>
+
+<p>Alternatively, in the <abbr title="Living Off the Foreign Land">LOFL</abbr> repository the <code class="language-plaintext highlighter-rouge">add_routes.sh</code> utility is available which aids in creating the routes.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Usage: add_routes.sh &lt;subnet_file&gt; &lt;interface&gt; <span class="o">[</span>gateway_ip]
+</code></pre></div></div>
+
+<p>At this point, from the Linux routing VM it is now possible to connect to systems on the target network. One more step is still required though to also provide the Offensive Windows VM possibility to reach the target network.</p>
+
+<h2 id="iptables">Iptables</h2>
+<p>Because the Offensive Windows VM is in a different network segment, a network address translation (NAT) configuration is required for the Linux routing VM to properly masquerade traffic originating from the Offensive Windows VM. That way the Offensive Windows VM is able to send traffic to its default gateway (the Linux routing VM), which is then routed accordingly to the appropriate gateways which are either the Internet (default) or the specific target network subnets which are configured in the previous subsection. The following commands can be used for this.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Internet</span>
+iptables <span class="nt">-t</span> nat <span class="nt">-A</span> POSTROUTING <span class="nt">-o</span> ens33 <span class="nt">-j</span> MASQUERADE
+iptables <span class="nt">-A</span> FORWARD <span class="nt">-i</span> ens33 <span class="nt">-o</span> en37 <span class="nt">-m</span> state <span class="nt">--state</span> RELATED,ESTABLISHED <span class="nt">-j</span> ACCEPT
+iptables <span class="nt">-A</span> FORWARD <span class="nt">-i</span> en37 <span class="nt">-o</span> ens33 <span class="nt">-j</span> ACCEPT
+
+<span class="c"># Target network</span>
+iptables <span class="nt">-t</span> nat <span class="nt">-A</span> POSTROUTING <span class="nt">-o</span> tun1 <span class="nt">-j</span> MASQUERADE
+iptables <span class="nt">-A</span> FORWARD <span class="nt">-i</span> tun1 <span class="nt">-o</span> en37 <span class="nt">-m</span> state <span class="nt">--state</span> RELATED,ESTABLISHED <span class="nt">-j</span> ACCEPT
+iptables <span class="nt">-A</span> FORWARD <span class="nt">-i</span> en37 <span class="nt">-o</span> tun1 <span class="nt">-j</span> ACCEPT
+</code></pre></div></div>
+
+<p>Alternatively, in the <abbr title="Living Off the Foreign Land">LOFL</abbr> repository the utility <code class="language-plaintext highlighter-rouge">iptables_nat.sh</code> is available which aids in creating the iptables NAT rules.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Create iptables NAT v1.0
+@bitsadmin - https://github.com/bitsadmin/lofl
+
+Usage: iptables_nat.sh [-d] [-f] INPUT OUTPUT
+
+Parameters:
+  -d:       Delete the iptables rule
+  -f:       Skip user confirmation prompt
+  INPUT:    Input interface
+  OUTPUT:   Output interface
+
+Examples:
+  Create NAT from ens36 to tun1
+  iptables_nat.sh ens36 tun1
+
+  Delete NAT from ens36 to tun1
+  iptables_nat.sh -d ens36 tun1
+
+  Delete NAT from ens36 to tun1 without prompt
+  iptables_nat.sh -d -f ens36 tun1
+</code></pre></div></div>
+
+<p>Because split tunneling is used, the iptables rules need to be configured for both the <code class="language-plaintext highlighter-rouge">ens37</code> to <code class="language-plaintext highlighter-rouge">ens33</code> (default gateway) interfaces and for the <code class="language-plaintext highlighter-rouge">ens37</code> to <code class="language-plaintext highlighter-rouge">tun1</code> (target network) interfaces.</p>
+
+<h2 id="network-traffic-logging">Network traffic logging</h2>
+<p>During pentesting and red teaming activities a best practice is to maintain logging of interactions with the client environment, such as the network traffic. The <abbr title="Living Off the Foreign Land">LOFL</abbr> setup allows for a very easy logging of such network traffic by simply running a tcpdump on the <code class="language-plaintext highlighter-rouge">tun1</code> interface. Such command looks as follows.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-s0</span> <span class="nt">-n</span> <span class="nt">-i</span> tun1 <span class="nt">-w</span> <span class="si">$(</span><span class="nb">date</span> +%Y%m%d%H%M%S<span class="si">)</span>.pcap
+</code></pre></div></div>
+
+<h1 id="conclusion">Conclusion</h1>
+<p>After all steps have been performed, on the Linux host it is now possible to interact with the target network as if it is a locally connected network. This can for example be validated by resolving the DNS A records of the domain.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>host <span class="nt">-t</span> A ad.bitsadmin.com
+</code></pre></div></div>
+
+<p>This concludes the setup of the Linux routing VM to facilitate for the living off the foreign land activities performed from the Offensive Windows VM. In <strong><a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-2">part 2 of this article</a></strong>, the configuration of the Offensive Windows VM will be discussed. Moreover, this second part will detail the various ways of collecting different types of credentials from the victim system and how to use them from the Offensive Windows VM.</p>
+
+<h1 id="troubleshooting">Troubleshooting</h1>
+
+<h2 id="network-does-not-seem-to-work">Network does not seem to work</h2>
+<p>Launch Wireshark on the Linux router VM and individually check the traffic going over the SOCKS tunnel (<code class="language-plaintext highlighter-rouge">tun1</code>) as well as the traffic between the Linux router VM and the Offensive Windows VM (<code class="language-plaintext highlighter-rouge">ens37</code>). Examples of issues that can surface here are:</p>
+<ul>
+  <li>In case no traffic is observed on tun1, the Linux routing VM might not be correctly configured
+    <ul>
+      <li>Check that the <code class="language-plaintext highlighter-rouge">ip_forward</code> flag of the OS is set to true: <code class="language-plaintext highlighter-rouge">cat /proc/sys/net/ipv4/ip_forward</code></li>
+      <li>Check that the iptables are configured correctly: <code class="language-plaintext highlighter-rouge">iptables -nvL</code></li>
+      <li>Check that relevant routes exist: <code class="language-plaintext highlighter-rouge">ip route | grep tun1</code></li>
+      <li>Make sure that tun2socks is running, not reporting errors and the correct <code class="language-plaintext highlighter-rouge">-device</code> and <code class="language-plaintext highlighter-rouge">-proxy</code> parameters are specified</li>
+    </ul>
+  </li>
+  <li>In case no responses are observed to TCP packets sent over <code class="language-plaintext highlighter-rouge">tun1</code>, validate that the SOCKS server is running properly</li>
+</ul>
+
+<h2 id="dns-records-do-not-resolve">DNS records do not resolve</h2>
+<ul>
+  <li>If the <code class="language-plaintext highlighter-rouge">/etc/dnsmasq.conf</code> has just been modified, make sure to restart both the <code class="language-plaintext highlighter-rouge">dnsmasq</code> service and the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script to apply the changes</li>
+  <li>Make sure the <code class="language-plaintext highlighter-rouge">dns_over_tcp.py</code> script is running and not reporting errors</li>
+  <li>More debugging can be performed using the <code class="language-plaintext highlighter-rouge">dig</code> utility, forcing the queries to go over TCP to test the various links in the chain</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check whether dns_over_tcp.py works</span>
+dig @127.0.0.1 <span class="nt">-p</span> 53 ad.bitadmin.com +retry<span class="o">=</span>0 +tcp
+
+<span class="c"># If not, check whether dnsmasq works</span>
+dig @127.0.0.1 <span class="nt">-p</span> 5353 ad.bitadmin.com +retry<span class="o">=</span>0 +tcp
+
+<span class="c"># If not, check whether directly querying the DC IP over TCP works</span>
+dig @10.0.0.10 <span class="nt">-p</span> 53 ad.bitadmin.com +retry<span class="o">=</span>0 +tcp
+</code></pre></div></div>
+
+<h2 id="port-does-not-respond">Port does not respond</h2>
+<p>Be aware that the tun2socks software is a bit deceptive. For performance reasons when a TCP SYN packet is sent to the tun2socks interface (<code class="language-plaintext highlighter-rouge">tun1</code>), the interface immediately responds with a SYN/ACK response without checking whether the port on the target is actually open. For that reason make sure to check the output of tun2socks to see whether a warning is displayed for the host:port combination the connection is attempted to. Alternatively using proxychains (make sure the correct SOCKS server/version is set in <code class="language-plaintext highlighter-rouge">/etc/proxychains.conf</code>) it is possible to validate using for example <code class="language-plaintext highlighter-rouge">ncat</code> or <code class="language-plaintext highlighter-rouge">nmap -sT</code> whether a port is open. See also the <a href="/living-off-the-foreign-land-windows-as-offensive-platform-part-3#future-work section in part 3">Future work</a> on a possible fix for this.</p>
+
+<h2 id="cldap-queries-are-not-properly-forwarded">CLDAP queries are not properly forwarded</h2>
+<p>It is a known issue that for some reason the <code class="language-plaintext highlighter-rouge">cldaproxy.sh</code> script is not always working properly. In case a LOLFCAB hangs and and by looking at the network traffic between the Offensive Windows VM and the Linux routing VM it shows that CLDAP (389/UDP) is used, restarting the <code class="language-plaintext highlighter-rouge">cldaproxy.sh</code> script might resolve the issue.</p>
+
+<h2 id="windows-terminal-does-not-accept-input">Windows Terminal does not accept input</h2>
+<p>When launching Windows Terminal (<code class="language-plaintext highlighter-rouge">wt.exe</code>) from an elevated prompt in which the credential material has been prepared, it is not possible to use the keyboard input. This is a known issue with Windows Terminal, for more information see <a href="https://github.com/microsoft/terminal/issues/9971">https://github.com/microsoft/terminal/issues/9971</a>.</p>
+
+<h1 id="appendix-a-comparison-of-socks-tools">Appendix A: Comparison of SOCKS tools</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th><strong>Type</strong></th>
+      <th><strong>Title</strong></th>
+      <th><strong>Native reverse?</strong></th>
+      <th><strong>UDP</strong></th>
+      <th><strong>Proxy support/auth</strong></th>
+      <th><strong>Website</strong></th>
+      <th><strong>Notes</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C2</td>
+      <td>Cobalt Strike</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes, transparent</td>
+      <td><a href="https://www.cobaltstrike.com/">https://www.cobaltstrike.com/</a></td>
+      <td>Documentation: <a href="https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/topics/pivoting_socks-proxy.htm">https://hstechdocs.helpsystems.com/manuals/cobaltstrike/current/userguide/content/topics/pivoting_socks-proxy.htm</a></td>
+    </tr>
+    <tr>
+      <td>C2</td>
+      <td>Metasploit</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes, transparent</td>
+      <td><a href="https://www.metasploit.com/">https://www.metasploit.com/</a></td>
+      <td>Documentation: <a href="https://www.rapid7.com/db/modules/auxiliary/server/socks4a/">https://www.rapid7.com/db/modules/auxiliary/server/socks4a/</a></td>
+    </tr>
+    <tr>
+      <td>C2</td>
+      <td>Sliver</td>
+      <td>Yes</td>
+      <td>?</td>
+      <td>Yes, transparent</td>
+      <td><a href="https://github.com/BishopFox/sliver">https://github.com/BishopFox/sliver</a></td>
+      <td>Documentation: <a href="https://github.com/BishopFox/sliver/wiki/Reverse-SOCKS">https://github.com/BishopFox/sliver/wiki/Reverse-SOCKS</a></td>
+    </tr>
+    <tr>
+      <td>C2</td>
+      <td>*</td>
+      <td>n/a</td>
+      <td>n/a</td>
+      <td>n/a</td>
+      <td><a href="https://www.thec2matrix.com/">https://www.thec2matrix.com/</a></td>
+      <td>Website dedicated to comparing many different C2 frameworks, including whether they have SOCKS support</td>
+    </tr>
+    <tr>
+      <td>Hardware</td>
+      <td>Hardware implant</td>
+      <td>No</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td>n/a</td>
+      <td>Connecting to hardware implant or a Linux server and specifying the dynamic port forwarding flag (<code class="language-plaintext highlighter-rouge">-D</code>): <code class="language-plaintext highlighter-rouge">ssh -D 1080</code> or reverse dynamic port forwarding flag (<code class="language-plaintext highlighter-rouge">-R</code>): <code class="language-plaintext highlighter-rouge">ssh -R 1080</code></td>
+    </tr>
+    <tr>
+      <td>RDP</td>
+      <td>Ica2Tcp</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/synacktiv/ica2tcp">https://github.com/synacktiv/ica2tcp</a></td>
+      <td>For Citrix</td>
+    </tr>
+    <tr>
+      <td>RDP</td>
+      <td>rdp2tcp</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/V-E-O/rdp2tcp">https://github.com/V-E-O/rdp2tcp</a></td>
+      <td>For rdesktop in Linux</td>
+    </tr>
+    <tr>
+      <td>RDP</td>
+      <td>SocksOverRDP</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/nccgroup/SocksOverRDP">https://github.com/nccgroup/SocksOverRDP</a></td>
+      <td>SOCKS tunnel over dynamic virtual channels of Microsoft Remote Desktop or Citrix Remote Desktop</td>
+    </tr>
+    <tr>
+      <td>RDP</td>
+      <td>UniversalDVC</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/earthquake/UniversalDVC">https://github.com/earthquake/UniversalDVC</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>RDP</td>
+      <td>xfreerdp</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/FreeRDP/FreeRDP">https://github.com/FreeRDP/FreeRDP</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Script</td>
+      <td>Invoke-SocksProxy</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes, transparent</td>
+      <td><a href="https://github.com/p3nt4/Invoke-SocksProxy">https://github.com/p3nt4/Invoke-SocksProxy</a></td>
+      <td>Great script, but in very early beta. Works well from PowerShell core, not from Windows PowerShell</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>chisel</td>
+      <td>Yes</td>
+      <td>Yes*</td>
+      <td>Yes, not sure which auth</td>
+      <td><a href="https://github.com/jpillora/chisel">https://github.com/jpillora/chisel</a></td>
+      <td>* Supports UDP when using the following fork: <a href="https://github.com/Meteorite/chisel/tree/feature-socks-udp-associate">https://github.com/Meteorite/chisel/tree/feature-socks-udp-associate</a></td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>fullproxy</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td><a href="https://github.com/shoriwe/fullproxy">https://github.com/shoriwe/fullproxy</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>gost</td>
+      <td>No</td>
+      <td>?</td>
+      <td>Yes, basic</td>
+      <td><a href="https://github.com/go-gost/gost">https://github.com/go-gost/gost</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>Lastenzug</td>
+      <td>No</td>
+      <td>No</td>
+      <td>?</td>
+      <td><a href="https://github.com/codewhitesec/Lastenzug">https://github.com/codewhitesec/Lastenzug</a></td>
+      <td>Implements a Socka4a proxy based on WebSockets</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>MicroSocks</td>
+      <td>No</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/rofl0r/microsocks">https://github.com/rofl0r/microsocks</a></td>
+      <td>Linux-only</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>penguin</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes, basic/?</td>
+      <td><a href="https://github.com/myzhang1029/penguin-rs">https://github.com/myzhang1029/penguin-rs</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Tool</td>
+      <td>revsocks</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes, basic/NTLM</td>
+      <td><a href="https://github.com/kost/revsocks">https://github.com/kost/revsocks</a></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Webserver</td>
+      <td>Pivotnacci</td>
+      <td>n/a</td>
+      <td>No</td>
+      <td>n/a</td>
+      <td><a href="https://github.com/blackarrowsec/pivotnacci">https://github.com/blackarrowsec/pivotnacci</a></td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="references">References</h1>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1" role="doc-endnote">
+      <p><a href="https://lofl-project.github.io/">https://lofl-project.github.io/</a>&nbsp;<a href="#fnref:1" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:2" role="doc-endnote">
+      <p><a href="https://lolbas-project.github.io/">https://lolbas-project.github.io/</a>&nbsp;<a href="#fnref:2" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:3" role="doc-endnote">
+      <p><a href="https://gtfobins.github.io/">https://gtfobins.github.io/</a>&nbsp;<a href="#fnref:3" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:4" role="doc-endnote">
+      <p><a href="https://github.com/bitsadmin/lofl">https://github.com/bitsadmin/lofl</a>&nbsp;<a href="#fnref:4" class="reversefootnote" role="doc-backlink">↩</a>&nbsp;<a href="#fnref:4:1" class="reversefootnote" role="doc-backlink">↩<sup>2</sup></a>&nbsp;<a href="#fnref:4:2" class="reversefootnote" role="doc-backlink">↩<sup>3</sup></a></p>
+    </li>
+    <li id="fn:5" role="doc-endnote">
+      <p><a href="https://github.com/rofl0r/proxychains-ng">https://github.com/rofl0r/proxychains-ng</a>&nbsp;<a href="#fnref:5" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:6" role="doc-endnote">
+      <p><a href="https://github.com/jpillora/chisel">https://github.com/jpillora/chisel</a>&nbsp;<a href="#fnref:6" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:7" role="doc-endnote">
+      <p><a href="https://github.com/Meteorite/chisel/tree/feature-socks-udp-associate">https://github.com/Meteorite/chisel/tree/feature-socks-udp-associate</a>&nbsp;<a href="#fnref:7" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:8" role="doc-endnote">
+      <p><a href="https://github.com/jpillora/chisel/pull/250">https://github.com/jpillora/chisel/pull/250</a>&nbsp;<a href="#fnref:8" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:9" role="doc-endnote">
+      <p><a href="https://github.com/go-gost/gost">https://github.com/go-gost/gost</a>&nbsp;<a href="#fnref:9" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:10" role="doc-endnote">
+      <p><a href="https://github.com/nccgroup/SocksOverRDP">https://github.com/nccgroup/SocksOverRDP</a>&nbsp;<a href="#fnref:10" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:11" role="doc-endnote">
+      <p><a href="https://github.com/blackarrowsec/pivotnacci">https://github.com/blackarrowsec/pivotnacci</a>&nbsp;<a href="#fnref:11" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:12" role="doc-endnote">
+      <p><a href="https://www.kali.org/tools/all-tools/">https://www.kali.org/tools/all-tools/</a>&nbsp;<a href="#fnref:12" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:13" role="doc-endnote">
+      <p><a href="https://www.blackarch.org/tools.html">https://www.blackarch.org/tools.html</a>&nbsp;<a href="#fnref:13" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:14" role="doc-endnote">
+      <p><a href="https://sourceforge.net/projects/sockscap64/">https://sourceforge.net/projects/sockscap64/</a>&nbsp;<a href="#fnref:14" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:15" role="doc-endnote">
+      <p><a href="https://www.proxycap.com/">https://www.proxycap.com/</a>&nbsp;<a href="#fnref:15" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:16" role="doc-endnote">
+      <p><a href="https://www.proxifier.com/">https://www.proxifier.com/</a>&nbsp;<a href="#fnref:16" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:17" role="doc-endnote">
+      <p><a href="http://www.dest-unreach.org/socat/">http://www.dest-unreach.org/socat/</a>&nbsp;<a href="#fnref:17" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:18" role="doc-endnote">
+      <p><a href="https://github.com/ambrop72/badvpn">https://github.com/ambrop72/badvpn</a>&nbsp;<a href="#fnref:18" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:19" role="doc-endnote">
+      <p><a href="https://github.com/xjasonlyu/tun2socks">https://github.com/xjasonlyu/tun2socks</a>&nbsp;<a href="#fnref:19" class="reversefootnote" role="doc-backlink">↩</a>&nbsp;<a href="#fnref:19:1" class="reversefootnote" role="doc-backlink">↩<sup>2</sup></a></p>
+    </li>
+    <li id="fn:20" role="doc-endnote">
+      <p><a href="https://dnsmasq.org/">https://dnsmasq.org/</a>&nbsp;<a href="#fnref:20" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:21" role="doc-endnote">
+      <p><a href="https://github.com/xjasonlyu/tun2socks/wiki/Proxy-Models">https://github.com/xjasonlyu/tun2socks/wiki/Proxy-Models</a>&nbsp;<a href="#fnref:21" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+  </article>
+  
+  
+
+
+
+
+</div>
+
+        </div>
+        <div class="col-second">
+          <div class="col-box col-box-author">
+  <a href="/"><img class="avatar" src="https://static.bitsadmin.com/bitsadmin.png?living-off-the-foreign-land-windows-as-offensive-platform" alt="Arris Huijgen"></a>
+  <div class="col-box-title name">Arris Huijgen</div>
+  <p>Security Researcher - Red Teamer<br><span title="Offensive Security Certified Professional">OSCP</span> • <span title="Offensive Security Certified Expert">OSCE</span> • <span title="Offensive Security Exploitation Expert">OSEE</span></p>
+  <p class="contact">
+    
+    <a href="https://bitsadmin.com">Website</a>
+    
+    <a href="https://github.com/bitsadmin">GitHub</a>
+    
+    <a href="https://twitter.com/bitsadmin">Twitter</a>
+    
+    <a rel="me" href="https://infosec.exchange/@bitsadmin" style="display:none">Mastodon</a>
+  </p>
+</div>
+
+<div class="col-box">
+  <div class="col-box-title">Newest Posts</div>
+  <ul class="post-list">
+    
+    
+      <li><a class="post-link" href="/living-off-the-foreign-land-windows-as-offensive-platform">Living Off the Foreign Land - Part 1/3: Setup Linux VM for SOCKS routing</a></li>
+    
+      <li><a class="post-link" href="/living-off-the-foreign-land-windows-as-offensive-platform-part-2">Living Off the Foreign Land - Part 2/3: Configuring the Offensive Windows VM</a></li>
+    
+      <li><a class="post-link" href="/living-off-the-foreign-land-windows-as-offensive-platform-part-3">Living Off the Foreign Land - Part 3/3: Using Windows as Offensive Platform</a></li>
+    
+      <li><a class="post-link" href="/digging-for-secrets">Digging for Secrets on Corporate Shares</a></li>
+    
+      <li><a class="post-link" href="/dealing-with-large-bloodhound-datasets">Dealing with large BloodHound datasets</a></li>
+    
+  </ul>
+</div>
+
+<div class="col-box post-toc hide" style="display: block;">
+  <div class="col-box-title">TOC</div>
+<div></div><ul><li><a href="#introduction">Introduction</a></li><li><a href="#socks">SOCKS</a></li><ul><li><a href="#socks-1">SOCKS</a></li><li><a href="#socks4a">SOCKS4A</a></li><li><a href="#socks5">SOCKS5</a></li><li><a href="#non-socks-aware-software">Non-SOCKS aware software</a></li></ul><li><a href="#red-teaming-and-socks">Red teaming and SOCKS</a></li><ul><li><a href="#c2">C2</a></li><li><a href="#ssh">SSH</a></li><li><a href="#hardware-implant">Hardware implant</a></li><li><a href="#reverse-socks">Reverse SOCKS</a></li><ul><li><a href="#chisel">Chisel</a></li><li><a href="#gost">Gost</a></li></ul><li><a href="#other-options">Other options</a></li><li><a href="#summary">Summary</a></li></ul><li><a href="#windows-red-teaming-and-socks">Windows, red teaming and SOCKS</a></li><ul><li><a href="#advantages-of-using-windows">Advantages of using Windows</a></li><li><a href="#socks-tooling-in-windows">SOCKS tooling in Windows</a></li><li><a href="#disadvantages-of-using-socks">Disadvantages of using SOCKS</a></li></ul><li><a href="#a-match-made-in-heaven">A match made in heaven</a></li><li><a href="#offensive-setup-linux-routing-vm">Offensive setup: Linux routing VM</a></li><ul><li><a href="#two-network-interfaces">Two network interfaces</a></li><li><a href="#dns-server">DNS server</a></li><li><a href="#dns-server-and-udp-over-socks">DNS server and UDP over SOCKS</a></li><li><a href="#tun2socks">Tun2socks</a></li><li><a href="#routes">Routes</a></li><li><a href="#iptables">Iptables</a></li><li><a href="#network-traffic-logging">Network traffic logging</a></li></ul><li><a href="#conclusion">Conclusion</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><ul><li><a href="#network-does-not-seem-to-work">Network does not seem to work</a></li><li><a href="#dns-records-do-not-resolve">DNS records do not resolve</a></li><li><a href="#port-does-not-respond">Port does not respond</a></li><li><a href="#cldap-queries-are-not-properly-forwarded">CLDAP queries are not properly forwarded</a></li><li><a href="#windows-terminal-does-not-accept-input">Windows Terminal does not accept input</a></li></ul><li><a href="#appendix-a-comparison-of-socks-tools">Appendix A: Comparison of SOCKS tools</a></li><li><a href="#references">References</a></li></ul></div>
+
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+<div class="wrapper">
+© 2023 Arris Huijgen
+</div>
+</footer>
+
+<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']]}});</script>
+<script src="/js/easybook.js"></script><div class="util-notify1 hidden" style="top: -200px;">Double click to select all</div>
+
+
+  
+
+
+</body></html>

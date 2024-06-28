@@ -1,0 +1,1796 @@
+<html lang="de"><head>
+<meta charset="UTF-8">
+<title>When Hackers hack the Hackers - r-tec Cyber Security</title>
+<base href="https://www.r-tec.net/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta name="description" content="In this post, the malware analysis process, as well as attacker activities and Indicators of Compromise (IoCs) are presented.">
+<meta name="generator" content="Contao Open Source CMS">
+<link rel="canonical" href="https://www.r-tec.net/r-tec-blog-when-hackers-hack-the-hackers.html">
+<link rel="stylesheet" href="assets/contao/css/layout.min.css?v=8a9171bc"><link rel="stylesheet" href="system/modules/Subcolumns/assets/yaml3/subcols.css?v=676cb9d4"><link rel="stylesheet" href="files/layout/css/main.css?v=781d5a10"><link rel="stylesheet" href="files/layout/css/additional.css?v=3ee9c646">        <!--[if lte IE 7]><link href="system/modules/Subcolumns/assets/yaml3/subcolsIEHacks.css" rel="stylesheet" type="text/css" /><![endif]--> <meta property="og:title" content="When Hackers hack the Hackers"><meta property="og:type" content="article"><meta property="og:image:width" content="800"><meta property="og:image:height" content="450"><meta property="og:image:secure_url" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta property="og:image" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="When Hackers hack the Hackers"><meta name="twitter:description" content="In this post, the malware analysis process, as well as attacker activities and Indicators of Compromise (IoCs) are presented."><meta name="twitter:image" content="https://www.r-tec.net/files/content/img/News%2BEvents/Share_images_Social_Media/arif-wahid-266541-unsplash.jpg"><meta property="og:locale" content="de_DE"><meta property="og:url" content="https://www.r-tec.net/r-tec-blog-when-hackers-hack-the-hackers.html"><meta name="google-site-verification" content="WDULePqn79mGDCPpkbQ3zM_SNn8_hu4Foaw1g3E0C0g">
+<meta name="google-site-verification" content="cY6zlHuB1B-yojWYPmMN3YPE91JmDcYngl1Er5foapk">
+<script type="text/javascript" async="" src="https://snap.licdn.com/li.lms-analytics/insight.min.js"></script><script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-3KES9QJP2J&amp;l=dataLayer&amp;cx=c"></script><script type="text/javascript" id="www-widgetapi-script" src="https://www.youtube.com/s/player/74204f6c/www-widgetapi.vflset/www-widgetapi.js" async=""></script><script src="https://www.youtube.com/iframe_api"></script><script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-MX8FNS6"></script><script type="text/javascript" charset="UTF-8" async="" src="https://consent.cookiebot.com/8999b058-10c6-403f-96c7-a163e2a3a5e3/cc.js?renew=false&amp;referer=www.r-tec.net&amp;dnt=false&amp;init=false"></script><script type="text/javascript" charset="UTF-8" src="https://consentcdn.cookiebot.com/consentconfig/8999b058-10c6-403f-96c7-a163e2a3a5e3/r-tec.net/configuration.js"></script><script data-cookieconsent="ignore">['CookiebotOnAccept','CookiebotOnDecline'].forEach(function(event){window.addEventListener(event,function(){if(Cookiebot.changed){var bodyEl=document.querySelector('body');bodyEl.style.opacity=0;bodyEl.style.pointerEvents='none';setTimeout(function(){window.location.reload()},800)}})})</script>
+<script data-cookieconsent="ignore">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag("consent","default",{ad_storage:"denied",analytics_storage:"denied",functionality_storage:"denied",personalization_storage:"denied",security_storage:"granted",wait_for_update:500,});gtag("set","ads_data_redaction",!0)</script>
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="8999b058-10c6-403f-96c7-a163e2a3a5e3" data-blockingmode="auto" type="text/javascript"></script><style type="text/css" id="CookieConsentStateDisplayStyles">.cookieconsent-optin-preferences,.cookieconsent-optin-statistics,.cookieconsent-optin-marketing,.cookieconsent-optin{display:none;}.cookieconsent-optout-preferences,.cookieconsent-optout-statistics,.cookieconsent-optout-marketing,.cookieconsent-optout{display:block;display:initial;}</style>
+<script data-cookieconsent="ignore">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=!0;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','GTM-MX8FNS6')</script>
+<!--<script defer id="klc" src="files/layout/js/klaro/config.js"></script>-->
+<!--<script defer id="klj" src="files/layout/js/klaro/klaro.js"></script>-->
+</head>
+<body id="top" class="r-tec-blog-when-hackers-hack-the-hackers win firefox gecko fx126  " itemscope="" itemtype="http://schema.org/WebPage">
+<div class="emergency soforthilfe"> <div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="INCIDENT RESPONSE SERVICE" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>INCIDENT RESPONSE SERVICE</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<h3>Garantierte Reaktionszeiten.<br>Umfassende Vorbereitung.</h3>
+<p>Mit unserem Incident Response Service stellen wir sicher, dass Ihrem Unternehmen im Ernstfall die richtigen Ressourcen und Kompetenzen zur Verfügung stehen. Sie zahlen eine feste monatliche Pauschale und wir bieten Ihnen dafür einen Bereitschaftsdienst mit garantierten Annahme- und Reaktionszeiten. Durch einen im Vorfeld von uns erarbeiteten Maßnahmenplan sparen Sie im Ernstfall wertvolle Zeit.</p>
+<p><a href="incident-response-service.html">weiterlesen</a></p>            </div>
+</div>
+</div>
+<div id="wrapper">
+<header id="header" class="header">
+<div class="container">
+<div class="row clearfix">
+<div class="ce_hyperlink logo Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="files/layout/img/Logo.svg" width="221" height="89" alt="">
+</a>
+</figure>
+</div><div class="ce_hyperlink logo-black Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="files/layout/img/logo_black.svg" width="221" height="89" alt="">
+</a>
+</figure>
+</div><div class="ce_hyperlink logo-small Kein Abstand - 0px bg-  block">
+<figure class="image_container">
+<a title="" href="home.html" class="hyperlink_img">
+<img src="assets/images/7/Logo-50c16b65.svg" width="159" height="64" alt="">
+</a>
+</figure>
+</div>
+<!-- indexer::stop -->
+<nav class="mod_navigation block" itemscope="" itemtype="http://schema.org/SiteNavigationElement">
+<div class="nav-icon">
+<span></span>
+<span></span>
+</div>
+<a href="r-tec-blog-when-hackers-hack-the-hackers.html#skipNavigation6" class="invisible">Navigation überspringen</a>
+<div class="nav__inside">
+<div class="container">
+<div class="row">
+<ul class="level_1">
+<li class="submenu megamenu first">
+<div style="position:relative;width:100%;">
+<a href="leistungen-loesungen.html" title="Leistungen" class="submenu megamenu first" aria-haspopup="true" itemprop="url"><span itemprop="name">Leistungen</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="leistungen-loesungen.html">
+zur Übersicht Leistungen                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="submenu first">
+<div style="position:relative;width:100%;">
+<a href="offensive-cyber-security-services.html" title="Offensive Cyber Security Services" class="submenu first" aria-haspopup="true" itemprop="url"><span itemprop="name">Offensive Services</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="pentests-sicherheitsanalysen.html" title="Pentests &amp; Sicherheitsanalysen" class="first" itemprop="url"><span itemprop="name">Pentests &amp; Sicherheitsanalysen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="red-teaming.html" title="Red Teaming" itemprop="url"><span itemprop="name">Red Teaming</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="social-engineering-awareness.html" title="Social Engineering Awareness" class="last" itemprop="url"><span itemprop="name">Social Engineering &amp; Awareness</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-consulting-integration.html" title="Security Consulting &amp; Integration" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Consulting &amp; Integration</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="incident-response-readiness.html" title="Incident Response Readiness" class="first" itemprop="url"><span itemprop="name">Incident Response Readiness</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="incident-response-readiness-assessment.html" title="Incident Response Readiness Assessment – r-tec Cyber Security" itemprop="url"><span itemprop="name">Incident Response Readiness Assessment</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="orientierungshilfe-sza-readiness-assessment.html" title="Orientierungshilfe SzA – Readiness Assessment" itemprop="url"><span itemprop="name">Orientierungshilfe SzA – Readiness Assessment</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="industrial-cyber-security-audit.html" title="Industrial Cyber Security Audit" itemprop="url"><span itemprop="name">Industrial Cyber Security Audit</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="active-directory-security.html" title="Active Directory Security – r-tec Cyber Security" itemprop="url"><span itemprop="name">Active Directory Security</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="cyber-security-design-integration.html" title="Cyber Security Design &amp; Integration" itemprop="url"><span itemprop="name">Cyber Security Design &amp; Integration</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="cyber-security-check.html" title="Cyber Security Check" itemprop="url"><span itemprop="name">Cyber Security Check</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-quick-check.html" title="Cyber Security Quick Check" class="last" itemprop="url"><span itemprop="name">Cyber Security Quick Check</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="cyber-defense-center.html" title="Cyber Defense Center" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Cyber Defense Center</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="incident-response-service.html" title="Incident Response Service" class="first" itemprop="url"><span itemprop="name">Incident Response Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-detection-and-response-service.html" title="MDR Service" itemprop="url"><span itemprop="name">MDR Service for IT</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-endpoint-detection-and-response-service.html" title="Managed EDR Service" itemprop="url"><span itemprop="name">Managed EDR Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="managed-detection-and-response-for-ot.html" title="MDR Service for OT" itemprop="url"><span itemprop="name">MDR Service for OT</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="vulnerability-management-service.html" title="Vulnerability Management Service" itemprop="url"><span itemprop="name">Vulnerability Management Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="dark-web-monitoring-service.html" title="Dark Web Monitoring – r-tec Cyber Security" itemprop="url"><span itemprop="name">Dark Web Monitoring Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="threat-information-service.html" title="Threat Information Service" itemprop="url"><span itemprop="name">Threat Information Service</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="incident-response-emergency-team.html" title="Incident Response Emergency Team" class="last" itemprop="url"><span itemprop="name">Incident Response Emergency Team</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu last">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-operations-center.html" title="Cyber Security Operations Center" class="submenu last" aria-haspopup="true" itemprop="url"><span itemprop="name">Security Operations Center</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_3">
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="cyber-security-support-services.html" title="Cyber Security Support Services" class="first" itemprop="url"><span itemprop="name">Cyber Security Support Services</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="megamenu last">
+<div style="position:relative;width:100%;">
+<a href="hersteller-partner.html" title="Hersteller + Partner" class="megamenu last" itemprop="url"><span itemprop="name">Hersteller + Partner</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu megamenu">
+<div style="position:relative;width:100%;">
+<a href="hersteller-partner.html" title="Hersteller + Partner" class="submenu megamenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Hersteller + Partner</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2 has-gt-8">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="hersteller-partner.html">
+zur Übersicht Hersteller + Partner                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="checkpoint-partner-services.html" title="Check Point Partner Services" class="first" itemprop="url"><span itemprop="name">Check Point</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="macmon-partner-services.html" title="macmon Partner Services" itemprop="url"><span itemprop="name">macmon</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="exabeam-partner-services.html" title="Exabeam Partner Services" itemprop="url"><span itemprop="name">Exabeam</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="sophos-partner-services.html" title="Sophos Partner Services" itemprop="url"><span itemprop="name">Sophos</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="claroty-partner-services.html" title="Claroty Partner Services" itemprop="url"><span itemprop="name">Claroty</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="trellix-partner-services.html" title="Trellix Partner Services" itemprop="url"><span itemprop="name">Trellix</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="skyhigh-partner-services.html" title="Skyhigh Partner Services" itemprop="url"><span itemprop="name">Skyhigh</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="tenable-partner-services.html" title="Tenable Partner Services" itemprop="url"><span itemprop="name">Tenable</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="netwrix-partner-services.html" title="Netwrix Partner Services" itemprop="url"><span itemprop="name">Netwrix</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="rsa-partner-services.html" title="RSA Partner Services" itemprop="url"><span itemprop="name">RSA</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="yubico-partner-services.html" title="Yubico Partner Services" itemprop="url"><span itemprop="name">Yubico</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="nextron-partner-services.html" title="Nextron Partner Services" itemprop="url"><span itemprop="name">Nextron</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="crowdstrike-partner-services.html" title="Crowdstrike Partner Services" itemprop="url"><span itemprop="name">Crowdstrike</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="darkowl-partner-services.html" title="DarkOwl Partner Services" class="last" itemprop="url"><span itemprop="name">DarkOwl</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="submenu">
+<div style="position:relative;width:100%;">
+<a href="branchen-sektoren.html" title="Branchen + Sektoren" class="submenu" aria-haspopup="true" itemprop="url"><span itemprop="name">Branchen + Sektoren</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="branchen-sektoren.html">
+zur Übersicht Branchen + Sektoren                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first">
+<div style="position:relative;width:100%;">
+<a href="industrial-cyber-security.html" title="Industrial Cyber Security" class="first" itemprop="url"><span itemprop="name">Industrial Cyber Security</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="mittelstand.html" title="Cyber Security für den Mittelstand" itemprop="url"><span itemprop="name">Mittelstand</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="kritis.html" title="Cyber Security für KRITIS-Unternehmen" itemprop="url"><span itemprop="name">KRITIS</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="energieversorger.html" title="Cyber Security für Energieversorger" itemprop="url"><span itemprop="name">Energieversorger</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li>
+<div style="position:relative;width:100%;">
+<a href="gesundheitswesen.html" title="Cyber Security für das Gesundheitswesen" itemprop="url"><span itemprop="name">Gesundheitswesen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="last">
+<div style="position:relative;width:100%;">
+<a href="kommunen.html" title="IT-Security für öffentliche Einrichtungen" class="last" itemprop="url"><span itemprop="name">Kommunen</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<li class="trail">
+<div style="position:relative;width:100%;">
+<a href="news-events.html" title="Aktuelles" class="trail" itemprop="url"><span itemprop="name">Aktuelles</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="no-breadcrumb">
+<div style="position:relative;width:100%;">
+<a href="karriere-jobs.html" title="Karriere" class="no-breadcrumb" itemprop="url"><span itemprop="name">Karriere</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+<li class="submenu no-breadcrumb last">
+<div style="position:relative;width:100%;">
+<a href="unternehmen.html" title="Unternehmen" class="submenu no-breadcrumb last" aria-haspopup="true" itemprop="url"><span itemprop="name">Unternehmen</span></a>
+<a class="next" href="#"></a>
+</div>
+<ul class="level_2">
+<button class="btn btn-link btn-close">
+<span class="sr-only">Schließen</span>
+</button>
+<li class="overview">
+<div>
+<a href="unternehmen.html">
+zur Übersicht Unternehmen                    <svg version="1.1" class="overview__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 72 72" width="16" height="16" style="enable-background:new 0 0 72 72;" fill="#fff" stroke="#fff" stroke-width="1px" xml:space="preserve">
+<path d="M36,49.5c-7.5,0-13.5-6-13.5-13.5s6-13.5,13.5-13.5s13.5,6,13.5,13.5S43.5,49.5,36,49.5z     M36,25.7c-5.7,0-10.3,4.6-10.3,10.3S30.3,46.3,36,46.3S46.3,41.7,46.3,36l0,0C46.3,30.3,41.7,25.7,36,25.7z"></path>
+<path d="M36,53.5c-6.6,0-13.8-2.9-20.6-8.3C12.3,42.8,9.5,40,7,37l-0.8-1L7,35c2.5-3,5.3-5.8,8.4-8.2    c6.9-5.4,14-8.3,20.6-8.3s13.8,2.9,20.6,8.3c3.1,2.4,5.9,5.2,8.4,8.2l0.8,1L65,37c-2.5,3-5.3,5.8-8.4,8.2    c-6.7,5.3-13.7,8.2-20.2,8.3H36L36,53.5z M36,21.7c-12,0-22.5,10.7-25.5,14L10.3,36l0.2,0.2c2.9,3.3,13.4,14,25.5,14    s22.5-10.7,25.5-14l0.2-0.2l-0.2-0.2C58.5,32.5,48,21.7,36,21.7L36,21.7z"></path>
+<path d="M36,41.6c-3.1,0-5.6-2.5-5.6-5.6s2.5-5.6,5.6-5.6s5.6,2.5,5.6,5.6S39.1,41.6,36,41.6z M36,33.6    c-1.3,0-2.4,1.1-2.4,2.4s1.1,2.4,2.4,2.4s2.4-1.1,2.4-2.4S37.3,33.6,36,33.6z"></path>
+<path class="corner corner-tr" d="M66.3,17.6V5.7H54.4V2.5h15.1v15.1H66.3L66.3,17.6z"></path>
+<path class="corner corner-br" d="M54.4,69.5v-3.2h11.9V54.4h3.2v15.1H54.4L54.4,69.5z"></path>
+<path class="corner corner-bl" d="M2.5,69.5V54.4h3.2v11.9h11.9v3.2H2.5z"></path>
+<path class="corner corner-tl" d="M2.5,17.6V2.5h15.1v3.2H5.7v11.9L2.5,17.6L2.5,17.6z"></path>
+</svg>
+</a>
+</div>
+</li>
+<li class="first last">
+<div style="position:relative;width:100%;">
+<a href="kontakt.html" title="Kontakt" class="first last" itemprop="url"><span itemprop="name">Kontakt</span></a>
+<a class="next" href="#"></a>
+</div>
+</li>
+</ul>
+<a class="back" href="#">zurück</a>
+</li>
+<div class="soforthilfe">
+<div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="Emergency Hotline" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>Emergency Hotline</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p><strong>Ihre Nummer für alle Fälle:</strong><br><a href="tel:+4920231767112">+ 49 202 31767-112</a></p>
+<p>Wenn Sie einen Sicherheits-Vorfall bemerken, zögern Sie nicht. Kontaktieren Sie unsere Spezialisten, um umgehend Hilfe zu erhalten.</p>            </div>
+</div>
+</div>
+<div class="emergency soforthilfe"> <div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="INCIDENT RESPONSE SERVICE" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>INCIDENT RESPONSE SERVICE</span></a>
+</div><div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<h3>Garantierte Reaktionszeiten.<br>Umfassende Vorbereitung.</h3>
+<p>Mit unserem Incident Response Service stellen wir sicher, dass Ihrem Unternehmen im Ernstfall die richtigen Ressourcen und Kompetenzen zur Verfügung stehen. Sie zahlen eine feste monatliche Pauschale und wir bieten Ihnen dafür einen Bereitschaftsdienst mit garantierten Annahme- und Reaktionszeiten. Durch einen im Vorfeld von uns erarbeiteten Maßnahmenplan sparen Sie im Ernstfall wertvolle Zeit.</p>
+<p><a href="incident-response-service.html">weiterlesen</a></p>            </div>
+</div>
+</div>
+</ul>
+</div>
+</div>
+</div>
+<a id="skipNavigation6" class="invisible">&nbsp;</a>
+</nav>
+<!-- indexer::continue -->
+<!-- indexer::stop -->
+<div class="mod_search block">
+<div class="search__icon"></div>
+<form action="suche.html" method="get">
+<div class="formbody">
+<div class="widget widget-text">
+<label for="ctrl_keywords_21" class="invisible">Suchbegriffe</label>
+<input type="search" placeholder="Suchbegriff eingeben" name="keywords" id="ctrl_keywords_21" class="text input-search-text" value="">
+</div>
+<div class="widget widget-submit">
+<button type="submit" id="ctrl_submit_21" class="submit">Suchen</button>
+</div>
+</div>
+</form>
+</div>
+<!-- indexer::continue -->
+<a href="/kontakt.html" class="contact-btn">Kontakt</a>
+</div>
+</div>
+</header>
+<div id="container">
+<div class="dz_stage">
+<div class="dz_stage__background dz_stage__withtext" style="background-image: url('files/content/img/Buehne_schmal/arif-wahid-266541-unsplash.jpg');">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Arif Wahid 266541 - Unsplash                                    </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+<div class="dz_stage__content">
+<h1 class="dz_stage__headline">When Hackers hack the Hackers</h1>
+<p>Malware Analysis for a group targeting Malware Developers &nbsp;</p>                                                    </div>
+</div>
+</div>
+</div>
+</div>
+<main id="main">
+<div class="inside">
+<!-- indexer::stop -->
+<nav class="mod_breadcrumb container block" aria-label="Breadcrumb">
+<ul>
+<li><a href="news-events.html" title="Aktuelles">Aktuelles</a></li>
+<li class="active last" aria-current="page">r-tec Blog | When Hackers hack the Hackers</li>
+</ul>
+</nav>
+<!-- indexer::continue -->
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="article-2573">
+<div class="container container__article">
+<div class="row">
+<div class="ce_ContentDate Gering - 30px bg-  block">
+<div class="date">
+<p>June 2023</p></div>
+</div>
+<section class="ce_colsetStart subcolumns colcount_2 yaml3 col-66x33">
+<div class="c66l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<div class="ce_text Gering - 30px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">Last year, our experts had the opportunity to observe the execution of non-standard processes in a sandbox-like, isolated virtual machine (VM). Further analysis of these processes revealed Command &amp; Control (C2) connections using Discord for communication. As we continued to analyse the C2 agent, we also gained access to the attacker's Discord channel and were able to take a look at all the commands and modules executed for many more compromised systems. This attacker/group was very different to the ones we typically see while doing Incident Response for our customers in terms of the motivation and goals. It seemed, that this attacker was mainly compromising Malware developers and or Offensive Security related people to steal and sell code from the target systems. In this post, the malware analysis process, as well as attacker activities and Indicators of Compromise (IoCs) are presented.</p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33r col_2 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="1. Discord Command &amp; Control" href="#initialdetection" data-hash="#initialdetection" class="hyperlink_txt sprungmarke "><span>1. Discord Command &amp; Control</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="2. Discord-C2 is not enough" href="#discordc2" data-hash="#discordc2" class="hyperlink_txt sprungmarke "><span>2. Discord-C2 is not enough</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="3. Remcos is not enough" href="#remocs" data-hash="#remocs" class="hyperlink_txt sprungmarke "><span>3. Remcos is not enough</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="4. Initial Access" href="#initialaccess" data-hash="#initialaccess" class="hyperlink_txt sprungmarke "><span>4. Initial Access</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="5. Attacker actions &amp; Motivation" href="#attackeractions" data-hash="#attackeractions" class="hyperlink_txt sprungmarke "><span>5. Attacker actions &amp; Motivation</span></a>
+</div><div class="ce_hyperlink Kein Abstand - 0px bg-  block">
+<a title="6. IoC List" href="#IoClist" data-hash="#IoClist" class="hyperlink_txt sprungmarke "><span>6. IoC List</span></a>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="assessment">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="initialdetection">
+<h2>1. Discord Command &amp; Control</h2>
+<div class="ce_text__content">
+<p>While checking the running processes one strange process name stood out. The executable Updater.exe – located in the directory C:\users\&lt;username&gt;\Appdata\Local\MicrosoftEdge\ was running. A quick check on VirusTotal revealed, that this executable was detected by some, but not many vendors as Trojan or Malware:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-22%20um%2010.01.40.png" width="1057" height="632" alt="" title="Figure 1: Virustotal results - Updater.exe">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 1: Virustotal results - Updater.exe            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 1: Virustotal results - Updater.exe</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The executable can be found here: <a href="https://www.virustotal.com/gui/file/f68540f89ad95599ebcf673508a2d4fc3d093551581fd058902f7ddf80264498" target="_blank" rel="noopener">https://www.virustotal.com/gui/file/f68540f89ad95599ebcf673508a2d4fc3d093551581fd058902f7ddf80264498</a><br><em>Updater.exe </em>was started as sheduled task under „Windows\EdgeUpdater“ with the user logon as trigger. Later on this was classified as one of many persistence locations from the attacker.<br>It was signed with a valid certificate from GlobalSign CodeSigning CA:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-22%20um%2010.05.18.png" width="844" height="684" alt="" title="Figure 2: Signed executable">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 2: Signed executable            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 2: Signed executable</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The applicant was the following company according to the certificate:</p>
+<ul>
+<li>Xi'an Jingchi Electronic Technology Co.</li>
+<li>Provinz Shaanxi</li>
+</ul>
+<p>We assume, that either this company got compromised, so that the attacker was able to issue certificates on behalf of it. Or their Code Signing Certificate including a password was leaked somewhere on the Internet, so that our attacker was able to sign his Malware with it.<br>The description field metadata was taken from an <em>svchost.exe</em> executable of the Microsoft Windows operating system. This is actually easy to fake/change from an attackers point of view and doesn’t need any further verifications.<br>As this executable was not using any sandbox <a href="https://attack.mitre.org/techniques/T1497/" target="_blank" rel="noopener">evasion</a> / environmental <a href="https://attack.mitre.org/techniques/T1480/001/" target="_blank" rel="noopener">keying</a> , throwing it into a Sandbox revealed connections to discord.com, gateway.discord.gg and geolocation-db.com, which can also already be seen in the VirusTotal-Report:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-22%20um%2010.10.23.png" width="911" height="232" alt="" title="Figure 3: Updater.exe network connections">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 3: Updater.exe network connections            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 3: Updater.exe network connections</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>We were thinking – Discord as Command &amp; Control communication channel? Doing a quick search about these keywords results in the Open <a href="https://github.com/crawl3r/DaaC2" target="_blank" rel="noopener">Source DaaC2</a> framework written in Golang and <a href="https://github.com/3ct0s/disctopia-c2" target="_blank" rel="noopener">disctopia-c2</a> written in python. Our Updater.exe also dropped several python3.8 library files into the appdata directory on runtime, which indicates, that is was written in python and compiled via e.g. pyinstaller to an executable.<br>All of these C2-Frameworks use a Discord Bot Token, to connect to the Discord API for message sending and message retrieval:<br><a href="https://github.com/3ct0s/disctopia-c2/blob/cffdc4e1ab58076bb6227e7cfb971b59dd984025/code/main.py#L36">https://github.com/3ct0s/disctopia-c2/blob/cffdc4e1ab58076bb6227e7cfb971b59dd984025/code/main.py#L36</a><br>Dumping the Updater.exe memory and going through this memory dump via Hexeditor indeed revealed, that this executable was using a Bot-Token for a Discord Channel communication:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2010.24.12.png" width="628" height="491" alt="" title="Figure 4: Memory dump with Discord C2 Bot Token">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 4: Memory dump with Discord C2 Bot Token            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 4: Memory dump with Discord C2 Bot Token</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>Having access to this token, we at first wanted to verify, that this communication and executable was indeed a C2-connection. Using <a href="https://github.com/Tyrrrz/DiscordChatExporter" target="_blank" rel="noopener">DiscordChatExporter</a> for example, it was possible to take a look at the channel permissions for our bot:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2010.27.23.png" width="471" height="664" alt="" title="Figure 5: Accessible Channels">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 5: Accessible Channels            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 5: Accessible Channels</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>Taking a look into the channels themselves, it was possible to see each of the executed commands per system as well as the return value / output:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2010.31.16.png" width="540" height="469" alt="" title="Figure 6: Discord C2 channel access">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 6: Discord C2 channel access            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 6: Discord C2 channel access</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>So, we were not only able to see, what the attacker did on our isolated virtual machine, but we could also see all executed commands and output for other compromised systems. What we found here revealed more information about the attacker motivation and or targets/victims. These information can be found in the <a href="r-tec-blog-when-hackers-hack-the-hackers.html#attackeractions">Chapter 5</a>.<br>Comparing the modules/commands from our Updater.exe with the Open Source disctopia-c2 project also lead to the assumption for us, that <em>Updater.exe</em> is a modified disctopia stager, as some modules were exactly the same and others or new ones were added:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2010.58.19.png" width="563" height="363" alt="" title="Figure 7: Memory Dump - excerpt of C2-Module strings">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 7: Memory Dump - excerpt of C2-Module strings            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 7: Memory Dump - excerpt of C2-Module strings</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>Going through the Windows Autorun entries, another executable ran via a different sheduled task was found later on in the directory <em>C:\users\&lt;username&gt;\AppData\Local\GithubDesktop\</em> named <em>GithubCrashReporter.exe.</em></p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/8_Figure.png" width="248" height="290" alt="" title="Figure 8: GithubCrashReporter.exe Discord C2 Stager">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 8: GithubCrashReporter.exe Discord C2 Stager            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 8: GithubCrashReporter.exe Discord C2 Stager</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p style="font-weight: 400;">In this case, the attacker cloned the icon and description fields from the legitimate GithubDesktop.exe before dropping it on disk.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="assessment">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="discordc2">
+<h2>2. Discord-C2 is not enough</h2>
+<div class="ce_text__content">
+<p>As we had access to the Discord channels chats, we could easily go through them to look for other attacker actions. One action was used on many different systems. The attacker generated scheduled task „Cleanup task“ was run:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.18.22.png" width="359" height="65" alt="" title="Figure 9: Start &quot;Cleanup Task&quot; via Discord C2">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 9: Start "Cleanup Task" via Discord C2            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 9: Start "Cleanup Task" via Discord C2</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>This task was configured to run every day at 04:01 pm normally and the action was to run „C:\Programdata\silverlight\slllauncher.exe 1 debug“.</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.23.04.png" width="784" height="178" alt="" title="Figure 10: “Cleanup Task” sheduled task">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 10: “Cleanup Task” sheduled task            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 10: “Cleanup Task” sheduled task</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The Silverlight launcher binary, however was valid and signed by Microsoft. But the same directory also contained a Dynamic Link Library (DLL) named <em>version.dll</em> and a file named<em> sll</em> as well as<em> sllpackages.dpkg</em> with different time stamps:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/11_Figure.png" width="448" height="216" alt="" title="Figure 11: Silverlight directory">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 11: Silverlight directory            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 11: Silverlight directory</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p><em>Sllpackages.dpkg</em> was a registry file, which looked like the following:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.26.38.png" width="693" height="139" alt="" title="Figure 12: Sllpackages.dpkg registry file HKCU\Software\Microsoft\VisualStudio\Licence">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 12: Sllpackages.dpkg registry file HKCU\Software\Microsoft\VisualStudio\Licence            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 12: Sllpackages.dpkg registry file HKCU\Software\Microsoft\VisualStudio\Licence</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>By extracting the hex values from the registry file to analyse the content, we saw that the resulting content was a <a href="https://breakingsecurity.net/remcos/%20" target="_blank" rel="noopener">Remcos</a> stager:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.28.15.png" width="712" height="172" alt="" title="Figure 5: Accessible Channels">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 5: Accessible Channels            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 5: Accessible Channels</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>Both files can be found on VirusTotal and had only one detection in February 2022 / December 2021 when first being uploaded::</p>
+<ul>
+<li><a href="https://www.virustotal.com/gui/file/c228ec03d28aed34b0bbead2095ddc65f400c5dd015b83985b484fa9dfb1bfe7">https://www.virustotal.com/gui/file/c228ec03d28aed34b0bbead2095ddc65f400c5dd015b83985b484fa9dfb1bfe7</a></li>
+<li><a href="https://www.virustotal.com/gui/file/4e107639627eb8ac000590818168c69afde49d735794f2f809e82da93a5e5bf3/detection">https://www.virustotal.com/gui/file/4e107639627eb8ac000590818168c69afde49d735794f2f809e82da93a5e5bf3/detection</a></li>
+</ul>
+<p>We identified, that <em>version.dll</em> was loaded by Silverlight on application start, so the attackers were using <a href="https://attack.mitre.org/techniques/T1574/002/">DLL Side-Loading</a> here to avoid potential detections:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.41.24.png" width="561" height="217" alt="" title="Figure 13: version.dll Sideloading">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 13: version.dll Sideloading            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 13: version.dll Sideloading</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>In the background, <em>version.dll</em> did retrieve the Remcos stager from the registry and executed it from memory. By separating the Payload into the Registry, the attacker was able to even gain less detections for<em> version.dll</em>, as it’s execution never results in a working Remcos stager when being analysed alone.</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.43.17.png" width="568" height="323" alt="" title="Figure 14: Remcos Execution verified via memory analysis">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 14: Remcos Execution verified via memory analysis            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 14: Remcos Execution verified via memory analysis</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>As an additional Indicator of Compromise (IoC), the following registry key was created after execution:<br><em>HKEY_CURRENT_USER\SOFTWARE\MOZILLASYNC2-FHG6DC\LICENCE</em><br>The RemCos Teamserver had the IP-Address 87.98.236.198 and was using the port 49650 for initial connections. It was not using HTTP but encrypted TCP for C2-Execution and was still active in June 2022:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.45.01.png" width="515" height="454" alt="" title="Figure 15: Remcos C2-Server Network traffic">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 15: Remcos C2-Server Network traffic            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 15: Remcos C2-Server Network traffic</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>In comparison to the Discord C2, this Framework also has advanced capabilities like for example network tunneling.<br>Going through the Discord C2 messages, we were able to find one attacker command regarding to the <em>sll</em> file:<br><em>!shell 7za x -aoa -pzSDcvGHnm -t7z sll</em><br>So this file basically was a 7z archive with the password „zSDcvGHnm“. Extracting the content resulted in an „older“ version.dll file, which was already detected by multiple vendors:<br><a href="https://www.virustotal.com/gui/file/831176db71ccedd14a55bdbe1d5d0c504bd492cf291ba71d591ed3a1473ae4df" target="_blank" rel="noopener">https://www.virustotal.com/gui/file/831176db71ccedd14a55bdbe1d5d0c504bd492cf291ba71d591ed3a1473ae4df</a><br>As the first submission for this older file was already done in August 2021, this attacker or group was using the same persistence technique already before in other environments. They only replaced the malicious payload with the time. We guess, that the attacker replaced this older version.dll at some point due to the AV vendor detections.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="assessment">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="remocs">
+<h2>3. Remcos is not enough</h2>
+<div class="ce_text__content">
+<p>We knew, that the attacker was using two different C2-Frameworks with persistence for each on the compromised system till now. Shouldn’t that be enough? Seams, that the attackers didn’t think so. In our initial search for persistence, we skipped legit signed binaries. Obviously a mistake, as the attacker was using legit binaries with valid certificates from trusted publishers to load his malware (e.g. the Silverlight launcher) via Sideloading technique. Going through the scheduled tasks again – including signed binaries – resulted in one more interesting finding:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.50.45.png" width="788" height="97" alt="" title="Figure 16: McAfee Inc mcinsupd.exe sheduled Task">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 16: McAfee Inc mcinsupd.exe sheduled Task            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 16: McAfee Inc mcinsupd.exe sheduled Task</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>There was another signed binary from McAfee in the directory <em>C:\windows\ named mcinsupd.exe.</em> This executable was started every single hour. So another potential Sideloading persistence? The directory also included files named <em>f.dll</em> and <em>mytilus3.dll</em> with the same timestamp. And it turned out, that these DLL’s were loaded by the McAfee binaries via Sideloading again:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.52.10.png" width="480" height="235" alt="" title="Figure 17: Sandbox loading mytilus3.dll via mcinsupd.exe">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 17: Sandbox loading mytilus3.dll via mcinsupd.exe            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 17: Sandbox loading mytilus3.dll via mcinsupd.exe</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>This DLL in the first place spawned a new <em>nslookup.exe</em> process and injected shellcode into it:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2011.54.04.png" width="632" height="187" alt="" title="Figure 18:Spawn nslookup.exe and inject Shellcode">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 18:Spawn nslookup.exe and inject Shellcode            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 18:Spawn nslookup.exe and inject Shellcode</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The injected shellcode permissions were not cleaned up and the C2 itself was not using any sleep obfuscation, so it was easy to find and extract the shellcode:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.11.51.png" width="640" height="298" alt="" title="Figure 19: Remcos Shellcode from nslookup.exe">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 19: Remcos Shellcode from nslookup.exe            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 19: Remcos Shellcode from nslookup.exe</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>For those, who are interested, the dumped shellcode sections can be found here:<br><a href="https://www.virustotal.com/gui/file/10f71216f94812cdb57288e52d1d7d9753a804ac1a5952711d447e055e4c234a" target="_blank" rel="noopener">https://www.virustotal.com/gui/file/10f71216f94812cdb57288e52d1d7d9753a804ac1a5952711d447e055e4c234a</a><a href="https://secure-web.cisco.com/19YmPVErKJKWdVP3G3EHIiFRTxh5PE1rYc0HCMJqMpxZfHQbpQriATn97Chm-xQcU9gWQzh3_JKGG_z_JtUc9h2d-Yi-_I4-K2x_4GHjw6JVi8sqCICGGkXWmYsvwcHcKNgzeM0Pe0-ddxqSYPfCqrT8dYL0lBuF9hQbizAQn0cpf8AB2RPbRVkJNOiam7YMXQToq73URDEue9anq_qyh0T2kaVqLSQaGC13sXpxkNYyAbOjD95zlkdyNDnZr0enmGGKv4HKKKYzflpThYU8PTZRs8xMyxfRrpvc1qkW7sEWuNdJrqu999-qg_tS_8VtqaJMCS6da2UsZOSMRt3x_T9tv9U_CPbAsW6bBaO6mb04/https%3A%2F%2Fwww.virustotal.com%2Fgui%2Ffile%2F464ea09b9d8a160564807216ff78815a3b6a508118ea510c1b3d9177b9155438">https://secure-web.cisco.com/19YmPVErKJKWdVP3G3EHIiFRTxh5PE1rYc0HCMJqMpxZfHQbpQriATn97Chm-xQcU9gWQzh3_JKGG_z_JtUc9h2d-Yi-_I4-K2x_4GHjw6JVi8sqCICGGkXWmYsvwcHcKNgzeM0Pe0-ddxqSYPfCqrT8dYL0lBuF9hQbizAQn0cpf8AB2RPbRVkJNOiam7YMXQToq73URDEue9anq_qyh0T2kaVqLSQaGC13sXpxkNYyAbOjD95zlkdyNDnZr0enmGGKv4HKKKYzflpThYU8PTZRs8xMyxfRrpvc1qkW7sEWuNdJrqu999-qg_tS_8VtqaJMCS6da2UsZOSMRt3x_T9tv9U_CPbAsW6bBaO6mb04/https%3A%2F%2Fwww.virustotal.com%2Fgui%2Ffile%2F464ea09b9d8a160564807216ff78815a3b6a508118ea510c1b3d9177b9155438</a></p>
+<p>The second section contained <a href="https://github.com/TheWover/donut" target="_blank" rel="noopener">Donut</a> generated Shellcode, which loads a Cobalt Strike Beacon into a newly spawned Choice.exe process. Via <a href="https://github.com/CCob/BeaconEye" target="_blank" rel="noopener">BeaconEye</a> , we were able to extract the Beacon configuration of the attackers C2-System:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.13.51.png" width="574" height="359" alt="" title="Figure 20: Beacon configuration dumped from memory via BeaconEye">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 20: Beacon configuration dumped from memory via BeaconEye            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 20: Beacon configuration dumped from memory via BeaconEye</figcaption>
+</figure>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.15.01.png" width="446" height="233" alt="" title="Figure 21: Beacon configuration II">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 21: Beacon configuration II            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 21: Beacon configuration II</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The C2-Server was using the domain <em>adsense.servehttp.com</em> Port 8080 in this case. As the system was already offline, we were unfortunately not able to live monitor the attacker commands here.<br>For this DLL-Sideloading vector, the attacker again used another persistence path and created sheduled tasks for more binaries located under <em>C:\mingw64\bin\:</em></p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/22_Figure.png" width="358" height="208" alt="" title="Figure 22: More persistence binaries">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 22: More persistence binaries            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 22: More persistence binaries</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The attacker also uploaded <a href="https://github.com/optiv/ScareCrow" target="_blank" rel="noopener">ScareCrow</a> generated DLL’s for new Command &amp; Control connections, for example the following:<br><a href="https://www.virustotal.com/gui/file/30e4cfca8250cf3b5a2fb442e1d562eb9a5951190d2f4dee4b8fd54158559ae8" target="_blank" rel="noopener">https://www.virustotal.com/gui/file/30e4cfca8250cf3b5a2fb442e1d562eb9a5951190d2f4dee4b8fd54158559ae8</a><br>This looked like a reverse VNC tunnel to us, as the following connections were opened up:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.18.21.png" width="784" height="48" alt="" title="Figure 23: VNC Connection to skynet-corporation.myvnc.com">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 23: VNC Connection to skynet-corporation.myvnc.com            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 23: VNC Connection to skynet-corporation.myvnc.com</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="assessment">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="initialaccess">
+<h2>4. Initial Access</h2>
+<div class="ce_text__content">
+<p>Going through the Browser history and Download folder revealed, that a „MultiRDP“ Repository was downloaded this day at 16:00 pm.</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/25_Figure.png" width="280" height="310" alt="" title="Figure 24: MultiRDP Github Repository">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 24: MultiRDP Github Repository            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 24: MultiRDP Github Repository</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The .csproj file was backdoored, so that a VBScript named MultiRDP.suo was executed when opening the Visual Studio Solution file and compiling the solution (pre-build and post-built execution):</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.31.28.png" width="703" height="255" alt="" title="Figure 25: VBScript execution via .csproj File">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 25: VBScript execution via .csproj File            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 25: VBScript execution via .csproj File</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>This script contained an encoded Powershell oneliner to download the Silverlight executable and DLL for the initial RemCos C2-Stager:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.33.12.png" width="723" height="101" alt="" title="Figure 26: Powershell oneliner">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 26: Powershell oneliner            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 26: Powershell oneliner</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The decoded Powershell Script looked like this:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.34.49.png" width="789" height="282" alt="" title="Figure 27: Decoded Powershell Script">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 27: Decoded Powershell Script            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 27: Decoded Powershell Script</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>The attacker therefore initially worked over RemCos C2 and after some time deployed further persistence binaries for Discord C2 as well as Cobalt Strike. The fact, that the RemCos stager was triggered multiple times over the Discord C2 leads to the assumption, that different C2’s were just used to maintain access in case a payload gets detected. <br>To ensure, that one does not fall victim to such an attack, untrusted code from Github repositories should never be executed. A check of the source code, as well as the .sln and .csproj files and all other executables should be performed before even thinking about execution.</p>            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mod_article color-Schwarz Kein Abstand - 0px bg- block" id="assessment">
+<div class="container container__article">
+<div class="row">
+<div class="ce_text Mittel - 60px bg-  block" id="attackeractions">
+<h2>5. Attacker actions &amp; Motivation</h2>
+<div class="ce_text__content">
+<p>As this attacker was using Github Repositories with backdoored .csproj files for initial access, anyone could be victim to this Incident who blindly downloaded and ran untrustworthy Github Repositories. Our findings indicate, that this attacker wanted to either compromise Malware developers or any other Offensive Security related people.<br><br>The attacker either used multiple C2-Connections, because the access to the victims was shared with other people or to maintain access if one of his techniques gets detected by the local Antivirus. At least one message in the general channel of the Discord server indicates, that the C2-connections was later indeed shared:</p>            </div>
+</div><div class="ce_image Gering - 30px bg-  block">
+<figure class="image_container">
+<div style="position:relative;overflow:hidden;">
+<img src="files/content/img/News%2BEvents/Blog_When_Hackers_Hack/Bildschirmfoto%202023-02-27%20um%2014.39.02.png" width="292" height="210" alt="" title="Figure 29: resu „Thanks“ someone for getting access to the channel">
+<div class="c-image-container__copyright-layer js-copyright-close">
+<div class="c-image-container__copyright-layer-close">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+<path fill="#ffffff" fill-rule="evenodd" d="M16.6892426,0.311014057 C16.2748994,-0.103671352 15.6099753,-0.103671352 15.195241,0.311014057 L8.49995112,7.00551465 L1.8051501,0.311014057 C1.39031804,-0.103671352 0.725491718,-0.103671352 0.311050725,0.311014057 C-0.103683575,0.725406195 -0.103683575,1.39015414 0.311050725,1.80493731 L7.00634058,8.49894911 L0.311050725,15.1934497 C-0.103683575,15.6081351 -0.103683575,16.2729808 0.311050725,16.6872752 C0.514213826,16.8908054 0.788063607,17 1.05428744,17 C1.3201202,17 1.59387221,16.8984304 1.79713308,16.6872752 L8.49232517,9.99287236 L15.187615,16.6872752 C15.3907781,16.8908054 15.6646279,17 15.9303629,17 C16.2042127,17 16.4704365,16.8984304 16.6735996,16.6872752 C17.0883339,16.2729808 17.0883339,15.6081351 16.6735996,15.1934497 L9.99405049,8.49894911 L16.6892426,1.80493731 C17.1035858,1.39015414 17.1035858,0.725406195 16.6892426,0.311014057"></path>
+</svg>
+</div>© Figure 29: resu „Thanks“ someone for getting access to the channel            </div>
+<a href="#" class="c-image-container__copyright-link js-copyright-open" title="Copyright Informationen anzeigen" tabindex="0"><i class="icon-Copyright"></i></a>
+</div>
+<figcaption class="caption">Figure 29: resu „Thanks“ someone for getting access to the channel</figcaption>
+</figure>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>While going through the Discord Server messages, we could check several commands executed by this attacker. The first thing that has attracted our attention is, that screenshots were made on all systems to get an overview about what the victims are doing. Most victims had Visual Studio, Visual Studio Code or other development platforms open. Over all victim systems we could only identify one or two potential domain joined systems. Most victim systems were standalone Windows OS’s. The systems found were from all over the world, it seemed that no specific country or region was targeted. After all, this fits in very well with the initial access technique chosen.<br>Whenever the attacker saw some interesting code or project, he downloaded the source via the Discord C2 or established a Remcos C2-Connection for (we guess) better/faster exfiltration of data.<br>We also saw some potentially shady commercial Command &amp; Control developers being compromised. Those Command &amp; Control developers didn’t provide any names or company information for their products and also sell their software via cryptocurrency. Exactly these Command &amp; Control Frameworks got leaked on Hacking forums in the exact time-frame of our investigation. This indicates, that our attacker from this Incident was the one stealing the source code and publishing it on Hacking forums or at least exchanging or selling it to other parties.<br>Accordingly, our attacker did not aim to compromise company networks or demand payments via ransomware. Long-term persistence, as well as tapping source code or licenses, seems to be the main objective here.<br>We communicated all IoCs and information we had to the German cybercrime Authorities several months ago and were waiting for their final go for the publication. As their investigation is finished, the information is now published.</p>            </div>
+</div>
+<h2 class="col-lg-12   Mittel - 60px ce_headline" id="IoClist">
+6. IoC List</h2>
+<div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<table style="font-weight: 400;" width="685">
+<tbody>
+<tr>
+<td width="352">
+<p><strong>Keyword</strong></p>
+</td>
+<td width="333">
+<p><strong>Description</strong></p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>schtasks /run /tn "Microsoft\Windows\Tasks\Optimiser</p>
+</td>
+<td width="333">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>schtasks /run /tn "cleanup task"</p>
+</td>
+<td width="333">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>schtasks /run /tn "Github\CrashReporter"</p>
+</td>
+<td width="333">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>schtasks /run /tn "Windows\EdgeUpdater"</p>
+</td>
+<td width="333">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>937040926939942982/948207270624395295</p>
+</td>
+<td width="333">
+<p>Discord Server Channel ID</p>
+</td>
+</tr>
+<tr>
+<td width="352">
+<p>HKEY_CURRENT_USER\SOFTWARE\MOZILLASYNC2-FHG6DC</p>
+</td>
+<td width="333">
+<p>New entry "Licence" with the value 8310E7DD6A51445D4232221B990EF746</p>
+</td>
+</tr>
+</tbody>
+</table>            </div>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<table style="font-weight: 400;" width="877">
+<tbody>
+<tr>
+<td width="175">
+<p><strong>IP-Address</strong></p>
+</td>
+<td width="175">
+<p><strong>Hostname / Domain</strong></p>
+</td>
+<td width="528">
+<p><strong>Description</strong></p>
+</td>
+</tr>
+<tr>
+<td width="175">&nbsp;</td>
+<td width="175">
+<p>adsense.servehttp.com</p>
+</td>
+<td width="528">
+<p>Cobalt Strike C2 Domain</p>
+</td>
+</tr>
+<tr>
+<td width="175">
+<p>87.98.236.198</p>
+</td>
+<td width="175">&nbsp;</td>
+<td width="528">
+<p>Remcos C2-Server</p>
+</td>
+</tr>
+<tr>
+<td width="175">
+<p>51.68.203.106</p>
+</td>
+<td width="175">
+<p>nuget.servehttp.com</p>
+</td>
+<td width="528">
+<p>Silverlight Download Webserver</p>
+</td>
+</tr>
+</tbody>
+</table>            </div>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<table style="font-weight: 400;" width="662">
+<tbody>
+<tr>
+<td width="163">
+<p><strong>Filename</strong></p>
+</td>
+<td width="498">
+<p><strong>SHA256 Hash</strong></p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>Updater.exe</p>
+</td>
+<td width="498">
+<p>f68540f89ad95599ebcf673508a2d4fc3d093551581fd058902f7ddf80264498</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>GithubCrashReporter.exe</p>
+</td>
+<td width="498">
+<p>5e4f72ec6d5583c04075f237c8372dd65d7f191f9095aff050cb0ce71f43a3d7</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>version.dll</p>
+</td>
+<td width="498">
+<p>831176db71ccedd14a55bdbe1d5d0c504bd492cf291ba71d591ed3a1473ae4df</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>version.dll</p>
+</td>
+<td width="498">
+<p>c228ec03d28aed34b0bbead2095ddc65f400c5dd015b83985b484fa9dfb1bfe7</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>mytilus3.dll</p>
+</td>
+<td width="498">
+<p>e8f39d441cddf846ddc53bff93ee9ac7ab47454652a723512a5f5ad0e55cfae6</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>f.dll</p>
+</td>
+<td width="498">
+<p>2b6786146ed2af06eb3f70dc0d55c0930deb2d5ce450cc984ecc48cdd0820914</p>
+</td>
+</tr>
+<tr>
+<td width="163">
+<p>UrlMon3.dll</p>
+</td>
+<td width="498">
+<p>30e4cfca8250cf3b5a2fb442e1d562eb9a5951190d2f4dee4b8fd54158559ae8</p>
+</td>
+</tr>
+</tbody>
+</table>            </div>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<table style="font-weight: 400;" width="330">
+<tbody>
+<tr>
+<td width="330">
+<p><strong>PataNahi Discord Server Users</strong></p>
+</td>
+</tr>
+<tr>
+<td width="330">
+<p>Resu#4893</p>
+</td>
+</tr>
+<tr>
+<td width="330">
+<p>Eflags#0932</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>            </div>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<p>More Sheduled Task commands over all agents:</p>            </div>
+</div><div class="ce_text Mittel - 60px bg-  block">
+<div class="ce_text__content">
+<table style="font-weight: 400;">
+<tbody>
+<tr>
+<td width="340">
+<p><strong>Keyword</strong></p>
+</td>
+<td width="264">
+<p><strong>Description</strong></p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "cleanup task"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Network\URLMoniker"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "pegasus licence"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Debug\Helper\Service" /sc hourly /rl highest /tr "C:\windows\system32\dbghelp.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Graphics\Driver" /sc onlogon /ru system /tr "C:\windows\system\intelgfxdrv.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Networking\URLMoniker" /sc hourly /rl highest /tr "c:\windows\system32\rundll32.exe c:\windows\system32\urlmon3.dll,Run"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Network\URLMoniker" /sc hourly /ru productionbox /rl highest /tr "c:\windows\system32\rundll32.exe c:\windows\system32\urlmon3.dll,Run"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Silverlight\PreLoader" /sc hourly /rl highest /tr "c:\windows\system32\silverlight\sllauncher.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\Sync\PhoneSync" /sc hourly /rl highest /tr "c:\windows\system\mobsynq.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Microsoft\Windows\VPN\Service" /sc hourly /rl highest /tr "C:\users\dd\AppData\Local\StrongVPN\svchost.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Unity Framework\Helpers\Debug" /sc hourly /tr "c:\users\nabasoki\appdata\roaming\unity\dbghelp.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Windows\.NetRuntime\BrokerService" /sc hourly /tr "C:\python27\runtimebroker.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /f /tn "Windows\Silverlight\Prefetch" /sc hourly /tr "c:\programdata\silverlight\sllauncher.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /tn "Microsoft\Windows\Debug\Helper" /sc hourly /rl highest /tr "C:\windows\system32\dbghelp.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /tn "Microsoft\Windows\Debug\Helper\Service" /sc hourly /rl highest /tr "C:\windows\system32\dbghelp.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /tn "Microsoft\Windows\Networking\URLMoniker" /sc hourly /rl highest /tr "c:\windows\system32\rundll32.exe c:\windows\system32\urlmon3.dll,Run"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /create /tn "Unity Framework\Helpers\Debug" /sc hourly /tr "c:\users\nabasoki\appdata\roaming\unity\dbghelp.exe"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /delete /f /tn "microsoft\windows\networking\urlmoniker"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /query /v /tn "Google\CrashHandler\HandlerService"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /query /v /tn "Microsoft\Windows\Debug\Helper"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn&nbsp; "cleanup task"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "cleanup task"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Google\CrashHandler\HandlerService"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Debug\Helper"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Debug\Helper\Service"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Graphics\Driver"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Networking\URLMoniker"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Silverlight\PreLoader"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Sync\PhoneSync"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Microsoft\Windows\Tasks\Optimiser"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "microsoft\windows\termsrv\graphics"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "pegasus licence"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Unity Framework\Helpers\Debug"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+<tr>
+<td width="340">
+<p>schtasks /run /tn "Windows\Silverlight\Prefetch"</p>
+</td>
+<td width="264">
+<p>Scheduled Task</p>
+</td>
+</tr>
+</tbody>
+</table>            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<footer id="footer" class="footer no_contact">
+<div class="container">
+<div class="row clearfix">
+<div class="footer-top clearfix">
+<div class="ce_hyperlink toplink  bg-  block">
+<a title="Nach oben" href="#" data-hash="#" class="hyperlink_txt sprungmarke "><span>Nach oben</span></a>
+</div>
+</div>
+<div class="footer-middle clearfix">
+<section class="ce_colsetStart subcolumns colcount_2 yaml3 col-50x50">
+<div class="c50l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<section class="ce_colsetStart subcolumns colcount_3 yaml3 col-33x33x33">
+<div class="c33l col_1 first">
+<div class="subcl" style="padding-right:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>r-tec IT Security GmbH<br><a style="color: #fff;" href="mailto:info@r-tec.net">info@r-tec.net</a></p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33l col_2">
+<div class="subc" style="padding-right:0px;padding-left:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p><a href="tel:+4920231767100">tel +49 (0) 202 31767–100</a><br>fax +49 (0) 202 31767–199</p>            </div>
+</div>
+</div>
+</div>
+<div class="ce_colsetPart c33r col_3 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>Hatzfelder Str. 165-167<br>D-42281 Wuppertal</p>            </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+</div>
+</div>
+<div class="ce_colsetPart c50r col_2 last">
+<div class="subcr" style="padding-left:0px;">
+<div class="ce_hyperlink xing Kein Abstand - 0px bg-  block">
+<a title="Xing" href="https://www.xing.com/company/r-tec-it-security" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Xing</span></a>
+</div><div class="ce_hyperlink fb Kein Abstand - 0px bg-  block">
+<a title="Facebook" href="https://www.facebook.com/rtec.IT.Systeme.GmbH/" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Facebook</span></a>
+</div><div class="ce_hyperlink kununu Kein Abstand - 0px bg-  block">
+<a title="Kununu" href="https://www.kununu.com/de/r-tec-it-systeme1" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Kununu</span></a>
+</div><div class="ce_hyperlink linkedin Kein Abstand - 0px bg-  block">
+<a title="Linkedin" href="https://www.linkedin.com/company/r-tec-it-security-gmbh" class="hyperlink_txt externer " target="_blank" rel="noreferrer noopener"><span>Linkedin</span></a>
+</div>
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+<section class="ce_colsetStart subcolumns colcount_4 yaml3 col-25x25x25x25">
+<div class="c25l col_1 first">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25l col_2">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25l col_3">
+<div class="">
+</div>
+</div>
+<div class="ce_colsetPart c25r col_4 last">
+<div class="">
+</div>
+</div>
+</section>
+<!-- Spaltenset End //-->
+<div class="ce_text din Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>ISO 27001 &amp; ISO 9001 zertifiziert<br>Zertifizierter APT-Response-Dienstleister</p>            </div>
+</div>
+</div>
+<div class="footer-bottom clearfix">
+<div class="ce_text Kein Abstand - 0px bg-  block">
+<div class="ce_text__content">
+<p>© 2024 r-tec IT Security GmbH – Alle Rechte vorbehalten</p>            </div>
+</div>
+<!-- indexer::stop -->
+<nav class="mod_customnav block">
+<a href="r-tec-blog-when-hackers-hack-the-hackers.html#skipNavigation3" class="invisible">Navigation überspringen</a>
+<ul class="level_1">
+<li class="first"><a href="impressum.html" title="Impressum" class="first" itemprop="url"><span itemprop="name">Impressum</span></a></li>
+<li class="last"><a href="datenschutz.html" title="Datenschutz" class="last" itemprop="url"><span itemprop="name">Datenschutz</span></a></li>
+</ul>
+<span id="skipNavigation3" class="invisible"></span>
+</nav>
+<!-- indexer::continue -->
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script type="text/javascript">(function(){if(navigator.cookieEnabled)return;var e=document.querySelectorAll('input[name="REQUEST_TOKEN"]'),t,c,i;for(i=0;i<e.length;i++){c=e[i].parentNode;if('formbody'!==c.className)return;t=document.createElement('p');t.className='error nocookie';t.innerHTML='Sie werden dieses Formular nicht absenden können, da Sie Cookies in Ihrem Browser deaktiviert haben.';c.insertBefore(t,c.firstChild)}})()</script>
+<script type="application/ld+json">
+{
+    "@context": "https:\/\/schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage"
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "home.html",
+                        "name": "r-tec"
+                    },
+                    "position": 1
+                },
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "news-events.html",
+                        "name": "Aktuelles"
+                    },
+                    "position": 2
+                },
+                {
+                    "@type": "ListItem",
+                    "item": {
+                        "@id": "r-tec-blog-when-hackers-hack-the-hackers.html",
+                        "name": "r-tec Blog | When Hackers hack the Hackers"
+                    },
+                    "position": 3
+                }
+            ]
+        }
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https:\/\/schema.contao.org",
+    "@graph": [
+        {
+            "@type": "Page",
+            "fePreview": false,
+            "groups": [],
+            "noSearch": false,
+            "pageId": 346,
+            "protected": false,
+            "title": "When Hackers hack the Hackers"
+        }
+    ]
+}
+</script>
+<script data-cookieconsent="ignore" src="files/layout/js/build.js?1713253373"></script>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MX8FNS6" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<img id="CookiebotSessionPixel" src="https://imgsct.cookiebot.com/1.gif?dgi=8999b058-10c6-403f-96c7-a163e2a3a5e3" alt="Cookiebot session tracker icon loaded" data-cookieconsent="ignore" style="display: none;"><iframe style="display: none; position: absolute; width: 1px; height: 1px; top: -9999px;" name="__uspapiLocator" tabindex="-1" role="presentation" aria-hidden="true" title="Blank"></iframe><iframe style="position: absolute; width: 1px; height: 1px; top: -9999px;" tabindex="-1" role="presentation" aria-hidden="true" title="Blank" src="https://consentcdn.cookiebot.com/sdk/bc-v4.min.html"></iframe><script type="text/javascript" id="">(function(){var h=18E5,f="dataLayer",l=window[f].push,p=google_tag_manager["rm"]["30695109"](5),m=function(){for(var a=[],c=0,d=window[f].length;c<d;c++)a.push(window[f][c]);return a},n=function(a){if(!a||"object"!==typeof a||a.nodeType||a===a.window)return!1;try{if(a.constructor&&!a.hasOwnProperty("constructor")&&!a.constructor.prototype.hasOwnProperty("isPrototypeOf"))return!1}catch(d){return!1}for(var c in a);return void 0===c||a.hasOwnProperty(c)},g=function(a,c){for(var d in a)if(a.hasOwnProperty(d)){var e=a[d];
+Array.isArray(e)?(Array.isArray(c[d])||(c[d]=[]),g(e,c[d])):n(e)?(n(c[d])||(c[d]={}),g(e,c[d])):c[d]=e}},k=function(){return window.google_tag_manager[p].dataLayer.get({split:function(){return[]}})},b=window._dataLayerHistory=JSON.parse(window.localStorage.getItem("_dataLayerHistory")||"{}");b.reset=function(){b.timeout=(new Date).getTime()+h;b.history=m();for(var a in b.model)b.model.hasOwnProperty(a)&&"get"!==a&&delete b.model[a];g(k(),b.model);window.localStorage.setItem("_dataLayerHistory",JSON.stringify(b))};
+b.timeout||(b.timeout=(new Date).getTime()+h,b.history=[],b.model={});b.history=b.history.concat(m());g(k(),b.model);b.hasOwnProperty("timeout")&&b.timeout<(new Date).getTime()&&b.reset();b.model.get=function(a){var c=b.model;a=a.split(".");for(var d=0;d<a.length;d++){if(void 0===c[a[d]])return;c=c[a[d]]}return c};window.localStorage.setItem("_dataLayerHistory",JSON.stringify(b));window[f].push=function(){try{var a=[].slice.call(arguments,0),c=(new Date).getTime(),d=l.apply(window[f],a),e=window[f],
+q=k();b.hasOwnProperty("timeout")&&b.timeout<(new Date).getTime()&&b.reset();b.history.push(e[e.length-1]);g(q,b.model);b.timeout=c+h;window.localStorage.setItem("_dataLayerHistory",JSON.stringify(b));return d}catch(r){return console.log("Problem interacting with dataLayer history: "+r),a=[].slice.call(arguments,0),d=l.apply(window[f],a)}}})();</script>  <script type="text/javascript" id="">_linkedin_partner_id="1751809";window._linkedin_data_partner_ids=window._linkedin_data_partner_ids||[];window._linkedin_data_partner_ids.push(_linkedin_partner_id);</script><script type="text/javascript" id="">(function(a){a||(window.lintrk=function(c,d){window.lintrk.q.push([c,d])},window.lintrk.q=[]);a=document.getElementsByTagName("script")[0];var b=document.createElement("script");b.type="text/javascript";b.async=!0;b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";a.parentNode.insertBefore(b,a)})(window.lintrk);</script> <noscript> <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=1751809&amp;fmt=gif"> </noscript></body></html>
